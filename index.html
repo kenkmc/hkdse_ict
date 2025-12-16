@@ -1,134 +1,345 @@
-<script>
-var net={p:null,c:null,id:null,h:false}, game={on:false,t:0}, p1, p2, obs=[], sc, cam3d, ren, pose, video;
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高中 ICT 學習資源網</title>
+    <!-- Tailwind CSS 用於快速排版 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8fafc;
+        }
+        .card {
+            transition: all 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* 自定義捲軸 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-slate-800">
 
-function initNet(){
- var id=net.h?Math.floor(1000+Math.random()*9000):'G'+Math.floor(Math.random()*9999);
- if(net.h) net.id=id;
- var pid=net.h?'nr-'+id:id;
- try{
-  net.p=new Peer(pid,{debug:1,config:{'iceServers':[{url:'stun:stun.l.google.com:19302'}]}});
-  net.p.on('open',function(i){
-   if(net.h) document.getElementById('did').innerText=net.id;
-   else if(net.id) conn(net.id);
-  });
-  net.p.on('connection',function(c){
-   if(net.c){c.close();return;} net.c=c; setupC();
-  });
-  net.p.on('error',function(e){alert("PeerErr:"+e.type)});
- }catch(e){alert("PeerJS Init Fail");}
-}
+    <!-- 頂部導航欄 -->
+    <header class="bg-indigo-700 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="monitor-smartphone" class="w-8 h-8"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold tracking-wide">ICT 學習資源網</h1>
+                        <p class="text-indigo-200 text-xs">高中資訊及通訊科技科</p>
+                    </div>
+                </div>
+                
+                <!-- Google 站內搜尋 (針對檔案內容) -->
+                <form action="https://www.google.com/search" method="get" target="_blank" class="flex w-full md:w-auto bg-indigo-800 rounded-lg overflow-hidden border border-indigo-600 focus-within:ring-2 focus-within:ring-white transition">
+                    <!-- 請將下面的 value 改為你的實際網址，例如 site:your-school.edu.hk -->
+                    <input type="hidden" name="sitesearch" value="yoursite.com"> 
+                    <input type="text" name="q" placeholder="Google 內容搜尋..." class="bg-transparent text-white placeholder-indigo-300 px-4 py-2 outline-none w-full md:w-64">
+                    <button type="submit" class="px-4 py-2 bg-indigo-900 hover:bg-indigo-950 transition text-indigo-100">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </header>
 
-window.startH=function(){
- net.h=true;
- document.getElementById('pg1').style.display='none';
- document.getElementById('pg2').style.display='block';
- initNet();
-}
-window.startJ=function(){
- document.getElementById('pg1').style.display='none';
- document.getElementById('pg3').style.display='block';
-}
-window.join=function(){
- var v=document.getElementById('inp').value;
- if(v.length<4)return alert("ID Err");
- net.h=false; net.id=v;
- document.getElementById('pg3').style.display='none';
- document.getElementById('pgLoad').style.display='block';
- initNet();
-}
+    <!-- 主要內容區 -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        
+        <!-- 歡迎與即時篩選區 -->
+        <div class="max-w-4xl mx-auto mb-10 text-center">
+            <h2 class="text-3xl font-bold text-slate-800 mb-4">課程目錄</h2>
+            <p class="text-slate-500 mb-8">選擇下方的單元開始學習，或使用篩選器快速尋找課題。</p>
+            
+            <div class="relative max-w-xl mx-auto">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i data-lucide="filter" class="h-5 w-5 text-gray-400"></i>
+                </div>
+                <input type="text" id="filterInput" 
+                       class="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm shadow-sm transition" 
+                       placeholder="輸入關鍵字篩選課題 (例如: Python, SQL, 網絡...)">
+            </div>
+        </div>
 
-function conn(t){var d='nr-'+t;net.c=net.p.connect(d);setupC();}
-function setupC(){
- net.c.on('open',function(){
-  if(net.h){document.getElementById('pg2').style.display='none';document.getElementById('pgLoad').style.display='block';}
-  setTimeout(function(){
-   document.getElementById('lobby').style.display='none';
-   document.getElementById('ui').style.display='flex';
-   init3D(); initAI();
-  },1500);
- });
- net.c.on('data',function(d){
-  if(p2&&d.t=='u'){p2.l=d.l;p2.s=d.s;if(d.j)p2.jump();if(d.d)p2.die();document.getElementById('s2').innerText=p2.s;}
- });
- net.c.on('close',function(){alert("Closed");location.reload();});
-}
-function send(d){if(net.c&&net.c.open)net.c.send(d);}
+        <!-- 課程列表容器 -->
+        <div id="course-container" class="space-y-12 max-w-6xl mx-auto">
+            <!-- JavaScript 將會把內容填充到這裡 -->
+        </div>
 
-function init3D(){
- sc=new THREE.Scene(); sc.fog=new THREE.FogExp2(0,0.02);
- cam3d=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,100);
- cam3d.position.set(0,4,8); cam3d.lookAt(0,0,-5);
- ren=new THREE.WebGLRenderer({antialias:true}); ren.setSize(innerWidth,innerHeight);
- document.getElementById('c').appendChild(ren.domElement);
- sc.add(new THREE.AmbientLight(0x555));
- var dl=new THREE.DirectionalLight(0xffffff,0.8); dl.position.set(5,10,5); sc.add(dl);
- var gr=new THREE.GridHelper(100,50,0x0ff,0x222); gr.position.z=-20; sc.add(gr);
- var fl=new THREE.Mesh(new THREE.PlaneGeometry(20,100),new THREE.MeshPhongMaterial({color:0x111}));
- fl.rotation.x=-1.57; fl.position.z=-40; sc.add(fl);
- p1=new Pl(0x0ff,0); p2=new Pl(0xf33,4);
- game.on=true; setInterval(spw,1000); loop();
-}
+        <!-- 無結果提示 -->
+        <div id="no-results" class="hidden text-center py-12">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                <i data-lucide="file-question" class="w-8 h-8 text-gray-400"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900">找不到相關課題</h3>
+            <p class="text-gray-500 mt-2">請嘗試使用不同的關鍵字。</p>
+        </div>
 
-class Pl{
- constructor(c,o){
-  this.l=1;this.s=0;this.xs=[-2+o,0+o,2+o];this.dead=false;this.jp=false;this.vy=0;
-  this.g=new THREE.Group();this.g.position.set(this.xs[1],0,0);
-  var m=new THREE.MeshPhongMaterial({color:0x333}),m2=new THREE.MeshBasicMaterial({color:c});
-  this.g.add(new THREE.Mesh(new THREE.BoxGeometry(0.5,0.8,0.3),m)).children[0].position.y=0.8;
-  this.g.add(new THREE.Mesh(new THREE.BoxGeometry(0.3,0.3,0.3),m2)).children[1].position.y=1.4;
-  sc.add(this.g);
- }
- upd(){
-  if(this.dead)return;
-  this.g.position.x+=(this.xs[this.l]-this.g.position.x)*0.2;
-  if(this.jp){
-   this.g.position.y+=this.vy;this.vy-=0.06;
-   if(this.g.position.y<=0){this.g.position.y=0;this.jp=false;}
-  }
- }
- jump(){if(!this.jp&&!this.dead){this.jp=true;this.vy=0.6;}}
- die(){this.dead=true;this.g.rotation.x=-1.5;}
-}
+    </main>
 
-function spw(){
- if(!game.on)return;
- var l=Math.floor(Math.random()*3), c=Math.random()>0.5;
- var m=c?new THREE.Mesh(new THREE.OctahedronGeometry(0.3),new THREE.MeshBasicMaterial({color:0xff0})):new THREE.Mesh(new THREE.BoxGeometry(1.5,1,0.5),new THREE.MeshPhongMaterial({color:0xf00}));
- m.position.set(p1.xs[l],0.5,-60); m.ud={t:c?'c':'w',a:true}; sc.add(m); obs.push(m);
-}
+    <!-- 頁尾 -->
+    <footer class="bg-slate-900 text-slate-400 py-8 mt-auto">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2025 Ku Man chung. All rights reserved.</p>
+            <p class="text-xs mt-2 text-slate-600">Designed for Student Learning.</p>
+        </div>
+    </footer>
 
-function loop(){
- requestAnimationFrame(loop); if(!game.on)return;
- game.t+=0.1; var sp=0.5+(p1.s*0.001);
- p1.upd(); p2.upd();
- for(var i=obs.length-1;i>=0;i--){
-  var o=obs[i]; o.position.z+=sp;
-  if(o.ud.a && Math.abs(o.position.z-p1.g.position.z)<1 && Math.abs(o.position.x-p1.g.position.x)<0.8){
-   if(o.ud.t=='c'){p1.s+=100;o.visible=false;o.ud.a=false;document.getElementById('s1').innerText=p1.s;}
-   else if(!(p1.jp&&p1.g.position.y>0.8)){p1.die();send({t:'u',d:true});alert("Over:"+p1.s);game.on=false;}
-  }
-  if(o.position.z>5){sc.remove(o);obs.splice(i,1);}
- }
- var jf=false; if(p1.jp&&p1.vy>0.5)jf=true;
- send({t:'u',l:p1.l,s:p1.s,j:jf,d:p1.dead});
- ren.render(sc,cam3d);
-}
+    <!-- 核心邏輯腳本 -->
+    <script>
+        /**
+         * =================================================================
+         * 資料管理區 (Data Configuration)
+         * 在這裡新增、修改或刪除課程內容。
+         * 格式: 
+         * {
+         * sectionTitle: "大章節標題",
+         * sectionCode: "章節代號(用於顏色分類等)",
+         * mainLink: "該章節總覽頁面連結 (如 corea.html)",
+         * items: [
+         * { title: "小節標題", file: "連結檔案名稱.html", desc: "簡短描述(選填)" }
+         * ]
+         * }
+         * =================================================================
+         */
+        const courseData = [
+            {
+                sectionTitle: "必修部分 A - 資訊處理",
+                sectionCode: "Core A",
+                mainLink: "corea.html",
+                color: "bg-blue-50 text-blue-700",
+                icon: "cpu",
+                items: [
+                    { title: "i. 資訊處理簡介", file: "cha.1.html", desc: "IPO 模型、數據與資訊" },
+                    { title: "ii. 數據控制和數據組織", file: "cha.2.html", desc: "二進制、字符編碼" },
+                    { title: "iii. 數據表示", file: "cha.3.html", desc: "多媒體數據表示" },
+                    { title: "iv. 試算表", file: "cha.4.html", desc: "Excel 公式與圖表" },
+                    { title: "v. 數據庫", file: "cha.5.html", desc: "Access 基礎操作" }
+                ]
+            },
+            {
+                sectionTitle: "必修部分 B - 電腦系統基礎",
+                sectionCode: "Core B",
+                mainLink: "coreb.html",
+                color: "bg-emerald-50 text-emerald-700",
+                icon: "hard-drive",
+                items: [
+                    { title: "i. 輸入及輸出設備", file: "chb.1.html", desc: "常用 I/O 裝置介紹" },
+                    { title: "ii. 電腦硬件", file: "chb.2.html", desc: "CPU、RAM、儲存裝置" },
+                    { title: "iii. 電腦軟件", file: "chb.3.html", desc: "系統軟件與應用軟件" }
+                ]
+            },
+            {
+                sectionTitle: "必修部分 C - 互聯網及其應用",
+                sectionCode: "Core C",
+                mainLink: "corec.html",
+                color: "bg-cyan-50 text-cyan-700",
+                icon: "globe",
+                items: [
+                    { title: "i. 建網及互聯網基本知識", file: "chc.1.html", desc: "網絡類型、拓撲" },
+                    { title: "ii. 互聯網協定", file: "chc.2.html", desc: "TCP/IP, IP Address" },
+                    { title: "iii. 互網聯服務及應用", file: "chc.3.html", desc: "雲端運算、串流" },
+                    { title: "iv. 初級網頁創作", file: "chc.4.html", desc: "HTML 與 CSS 基礎" },
+                    { title: "v. 網絡安全和私隱威脅", file: "chc.5.html", desc: "惡意軟件、網絡釣魚" },
+                    { title: "vi. 網絡保安措施", file: "chc.6.html", desc: "防火牆、加密技術" }
+                ]
+            },
+            {
+                sectionTitle: "必修部分 D - 計算思維與程式編寫",
+                sectionCode: "Core D",
+                mainLink: "cored.html",
+                color: "bg-amber-50 text-amber-700",
+                icon: "code-2",
+                items: [
+                    { title: "i. 問題建構和分析", file: "chd.1.html", desc: "解難步驟" },
+                    { title: "ii. 算法設計(一)", file: "chd.2.html", desc: "流程圖、偽代碼" },
+                    { title: "iii. 算法設計(二)", file: "chd.3.html", desc: "控制結構" },
+                    { title: "iv. Python 編程入門", file: "chd.4.html", desc: "變數、輸入輸出" },
+                    { title: "v. Python 綜合解難", file: "chd.5.html", desc: "實戰應用" },
+                    { title: "vi. 程式測試和除錯", file: "chd.6.html", desc: "Debug 技巧" }
+                ]
+            },
+            {
+                sectionTitle: "必修部分 E - 資訊及通訊科技對社會的影響",
+                sectionCode: "Core E",
+                mainLink: "coree.html",
+                color: "bg-purple-50 text-purple-700",
+                icon: "users",
+                items: [
+                    { title: "i. 科技創新", file: "che.1.html", desc: "新興科技趨勢" },
+                    { title: "ii. 健康及道德議題", file: "che.2.html", desc: "人體工學、網絡欺凌" },
+                    { title: "iii. 知識產權", file: "che.3.html", desc: "版權、共享創意" }
+                ]
+            },
+            {
+                sectionTitle: "選修部分 A - 數據庫",
+                sectionCode: "Elective A",
+                mainLink: "eleca.html",
+                color: "bg-rose-50 text-rose-700",
+                icon: "database",
+                items: [
+                    { title: "i. 運用SQL 管理數據", file: "eleca.1.html", desc: "SELECT, UPDATE, DELETE" },
+                    { title: "ii. SQL 運算符與函數", file: "eleca.2.html", desc: "WHERE, COUNT, AVG" },
+                    { title: "iii. 數據表之間的SQL操作", file: "eleca.3.html", desc: "JOIN 操作" },
+                    { title: "iv. 關聯式數據庫", file: "eleca.4.html", desc: "Key, Normalization" },
+                    { title: "v. 數據庫設計與實體關係圖", file: "eleca.5.html", desc: "ER Diagram" }
+                ]
+            },
+            {
+                sectionTitle: "選修部分 C - 算法與程式編寫",
+                sectionCode: "Elective C",
+                mainLink: "elecc.html",
+                color: "bg-orange-50 text-orange-700",
+                icon: "terminal",
+                items: [
+                    { title: "i. 算法設計及Python程式基本知識", file: "elecc.1.html", desc: "複習與進階" },
+                    { title: "ii. 程式測試和除錯(二)", file: "elecc.2.html", desc: "白箱與黑箱測試" },
+                    { title: "iii. 進階控制結構", file: "elecc.3.html", desc: "嵌套迴圈" },
+                    { title: "iv. 子程式", file: "elecc.4.html", desc: "Function, Scope" },
+                    { title: "v. 數據結構", file: "elecc.5.html", desc: "Array, List" },
+                    { title: "vi. 檢索及排序", file: "elecc.6.html", desc: "Searching & Sorting" },
+                    { title: "vii. 文字檔案處理", file: "elecc.7.html", desc: "File I/O" },
+                    { title: "viii. 程式編寫在現實生活的應用", file: "elecc.8.html", desc: "專題研習" }
+                ]
+            }
+        ];
 
-async function initAI(){
- pose=new Pose({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/pose/${f}`});
- pose.setOptions({modelComplexity:0}); pose.onResults(onRes);
- video=document.getElementById('cam');
- var c=new Camera(video,{onFrame:async()=>{await pose.send({image:video})},width:320,height:240});
- await c.start();
-}
-var px=0.5,ly=0.5;
-function onRes(r){
- if(!game.on||!r.poseLandmarks)return;
- var lm=r.poseLandmarks; px=px*0.8+lm[0].x*0.2;
- var y=(lm[11].y+lm[12].y)/2, dy=y-ly; ly=y;
- document.getElementById('mk').style.left=((1-px)*100)+'%';
- if(px>0.6)p1.l=0;else if(px<0.4)p1.l=2;else p1.l=1;
- if(dy<-0.015)p1.jump();
-}
-window.onresize=function(){if(cam3d&&ren){cam3d.aspect=innerWidth/innerHeight;cam3d.updateProjectionMatrix();ren.setSize(innerWidth,innerHeight);}}
-</script>
+        /**
+         * =================================================================
+         * 程式邏輯區 (無需修改)
+         * 負責將資料轉換為 HTML 並處理搜尋功能。
+         * =================================================================
+         */
+        
+        const container = document.getElementById('course-container');
+        const filterInput = document.getElementById('filterInput');
+        const noResultsMsg = document.getElementById('no-results');
+
+        // 初始化圖示
+        lucide.createIcons();
+
+        // 渲染課程內容
+        function renderCourses() {
+            container.innerHTML = ''; // 清空
+
+            courseData.forEach((section) => {
+                // 創建區塊容器
+                const sectionEl = document.createElement('div');
+                sectionEl.className = 'course-section'; // 用於搜尋標記
+                
+                // 區塊標題與連結
+                const headerHtml = `
+                    <div class="flex items-center justify-between mb-4 border-b border-gray-200 pb-2">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 rounded-lg ${section.color}">
+                                <i data-lucide="${section.icon}" class="w-6 h-6"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-slate-800">${section.sectionTitle}</h2>
+                        </div>
+                        <a href="${section.mainLink}" class="hidden sm:flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition">
+                            進入總覽頁 <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                        </a>
+                    </div>
+                `;
+
+                // 網格佈局
+                const gridEl = document.createElement('div');
+                gridEl.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5';
+
+                // 生成每個課題卡片
+                section.items.forEach(item => {
+                    const card = document.createElement('a');
+                    card.href = item.file;
+                    card.className = 'card block bg-white border border-gray-200 rounded-xl p-5 hover:border-indigo-300 group relative overflow-hidden';
+                    card.setAttribute('data-search-text', `${section.sectionTitle} ${item.title} ${item.desc || ''}`.toLowerCase());
+                    
+                    card.innerHTML = `
+                        <div class="absolute top-0 left-0 w-1 h-full bg-gray-200 group-hover:bg-indigo-500 transition-colors"></div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-1 group-hover:text-indigo-600 transition-colors">${item.title}</h3>
+                        ${item.desc ? `<p class="text-sm text-slate-500 mb-3">${item.desc}</p>` : ''}
+                        <div class="flex items-center justify-between mt-auto pt-3 border-t border-gray-50">
+                            <span class="text-xs font-mono text-gray-400 bg-gray-50 px-2 py-1 rounded">${item.file}</span>
+                            <i data-lucide="external-link" class="w-4 h-4 text-gray-300 group-hover:text-indigo-500"></i>
+                        </div>
+                    `;
+                    gridEl.appendChild(card);
+                });
+
+                sectionEl.innerHTML = headerHtml;
+                sectionEl.appendChild(gridEl);
+                container.appendChild(sectionEl);
+            });
+
+            // 重新載入圖示
+            lucide.createIcons();
+        }
+
+        // 執行初次渲染
+        renderCourses();
+
+        // 搜尋/篩選功能邏輯
+        filterInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            let hasGlobalResults = false;
+
+            const sections = document.querySelectorAll('.course-section');
+
+            sections.forEach(section => {
+                const cards = section.querySelectorAll('.card');
+                let sectionHasVisibleCards = false;
+
+                cards.forEach(card => {
+                    // 取得卡片上的搜尋關鍵字 (標題 + 描述 + 章節名)
+                    const searchText = card.getAttribute('data-search-text');
+                    
+                    if (searchText.includes(query)) {
+                        card.style.display = 'block'; // 顯示符合的
+                        sectionHasVisibleCards = true;
+                        hasGlobalResults = true;
+                    } else {
+                        card.style.display = 'none'; // 隱藏不符合的
+                    }
+                });
+
+                // 如果該大章節下沒有任何卡片顯示，則隱藏整個章節標題
+                if (sectionHasVisibleCards) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+
+            // 處理無結果顯示
+            if (hasGlobalResults) {
+                noResultsMsg.classList.add('hidden');
+            } else {
+                noResultsMsg.classList.remove('hidden');
+            }
+        });
+
+    </script>
+</body>
+</html>
