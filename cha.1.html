@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1. 資訊處理簡介 - ICT 學習資源網</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f0f9ff; }
+        
+        /* 卡片翻轉特效 */
+        .flip-card { perspective: 1000px; height: 280px; cursor: pointer; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 1rem; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .flip-card-front { background-color: white; color: #1e293b; border: 1px solid #e2e8f0; }
+        .flip-card-back { background-color: #4f46e5; color: white; transform: rotateY(180deg); }
+
+        /* IPO 動畫線條 */
+        @keyframes flowLine {
+            0% { width: 0; opacity: 1; }
+            100% { width: 100%; opacity: 0; }
+        }
+        .flow-line::after {
+            content: ''; position: absolute; top: 50%; left: 0; height: 3px; background: #6366f1;
+            animation: flowLine 2s infinite;
+        }
+
+        /* 模擬 vs 數碼 動畫 */
+        @keyframes wave {
+            0% { d: path("M0,50 Q25,0 50,50 T100,50"); }
+            50% { d: path("M0,50 Q25,100 50,50 T100,50"); }
+            100% { d: path("M0,50 Q25,0 50,50 T100,50"); }
+        }
+        .analog-wave { animation: wave 3s ease-in-out infinite; fill: none; stroke: #3b82f6; stroke-width: 3; }
+        
+        .digital-step { fill: none; stroke: #10b981; stroke-width: 3; stroke-dasharray: 200; animation: dash 3s linear infinite; }
+        @keyframes dash { from { stroke-dashoffset: 200; } to { stroke-dashoffset: 0; } }
+
+        /* 測驗回饋樣式 */
+        .correct-anim { animation: bounce 0.5s; background-color: #dcfce7 !important; border-color: #22c55e !important; }
+        .wrong-anim { animation: shake 0.5s; background-color: #fee2e2 !important; border-color: #ef4444 !important; }
+        @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        
+        /* 多媒體 Tab 樣式 */
+        .media-tab-content { display: none; animation: fadeIn 0.5s; }
+        .media-tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 自定義滑桿樣式 */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <!-- 頂部導航 -->
+    <header class="bg-indigo-700 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <a href="portal.html" class="hover:bg-indigo-600 p-2 rounded-lg transition" title="回首頁">
+                    <i data-lucide="home" class="w-6 h-6"></i>
+                </a>
+                <span class="font-bold text-lg hidden md:block">必修部分 A > 1. 資訊處理簡介</span>
+            </div>
+            
+            <div class="flex gap-3">
+                <button onclick="if(typeof randomStudy === 'function') randomStudy(); else alert('請確保 course_data.js 已連結');" class="flex items-center gap-2 bg-pink-500 hover:bg-pink-600 px-4 py-2 rounded-full font-bold transition shadow-md text-sm">
+                    <i data-lucide="shuffle" class="w-4 h-4"></i> 隨機挑戰
+                </button>
+            </div>
+        </div>
+        <!-- 進度條 -->
+        <div class="h-1 bg-indigo-900 w-full">
+            <div id="progressBar" class="h-full bg-cyan-400 w-0 transition-all duration-300"></div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 max-w-5xl space-y-16">
+
+        <!-- 1.1 資訊系統 Information Systems -->
+        <section id="sec1-1" class="scroll-mt-24">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold text-sm">1.1</span>
+                <h2 class="text-3xl font-bold text-slate-800">資訊系統 (Information Systems)</h2>
+            </div>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-8">
+                <p class="mb-4 text-lg leading-relaxed">
+                    <span class="font-bold text-indigo-700">定義：</span>資訊系統是一個結合了不同部件的系統，用於收集、處理、儲存及分發資訊。
+                </p>
+                <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500 text-sm text-blue-800">
+                    <i data-lucide="info" class="w-4 h-4 inline mr-1"></i>
+                    資訊系統的目標是：<strong>實現流程自動化</strong>、<strong>減少人為錯誤</strong>，並<strong>提升效率</strong>。
+                </div>
+            </div>
+
+            <h3 class="text-xl font-bold text-slate-700 mb-4 ml-2 border-l-4 border-indigo-500 pl-3">資訊系統的四大組成項目</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- A. 系統功能 -->
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front border-t-4 border-t-indigo-500">
+                            <div class="absolute top-4 left-4 bg-indigo-100 text-indigo-700 w-8 h-8 rounded-full flex items-center justify-center font-bold">A</div>
+                            <i data-lucide="settings-2" class="w-12 h-12 text-indigo-500 mb-3"></i>
+                            <h3 class="font-bold text-lg">系統功能<br>(Functions)</h3>
+                            <span class="text-xs text-slate-400 mt-2">翻轉查看詳情</span>
+                        </div>
+                        <div class="flip-card-back bg-indigo-600">
+                            <h4 class="font-bold mb-2">系統功能</h4>
+                            <p class="text-sm">指系統設立的目的和作用。例如：圖書館系統管理借還紀錄。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- B. 數據 -->
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front border-t-4 border-t-amber-500">
+                            <div class="absolute top-4 left-4 bg-amber-100 text-amber-700 w-8 h-8 rounded-full flex items-center justify-center font-bold">B</div>
+                            <i data-lucide="database" class="w-12 h-12 text-amber-500 mb-3"></i>
+                            <h3 class="font-bold text-lg">數據<br>(Data)</h3>
+                        </div>
+                        <div class="flip-card-back bg-amber-600">
+                            <h4 class="font-bold mb-2">數據</h4>
+                            <p class="text-sm">輸入系統的原始事實。例如：分數、條碼。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- C. 科技 -->
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front border-t-4 border-t-blue-500">
+                            <div class="absolute top-4 left-4 bg-blue-100 text-blue-700 w-8 h-8 rounded-full flex items-center justify-center font-bold">C</div>
+                            <i data-lucide="monitor-smartphone" class="w-12 h-12 text-blue-500 mb-3"></i>
+                            <h3 class="font-bold text-lg">科技<br>(Technology)</h3>
+                        </div>
+                        <div class="flip-card-back bg-blue-600">
+                            <h4 class="font-bold mb-2">科技</h4>
+                            <p class="text-sm">包含硬件 (設備) 和軟件 (程式)。它們是支援系統運作的工具。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- D. 流程 -->
+                <div class="flip-card">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front border-t-4 border-t-emerald-500">
+                            <div class="absolute top-4 left-4 bg-emerald-100 text-emerald-700 w-8 h-8 rounded-full flex items-center justify-center font-bold">D</div>
+                            <i data-lucide="git-merge" class="w-12 h-12 text-emerald-500 mb-3"></i>
+                            <h3 class="font-bold text-lg">流程<br>(Processes)</h3>
+                        </div>
+                        <div class="flip-card-back bg-emerald-600">
+                            <h4 class="font-bold mb-2">流程</h4>
+                            <p class="text-sm">系統運作時所遵循的步驟和程序。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1.2 數據和資訊 Data and Information -->
+        <section id="sec1-2" class="scroll-mt-24">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold text-sm">1.2</span>
+                <h2 class="text-3xl font-bold text-slate-800">數據和資訊 (Data and Information)</h2>
+            </div>
+
+            <!-- 數據 vs 資訊 & 訊號 -->
+            <div class="grid lg:grid-cols-2 gap-8 mb-12">
+                <!-- 定義區 -->
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xl font-bold text-blue-900 mb-3 flex items-center gap-2">
+                            <i data-lucide="file-digit" class="w-5 h-5"></i> 數據 (Data)
+                        </h3>
+                        <p class="text-slate-600 text-sm">未經處理的原始事實。本身可能缺乏明確意義。</p>
+                        <div class="bg-slate-50 p-2 mt-2 rounded text-xs text-slate-500 font-mono">例子: 38.5, "Rainy"</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xl font-bold text-indigo-900 mb-3 flex items-center gap-2">
+                            <i data-lucide="lightbulb" class="w-5 h-5"></i> 資訊 (Information)
+                        </h3>
+                        <p class="text-slate-600 text-sm">經過處理、整理後，賦予了意義的數據。有助於決策。</p>
+                        <div class="bg-slate-50 p-2 mt-2 rounded text-xs text-slate-500 font-mono">例子: "發燒 (38.5°C)"</div>
+                    </div>
+                </div>
+
+                <!-- 模擬 vs 數碼訊號 -->
+                <div class="bg-slate-800 text-white rounded-2xl p-6 shadow-lg">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                        <i data-lucide="activity" class="w-5 h-5 text-cyan-400"></i>
+                        訊號類型
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex gap-4 items-center">
+                            <div class="w-16 h-12 bg-slate-900 rounded border border-slate-600 flex items-center justify-center">
+                                <svg viewBox="0 0 50 30" class="w-full h-full p-1"><path d="M0,15 Q12,0 25,15 T50,15" fill="none" stroke="#3b82f6" stroke-width="2"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-blue-400 text-sm">模擬 (Analog)</h4>
+                                <p class="text-xs text-slate-400">連續變化 (如聲波)。易失真。</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 items-center">
+                            <div class="w-16 h-12 bg-slate-900 rounded border border-slate-600 flex items-center justify-center">
+                                <svg viewBox="0 0 50 30" class="w-full h-full p-1"><path d="M0,25 L10,25 L10,5 L20,5 L20,25 L30,25 L30,5 L40,5 L40,25 L50,25" fill="none" stroke="#10b981" stroke-width="2"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-green-400 text-sm">數碼 (Digital)</h4>
+                                <p class="text-xs text-slate-400">離散數值 (0, 1)。不易失真。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 多媒體數據類型 (Multimedia Data Types) -->
+            <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+                <div class="bg-indigo-50 px-6 py-4 border-b border-indigo-100">
+                    <h3 class="text-xl font-bold text-indigo-900 flex items-center gap-2">
+                        <i data-lucide="layers" class="w-6 h-6"></i>
+                        多媒體數據類型 (Multimedia Data Types)
+                    </h3>
+                </div>
+
+                <div class="p-6">
+                    <!-- Tabs -->
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <button onclick="switchMediaTab('text', this)" class="media-tab-btn px-4 py-2 rounded-full text-sm font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition">文本 (Text)</button>
+                        <button onclick="switchMediaTab('image', this)" class="media-tab-btn active px-4 py-2 rounded-full text-sm font-bold bg-indigo-600 text-white transition">圖像 (Image)</button>
+                        <button onclick="switchMediaTab('audio', this)" class="media-tab-btn px-4 py-2 rounded-full text-sm font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition">聲音 (Audio)</button>
+                        <button onclick="switchMediaTab('video', this)" class="media-tab-btn px-4 py-2 rounded-full text-sm font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition">視像 (Video)</button>
+                    </div>
+
+                    <!-- 內容區域 -->
+                    <div id="media-content">
+                        <!-- 1. 文本 -->
+                        <div id="tab-text" class="media-tab-content">
+                            <div class="flex gap-4 items-start">
+                                <div class="bg-indigo-100 p-3 rounded-lg"><i data-lucide="type" class="w-8 h-8 text-indigo-600"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-lg text-slate-800 mb-2">文本 (Text)</h4>
+                                    <p class="text-sm text-slate-600 mb-4">最基本的數據類型。分為兩類：</p>
+                                    <div class="grid md:grid-cols-2 gap-4">
+                                        <div class="border p-3 rounded-lg">
+                                            <span class="font-bold text-indigo-600 block mb-1">純文字 (Plain Text)</span>
+                                            <span class="text-xs text-slate-500">只儲存字符本身，不含樣式。檔案極小。<br>例: .txt</span>
+                                        </div>
+                                        <div class="border p-3 rounded-lg">
+                                            <span class="font-bold text-indigo-600 block mb-1">格式化文本 (Formatted Text)</span>
+                                            <span class="text-xs text-slate-500">包含字型、顏色、粗體等樣式資訊。<br>例: .doc, .html</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. 圖像 (互動版) -->
+                        <div id="tab-image" class="media-tab-content active">
+                            <div class="space-y-6">
+                                <div class="flex gap-4 items-start">
+                                    <div class="bg-pink-100 p-3 rounded-lg"><i data-lucide="image" class="w-8 h-8 text-pink-600"></i></div>
+                                    <div>
+                                        <h4 class="font-bold text-lg text-slate-800 mb-2">圖像 (Image / Graphics) - 互動實驗室</h4>
+                                        <p class="text-sm text-slate-600 mb-2">拖動下方的滑桿，親眼看看放大後的差異！</p>
+                                    </div>
+                                </div>
+
+                                <!-- 互動區域 -->
+                                <div class="bg-slate-50 border border-slate-200 rounded-xl p-6">
+                                    <div class="mb-6">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <label for="zoomSlider" class="text-sm font-bold text-slate-700 flex items-center gap-2">
+                                                <i data-lucide="zoom-in" class="w-4 h-4"></i> 放大倍率 (Zoom)
+                                            </label>
+                                            <span id="zoomValue" class="bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded">1.0x</span>
+                                        </div>
+                                        <input type="range" id="zoomSlider" min="1" max="8" step="0.1" value="1" class="w-full">
+                                        <div class="flex justify-between text-xs text-gray-400 mt-1">
+                                            <span>1x (原圖)</span>
+                                            <span>8x (最大)</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-2 gap-4 h-64 overflow-hidden relative">
+                                        <!-- Bitmap Container -->
+                                        <div class="bg-white border border-gray-300 rounded-lg flex flex-col items-center justify-center overflow-hidden relative group">
+                                            <span class="absolute top-2 left-2 bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-bold px-2 py-1 rounded z-10 shadow-sm">點陣圖 (Bitmap)</span>
+                                            <div class="w-full h-full flex items-center justify-center overflow-hidden">
+                                                 <!-- Canvas: 實際尺寸小 (50px)，顯示尺寸大，image-rendering: pixelated 產生鋸齒 -->
+                                                 <canvas id="bitmapCanvas" width="50" height="50" style="image-rendering: pixelated; width: 100px; height: 100px; transition: transform 0.1s linear;"></canvas>
+                                            </div>
+                                            <div class="absolute bottom-0 w-full bg-red-50 text-red-600 text-xs text-center py-1 opacity-0 group-hover:opacity-100 transition border-t border-red-100">
+                                                放大後失真 (起格)
+                                            </div>
+                                        </div>
+
+                                        <!-- Vector Container -->
+                                        <div class="bg-white border border-gray-300 rounded-lg flex flex-col items-center justify-center overflow-hidden relative group">
+                                            <span class="absolute top-2 left-2 bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-bold px-2 py-1 rounded z-10 shadow-sm">向量圖 (Vector)</span>
+                                            <div class="w-full h-full flex items-center justify-center overflow-hidden">
+                                                <!-- SVG -->
+                                                <svg id="vectorSvg" viewBox="0 0 50 50" width="100" height="100" style="transition: transform 0.1s linear;">
+                                                    <circle cx="25" cy="25" r="20" fill="#db2777" />
+                                                    <text x="25" y="25" text-anchor="middle" dy=".35em" fill="white" font-weight="bold" font-size="20" font-family="Arial">A</text>
+                                                </svg>
+                                            </div>
+                                            <div class="absolute bottom-0 w-full bg-green-50 text-green-600 text-xs text-center py-1 opacity-0 group-hover:opacity-100 transition border-t border-green-100">
+                                                放大後保持平滑
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-4 grid grid-cols-2 gap-4 text-xs text-slate-500">
+                                        <div>
+                                            <span class="font-bold text-slate-700">原理：</span>由像素點 (Pixels) 組成。<br>
+                                            <span class="font-bold text-slate-700">缺點：</span>放大會模糊或起格。<br>
+                                            <span class="font-bold text-slate-700">例子：</span>JPG, PNG (照片)
+                                        </div>
+                                        <div>
+                                            <span class="font-bold text-slate-700">原理：</span>由數學公式定義路徑。<br>
+                                            <span class="font-bold text-slate-700">優點：</span>無限放大不失真。<br>
+                                            <span class="font-bold text-slate-700">例子：</span>SVG, AI (標誌)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. 聲音 -->
+                        <div id="tab-audio" class="media-tab-content">
+                            <div class="flex gap-4 items-start">
+                                <div class="bg-amber-100 p-3 rounded-lg"><i data-lucide="mic" class="w-8 h-8 text-amber-600"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-lg text-slate-800 mb-2">聲音 (Audio)</h4>
+                                    <p class="text-sm text-slate-600 mb-4">將聲波轉換為數碼訊號。主要概念包括：</p>
+                                    <ul class="list-disc list-inside text-sm text-slate-600 space-y-1">
+                                        <li><span class="font-bold">採樣率 (Sampling Rate)</span>：每秒鐘擷取聲音樣本的次數。</li>
+                                        <li>常見格式：<span class="font-mono bg-gray-100 px-1">.mp3</span> (有損壓縮), <span class="font-mono bg-gray-100 px-1">.wav</span> (無損), <span class="font-mono bg-gray-100 px-1">.mid</span> (MIDI 音符)。</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. 視像 -->
+                        <div id="tab-video" class="media-tab-content">
+                            <div class="flex gap-4 items-start">
+                                <div class="bg-cyan-100 p-3 rounded-lg"><i data-lucide="film" class="w-8 h-8 text-cyan-600"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-lg text-slate-800 mb-2">視像 (Video)</h4>
+                                    <p class="text-sm text-slate-600 mb-4">包含圖像和聲音的動態媒體。</p>
+                                    <ul class="list-disc list-inside text-sm text-slate-600 space-y-1">
+                                        <li>由連續播放的靜態圖像（幀 Frame）組成，利用視覺暫留產生動感。</li>
+                                        <li>檔案體積通常最大，需要壓縮技術。</li>
+                                        <li>常見格式：<span class="font-mono bg-gray-100 px-1">.mp4</span>, <span class="font-mono bg-gray-100 px-1">.avi</span>, <span class="font-mono bg-gray-100 px-1">.mov</span>。</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1.3 資訊處理 Information Processing (UPDATED) -->
+        <section id="sec1-3" class="scroll-mt-24">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold text-sm">1.3</span>
+                <h2 class="text-3xl font-bold text-slate-800">資訊處理 (Information Processing)</h2>
+            </div>
+
+            <div class="bg-white p-8 rounded-2xl shadow-lg border-2 border-indigo-100 mb-12">
+                <div class="mb-8">
+                    <p class="text-lg leading-relaxed text-slate-700">
+                        資訊處理是將原始數據轉變為有意義資訊的過程。這個過程通常分為以下 <span class="font-bold text-indigo-700">七個主要階段</span>：
+                    </p>
+                </div>
+
+                <!-- 資訊處理 7 大階段 (Vertical Timeline) -->
+                <div class="relative pl-4 md:pl-8 space-y-8">
+                    <!-- 連接線 -->
+                    <div class="absolute left-8 top-4 bottom-4 w-1 bg-indigo-100 hidden md:block"></div>
+
+                    <!-- 1. 數據收集 -->
+                    <div class="relative flex flex-col md:flex-row gap-6 md:items-center group">
+                        <div class="flex-shrink-0 w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center border-4 border-white shadow-md z-10 group-hover:scale-110 transition">
+                            <i data-lucide="folder-plus" class="w-8 h-8 text-blue-600"></i>
+                        </div>
+                        <div class="flex-grow bg-blue-50 p-5 rounded-xl border border-blue-100 hover:shadow-md transition">
+                            <h4 class="text-lg font-bold text-blue-900 mb-1">1. 數據收集 (Data Collection)</h4>
+                            <p class="text-sm text-slate-600">從不同來源獲取原始數據。</p>
+                            <p class="text-xs text-blue-500 mt-2 font-mono bg-white inline-block px-2 py-1 rounded">例子：問卷調查、感應器讀數、網上表格</p>
+                        </div>
+                    </div>
+
+                    <!-- 2. 數據組織 -->
+                    <div class="relative flex flex-col md:flex-row gap-6 md:items-center group">
+                        <div class="flex-shrink-0 w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center border-4 border-white shadow-md z-10 group-hover:scale-110 transition">
+                            <i data-lucide="library" class="w-8 h-8 text-indigo-600"></i>
+                        </div>
+                        <div class="flex-grow bg-indigo-50 p-5 rounded-xl border border-indigo-100 hover:shadow-md transition">
+                            <h4 class="text-lg font-bold text-indigo-900 mb-1">2. 數據組織 (Data Organization)</h4>
+                            <p class="text-sm text-slate-600">將收集到的數據進行整理、分類或排序，使其有條理。</p>
+                            <p class="text-xs text-indigo-500 mt-2 font-mono bg-white inline-block px-2 py-1 rounded">例子：將問卷數據輸入 Excel 表格</p>
+                        </div>
+                    </div>
+
+                    <!-- 3. 數據儲存 -->
+                    <div class="relative flex flex-col md:flex-row gap-6 md:items-center group">
+                        <div class="flex-shrink-0 w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center border-4 border-white shadow-md z-10 group-hover:scale-110 transition">
+                            <i data-lucide="save" class="w-8 h-8 text-purple-600"></i>
+                        </div>
+                        <div class="flex-grow bg-purple-50 p-5 rounded-xl border border-purple-100 hover:shadow-md transition">
+                            <h4 class="text-lg font-bold text-purple-900 mb-1">3. 數據儲存 (Data Storage)</h4>
+                            <p class="text-sm text-slate-600">將數據保存在儲存媒體中，以供日後使用。</p>
+                            <p class="text-xs text-purple-500 mt-2 font-mono bg-white inline-block px-2 py-1 rounded">例子：儲存在硬碟、USB、雲端伺服器</p>
+                        </div>
+                    </div>
+
+                    <!-- 4. 數據處理 -->
+                    <div class="relative flex flex-col md:flex-row gap-6 md:items-center group">
+                        <div class="flex-shrink-0 w-16 h-16 bg-fuchsia-100 rounded-2xl flex items-center justify-center border-4 border-white shadow-md z-10 group-hover:scale-110 transition">
+                            <i data-lucide="cpu" class="w-8 h-8 text-fuchsia-600"></i>
+                        </div>
+                        <div class="flex-grow bg-fuchsia-50 p-5 rounded-xl border border-fuchsia-100 hover:shadow-md transition">
+                            <h4 class="text-lg font-bold text-fuchsia-900 mb-1">4. 數據處理 (Data Processing)</h4>
+                            <p class="text-sm text-slate-600">對數據進行運算、轉換或修改。</p>
+                            <p class="text-xs text-fuchsia-500 mt-2 font-mono bg-white inline-block px-2 py-1 rounded">例子：計算總分、將圖像轉為黑白</p>
+                        </div>
+                    </div>
+
+                    <!-- 5. 數據分析 -->
+                    <div class="relative flex flex-col md:flex-row gap-6 md:items-center group">
+                        <div class="flex-shrink-0 w-16 h-16 bg-pink-100 rounded-2xl flex items-center justify-center border-4 border-white shadow-md z-10 group-hover:scale-110 transition">
+                            <i data-lucide="bar-chart-3" class="w-8 h-8 text-pink-600"></i>
+                        </div>
+                        <div class="flex-grow bg-pink-50 p-5 rounded-xl border border-pink-100 hover:shadow-md transition">
+                            <h4 class="text-lg font-bold text-pink-900 mb-1">5. 數據分析 (Data Analysis)</h4>
+                            <p class="text-sm text-slate-600">檢視和解釋處理後的數據，以發現模式、趨勢或關係。</p>
+                            <p class="text-xs text-pink-500 mt-2 font-mono bg-white inline-block px-2 py-1 rounded">例子：製作統計圖表、找出最高銷量的產品</p>
+                        </div>
+                    </div>
+
+                    <!-- 6. 數據傳輸 -->
+                    <div class="relative flex flex-col md:flex-row gap-6 md:items-center group">
+                        <div class="flex-shrink-0 w-16 h-16 bg-rose-100 rounded-2xl flex items-center justify-center border-4 border-white shadow-md z-10 group-hover:scale-110 transition">
+                            <i data-lucide="send" class="w-8 h-8 text-rose-600"></i>
+                        </div>
+                        <div class="flex-grow bg-rose-50 p-5 rounded-xl border border-rose-100 hover:shadow-md transition">
+                            <h4 class="text-lg font-bold text-rose-900 mb-1">6. 數據傳輸 (Data Transmission)</h4>
+                            <p class="text-sm text-slate-600">將數據從一個地方傳送到另一個地方。</p>
+                            <p class="text-xs text-rose-500 mt-2 font-mono bg-white inline-block px-2 py-1 rounded">例子：發送電郵、上載檔案、網絡傳輸</p>
+                        </div>
+                    </div>
+
+                    <!-- 7. 數據演示 -->
+                    <div class="relative flex flex-col md:flex-row gap-6 md:items-center group">
+                        <div class="flex-shrink-0 w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center border-4 border-white shadow-md z-10 group-hover:scale-110 transition">
+                            <i data-lucide="presentation" class="w-8 h-8 text-orange-600"></i>
+                        </div>
+                        <div class="flex-grow bg-orange-50 p-5 rounded-xl border border-orange-100 hover:shadow-md transition">
+                            <h4 class="text-lg font-bold text-orange-900 mb-1">7. 數據演示 (Data Presentation)</h4>
+                            <p class="text-sm text-slate-600">以易於理解的方式展示資訊。</p>
+                            <p class="text-xs text-orange-500 mt-2 font-mono bg-white inline-block px-2 py-1 rounded">例子：書面報告、PowerPoint 簡報、網頁展示</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IPO Cycle (作為補充概念保留) -->
+            <div class="bg-slate-50 p-8 rounded-2xl border border-slate-200">
+                <div class="mb-6 flex items-center gap-2">
+                    <i data-lucide="refresh-cw" class="text-slate-500"></i>
+                    <h3 class="text-xl font-bold text-slate-700">相關概念：資訊處理週期 (IPO Cycle)</h3>
+                </div>
+                <p class="text-slate-600 mb-6 text-sm">
+                    雖然資訊處理包含上述七個階段，但在電腦硬件層面，我們常將其簡化為 <span class="font-bold">輸入 (Input)</span>、<span class="font-bold">處理 (Process)</span>、<span class="font-bold">輸出 (Output)</span> 及 <span class="font-bold">儲存 (Storage)</span> 的循環週期。
+                </p>
+
+                <!-- IPO 週期圖解 (Simplified) -->
+                <div class="flex flex-wrap items-center justify-center gap-4 text-center">
+                    <div class="bg-white p-3 rounded-lg border shadow-sm w-24">
+                        <div class="text-blue-600 font-bold mb-1">輸入</div>
+                        <i data-lucide="keyboard" class="mx-auto w-5 h-5 text-gray-400"></i>
+                    </div>
+                    <i data-lucide="arrow-right" class="text-gray-300"></i>
+                    <div class="bg-white p-3 rounded-lg border shadow-sm w-24">
+                        <div class="text-emerald-600 font-bold mb-1">處理</div>
+                        <i data-lucide="cpu" class="mx-auto w-5 h-5 text-gray-400"></i>
+                    </div>
+                    <i data-lucide="arrow-right" class="text-gray-300"></i>
+                    <div class="bg-white p-3 rounded-lg border shadow-sm w-24">
+                        <div class="text-purple-600 font-bold mb-1">輸出</div>
+                        <i data-lucide="monitor" class="mx-auto w-5 h-5 text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1.4 資訊時代 Information Age -->
+        <section id="sec1-4" class="scroll-mt-24">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold text-sm">1.4</span>
+                <h2 class="text-3xl font-bold text-slate-800">資訊時代 (Information Age)</h2>
+            </div>
+
+            <div class="space-y-6">
+                <div class="bg-white p-6 rounded-xl border border-gray-200">
+                    <h3 class="font-bold text-lg mb-4 text-indigo-800">工業時代 vs 資訊時代</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-gray-100 text-gray-700">
+                                <tr>
+                                    <th class="p-3">特徵</th>
+                                    <th class="p-3">工業時代</th>
+                                    <th class="p-3 rounded-tr-lg text-indigo-700 font-bold bg-indigo-50">資訊時代</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b">
+                                    <td class="p-3 font-bold">核心資源</td>
+                                    <td class="p-3">原材料、能源 (煤、石油)</td>
+                                    <td class="p-3 font-medium bg-indigo-50">數據、資訊、知識</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="p-3 font-bold">生產模式</td>
+                                    <td class="p-3">標準化、大規模生產</td>
+                                    <td class="p-3 font-medium bg-indigo-50">個人化、彈性生產</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold">勞動力</td>
+                                    <td class="p-3">體力勞動者 (藍領)</td>
+                                    <td class="p-3 font-medium bg-indigo-50">知識工作者 (白領)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-blue-50 p-6 rounded-xl border border-blue-100">
+                        <h4 class="font-bold text-lg text-blue-800 mb-2">知識型經濟 (Knowledge-based Economy)</h4>
+                        <p class="text-sm text-blue-900">
+                            經濟結構從依賴物質生產轉變為依賴<strong>知識的創造、傳播和應用</strong>。創新能力和資訊素養成為競爭力的關鍵。
+                        </p>
+                    </div>
+
+                    <div class="bg-rose-50 p-6 rounded-xl border border-rose-100">
+                        <h4 class="font-bold text-lg text-rose-800 mb-2">數碼鴻溝 (Digital Divide)</h4>
+                        <p class="text-sm text-rose-900">
+                            指不同社群（如貧富、長幼、城鄉）在<strong>接觸和使用資訊科技</strong>方面的差距，這可能導致機會和資源分配的不平等。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 總結測驗 -->
+        <section class="bg-indigo-900 text-white rounded-3xl p-8 md:p-12 text-center relative overflow-hidden mt-12">
+            <h2 class="text-3xl font-bold mb-8 relative z-10">🚀 第一章 總結測驗</h2>
+            
+            <div class="max-w-2xl mx-auto space-y-6 relative z-10 text-left">
+                <!-- Q1 -->
+                <div class="bg-indigo-800 p-6 rounded-xl border border-indigo-700">
+                    <p class="font-bold text-lg mb-4">1. 「人類的聲音」屬於哪種訊號？</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <button class="quiz-btn p-3 bg-indigo-950 rounded hover:bg-indigo-700 transition text-sm text-left" onclick="checkFinalQuiz(this, true)">A. 模擬訊號 (Analog)</button>
+                        <button class="quiz-btn p-3 bg-indigo-950 rounded hover:bg-indigo-700 transition text-sm text-left" onclick="checkFinalQuiz(this, false)">B. 數碼訊號 (Digital)</button>
+                    </div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="bg-indigo-800 p-6 rounded-xl border border-indigo-700">
+                    <p class="font-bold text-lg mb-4">2. 哪種圖像格式放大後「不會」失真？</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <button class="quiz-btn p-3 bg-indigo-950 rounded hover:bg-indigo-700 transition text-sm text-left" onclick="checkFinalQuiz(this, false)">A. 點陣圖 (Bitmap)</button>
+                        <button class="quiz-btn p-3 bg-indigo-950 rounded hover:bg-indigo-700 transition text-sm text-left" onclick="checkFinalQuiz(this, true)">B. 向量圖 (Vector)</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="bg-slate-100 py-8 mt-12 text-center text-slate-500 text-sm">
+        <p>高中 ICT 學習資源網 &copy; 2025</p>
+    </footer>
+
+    <script src="course_data.js"></script>
+    <script>
+        lucide.createIcons();
+
+        // 進度條
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progressBar").style.width = scrolled + "%";
+        };
+
+        // 多媒體 Tab 切換功能
+        function switchMediaTab(tabName, btn) {
+            // 1. 隱藏所有內容
+            document.querySelectorAll('.media-tab-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            // 2. 移除所有按鈕 active 樣式
+            document.querySelectorAll('.media-tab-btn').forEach(el => {
+                el.classList.remove('bg-indigo-600', 'text-white');
+                el.classList.add('bg-gray-100', 'text-gray-600');
+            });
+
+            // 3. 顯示目標內容
+            document.getElementById('tab-' + tabName).classList.add('active');
+            // 4. 設定當前按鈕樣式
+            btn.classList.remove('bg-gray-100', 'text-gray-600');
+            btn.classList.add('bg-indigo-600', 'text-white');
+            
+            // 如果切換到 image tab，可能需要重繪或確保 canvas 正確
+            if(tabName === 'image') {
+                initImageDemo();
+            }
+        }
+
+        // 測驗功能
+        function checkFinalQuiz(btn, isCorrect) {
+            const parent = btn.parentElement;
+            const allBtns = parent.querySelectorAll('.quiz-btn');
+            allBtns.forEach(b => b.disabled = true);
+            if (isCorrect) {
+                btn.classList.add('correct-anim');
+                btn.innerHTML += ' ✅';
+            } else {
+                btn.classList.add('wrong-anim');
+                btn.innerHTML += ' ❌';
+                allBtns.forEach(b => {
+                    if (b.getAttribute('onclick').includes('true')) {
+                        b.classList.add('bg-green-600');
+                    }
+                });
+            }
+        }
+
+        // ==========================================
+        //         圖像互動實驗室 邏輯
+        // ==========================================
+        
+        function initImageDemo() {
+            const canvas = document.getElementById('bitmapCanvas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            // 清空畫布 (確保背景是白色，對比更明顯)
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0,0,50,50);
+
+            // 繪製圓形
+            ctx.fillStyle = '#db2777'; // Pink
+            ctx.beginPath();
+            ctx.arc(25, 25, 20, 0, Math.PI*2);
+            ctx.fill();
+
+            // 繪製文字
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('A', 25, 25);
+        }
+
+        // 綁定滑桿事件 (確保 DOM 載入後執行)
+        window.addEventListener('DOMContentLoaded', () => {
+            initImageDemo(); // 初始繪圖
+
+            const zoomSlider = document.getElementById('zoomSlider');
+            const zoomValue = document.getElementById('zoomValue');
+            const bmpCanvas = document.getElementById('bitmapCanvas');
+            const vecSvg = document.getElementById('vectorSvg');
+
+            if(zoomSlider) {
+                zoomSlider.addEventListener('input', (e) => {
+                    const scale = e.target.value;
+                    zoomValue.textContent = scale + 'x';
+                    
+                    // 應用縮放
+                    if(bmpCanvas) bmpCanvas.style.transform = `scale(${scale})`;
+                    if(vecSvg) vecSvg.style.transform = `scale(${scale})`;
+                });
+            }
+        });
+        
+    </script>
+</body>
+</html>
