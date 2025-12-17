@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2. 數據控制及數據組織 - ICT 學習資源網</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f0f9ff; }
+        
+        /* 卡片翻轉特效 */
+        .flip-card { perspective: 1000px; height: 260px; cursor: pointer; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 1rem; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .flip-card-front { background-color: white; color: #1e293b; border: 1px solid #e2e8f0; }
+        .flip-card-back { background-color: #4f46e5; color: white; transform: rotateY(180deg); }
+
+        /* 金字塔層級樣式 */
+        .hierarchy-level { transition: all 0.3s ease; clip-path: polygon(5% 0%, 95% 0%, 100% 100%, 0% 100%); }
+        .hierarchy-level:hover { transform: scale(1.02); z-index: 10; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2); }
+
+        /* 磁帶動畫 */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .tape-reel { animation: spin 2s linear infinite; }
+        .tape-paused { animation-play-state: paused; }
+
+        /* 測驗回饋樣式 */
+        .correct-anim { animation: bounce 0.5s; background-color: #dcfce7 !important; border-color: #22c55e !important; }
+        .wrong-anim { animation: shake 0.5s; background-color: #fee2e2 !important; border-color: #ef4444 !important; }
+        @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        
+        /* 計算步驟顯示 */
+        .calc-step { opacity: 0; animation: fadeIn 0.5s forwards; }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        /* 奇偶檢測位元動畫 */
+        .bit-box { transition: all 0.3s ease; }
+        .bit-new { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* 索引演示方塊動畫 */
+        .idx-block { transition: all 0.3s ease; }
+        .idx-scanning { background-color: #fef08a !important; border-color: #eab308 !important; transform: scale(1.1); box-shadow: 0 0 10px rgba(234, 179, 8, 0.5); }
+        .idx-found { background-color: #22c55e !important; color: white !important; border-color: #15803d !important; transform: scale(1.2); box-shadow: 0 0 15px rgba(34, 197, 94, 0.6); z-index: 10; }
+        .idx-visited { background-color: #f1f5f9; color: #cbd5e1; border-color: #e2e8f0; }
+
+        /* 存取動畫樣式 */
+        .access-block { transition: all 0.3s; }
+        .access-active { background-color: #fbbf24 !important; border-color: #d97706 !important; transform: scale(1.1); box-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+        .head-pointer { transition: left 0.5s ease-in-out, top 0.5s ease-in-out; }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <!-- 頂部導航 -->
+    <header class="bg-indigo-700 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="hover:bg-indigo-600 p-2 rounded-lg transition" title="回首頁">
+                    <i data-lucide="home" class="w-6 h-6"></i>
+                </a>
+                <span class="font-bold text-lg hidden md:block">必修部分 A > 2. 數據控制及數據組織</span>
+            </div>
+            
+            <div class="flex gap-3">
+                <button onclick="if(typeof randomStudy === 'function') randomStudy(); else alert('請確保 course_data.js 已連結');" class="flex items-center gap-2 bg-pink-500 hover:bg-pink-600 px-4 py-2 rounded-full font-bold transition shadow-md text-sm">
+                    <i data-lucide="shuffle" class="w-4 h-4"></i> 隨機挑戰
+                </button>
+            </div>
+        </div>
+        <!-- 進度條 -->
+        <div class="h-1 bg-indigo-900 w-full">
+            <div id="progressBar" class="h-full bg-cyan-400 w-0 transition-all duration-300"></div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 max-w-5xl space-y-16">
+
+        <!-- 2.1 數據分級 Data Hierarchy -->
+        <section id="sec2-1" class="scroll-mt-24">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold text-sm">2.1</span>
+                <h2 class="text-3xl font-bold text-slate-800">數據分級 (Data Hierarchy)</h2>
+            </div>
+            
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 mb-8">
+                <p class="mb-6 text-lg leading-relaxed text-slate-600">
+                    數據在電腦系統中是按層級組織的，由最小的單位逐漸組合成複雜的結構。
+                </p>
+
+                <!-- 互動金字塔 -->
+                <div class="flex flex-col items-center justify-center space-y-1 max-w-2xl mx-auto py-6">
+                    <!-- Database -->
+                    <div class="hierarchy-level w-full bg-indigo-900 text-white p-4 text-center rounded-t-xl cursor-pointer group relative">
+                        <div class="font-bold text-xl">數據庫 (Database)</div>
+                        <div class="text-xs text-indigo-200">相關檔案的集合</div>
+                        <div class="absolute inset-0 bg-black/80 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition rounded-t-xl">
+                            例子：學校所有學生的資料庫 (包含個人資料、成績檔)
+                        </div>
+                    </div>
+                    <!-- File -->
+                    <div class="hierarchy-level w-[90%] bg-indigo-700 text-white p-3 text-center cursor-pointer group relative">
+                        <div class="font-bold text-lg">檔案 (File)</div>
+                        <div class="text-xs text-indigo-200">相關記錄的集合</div>
+                        <div class="absolute inset-0 bg-black/80 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition">
+                            例子：全班同學的「個人資料表」
+                        </div>
+                    </div>
+                    <!-- Record -->
+                    <div class="hierarchy-level w-[80%] bg-indigo-600 text-white p-3 text-center cursor-pointer group relative">
+                        <div class="font-bold text-lg">記錄 (Record)</div>
+                        <div class="text-xs text-indigo-200">相關欄位的集合 (描述一個實體)</div>
+                        <div class="absolute inset-0 bg-black/80 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition">
+                            例子：陳大文這一位同學的所有資料
+                        </div>
+                    </div>
+                    <!-- Field -->
+                    <div class="hierarchy-level w-[70%] bg-indigo-500 text-white p-2 text-center cursor-pointer group relative">
+                        <div class="font-bold">欄位 (Field)</div>
+                        <div class="text-xs text-indigo-100">單一項數據</div>
+                        <div class="absolute inset-0 bg-black/80 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition">
+                            例子：姓名 "Chan Tai Man"
+                        </div>
+                    </div>
+                    <!-- Byte -->
+                    <div class="hierarchy-level w-[60%] bg-indigo-400 text-white p-2 text-center cursor-pointer group relative">
+                        <div class="font-bold text-sm">位元組 (Byte) / 字符 (Character)</div>
+                        <div class="absolute inset-0 bg-black/80 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition">
+                            例子：字母 "C" (由8個bit組成)
+                        </div>
+                    </div>
+                    <!-- Bit -->
+                    <div class="hierarchy-level w-[50%] bg-indigo-300 text-white p-2 text-center rounded-b-xl cursor-pointer group relative">
+                        <div class="font-bold text-xs">位元 (Bit)</div>
+                        <div class="text-[10px] text-indigo-800">最小單位 (0 或 1)</div>
+                        <div class="absolute inset-0 bg-black/80 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition rounded-b-xl">
+                            例子：0 或 1
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2.2 數據控制 Data Control -->
+        <section id="sec2-2" class="scroll-mt-24">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold text-sm">2.2</span>
+                <h2 class="text-3xl font-bold text-slate-800">數據控制 (Data Control)</h2>
+            </div>
+
+            <!-- GIGO & Error Types -->
+            <div class="bg-rose-50 border-l-4 border-rose-500 p-6 rounded-r-xl mb-12 shadow-sm">
+                <div class="flex items-start gap-4 mb-6">
+                    <div class="bg-rose-100 p-3 rounded-full">
+                        <i data-lucide="trash-2" class="w-8 h-8 text-rose-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-rose-800 text-xl mb-2">GIGO 原則 (Garbage In, Garbage Out)</h3>
+                        <p class="text-rose-700 leading-relaxed">
+                            「無用輸入，無用輸出」。如果輸入的數據是錯誤的（垃圾），那麼輸出的資訊也必然是錯誤的。
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-rose-200">
+                    <h4 class="font-bold text-rose-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+                        常見的數據錯誤類型
+                    </h4>
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="p-3 bg-rose-50 rounded-lg">
+                            <span class="font-bold text-rose-700 block mb-1">1. 數據來源錯誤</span>
+                            <span class="text-xs text-slate-600">源文件本身已有錯誤。<br>例：填寫表格時已寫錯電話號碼。</span>
+                        </div>
+                        <div class="p-3 bg-rose-50 rounded-lg">
+                            <span class="font-bold text-rose-700 block mb-1">2. 轉錄錯誤 (Transcription Error)</span>
+                            <span class="text-xs text-slate-600">在輸入過程中因看錯或聽錯而產生的錯誤。<br>例：將手寫的 "7" 看成 "1"。</span>
+                        </div>
+                        <div class="p-3 bg-rose-50 rounded-lg">
+                            <span class="font-bold text-rose-700 block mb-1">3. 換位錯誤 (Transposition Error)</span>
+                            <span class="text-xs text-slate-600">輸入時將兩個相鄰的字元次序倒轉。<br>例：將 "1234" 打成 "1324"。</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 用戶界面 (User Interface) -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-12">
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="bg-blue-600 text-white p-2 rounded-lg">
+                        <i data-lucide="layout-template" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-blue-800">用戶界面設計 (User Interface Design)</h3>
+                </div>
+                <p class="text-slate-600 mb-6">
+                    良好的用戶界面設計可以減少輸入錯誤。通過使用不同的<span class="font-bold">表單元件 (Form Elements)</span>，我們可以限制用戶的輸入選擇，從而提高數據的準確性。
+                </p>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Text Box -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 hover:border-blue-300 transition">
+                        <div class="font-bold text-slate-700 mb-2 flex items-center gap-2">
+                            <i data-lucide="type" class="w-4 h-4"></i> 文字方塊 (Text Box)
+                        </div>
+                        <p class="text-xs text-slate-500 mb-3">用於輸入自由文字或數字。</p>
+                        <input type="text" class="w-full p-2 border rounded text-sm mb-2" placeholder="請輸入姓名...">
+                        <div class="text-[10px] text-blue-600 bg-white p-1 rounded border border-blue-100">適合：姓名、地址</div>
+                    </div>
+
+                    <!-- Radio Button -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 hover:border-blue-300 transition">
+                        <div class="font-bold text-slate-700 mb-2 flex items-center gap-2">
+                            <i data-lucide="circle-dot" class="w-4 h-4"></i> 單選按鈕 (Radio Button)
+                        </div>
+                        <p class="text-xs text-slate-500 mb-3">在一組選項中只能選擇一個。</p>
+                        <div class="space-y-1 text-sm mb-2">
+                            <label class="flex items-center gap-2"><input type="radio" name="gender" checked> 男 (M)</label>
+                            <label class="flex items-center gap-2"><input type="radio" name="gender"> 女 (F)</label>
+                        </div>
+                        <div class="text-[10px] text-blue-600 bg-white p-1 rounded border border-blue-100">適合：性別 (防止輸入 "Man")</div>
+                    </div>
+
+                    <!-- Check Box -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 hover:border-blue-300 transition">
+                        <div class="font-bold text-slate-700 mb-2 flex items-center gap-2">
+                            <i data-lucide="check-square" class="w-4 h-4"></i> 複選方塊 (Check Box)
+                        </div>
+                        <p class="text-xs text-slate-500 mb-3">可以選擇零個或多個選項。</p>
+                        <div class="space-y-1 text-sm mb-2">
+                            <label class="flex items-center gap-2"><input type="checkbox" checked> 音樂</label>
+                            <label class="flex items-center gap-2"><input type="checkbox"> 運動</label>
+                        </div>
+                        <div class="text-[10px] text-blue-600 bg-white p-1 rounded border border-blue-100">適合：興趣、選修科</div>
+                    </div>
+
+                    <!-- Drop-down List -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 hover:border-blue-300 transition">
+                        <div class="font-bold text-slate-700 mb-2 flex items-center gap-2">
+                            <i data-lucide="list" class="w-4 h-4"></i> 下拉式選單 (Drop-down List)
+                        </div>
+                        <p class="text-xs text-slate-500 mb-3">從預設清單中選擇一個，節省空間。</p>
+                        <select class="w-full p-2 border rounded text-sm mb-2">
+                            <option>香港島</option>
+                            <option>九龍</option>
+                            <option>新界</option>
+                        </select>
+                        <div class="text-[10px] text-blue-600 bg-white p-1 rounded border border-blue-100">適合：地區 (確保固定值)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-12">
+                <!-- A. 數據有效性檢驗 (Data Validation) -->
+                <div>
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="bg-indigo-600 text-white p-2 rounded-lg">
+                            <i data-lucide="shield-check" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-indigo-800">A. 數據有效性檢驗 (Data Validation)</h3>
+                    </div>
+                    <p class="text-slate-600 mb-6 bg-white p-4 rounded-lg border border-gray-200">
+                        <span class="font-bold text-indigo-600">定義：</span>由<span class="font-bold">電腦程式</span>自動執行的檢查過程，確保輸入數據合理、完整且符合規則。
+                    </p>
+                    
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 hover:shadow-md transition border-t-4 border-t-indigo-500">
+                            <h4 class="font-bold text-indigo-700 mb-2 text-sm">1. 完整性檢查 (Completeness)</h4>
+                            <div class="text-xs text-slate-600">確保必要欄位沒有留空。</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 hover:shadow-md transition border-t-4 border-t-indigo-500">
+                            <h4 class="font-bold text-indigo-700 mb-2 text-sm">2. 固定值檢查 (Fixed Value)</h4>
+                            <div class="text-xs text-slate-600">數據必須來自預設的清單。</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 hover:shadow-md transition border-t-4 border-t-indigo-500">
+                            <h4 class="font-bold text-indigo-700 mb-2 text-sm">3. 類型檢查 (Type)</h4>
+                            <div class="text-xs text-slate-600">確保數據屬於正確的類型 (數字/文字)。</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 hover:shadow-md transition border-t-4 border-t-indigo-500">
+                            <h4 class="font-bold text-indigo-700 mb-2 text-sm">4. 範圍檢查 (Range)</h4>
+                            <div class="text-xs text-slate-600">數值介於可接受的上下限之間。</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 hover:shadow-md transition border-t-4 border-t-indigo-500">
+                            <h4 class="font-bold text-indigo-700 mb-2 text-sm">5. 長度檢查 (Length)</h4>
+                            <div class="text-xs text-slate-600">檢查字符數目是否正確。</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 hover:shadow-md transition border-t-4 border-t-indigo-500">
+                            <h4 class="font-bold text-indigo-700 mb-2 text-sm">6. 格式檢查 (Format)</h4>
+                            <div class="text-xs text-slate-600">符合特定模式 (如電郵格式)。</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 hover:shadow-md transition border-t-4 border-t-indigo-500">
+                            <h4 class="font-bold text-indigo-700 mb-2 text-sm">7. 一致性檢查 (Consistency)</h4>
+                            <div class="text-xs text-slate-600">相關欄位數據不矛盾。</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 hover:shadow-md transition border-t-4 border-t-indigo-500">
+                            <h4 class="font-bold text-indigo-700 mb-2 text-sm">8. 唯一性檢查 (Uniqueness)</h4>
+                            <div class="text-xs text-slate-600">數據不重複 (如學號)。</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-gray-200 hover:shadow-md transition border-t-4 border-t-purple-500">
+                            <h4 class="font-bold text-purple-700 mb-2 text-sm">9. 奇偶檢測 (Parity Check)</h4>
+                            <div class="text-xs text-slate-600">檢查傳輸時位元是否遺失/錯誤。</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 互動驗證實驗室 -->
+                <div class="bg-slate-800 rounded-2xl p-8 text-white mb-12 shadow-xl border border-slate-700">
+                    <div class="flex items-center gap-3 mb-6">
+                        <i data-lucide="flask-conical" class="w-8 h-8 text-yellow-400 animate-pulse"></i>
+                        <div>
+                            <h3 class="text-2xl font-bold">互動實驗室：親自試試 Validation</h3>
+                            <p class="text-slate-400 text-sm">請嘗試輸入<span class="text-red-400 font-bold">錯誤</span>的資料！</p>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="space-y-5 bg-slate-700/50 p-6 rounded-xl border border-slate-600">
+                            <div>
+                                <label class="flex justify-between text-sm font-bold mb-1 text-slate-300">
+                                    <span>1. 年齡 (Age)</span>
+                                    <span class="text-indigo-300 text-xs bg-indigo-900/50 px-2 py-0.5 rounded">範圍: 18-60</span>
+                                </label>
+                                <input type="number" id="inputAge" class="w-full p-3 rounded bg-slate-800 border border-slate-600 text-white focus:outline-none focus:border-indigo-500 transition" placeholder="試試輸入 100...">
+                                <p id="errAge" class="text-red-400 text-xs mt-2 hidden font-bold flex items-center gap-1"><i data-lucide="alert-circle" class="w-3 h-3"></i> <span></span></p>
+                            </div>
+                            
+                            <div>
+                                <label class="flex justify-between text-sm font-bold mb-1 text-slate-300">
+                                    <span>2. 學號 (Student ID)</span>
+                                    <span class="text-indigo-300 text-xs bg-indigo-900/50 px-2 py-0.5 rounded">長度: 5位</span>
+                                </label>
+                                <input type="text" id="inputID" class="w-full p-3 rounded bg-slate-800 border border-slate-600 text-white focus:outline-none focus:border-indigo-500 transition" placeholder="試試輸入 123...">
+                                <p id="errID" class="text-red-400 text-xs mt-2 hidden font-bold flex items-center gap-1"><i data-lucide="alert-circle" class="w-3 h-3"></i> <span></span></p>
+                            </div>
+                            
+                            <div>
+                                <label class="flex justify-between text-sm font-bold mb-1 text-slate-300">
+                                    <span>3. 電郵 (Email)</span>
+                                    <span class="text-indigo-300 text-xs bg-indigo-900/50 px-2 py-0.5 rounded">格式: 電郵</span>
+                                </label>
+                                <input type="text" id="inputEmail" class="w-full p-3 rounded bg-slate-800 border border-slate-600 text-white focus:outline-none focus:border-indigo-500 transition" placeholder="試試輸入無 @...">
+                                <p id="errEmail" class="text-red-400 text-xs mt-2 hidden font-bold flex items-center gap-1"><i data-lucide="alert-circle" class="w-3 h-3"></i> <span></span></p>
+                            </div>
+                            
+                            <button onclick="validateForm()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-lg transition shadow-lg flex justify-center items-center gap-2">
+                                <i data-lucide="play" class="w-4 h-4"></i> 提交測試
+                            </button>
+                        </div>
+
+                        <div class="bg-slate-900 p-6 rounded-xl border border-slate-600 flex flex-col justify-center items-center text-center relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-50"></div>
+                            <div id="validationResult" class="text-gray-400 z-10 w-full">
+                                <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i data-lucide="monitor" class="w-8 h-8 opacity-50"></i>
+                                </div>
+                                <p class="text-lg">等待輸入數據...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 奇偶檢測動畫 (Parity Check) -->
+                <div class="bg-purple-50 p-6 rounded-2xl shadow-sm border border-purple-100 mb-12">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="bg-purple-600 text-white p-2 rounded-lg">
+                            <i data-lucide="binary" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-purple-800">奇偶檢測 (Parity Check)</h3>
+                    </div>
+                    <p class="text-slate-600 mb-6">
+                        在數據傳輸時，會在每組數據（例如 7 個位元）後加上一個<span class="font-bold">校驗位元 (Parity Bit)</span>，使「1」的總數成為奇數（奇校驗）或偶數（偶校驗）。
+                    </p>
+
+                    <div class="bg-white p-6 rounded-xl border border-purple-200">
+                        <div class="flex flex-col md:flex-row gap-4 items-end mb-6">
+                            <div class="flex-grow">
+                                <label class="block text-sm font-bold text-slate-700 mb-1">輸入 7 位二進制碼 (例如 1000001)</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="parityInput" class="flex-grow p-2 border border-slate-300 rounded font-mono" placeholder="1000001" maxlength="7">
+                                    <button onclick="document.getElementById('parityInput').value = Math.floor(Math.random()*128).toString(2).padStart(7,'0');" class="bg-gray-200 px-3 rounded text-sm hover:bg-gray-300">隨機</button>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="runParityCheck('even')" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition">偶校驗 (Even)</button>
+                                <button onclick="runParityCheck('odd')" class="bg-fuchsia-600 text-white px-4 py-2 rounded hover:bg-fuchsia-700 transition">奇校驗 (Odd)</button>
+                            </div>
+                        </div>
+
+                        <!-- Animation Container -->
+                        <div id="parityDisplay" class="flex justify-center items-center gap-2 h-24 bg-slate-100 rounded-lg overflow-hidden relative">
+                            <span class="text-slate-400 text-sm">請輸入數據並點擊按鈕...</span>
+                        </div>
+                        <div id="parityExplanation" class="mt-4 text-center text-sm font-bold text-purple-700 hidden"></div>
+                    </div>
+                </div>
+
+                <!-- 檢查數位計算器 -->
+                <div class="bg-white p-6 rounded-xl border border-gray-200 mb-12">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+                            <i data-lucide="calculator" class="w-5 h-5 text-indigo-600"></i>
+                            HKID 檢查數位計算器 (Check Digit Calculator)
+                        </h4>
+                        <span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded">完整步驟展示</span>
+                    </div>
+                    <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-100">
+                        <p class="text-sm text-indigo-800 mb-4">
+                            加權模數 11 算法：(首字元空格=36, A=10...Z=35)
+                        </p>
+                        <div class="flex flex-col md:flex-row gap-4 items-end mb-4">
+                            <div class="flex-grow w-full">
+                                <label class="block text-xs font-bold text-indigo-600 mb-1">輸入身分證號碼 (如 M123456)</label>
+                                <input type="text" id="hkidInput" class="w-full p-3 border border-indigo-300 rounded-lg uppercase font-mono tracking-widest text-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" placeholder="M123456">
+                            </div>
+                            <button onclick="calculateHKID()" class="bg-indigo-600 text-white px-6 py-3.5 rounded-lg font-bold hover:bg-indigo-700 transition flex-shrink-0">計算</button>
+                        </div>
+                        
+                        <!-- 計算步驟展示 -->
+                        <div id="hkidSteps" class="hidden space-y-2 text-sm font-mono text-slate-700 bg-white p-4 rounded-lg border border-indigo-200 max-h-60 overflow-y-auto">
+                            <!-- JS will populate this -->
+                        </div>
+
+                        <div id="hkidResult" class="mt-4 p-4 bg-white rounded-lg border border-indigo-200 text-center hidden animate-bounce-in">
+                            <span class="text-slate-500 text-sm">完整身分證號碼：</span>
+                            <div class="text-3xl font-bold text-indigo-600 mt-2 font-mono tracking-widest flex justify-center items-center gap-2">
+                                <span id="hkidPrefix"></span>
+                                <span class="bg-yellow-100 px-2 rounded text-yellow-700" id="hkidDigit"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- B. 數據驗證 (Data Verification) -->
+                <div>
+                    <div class="flex items-center gap-2 mb-6">
+                        <div class="bg-emerald-600 text-white p-2 rounded-lg">
+                            <i data-lucide="eye" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-emerald-800">B. 數據驗證 (數據校驗 / Data Verification)</h3>
+                    </div>
+                    <p class="text-slate-600 mb-6 bg-white p-4 rounded-lg border border-gray-200">
+                        <span class="font-bold text-emerald-600">定義：</span>確保輸入電腦的數據與<span class="font-bold">原始文件 (Source Document)</span> 完全一致的過程。
+                    </p>
+
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <!-- 1. 輸入數據兩次 -->
+                        <div class="bg-white p-6 rounded-xl border-l-4 border-l-emerald-500 shadow-sm hover:shadow-md transition">
+                            <h4 class="font-bold text-lg text-emerald-800 mb-3">1. 輸入數據兩次<br>(Entering Data Twice)</h4>
+                            <p class="text-sm text-slate-600 mb-4 leading-relaxed">
+                                由<span class="font-bold text-emerald-600">同一位操作員</span>將數據輸入兩次。如果兩次輸入不符，系統會提示錯誤。
+                            </p>
+                            <div class="mt-3 text-xs text-slate-400 bg-gray-50 p-2 rounded">例子：更改密碼時，系統要求「確認新密碼」。</div>
+                        </div>
+
+                        <!-- 2. 雙重數據輸入 -->
+                        <div class="bg-white p-6 rounded-xl border-l-4 border-l-emerald-500 shadow-sm hover:shadow-md transition">
+                            <h4 class="font-bold text-lg text-emerald-800 mb-3">2. 雙重數據輸入<br>(Double Data Entry)</h4>
+                            <p class="text-sm text-slate-600 mb-4 leading-relaxed">
+                                由<span class="font-bold text-emerald-600">兩位不同的操作員</span>分別輸入相同的數據。系統會比對兩份數據，確保一致。
+                            </p>
+                            <div class="mt-3 text-xs text-slate-400 bg-gray-50 p-2 rounded">例子：重要考試分數輸入，由兩位老師分別輸入以防出錯。</div>
+                        </div>
+
+                        <!-- 3. 校對數據 -->
+                        <div class="bg-white p-6 rounded-xl border-l-4 border-l-emerald-500 shadow-sm hover:shadow-md transition">
+                            <h4 class="font-bold text-lg text-emerald-800 mb-3">3. 校對數據<br>(Proofreading Data)</h4>
+                            <p class="text-sm text-slate-600 mb-4 leading-relaxed">
+                                使用者看著電腦螢幕上的數據，用肉眼與<span class="font-bold text-emerald-600">原始文件</span>進行仔細比對，找出錯誤。
+                            </p>
+                            <div class="mt-3 text-xs text-slate-400 bg-gray-50 p-2 rounded">例子：網上購物結帳前，核對送貨地址。</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2.3 數據庫的功能 Database Functions -->
+        <section id="sec2-3" class="scroll-mt-24">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold text-sm">2.3</span>
+                <h2 class="text-3xl font-bold text-slate-800">數據庫的功能</h2>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <!-- 1. 組織 -->
+                <div class="flip-card h-64">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front border-t-4 border-blue-500">
+                            <i data-lucide="layout-grid" class="w-12 h-12 text-blue-500 mb-4"></i>
+                            <h3 class="text-xl font-bold text-slate-800">1. 組織<br>(Organizing)</h3>
+                        </div>
+                        <div class="flip-card-back bg-blue-600">
+                            <p>定義數據的結構。<br>例如：設定欄位名稱 (姓名、班別)、數據類型 (文字、數字) 以及關聯。</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- 2. 儲存 -->
+                <div class="flip-card h-64">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front border-t-4 border-amber-500">
+                            <i data-lucide="database" class="w-12 h-12 text-amber-500 mb-4"></i>
+                            <h3 class="text-xl font-bold text-slate-800">2. 儲存<br>(Storing)</h3>
+                        </div>
+                        <div class="flip-card-back bg-amber-600">
+                            <p>將數據永久保存在儲存媒體中。<br>確保數據的完整性，並讓多個使用者能同時存取。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 提取 (Full Width with Indexing Animation) -->
+            <div class="bg-white rounded-xl border border-emerald-200 h-auto overflow-hidden relative group shadow-sm">
+                <div class="bg-emerald-500 h-1 w-full shrink-0"></div>
+                <div class="p-6 flex flex-col md:flex-row gap-8">
+                    <div class="md:w-1/3 flex flex-col justify-center">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="search" class="w-6 h-6 text-emerald-500"></i>
+                            <h3 class="text-xl font-bold text-slate-800">3. 提取 (Retrieving)</h3>
+                        </div>
+                        <p class="text-sm text-slate-600 mb-4">利用查詢 (Query) 搜尋特定數據。</p>
+                        <div class="bg-emerald-50 p-4 rounded-lg border border-emerald-100">
+                            <h4 class="font-bold text-emerald-800 text-sm mb-2 flex items-center gap-2">
+                                <i data-lucide="zap" class="w-4 h-4"></i> 索引 (Indexing)
+                            </h4>
+                            <p class="text-xs text-emerald-700 leading-relaxed">
+                                就像書本後面的目錄，索引讓電腦能直接跳到數據所在位置，而無需從頭逐一搜尋 (Sequential Search)，大大提升速度。
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Index Animation Box -->
+                    <div class="md:w-2/3 bg-slate-50 rounded-xl border border-slate-200 p-6 flex flex-col justify-between relative min-h-[200px]">
+                         <div class="flex justify-between items-center mb-4">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">搜尋演示 (目標 ID: 6)</span>
+                            <span id="idxStatus" class="text-sm font-bold text-slate-800 bg-white px-3 py-1 rounded shadow-sm">準備就緒</span>
+                         </div>
+                         
+                         <!-- Grid of blocks -->
+                         <div class="grid grid-cols-4 gap-3 mb-6" id="idxGrid">
+                            <!-- Blocks inserted by JS -->
+                         </div>
+
+                         <!-- Index Book visual overlay -->
+                         <div id="idxBook" class="absolute inset-0 bg-emerald-600/95 flex flex-col items-center justify-center text-white rounded-xl opacity-0 pointer-events-none transition-all duration-500 z-10 transform scale-90">
+                            <i data-lucide="book-open" class="w-12 h-12 mb-2"></i>
+                            <span class="text-lg font-bold">查閱索引目錄...</span>
+                            <span class="text-xs text-emerald-200">ID 6 位於第 2 行第 2 格</span>
+                         </div>
+
+                         <div class="flex gap-4 mt-auto">
+                            <button onclick="playIndexDemo('seq')" class="flex-1 bg-white border-2 border-slate-200 text-slate-600 text-sm py-2 rounded-lg hover:border-slate-400 hover:text-slate-800 transition font-bold flex items-center justify-center gap-2">
+                                <i data-lucide="list" class="w-4 h-4"></i> 無索引 (逐一找)
+                            </button>
+                            <button onclick="playIndexDemo('idx')" class="flex-1 bg-emerald-600 text-white text-sm py-2 rounded-lg hover:bg-emerald-700 transition shadow-md font-bold flex items-center justify-center gap-2">
+                                <i data-lucide="zap" class="w-4 h-4"></i> 有索引 (直接跳)
+                            </button>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2.4 檔案存取方式 (Interactive Animation) -->
+        <section id="sec2-4" class="scroll-mt-24">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold text-sm">2.4</span>
+                <h2 class="text-3xl font-bold text-slate-800">檔案存取方式</h2>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- 順序存取 -->
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-slate-800">順序存取 (Sequential)</h3>
+                        <span class="bg-gray-100 text-xs px-2 py-1 rounded">磁帶 (Tape)</span>
+                    </div>
+                    
+                    <!-- 互動展示 -->
+                    <div class="bg-slate-100 p-4 rounded-lg mb-4">
+                        <div class="flex items-center justify-center gap-4 mb-4 h-20 relative">
+                            <!-- 磁帶輪 -->
+                            <div id="tapeLeft" class="w-12 h-12 border-4 border-gray-600 rounded-full border-dashed"></div>
+                            <div class="h-2 bg-gray-800 w-32 relative overflow-hidden rounded">
+                                <div id="tapeProgress" class="absolute left-0 top-0 h-full bg-blue-500 w-0"></div>
+                            </div>
+                            <div id="tapeRight" class="w-12 h-12 border-4 border-gray-600 rounded-full border-dashed"></div>
+                            
+                            <!-- 虛擬讀寫頭 -->
+                            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-6 bg-red-500/20 border border-red-500 rounded flex items-center justify-center">
+                                <div class="w-1 h-1 bg-red-500 rounded-full"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold text-slate-600">目標: 第</span>
+                            <input type="number" id="seqTarget" min="1" max="10" value="5" class="w-12 p-1 border rounded text-center text-sm">
+                            <span class="text-xs text-slate-600">首</span>
+                            <button onclick="playSequential()" class="flex-grow bg-blue-600 text-white text-xs py-2 rounded hover:bg-blue-700 transition">
+                                <i data-lucide="play" class="w-3 h-3 inline mr-1"></i> 開始搜尋
+                            </button>
+                        </div>
+                        <div id="seqStatus" class="mt-2 text-xs text-center h-4 text-blue-600 font-bold"></div>
+                    </div>
+
+                    <ul class="list-disc list-inside text-sm text-slate-600 space-y-2">
+                        <li>必須<span class="font-bold text-red-500">從頭開始</span>，逐一經過前面的記錄。</li>
+                        <li>要找第 100 筆，必須先讀過前 99 筆。</li>
+                        <li>適合：<span class="font-bold text-indigo-600">備份 (Backup)</span>。</li>
+                    </ul>
+                </div>
+
+                <!-- 直接存取 -->
+                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-slate-800">直接存取 (Direct)</h3>
+                        <span class="bg-gray-100 text-xs px-2 py-1 rounded">硬碟 (Disk)</span>
+                    </div>
+
+                    <!-- 互動展示 -->
+                    <div class="bg-slate-100 p-4 rounded-lg mb-4">
+                        <div class="relative w-32 h-32 mx-auto mb-4">
+                            <!-- Disk Platter -->
+                            <div class="w-full h-full rounded-full border-4 border-gray-400 bg-gray-200 relative animate-[spin_2s_linear_infinite]">
+                                <!-- 分區示意 (Tracks) -->
+                                <div class="absolute inset-0 border border-gray-300 rounded-full scale-75"></div>
+                                <div class="absolute inset-0 border border-gray-300 rounded-full scale-50"></div>
+                                <!-- Sectors lines -->
+                                <div class="absolute top-0 left-1/2 h-full w-px bg-gray-300 -translate-x-1/2"></div>
+                                <div class="absolute top-1/2 left-0 w-full h-px bg-gray-300 -translate-y-1/2"></div>
+                            </div>
+                            <!-- Arm -->
+                            <div id="diskArm" class="absolute top-1/2 left-1/2 w-20 h-2 bg-gray-700 origin-left -translate-y-1/2 transition-transform duration-300 ease-out z-10" style="transform: rotate(-45deg)">
+                                <div class="absolute right-0 top-1/2 w-3 h-3 bg-red-500 rounded-full -translate-y-1/2 shadow-sm border border-white"></div>
+                            </div>
+                            <!-- Pivot -->
+                            <div class="absolute top-1/2 left-1/2 w-4 h-4 bg-gray-800 rounded-full -translate-x-1/2 -translate-y-1/2 border-2 border-white z-20"></div>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold text-slate-600">目標: 第</span>
+                            <input type="number" id="dirTarget" min="1" max="8" value="3" class="w-12 p-1 border rounded text-center text-sm">
+                            <span class="text-xs text-slate-600">區</span>
+                            <button onclick="playDirect()" class="flex-grow bg-emerald-600 text-white text-xs py-2 rounded hover:bg-emerald-700 transition">
+                                <i data-lucide="zap" class="w-3 h-3 inline mr-1"></i> 直接跳轉
+                            </button>
+                        </div>
+                        <div id="dirStatus" class="mt-2 text-xs text-center h-4 text-emerald-600 font-bold"></div>
+                    </div>
+
+                    <ul class="list-disc list-inside text-sm text-slate-600 space-y-2">
+                        <li>可以直接<span class="font-bold text-green-600">跳到</span>任何位置讀寫。</li>
+                        <li>無需經過前面的資料，速度極快。</li>
+                        <li>適合：實時系統 (如訂票)。</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 總結測驗 -->
+        <section class="bg-indigo-900 text-white rounded-3xl p-8 md:p-12 text-center relative overflow-hidden mt-12">
+            <h2 class="text-3xl font-bold mb-8 relative z-10">🚀 第二章 總結測驗</h2>
+            <div class="max-w-2xl mx-auto space-y-6 relative z-10 text-left">
+                <div class="bg-indigo-800 p-6 rounded-xl border border-indigo-700">
+                    <p class="font-bold text-lg mb-4">1. 用戶界面中的「下拉式選單」有助於哪種驗證？</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <button class="quiz-btn p-3 bg-indigo-950 rounded hover:bg-indigo-700 transition text-sm text-left" onclick="checkFinalQuiz(this, false)">A. 範圍檢查</button>
+                        <button class="quiz-btn p-3 bg-indigo-950 rounded hover:bg-indigo-700 transition text-sm text-left" onclick="checkFinalQuiz(this, true)">B. 固定值檢查</button>
+                    </div>
+                </div>
+                <div class="bg-indigo-800 p-6 rounded-xl border border-indigo-700">
+                    <p class="font-bold text-lg mb-4">2. 偶校驗 (Even Parity) 要求數據中「1」的總數是？</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <button class="quiz-btn p-3 bg-indigo-950 rounded hover:bg-indigo-700 transition text-sm text-left" onclick="checkFinalQuiz(this, true)">A. 偶數</button>
+                        <button class="quiz-btn p-3 bg-indigo-950 rounded hover:bg-indigo-700 transition text-sm text-left" onclick="checkFinalQuiz(this, false)">B. 奇數</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="bg-slate-100 py-8 mt-12 text-center text-slate-500 text-sm">
+        <p>高中 ICT 學習資源網 &copy; 2025</p>
+    </footer>
+
+    <script src="course_data.js"></script>
+    <script>
+        lucide.createIcons();
+
+        // 進度條
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progressBar").style.width = scrolled + "%";
+        };
+
+        // ----------------------------------------
+        // 索引演示動畫
+        // ----------------------------------------
+        // Render Index Grid on Load
+        function renderIdxGrid() {
+            const container = document.getElementById('idxGrid');
+            if(!container) return;
+            container.innerHTML = '';
+            for(let i=1; i<=8; i++) {
+                const div = document.createElement('div');
+                div.className = 'w-full aspect-square bg-white border border-slate-200 rounded flex items-center justify-center text-sm font-bold text-slate-400 font-mono idx-block transition-all duration-300';
+                div.id = `idx-block-${i}`;
+                div.textContent = i;
+                container.appendChild(div);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', renderIdxGrid);
+
+        function playIndexDemo(mode) {
+            renderIdxGrid(); // Reset
+            const target = 6;
+            const status = document.getElementById('idxStatus');
+            const book = document.getElementById('idxBook');
+            
+            // Clear any active styles
+            document.querySelectorAll('.idx-block').forEach(b => b.className = 'w-full aspect-square bg-white border border-slate-200 rounded flex items-center justify-center text-sm font-bold text-slate-400 font-mono idx-block transition-all duration-300');
+            
+            if(mode === 'seq') {
+                status.textContent = "逐一尋找中...";
+                let current = 1;
+                const timer = setInterval(() => {
+                    if(current > 1) {
+                        const prev = document.getElementById(`idx-block-${current-1}`);
+                        if(prev) prev.classList.add('idx-visited');
+                    }
+                    
+                    const block = document.getElementById(`idx-block-${current}`);
+                    block.classList.add('idx-scanning');
+                    
+                    if(current === target) {
+                        clearInterval(timer);
+                        block.classList.remove('idx-scanning');
+                        block.classList.add('idx-found');
+                        status.textContent = "找到! (速度慢)";
+                    }
+                    current++;
+                }, 400); // Slow scan
+            } else {
+                status.textContent = "查閱索引目錄...";
+                book.style.opacity = '1';
+                book.style.transform = 'scale(1)';
+                
+                setTimeout(() => {
+                    book.style.opacity = '0';
+                    book.style.transform = 'scale(0.9)';
+                    status.textContent = "直接跳轉! (極快)";
+                    const block = document.getElementById(`idx-block-${target}`);
+                    block.classList.add('idx-found');
+                }, 1000);
+            }
+        }
+
+        // ----------------------------------------
+        // 檔案存取動畫邏輯
+        // ----------------------------------------
+        function playSequential() {
+            const target = parseInt(document.getElementById('seqTarget').value);
+            const status = document.getElementById('seqStatus');
+            const progress = document.getElementById('tapeProgress');
+            const leftReel = document.getElementById('tapeLeft');
+            const rightReel = document.getElementById('tapeRight');
+            
+            // Reset
+            progress.style.width = '0%';
+            progress.style.transition = 'none';
+            status.textContent = "準備...";
+            leftReel.classList.remove('tape-reel');
+            rightReel.classList.remove('tape-reel');
+            
+            setTimeout(() => {
+                const duration = Math.max(0.5, (target - 1) * 0.5); 
+                
+                status.textContent = `正在快進經過前 ${target-1} 首...`;
+                progress.style.transition = `width ${duration}s linear`;
+                progress.style.width = `${target * 10}%`; 
+                
+                leftReel.classList.add('tape-reel');
+                rightReel.classList.add('tape-reel');
+                leftReel.style.animationDuration = '0.3s'; 
+                rightReel.style.animationDuration = '0.3s';
+
+                setTimeout(() => {
+                    status.textContent = `✅ 已找到第 ${target} 首 (需時 ${duration.toFixed(1)}秒)`;
+                    leftReel.classList.remove('tape-reel');
+                    rightReel.classList.remove('tape-reel');
+                }, duration * 1000);
+            }, 100);
+        }
+
+        function playDirect() {
+            const target = parseInt(document.getElementById('dirTarget').value);
+            const status = document.getElementById('dirStatus');
+            const arm = document.getElementById('diskArm');
+            
+            status.textContent = "正在跳轉...";
+            
+            const angle = -45 + (target * 40) % 360; 
+            
+            setTimeout(() => {
+                arm.style.transform = `rotate(${angle}deg)`;
+                setTimeout(() => {
+                    status.textContent = `⚡ 瞬間到達第 ${target} 區 (極快)`;
+                }, 300);
+            }, 100);
+        }
+
+        // ----------------------------------------
+        // 奇偶檢測動畫邏輯
+        // ----------------------------------------
+        function runParityCheck(type) {
+            const input = document.getElementById('parityInput').value.trim();
+            const display = document.getElementById('parityDisplay');
+            const explain = document.getElementById('parityExplanation');
+            
+            if (!/^[01]{7}$/.test(input)) {
+                alert("請輸入剛好 7 個位元的二進制碼 (例如 1000001)");
+                return;
+            }
+
+            let onesCount = 0;
+            let html = "";
+            for(let char of input) {
+                if(char === '1') onesCount++;
+                html += `<div class="bit-box w-8 h-8 bg-white border border-slate-300 flex items-center justify-center font-mono font-bold text-slate-700 rounded">${char}</div>`;
+            }
+
+            let parityBit = '';
+            if (type === 'even') {
+                parityBit = (onesCount % 2 === 0) ? '0' : '1';
+                explain.innerHTML = `數據中有 ${onesCount} 個 '1'。<br>為了湊成<span class="text-purple-600">偶數</span>，校驗位元是 <strong>${parityBit}</strong>。`;
+            } else {
+                parityBit = (onesCount % 2 !== 0) ? '0' : '1';
+                explain.innerHTML = `數據中有 ${onesCount} 個 '1'。<br>為了湊成<span class="text-fuchsia-600">奇數</span>，校驗位元是 <strong>${parityBit}</strong>。`;
+            }
+
+            display.innerHTML = html;
+            explain.classList.remove('hidden');
+
+            setTimeout(() => {
+                const pBox = document.createElement('div');
+                pBox.className = "bit-box w-8 h-8 bg-yellow-300 border-2 border-yellow-500 flex items-center justify-center font-mono font-bold text-yellow-900 rounded bit-new ml-2";
+                pBox.textContent = parityBit;
+                display.appendChild(pBox);
+            }, 500);
+        }
+
+        // ----------------------------------------
+        // 互動驗證實驗室邏輯
+        // ----------------------------------------
+        function validateForm() {
+            const age = document.getElementById('inputAge').value;
+            const id = document.getElementById('inputID').value;
+            const email = document.getElementById('inputEmail').value;
+            const resultBox = document.getElementById('validationResult');
+            
+            document.getElementById('errAge').classList.add('hidden');
+            document.getElementById('errID').classList.add('hidden');
+            document.getElementById('errEmail').classList.add('hidden');
+            
+            let errors = [];
+
+            if (age && (age < 18 || age > 60)) {
+                document.querySelector('#errAge span').textContent = "範圍錯誤！必須 18-60。";
+                document.getElementById('errAge').classList.remove('hidden');
+                errors.push("年齡範圍錯誤");
+            }
+            if (id && id.length !== 5) {
+                document.querySelector('#errID span').textContent = "長度錯誤！必須 5 位。";
+                document.getElementById('errID').classList.remove('hidden');
+                errors.push("學號長度錯誤");
+            }
+            if (email && !email.includes('@')) {
+                document.querySelector('#errEmail span').textContent = "格式錯誤！欠缺 @。";
+                document.getElementById('errEmail').classList.remove('hidden');
+                errors.push("電郵格式錯誤");
+            }
+
+            if (errors.length > 0) {
+                resultBox.innerHTML = `
+                    <div class="text-red-400 font-bold text-xl mb-4 flex items-center justify-center gap-2">
+                        <i data-lucide="x-octagon" class="w-6 h-6"></i> 驗證失敗
+                    </div>
+                    <ul class="text-left text-sm text-slate-300 space-y-2 bg-black/20 p-4 rounded-lg">
+                        ${errors.map(e => `<li class="flex items-center gap-2"><i data-lucide="x" class="w-4 h-4 text-red-500"></i> ${e}</li>`).join('')}
+                    </ul>
+                `;
+            } else if (age || id || email) {
+                resultBox.innerHTML = `<div class="text-green-400 font-bold text-xl flex items-center gap-2"><i data-lucide="check-circle" class="w-6 h-6"></i> 驗證通過</div>`;
+            } else {
+                resultBox.innerHTML = `<p class="text-gray-400">等待輸入...</p>`;
+            }
+            lucide.createIcons();
+        }
+
+        // ----------------------------------------
+        // HKID Check Digit 邏輯 (展示計算步驟)
+        // ----------------------------------------
+        function calculateHKID() {
+            let input = document.getElementById('hkidInput').value.trim().toUpperCase();
+            const prefixSpan = document.getElementById('hkidPrefix');
+            const digitSpan = document.getElementById('hkidDigit');
+            const resultDiv = document.getElementById('hkidResult');
+            const stepsDiv = document.getElementById('hkidSteps');
+
+            let charPart = input.replace(/[0-9]/g, '');
+            let numPart = input.replace(/[^0-9]/g, '');
+            
+            if(charPart.length === 0 || numPart.length !== 6) {
+                 alert("格式錯誤。請輸入例如 A123456");
+                 return;
+            }
+
+            let sum = 0;
+            let stepsHtml = "";
+            let weights = [9, 8, 7, 6, 5, 4, 3, 2];
+            let currentWeightIdx = 0;
+
+            // Step 1: 處理字母
+            if (charPart.length === 1) {
+                sum += 36 * 9;
+                stepsHtml += `<div class="calc-step">1. 處理單字母前綴: 空格(36) × 9 = ${36*9}</div>`;
+                currentWeightIdx = 1;
+                
+                let val = charPart.charCodeAt(0) - 55;
+                sum += val * weights[currentWeightIdx];
+                stepsHtml += `<div class="calc-step">2. 字母 ${charPart}: ${val} × ${weights[currentWeightIdx]} = ${val * weights[currentWeightIdx]}</div>`;
+                currentWeightIdx++;
+            } else {
+                for(let i=0; i<charPart.length; i++) {
+                    let val = charPart.charCodeAt(i) - 55;
+                    sum += val * weights[currentWeightIdx];
+                    stepsHtml += `<div class="calc-step">${i+1}. 字母 ${charPart[i]}: ${val} × ${weights[currentWeightIdx]} = ${val * weights[currentWeightIdx]}</div>`;
+                    currentWeightIdx++;
+                }
+            }
+
+            // Step 2: 處理數字
+            for(let i=0; i<numPart.length; i++) {
+                let val = parseInt(numPart[i]);
+                sum += val * weights[currentWeightIdx];
+                if(i===0) stepsHtml += `<div class="calc-step text-slate-500 italic">...加上所有數字的加權乘積...</div>`;
+                currentWeightIdx++;
+            }
+
+            stepsHtml += `<div class="calc-step border-t mt-2 pt-2 font-bold">總和 (Sum) = ${sum}</div>`;
+            let remainder = sum % 11;
+            stepsHtml += `<div class="calc-step">除以 11 的餘數 = ${remainder}</div>`;
+
+            let checkDigitVal = 11 - remainder;
+            let checkDigitStr = "";
+            
+            if (checkDigitVal === 11) {
+                checkDigitStr = "0";
+                stepsHtml += `<div class="calc-step text-indigo-600 font-bold">結果: 11 - 0 = 11 → 檢查數位為 0</div>`;
+            } else if (checkDigitVal === 10) {
+                checkDigitStr = "A";
+                stepsHtml += `<div class="calc-step text-indigo-600 font-bold">結果: 11 - 1 = 10 → 檢查數位為 A</div>`;
+            } else {
+                checkDigitStr = checkDigitVal.toString();
+                stepsHtml += `<div class="calc-step text-indigo-600 font-bold">結果: 11 - ${remainder} = ${checkDigitStr}</div>`;
+            }
+
+            stepsDiv.innerHTML = stepsHtml;
+            stepsDiv.classList.remove('hidden');
+            
+            prefixSpan.textContent = input;
+            digitSpan.textContent = `(${checkDigitStr})`;
+            resultDiv.classList.remove('hidden');
+        }
+
+        function checkFinalQuiz(btn, isCorrect) {
+            const parent = btn.parentElement;
+            const allBtns = parent.querySelectorAll('.quiz-btn');
+            allBtns.forEach(b => b.disabled = true);
+            if (isCorrect) {
+                btn.classList.add('correct-anim');
+                btn.innerHTML += ' ✅';
+            } else {
+                btn.classList.add('wrong-anim');
+                btn.innerHTML += ' ❌';
+                allBtns.forEach(b => {
+                    if (b.getAttribute('onclick').includes('true')) {
+                        b.classList.add('bg-green-600');
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
