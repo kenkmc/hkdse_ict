@@ -43,6 +43,17 @@
         /* 排序表格樣式 */
         .sortable-th { cursor: pointer; user-select: none; }
         .sortable-th:hover { background-color: #e2e8f0; }
+
+        /* 圓形圖樣式 (CSS Conic Gradient) */
+        .pie-chart-css {
+            width: 160px; height: 160px; border-radius: 50%;
+            background: conic-gradient(
+                #3b82f6 0% 40%,   /* Blue 40% */
+                #10b981 40% 75%,  /* Green 35% */
+                #fbbf24 75% 100%  /* Yellow 25% */
+            );
+            position: relative;
+        }
     </style>
 </head>
 <body class="text-slate-700 flex flex-col min-h-screen">
@@ -102,7 +113,6 @@
                                     <th class="sheet-header-row">A</th>
                                     <th class="sheet-header-row">B</th>
                                     <th class="sheet-header-row">C</th>
-                                    <th class="sheet-header-row">D</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -291,7 +301,7 @@
                                     <tr><th class="border p-1 w-8"></th><th class="border p-1">A</th><th class="border p-1">B</th><th class="border p-1">C</th></tr>
                                 </thead>
                                 <tbody>
-                                    <tr><td class="bg-slate-100 font-bold border">1</td><td class="border p-1">Item</td><td class="border p-1">Price</td><td class="border p-1">Code</td></tr>
+                                    <tr><td class="bg-slate-100 font-bold border">1</td><td class="border p-1 bg-slate-50 font-bold">Item</td><td class="border p-1 bg-slate-50 font-bold">Price</td><td class="border p-1 bg-slate-50 font-bold">Code</td></tr>
                                     <tr><td class="bg-slate-100 font-bold border">2</td><td class="border p-1">Apple</td><td class="border p-1">10</td><td class="border p-1">A-001</td></tr>
                                     <tr><td class="bg-slate-100 font-bold border">3</td><td class="border p-1">Banana</td><td class="border p-1">5</td><td class="border p-1">B-002</td></tr>
                                     <tr><td class="bg-slate-100 font-bold border">4</td><td class="border p-1">Apple</td><td class="border p-1">10</td><td class="border p-1">A-003</td></tr>
@@ -399,16 +409,14 @@
                         <p class="font-bold text-slate-700">折線圖 (Line Chart)</p>
                         <p class="text-xs text-slate-500">用途：顯示趨勢 (如氣溫變化)。</p>
                     </div>
-                    <!-- Pie Chart (Improved SVG) -->
-                    <div id="chart-pie" class="chart-content w-full hidden">
-                        <svg viewBox="0 0 32 32" class="w-32 h-32 mx-auto mb-2 transform -rotate-90">
-                            <!-- 25% (90deg) - Yellow -->
-                            <circle r="16" cx="16" cy="16" fill="transparent" stroke="#fbbf24" stroke-width="32" stroke-dasharray="25 100" />
-                            <!-- 40% (144deg) - Blue -->
-                            <circle r="16" cx="16" cy="16" fill="transparent" stroke="#3b82f6" stroke-width="32" stroke-dasharray="40 100" stroke-dashoffset="-25" />
-                            <!-- 35% (126deg) - Green -->
-                            <circle r="16" cx="16" cy="16" fill="transparent" stroke="#10b981" stroke-width="32" stroke-dasharray="35 100" stroke-dashoffset="-65" />
-                        </svg>
+                    <!-- Pie Chart (CSS Conic Gradient) -->
+                    <div id="chart-pie" class="chart-content w-full hidden flex flex-col items-center">
+                        <div class="pie-chart-css mb-4 shadow-lg border-4 border-white"></div>
+                        <div class="flex gap-4 justify-center text-xs mb-2">
+                            <span class="flex items-center gap-1"><span class="w-3 h-3 bg-blue-500 rounded-full"></span> 40%</span>
+                            <span class="flex items-center gap-1"><span class="w-3 h-3 bg-emerald-500 rounded-full"></span> 35%</span>
+                            <span class="flex items-center gap-1"><span class="w-3 h-3 bg-yellow-400 rounded-full"></span> 25%</span>
+                        </div>
                         <p class="font-bold text-slate-700">圓形圖 (Pie Chart)</p>
                         <p class="text-xs text-slate-500">用途：顯示比例 (如血型分佈)。</p>
                     </div>
@@ -492,34 +500,37 @@
                             <div class="grid grid-cols-2 gap-2 mb-4">
                                 <div class="bg-white p-2 rounded border border-emerald-200">
                                     <strong class="text-emerald-800 block mb-1">列 (Rows)</strong>
-                                    <span class="text-slate-500">分類項目，顯示在左側。<br>例：班別 (4A, 4B)</span>
+                                    <span class="text-slate-500">分類項目，顯示在左側。<br><span class="text-emerald-600">例：班別 (4A, 4B)</span></span>
                                 </div>
                                 <div class="bg-white p-2 rounded border border-emerald-200">
                                     <strong class="text-emerald-800 block mb-1">欄 (Columns)</strong>
-                                    <span class="text-slate-500">分類項目，顯示在上方。<br>例：性別 (M, F)</span>
+                                    <span class="text-slate-500">分類項目，顯示在上方。<br><span class="text-emerald-600">例：性別 (M, F)</span></span>
                                 </div>
                                 <div class="col-span-2 bg-white p-2 rounded border border-emerald-200">
                                     <strong class="text-emerald-800 block mb-1">值 (Values)</strong>
-                                    <span class="text-slate-500">計算的數據內容。<br>例：平均分、總人數 (Count/Sum)</span>
+                                    <span class="text-slate-500">計算的數據內容。<br><span class="text-emerald-600">例：平均分 (Average)、總人數 (Count)</span></span>
                                 </div>
                             </div>
                             
                             <!-- 模擬結果 -->
-                            <table class="w-full text-center bg-white border border-emerald-200 text-[10px]">
-                                <thead class="bg-emerald-100 text-emerald-900 font-bold">
-                                    <tr>
-                                        <th class="border border-emerald-200 p-1">班別 (Row)</th>
-                                        <th class="border border-emerald-200 p-1">男 (Col)</th>
-                                        <th class="border border-emerald-200 p-1">女 (Col)</th>
-                                        <th class="border border-emerald-200 p-1">總計</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td class="border border-emerald-200 p-1 font-bold">4A</td><td>15</td><td>15</td><td class="bg-emerald-50">30</td></tr>
-                                    <tr><td class="border border-emerald-200 p-1 font-bold">4B</td><td>14</td><td>14</td><td class="bg-emerald-50">28</td></tr>
-                                    <tr class="bg-emerald-50 font-bold"><td class="border border-emerald-200 p-1">總計</td><td>29</td><td>29</td><td>58</td></tr>
-                                </tbody>
-                            </table>
+                            <div class="bg-white border border-emerald-200 rounded shadow-sm overflow-hidden">
+                                <div class="bg-emerald-100 p-1 text-center font-bold text-emerald-900">匯總結果 (班別 x 性別)</div>
+                                <table class="w-full text-center">
+                                    <thead class="bg-emerald-50 text-emerald-900 font-bold">
+                                        <tr>
+                                            <th class="border border-emerald-100 p-1">班別</th>
+                                            <th class="border border-emerald-100 p-1">男 (M)</th>
+                                            <th class="border border-emerald-100 p-1">女 (F)</th>
+                                            <th class="border border-emerald-100 p-1 bg-emerald-100">總計</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td class="border border-emerald-100 p-1 font-bold">4A</td><td>15</td><td>15</td><td class="bg-emerald-50 font-bold">30</td></tr>
+                                        <tr><td class="border border-emerald-100 p-1 font-bold">4B</td><td>14</td><td>14</td><td class="bg-emerald-50 font-bold">28</td></tr>
+                                        <tr class="bg-emerald-100 font-bold"><td class="border border-emerald-200 p-1">總計</td><td>29</td><td>29</td><td>58</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
                             <div class="mt-1 text-center text-emerald-600 font-bold">↑ 值 (Values): 計數 (Count)</div>
                         </div>
                     </div>
