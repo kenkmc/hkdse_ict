@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5. 數據庫 - ICT 學習資源網</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f0f9ff; }
+        
+        /* 模擬數據庫表格 */
+        .db-table-wrapper { overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); background: white; }
+        .db-table { width: 100%; border-collapse: collapse; font-family: 'Courier New', monospace; font-size: 0.9rem; }
+        .db-table th { background-color: #f1f5f9; color: #475569; font-weight: bold; padding: 10px; border-bottom: 2px solid #e2e8f0; text-align: left; }
+        .db-table td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+        .db-table tr:hover { background-color: #f8fafc; }
+
+        /* 互動高亮效果 */
+        .highlight-record { background-color: #fef3c7 !important; transition: background 0.2s; } /* Yellow */
+        .highlight-field { background-color: #dbeafe !important; transition: background 0.2s; } /* Blue */
+        
+        /* SQL 模擬器 */
+        .sql-block { @apply px-3 py-1.5 rounded text-xs font-bold font-mono cursor-pointer transition shadow-sm border select-none; }
+        .sql-keyword { @apply bg-blue-600 text-white border-blue-700 hover:bg-blue-700; }
+        .sql-field { @apply bg-emerald-100 text-emerald-800 border-emerald-300 hover:bg-emerald-200; }
+        .sql-value { @apply bg-orange-100 text-orange-800 border-orange-300 hover:bg-orange-200; }
+        .sql-dropzone { min-height: 50px; background-color: #1e293b; color: #10b981; font-family: monospace; padding: 15px; border-radius: 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+        /* 卡片特效 */
+        .hover-card { transition: all 0.3s ease; }
+        .hover-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+
+        /* 數據類型標籤 */
+        .type-badge { @apply text-[10px] px-2 py-0.5 rounded-full border uppercase font-bold tracking-wider; }
+        
+        /* Access 物件卡片 */
+        .access-obj-card { @apply cursor-pointer transition-all duration-300 border hover:shadow-md hover:border-indigo-300; }
+        .access-obj-card.active { @apply border-indigo-500 bg-indigo-50 shadow-md transform scale-105; }
+    </style>
+</head>
+<body class="text-slate-700 flex flex-col min-h-screen">
+
+    <!-- 頂部導航 -->
+    <header class="bg-indigo-700 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="hover:bg-indigo-600 p-2 rounded-lg transition" title="回首頁">
+                    <i data-lucide="home" class="w-6 h-6"></i>
+                </a>
+                <span class="font-bold text-lg hidden md:block">必修部分 A > 5. 數據庫</span>
+            </div>
+            <div class="text-sm bg-indigo-800 px-3 py-1 rounded-full flex items-center gap-2">
+                <i data-lucide="database" class="w-4 h-4"></i> 
+                <span class="hidden sm:inline">數據組織與管理</span>
+            </div>
+        </div>
+        <!-- 進度條 -->
+        <div class="h-1 bg-indigo-900 w-full">
+            <div id="progressBar" class="h-full bg-cyan-400 w-0 transition-all duration-300"></div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 max-w-5xl space-y-16 flex-grow">
+
+        <!-- 5.1 數據庫簡介 Introduction -->
+        <section id="sec5-1" class="scroll-mt-24">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold text-sm">5.1</span>
+                <h2 class="text-3xl font-bold text-slate-800">數據庫簡介 (Introduction)</h2>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-8">
+                <p class="text-slate-600 mb-6 leading-relaxed">
+                    <span class="font-bold text-indigo-600">數據庫 (Database)</span> 是一個有結構的數據集合，儲存在電腦系統中，以便有效地儲存、提取和管理大量數據。
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <!-- 傳統 vs 數據庫 -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                        <h4 class="font-bold text-slate-700 mb-4 flex items-center gap-2">
+                            <i data-lucide="folder-open" class="w-5 h-5 text-gray-400"></i> 傳統檔案系統
+                        </h4>
+                        <ul class="space-y-3 text-sm text-slate-600">
+                            <li class="flex gap-2"><i data-lucide="x" class="w-4 h-4 text-red-500 shrink-0"></i> 數據重複 (Data Redundancy)：相同資料存在多個檔案中。</li>
+                            <li class="flex gap-2"><i data-lucide="x" class="w-4 h-4 text-red-500 shrink-0"></i> 數據不一致 (Data Inconsistency)：更新時可能遺漏某些檔案。</li>
+                        </ul>
+                    </div>
+                    <div class="bg-indigo-50 p-5 rounded-xl border border-indigo-100">
+                        <h4 class="font-bold text-indigo-800 mb-4 flex items-center gap-2">
+                            <i data-lucide="database" class="w-5 h-5 text-indigo-600"></i> 數據庫系統 (DBMS)
+                        </h4>
+                        <ul class="space-y-3 text-sm text-indigo-700">
+                            <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-green-600 shrink-0"></i> 數據共享：多個用戶可同時存取。</li>
+                            <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-green-600 shrink-0"></i> 數據完整性 (Data Integrity)：確保數據準確可靠。</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Access 物件介紹 (新增) -->
+                <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                    <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="package" class="w-6 h-6 text-indigo-600"></i> Microsoft Access 核心物件
+                    </h3>
+                    <p class="text-slate-600 mb-6 text-sm">
+                        Access 是一個常見的關聯式數據庫管理系統，它主要由以下四種物件組成。點擊卡片查看詳情：
+                    </p>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                        <div class="access-obj-card bg-white p-4 rounded-lg text-center active" onclick="showAccessObj('table', this)">
+                            <i data-lucide="table" class="w-8 h-8 mx-auto mb-2 text-blue-500"></i>
+                            <h4 class="font-bold text-slate-700 text-sm">數據表<br>(Table)</h4>
+                        </div>
+                        <div class="access-obj-card bg-white p-4 rounded-lg text-center" onclick="showAccessObj('form', this)">
+                            <i data-lucide="form-input" class="w-8 h-8 mx-auto mb-2 text-rose-500"></i>
+                            <h4 class="font-bold text-slate-700 text-sm">表單<br>(Form)</h4>
+                        </div>
+                        <div class="access-obj-card bg-white p-4 rounded-lg text-center" onclick="showAccessObj('report', this)">
+                            <i data-lucide="file-text" class="w-8 h-8 mx-auto mb-2 text-green-500"></i>
+                            <h4 class="font-bold text-slate-700 text-sm">報告<br>(Report)</h4>
+                        </div>
+                        <div class="access-obj-card bg-white p-4 rounded-lg text-center" onclick="showAccessObj('query', this)">
+                            <i data-lucide="search" class="w-8 h-8 mx-auto mb-2 text-purple-500"></i>
+                            <h4 class="font-bold text-slate-700 text-sm">查詢<br>(Query)</h4>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 min-h-[100px] flex items-center">
+                        <div id="accessObjContent" class="w-full">
+                            <!-- Default Content -->
+                            <div class="flex items-start gap-3">
+                                <i data-lucide="info" class="w-5 h-5 text-blue-500 mt-1 shrink-0"></i>
+                                <div>
+                                    <h5 class="font-bold text-slate-800 mb-1">數據表 (Table)</h5>
+                                    <p class="text-sm text-slate-600">這是數據庫的<span class="font-bold">基礎</span>。所有數據都實際儲存在數據表中，以列 (Row) 和欄 (Column) 的形式組織。沒有數據表，其他物件就沒有數據可操作。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 5.2 數據庫結構 Structure -->
+        <section id="sec5-2" class="scroll-mt-24">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold text-sm">5.2</span>
+                <h2 class="text-3xl font-bold text-slate-800">數據庫結構 (Structure)</h2>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-8">
+                <p class="text-slate-600 mb-4">
+                    在關聯式數據庫中，數據儲存在<span class="font-bold text-indigo-600">數據表 (Table)</span> 中。
+                </p>
+                
+                <!-- 互動結構圖 -->
+                <div class="border border-slate-300 rounded-lg overflow-hidden relative">
+                    <!-- 控制按鈕 -->
+                    <div class="bg-gray-100 p-2 flex gap-2 justify-center border-b border-gray-300">
+                        <button onmouseover="highlightStructure('field')" onmouseout="clearHighlight()" class="px-3 py-1 bg-white border rounded text-xs font-bold text-blue-600 hover:bg-blue-50 transition">顯示 欄位 (Field)</button>
+                        <button onmouseover="highlightStructure('record')" onmouseout="clearHighlight()" class="px-3 py-1 bg-white border rounded text-xs font-bold text-amber-600 hover:bg-amber-50 transition">顯示 記錄 (Record)</button>
+                    </div>
+
+                    <div class="db-table-wrapper">
+                        <table class="db-table" id="structureTable">
+                            <thead>
+                                <tr>
+                                    <th class="struct-col">學生編號 (ID)</th>
+                                    <th class="struct-col">姓名 (Name)</th>
+                                    <th class="struct-col">性別 (Gender)</th>
+                                    <th class="struct-col">班別 (Class)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="struct-row"><td>S1001</td><td>Chan Tai Man</td><td>M</td><td>4A</td></tr>
+                                <tr class="struct-row"><td>S1002</td><td>Lee Siu Ming</td><td>M</td><td>4A</td></tr>
+                                <tr class="struct-row"><td>S1003</td><td>Wong Mei Ling</td><td>F</td><td>4B</td></tr>
+                                <tr class="struct-row"><td>S1004</td><td>Cheung Siu Fun</td><td>F</td><td>4A</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 浮動提示 -->
+                    <div id="structTip" class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-slate-800/90 text-white px-4 py-2 rounded-full text-xs opacity-0 transition-opacity pointer-events-none">
+                        提示文字
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-4 mt-6 text-sm">
+                    <div class="p-3 border-l-4 border-blue-500 bg-blue-50 rounded-r">
+                        <strong class="block text-blue-800">欄位 (Field)</strong>
+                        <span class="text-slate-600">垂直的一欄。描述實體的某一項屬性（如姓名）。</span>
+                    </div>
+                    <div class="p-3 border-l-4 border-amber-500 bg-amber-50 rounded-r">
+                        <strong class="block text-amber-800">記錄 (Record)</strong>
+                        <span class="text-slate-600">橫向的一列。有關一個特定實體的所有資料集合。</span>
+                    </div>
+                    <div class="p-3 border-l-4 border-slate-500 bg-slate-100 rounded-r">
+                        <strong class="block text-slate-800">數據表 (Table)</strong>
+                        <span class="text-slate-600">所有相關記錄的集合。</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5.3 數據類型 Data Types -->
+        <section id="sec5-3" class="scroll-mt-24">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold text-sm">5.3</span>
+                <h2 class="text-3xl font-bold text-slate-800">數據類型 (Data Types)</h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- 文本 -->
+                <div class="bg-white p-5 rounded-xl border border-gray-200 hover-card">
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="font-bold text-slate-700">文本 (Text)</h4>
+                        <span class="type-badge border-orange-200 text-orange-600 bg-orange-50">Short Text</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-3">儲存字母、數字或符號。不作數學運算。</p>
+                    <div class="bg-gray-50 p-2 rounded font-mono text-sm text-slate-700 border">"Chan Tai Man", "S1001"</div>
+                </div>
+
+                <!-- 數字 -->
+                <div class="bg-white p-5 rounded-xl border border-gray-200 hover-card">
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="font-bold text-slate-700">數字 (Number)</h4>
+                        <span class="type-badge border-emerald-200 text-emerald-600 bg-emerald-50">Integer / Decimal</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-3">儲存數值，可進行數學運算。</p>
+                    <div class="bg-gray-50 p-2 rounded font-mono text-sm text-slate-700 border">85, 12.5, -100</div>
+                </div>
+
+                <!-- 日期/時間 -->
+                <div class="bg-white p-5 rounded-xl border border-gray-200 hover-card">
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="font-bold text-slate-700">日期/時間</h4>
+                        <span class="type-badge border-blue-200 text-blue-600 bg-blue-50">Date/Time</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-3">儲存日期或時間。</p>
+                    <div class="bg-gray-50 p-2 rounded font-mono text-sm text-slate-700 border">2024-01-01, 14:30</div>
+                </div>
+
+                <!-- 布爾 -->
+                <div class="bg-white p-5 rounded-xl border border-gray-200 hover-card">
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="font-bold text-slate-700">布爾 (Boolean)</h4>
+                        <span class="type-badge border-purple-200 text-purple-600 bg-purple-50">Yes/No</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-3">只有兩個可能的值。</p>
+                    <div class="bg-gray-50 p-2 rounded font-mono text-sm text-slate-700 border">True/False, Yes/No</div>
+                </div>
+
+                <!-- 備忘 -->
+                <div class="bg-white p-5 rounded-xl border border-gray-200 hover-card">
+                    <div class="flex justify-between items-start mb-3">
+                        <h4 class="font-bold text-slate-700">備忘 (Memo)</h4>
+                        <span class="type-badge border-slate-200 text-slate-600 bg-slate-50">Long Text</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-3">儲存較長的文字段落。</p>
+                    <div class="bg-gray-50 p-2 rounded font-mono text-xs text-slate-700 border">"這是一個很長的備註..."</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5.4 關鍵碼 Keys -->
+        <section id="sec5-4" class="scroll-mt-24">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold text-sm">5.4</span>
+                <h2 class="text-3xl font-bold text-slate-800">關鍵碼 (Keys)</h2>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-8">
+                <!-- 主關鍵碼 -->
+                <div class="flex items-start gap-4 mb-6 border-b border-gray-100 pb-6">
+                    <div class="bg-yellow-100 p-3 rounded-full shrink-0"><i data-lucide="key" class="w-6 h-6 text-yellow-600"></i></div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">主關鍵碼 (Primary Key)</h3>
+                        <p class="text-slate-600 text-sm">
+                            一個欄位（或欄位組合），其值能<span class="font-bold text-indigo-600">唯一地識別</span>每一條記錄。主關鍵碼<span class="text-red-500 font-bold">不能重複</span>，也<span class="text-red-500 font-bold">不能留空 (Null)</span>。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 複合鍵 Composite Key -->
+                <div class="flex items-start gap-4 mb-6">
+                    <div class="bg-purple-100 p-3 rounded-full shrink-0"><i data-lucide="layers" class="w-6 h-6 text-purple-600"></i></div>
+                    <div class="flex-grow">
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">複合鍵 (Composite Key)</h3>
+                        <p class="text-slate-600 text-sm mb-4">
+                            當單一欄位不足以唯一識別記錄時，我們可以結合<span class="font-bold text-purple-600">兩個或以上</span>的欄位來組成主關鍵碼。
+                        </p>
+                        
+                        <!-- 複合鍵例子 -->
+                        <div class="bg-purple-50 p-4 rounded-lg border border-purple-100">
+                            <h4 class="font-bold text-purple-800 text-sm mb-2">例子：學生選科表</h4>
+                            <div class="bg-white border rounded overflow-hidden">
+                                <table class="w-full text-sm text-center">
+                                    <thead class="bg-gray-100 text-gray-600">
+                                        <tr>
+                                            <th class="p-2 border-b border-r border-purple-200 bg-purple-100/50">學生編號 (PK)</th>
+                                            <th class="p-2 border-b border-purple-200 bg-purple-100/50">科目編號 (PK)</th>
+                                            <th class="p-2 border-b">考試日期</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-slate-700">
+                                        <tr class="border-b"><td class="p-2 border-r bg-red-50">S101</td><td class="p-2 bg-blue-50">ENG</td><td>2024-06-01</td></tr>
+                                        <tr class="border-b"><td class="p-2 border-r bg-red-50">S101</td><td class="p-2">MATH</td><td>2024-06-02</td></tr>
+                                        <tr class="border-b"><td class="p-2 border-r">S102</td><td class="p-2 bg-blue-50">ENG</td><td>2024-06-01</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="text-[10px] text-purple-600 mt-2 text-center">
+                                雖然 S101 (紅色) 和 ENG (藍色) 都有重複，但每一行的組合 <span class="font-bold">(S101 + ENG)</span> 是唯一的。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 互動模擬器：主關鍵碼驗證 -->
+                <div class="bg-slate-50 rounded-xl p-6 border border-slate-200 mt-8">
+                    <h4 class="font-bold text-slate-700 mb-4 text-sm flex justify-between">
+                        <span>模擬數據庫輸入：學生資料表</span>
+                        <span class="text-yellow-600 text-xs flex items-center gap-1"><i data-lucide="key" class="w-3 h-3"></i> 主關鍵碼：學生編號 (ID)</span>
+                    </h4>
+
+                    <!-- 現有數據 -->
+                    <div class="bg-white border rounded mb-4 overflow-hidden">
+                        <table class="w-full text-sm text-center">
+                            <thead class="bg-gray-100 text-gray-600"><tr><th>ID (PK)</th><th>Name</th></tr></thead>
+                            <tbody id="pkDemoBody" class="text-slate-700">
+                                <tr><td>101</td><td>Alice</td></tr>
+                                <tr><td>102</td><td>Bob</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 輸入區 -->
+                    <div class="flex gap-2 items-end">
+                        <div class="w-1/3">
+                            <label class="block text-xs font-bold text-slate-500 mb-1">ID</label>
+                            <input type="text" id="inputPK" class="w-full p-2 border rounded text-sm focus:outline-none focus:border-indigo-500" placeholder="試試輸入 101...">
+                        </div>
+                        <div class="w-1/3">
+                            <label class="block text-xs font-bold text-slate-500 mb-1">Name</label>
+                            <input type="text" id="inputName" class="w-full p-2 border rounded text-sm focus:outline-none focus:border-indigo-500" placeholder="任意名字">
+                        </div>
+                        <button onclick="addRecord()" class="bg-indigo-600 text-white px-4 py-2 rounded text-sm font-bold hover:bg-indigo-700 transition">新增記錄</button>
+                    </div>
+                    <div id="pkErrorMsg" class="mt-3 text-xs font-bold text-red-500 h-4"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5.5 數據庫物件 Database Objects -->
+        <section id="sec5-5" class="scroll-mt-24">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold text-sm">5.5</span>
+                <h2 class="text-3xl font-bold text-slate-800">數據庫物件 (Database Objects)</h2>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
+                <p class="text-slate-600 mb-6 text-center">同一個數據庫，可以透過不同的「物件」來檢視和操作。</p>
+
+                <!-- 模擬切換介面 -->
+                <div class="flex border-b border-gray-200 mb-6">
+                    <button onclick="switchView('table')" class="view-tab px-6 py-3 border-b-2 border-indigo-600 text-indigo-600 font-bold bg-indigo-50/50 transition">數據表 (Table)</button>
+                    <button onclick="switchView('form')" class="view-tab px-6 py-3 border-b-2 border-transparent text-gray-500 hover:text-indigo-600 transition">表單 (Form)</button>
+                    <button onclick="switchView('report')" class="view-tab px-6 py-3 border-b-2 border-transparent text-gray-500 hover:text-indigo-600 transition">報告 (Report)</button>
+                    <button onclick="switchView('query')" class="view-tab px-6 py-3 border-b-2 border-transparent text-gray-500 hover:text-indigo-600 transition">查詢 (Query)</button>
+                </div>
+
+                <!-- 視圖內容 -->
+                <div class="min-h-[250px] relative">
+                    <!-- Table View -->
+                    <div id="view-table" class="view-content block animate-fade-in">
+                        <div class="bg-white border rounded-lg overflow-hidden shadow-sm">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-gray-100 text-gray-700"><tr><th class="p-3">ID</th><th class="p-3">產品</th><th class="p-3">價格</th><th class="p-3">庫存</th></tr></thead>
+                                <tbody class="text-slate-600">
+                                    <tr class="border-b"><td class="p-3">P001</td><td class="p-3">Notebook</td><td class="p-3">$5000</td><td class="p-3">10</td></tr>
+                                    <tr class="border-b"><td class="p-3">P002</td><td class="p-3">Mouse</td><td class="p-3">$150</td><td class="p-3">50</td></tr>
+                                    <tr><td class="p-3">P003</td><td class="p-3">Keyboard</td><td class="p-3">$300</td><td class="p-3">30</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="mt-4 text-sm text-slate-500"><i data-lucide="info" class="w-4 h-4 inline"></i> 用途：儲存數據的基礎結構，以行列形式顯示。</p>
+                    </div>
+
+                    <!-- Form View -->
+                    <div id="view-form" class="view-content hidden animate-fade-in">
+                        <div class="bg-gray-100 p-6 rounded-xl border border-gray-300 max-w-md mx-auto shadow-md">
+                            <h4 class="font-bold text-gray-700 mb-4 border-b pb-2">產品輸入表單</h4>
+                            <div class="space-y-3">
+                                <div><label class="block text-xs font-bold text-gray-500 mb-1">ID</label><input type="text" value="P001" class="w-full p-2 rounded border" disabled></div>
+                                <div><label class="block text-xs font-bold text-gray-500 mb-1">產品</label><input type="text" value="Notebook" class="w-full p-2 rounded border"></div>
+                                <div><label class="block text-xs font-bold text-gray-500 mb-1">價格</label><input type="text" value="$5000" class="w-full p-2 rounded border"></div>
+                            </div>
+                            <div class="mt-4 flex gap-2 justify-end">
+                                <button class="px-3 py-1 bg-gray-300 rounded text-xs text-gray-600">上一筆</button>
+                                <button class="px-3 py-1 bg-gray-300 rounded text-xs text-gray-600">下一筆</button>
+                            </div>
+                        </div>
+                        <p class="mt-4 text-sm text-slate-500 text-center"><i data-lucide="info" class="w-4 h-4 inline"></i> 用途：提供友善介面，方便用戶逐筆輸入或瀏覽。</p>
+                    </div>
+
+                    <!-- Report View -->
+                    <div id="view-report" class="view-content hidden animate-fade-in">
+                        <div class="bg-white p-8 border border-gray-200 shadow-lg max-w-lg mx-auto transform scale-95 origin-top">
+                            <h4 class="text-2xl font-bold text-center mb-6 text-slate-800">庫存報告</h4>
+                            <div class="text-right text-xs text-gray-500 mb-4">日期: 2024-05-20</div>
+                            <table class="w-full text-sm mb-6">
+                                <thead class="border-b-2 border-black"><tr><th class="text-left py-1">產品</th><th class="text-right py-1">價格</th><th class="text-right py-1">庫存</th></tr></thead>
+                                <tbody>
+                                    <tr><td class="py-1">Notebook</td><td class="text-right">$5000</td><td class="text-right">10</td></tr>
+                                    <tr><td class="py-1">Mouse</td><td class="text-right">$150</td><td class="text-right">50</td></tr>
+                                    <tr><td class="py-1">Keyboard</td><td class="text-right">$300</td><td class="text-right">30</td></tr>
+                                </tbody>
+                                <tfoot class="border-t-2 border-black font-bold">
+                                    <tr><td class="py-2">總數</td><td></td><td class="text-right py-2">90</td></tr>
+                                </tfoot>
+                            </table>
+                            <div class="text-center text-xs text-gray-400">--- End of Report ---</div>
+                        </div>
+                        <p class="mt-4 text-sm text-slate-500 text-center"><i data-lucide="info" class="w-4 h-4 inline"></i> 用途：以格式化版面展示數據，適合列印。</p>
+                    </div>
+
+                    <!-- Query View -->
+                    <div id="view-query" class="view-content hidden animate-fade-in">
+                        <div class="bg-slate-800 p-6 rounded-xl text-white font-mono text-sm shadow-md">
+                            <p class="text-green-400 mb-2">// 查詢：找出價格大於 $1000 的產品</p>
+                            <p><span class="text-blue-400">SELECT</span> *</p>
+                            <p><span class="text-blue-400">FROM</span> Products</p>
+                            <p><span class="text-blue-400">WHERE</span> Price > 1000;</p>
+                            
+                            <div class="mt-4 bg-slate-700 p-3 rounded border border-slate-600">
+                                <p class="text-xs text-slate-400 mb-1">結果：</p>
+                                <table class="w-full text-xs text-left">
+                                    <tr class="border-b border-slate-600"><th class="p-1">ID</th><th class="p-1">產品</th><th class="p-1">價格</th></tr>
+                                    <tr><td class="p-1">P001</td><td class="p-1">Notebook</td><td class="p-1">$5000</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                        <p class="mt-4 text-sm text-slate-500 text-center"><i data-lucide="info" class="w-4 h-4 inline"></i> 用途：從數據庫中檢索符合特定條件的數據。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5.6 數據操作 Data Manipulation -->
+        <section id="sec5-6" class="scroll-mt-24">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold text-sm">5.6</span>
+                <h2 class="text-3xl font-bold text-slate-800">數據操作 (Data Manipulation)</h2>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl border border-gray-200 hover-card">
+                    <div class="flex items-center gap-2 mb-3 text-blue-600">
+                        <i data-lucide="arrow-down-up" class="w-6 h-6"></i>
+                        <h4 class="font-bold text-lg">排序 (Sorting)</h4>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-4">重新排列記錄的次序。</p>
+                    <ul class="list-disc list-inside text-xs text-slate-500 space-y-1 bg-gray-50 p-3 rounded">
+                        <li>升序 (Ascending): A-Z, 0-9</li>
+                        <li>降序 (Descending): Z-A, 9-0</li>
+                        <li>可以多層排序 (先按班別，再按學號)。</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-gray-200 hover-card">
+                    <div class="flex items-center gap-2 mb-3 text-emerald-600">
+                        <i data-lucide="filter" class="w-6 h-6"></i>
+                        <h4 class="font-bold text-lg">篩選 (Filtering)</h4>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-4">只顯示符合特定條件的記錄，隱藏其他記錄。</p>
+                    <ul class="list-disc list-inside text-xs text-slate-500 space-y-1 bg-gray-50 p-3 rounded">
+                        <li>例子：只顯示 "4A" 班的學生。</li>
+                        <li>複合條件："4A" 班 <span class="font-bold">AND</span> "男" 生。</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5.7 SQL 簡介 Introduction to SQL -->
+        <section id="sec5-7" class="scroll-mt-24">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold text-sm">5.7</span>
+                <h2 class="text-3xl font-bold text-slate-800">SQL 簡介 (Introduction to SQL)</h2>
+            </div>
+
+            <div class="bg-slate-800 rounded-2xl p-8 text-white shadow-xl">
+                <div class="flex items-center gap-3 mb-6">
+                    <i data-lucide="terminal" class="w-8 h-8 text-green-400"></i>
+                    <div>
+                        <h3 class="text-2xl font-bold">SQL 積木工廠</h3>
+                        <p class="text-slate-400 text-sm">點擊下方積木，組合出正確的 SQL 查詢語句！</p>
+                    </div>
+                </div>
+
+                <!-- 積木區 -->
+                <div class="mb-6 space-y-3">
+                    <div class="flex flex-wrap gap-2 text-sm">
+                        <span class="text-slate-400 text-xs w-full mb-1">關鍵字 (Keywords):</span>
+                        <div class="sql-block sql-keyword" onclick="addToSQL('SELECT')">SELECT</div>
+                        <div class="sql-block sql-keyword" onclick="addToSQL('FROM')">FROM</div>
+                        <div class="sql-block sql-keyword" onclick="addToSQL('WHERE')">WHERE</div>
+                        <div class="sql-block sql-keyword" onclick="addToSQL('ORDER BY')">ORDER BY</div>
+                    </div>
+                    <div class="flex flex-wrap gap-2 text-sm">
+                        <span class="text-slate-400 text-xs w-full mb-1">欄位與表格 (Fields & Table):</span>
+                        <div class="sql-block sql-field" onclick="addToSQL('*')">* (所有)</div>
+                        <div class="sql-block sql-field" onclick="addToSQL('Name')">Name</div>
+                        <div class="sql-block sql-field" onclick="addToSQL('Class')">Class</div>
+                        <div class="sql-block sql-field" onclick="addToSQL('Students')">Students</div>
+                    </div>
+                    <div class="flex flex-wrap gap-2 text-sm">
+                        <span class="text-slate-400 text-xs w-full mb-1">條件值 (Values):</span>
+                        <div class="sql-block sql-value" onclick="addToSQL('=')">=</div>
+                        <div class="sql-block sql-value" onclick="addToSQL('\'4A\'')">'4A'</div>
+                    </div>
+                </div>
+
+                <!-- 顯示區 -->
+                <div class="bg-black/40 p-4 rounded-xl border-2 border-slate-600 min-h-[80px] relative">
+                    <div id="sqlDisplay" class="font-mono text-lg text-green-400 min-h-[30px] flex flex-wrap gap-2 items-center">
+                        <span class="animate-pulse">_</span>
+                    </div>
+                    <button onclick="clearSQL()" class="absolute right-2 top-2 text-xs text-red-400 hover:text-red-300 border border-red-400/50 px-2 py-1 rounded">清空</button>
+                </div>
+
+                <!-- 結果預覽 -->
+                <div class="mt-6 p-4 bg-slate-700 rounded-xl border border-slate-600 hidden" id="sqlResultBox">
+                    <div class="text-xs text-slate-300 mb-2">查詢結果 (Result):</div>
+                    <table class="w-full text-sm text-left text-slate-200">
+                        <thead class="border-b border-slate-500"><tr><th>ID</th><th>Name</th><th>Class</th></tr></thead>
+                        <tbody>
+                            <tr><td>S1001</td><td>Chan Tai Man</td><td>4A</td></tr>
+                            <tr><td>S1002</td><td>Lee Siu Ming</td><td>4A</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4 flex justify-between items-center">
+                    <button onclick="runSQL()" class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-6 rounded-lg transition shadow-lg flex items-center gap-2">
+                        <i data-lucide="play" class="w-4 h-4"></i> 執行查詢 (Run)
+                    </button>
+                    <span class="text-xs text-slate-500">目標：找出 4A 班的所有學生資料</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 總結測驗 -->
+        <section class="bg-indigo-900 text-white rounded-3xl p-8 md:p-12 text-center relative overflow-hidden mt-12">
+            <h2 class="text-3xl font-bold mb-8 relative z-10">🚀 第五章 總結測驗</h2>
+            <div class="max-w-2xl mx-auto space-y-6 relative z-10 text-left">
+                <div class="bg-indigo-800 p-6 rounded-xl border border-indigo-700">
+                    <p class="font-bold text-lg mb-4">1. 數據庫中，用於唯一識別每一條記錄的欄位稱為？</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button class="quiz-btn p-3 bg-indigo-950 rounded hover:bg-indigo-700 transition text-sm" onclick="checkFinalQuiz(this, true)">主關鍵碼 (Primary Key)</button>
+                        <button class="quiz-btn p-3 bg-indigo-950 rounded hover:bg-indigo-700 transition text-sm" onclick="checkFinalQuiz(this, false)">外關鍵碼 (Foreign Key)</button>
+                    </div>
+                </div>
+                <div class="bg-indigo-800 p-6 rounded-xl border border-indigo-700">
+                    <p class="font-bold text-lg mb-4">2. 若要從數據庫中搜尋特定資料，應使用哪種物件？</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button class="quiz-btn p-3 bg-indigo-950 rounded hover:bg-indigo-700 transition text-sm" onclick="checkFinalQuiz(this, false)">表單 (Form)</button>
+                        <button class="quiz-btn p-3 bg-indigo-950 rounded hover:bg-indigo-700 transition text-sm" onclick="checkFinalQuiz(this, true)">查詢 (Query)</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="bg-slate-100 py-8 mt-12 text-center text-slate-500 text-sm">
+        <p>高中 ICT 學習資源網 &copy; 2025</p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // 進度條
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("progressBar").style.width = scrolled + "%";
+        };
+
+        // 5.1 Access 物件顯示
+        function showAccessObj(objType, card) {
+            document.querySelectorAll('.access-obj-card').forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+            
+            const contentDiv = document.getElementById('accessObjContent');
+            let content = '';
+
+            switch(objType) {
+                case 'table':
+                    content = `<div class="flex items-start gap-3"><i data-lucide="info" class="w-5 h-5 text-blue-500 mt-1 shrink-0"></i><div><h5 class="font-bold text-slate-800 mb-1">數據表 (Table)</h5><p class="text-sm text-slate-600">這是數據庫的<span class="font-bold">基礎</span>。所有數據都實際儲存在數據表中，以列 (Row) 和欄 (Column) 的形式組織。沒有數據表，其他物件就沒有數據可操作。</p></div></div>`;
+                    break;
+                case 'form':
+                    content = `<div class="flex items-start gap-3"><i data-lucide="info" class="w-5 h-5 text-rose-500 mt-1 shrink-0"></i><div><h5 class="font-bold text-slate-800 mb-1">表單 (Form)</h5><p class="text-sm text-slate-600">提供一個<span class="font-bold">友善的介面</span>，讓用戶方便地輸入、修改或檢視數據。它可以一次顯示一筆記錄，避免直接操作數據表時的混亂。</p></div></div>`;
+                    break;
+                case 'report':
+                    content = `<div class="flex items-start gap-3"><i data-lucide="info" class="w-5 h-5 text-green-500 mt-1 shrink-0"></i><div><h5 class="font-bold text-slate-800 mb-1">報告 (Report)</h5><p class="text-sm text-slate-600">用於將數據<span class="font-bold">格式化並列印</span>出來。報告可以對數據進行分組、匯總（如計算總和），適合製作專業的文件。</p></div></div>`;
+                    break;
+                case 'query':
+                    content = `<div class="flex items-start gap-3"><i data-lucide="info" class="w-5 h-5 text-purple-500 mt-1 shrink-0"></i><div><h5 class="font-bold text-slate-800 mb-1">查詢 (Query)</h5><p class="text-sm text-slate-600">用於從數據表中<span class="font-bold">檢索符合特定條件</span>的數據。你可以把它想像成向數據庫提問，例如「找出所有不及格的學生」。</p></div></div>`;
+                    break;
+            }
+            contentDiv.innerHTML = content;
+            lucide.createIcons();
+        }
+
+        // 5.2 結構高亮
+        function highlightStructure(type) {
+            const tip = document.getElementById('structTip');
+            tip.style.opacity = '1';
+            
+            if(type === 'field') {
+                document.querySelectorAll('.struct-col').forEach(el => el.classList.add('highlight-field'));
+                tip.textContent = "欄位 (Field)：垂直的資料類別";
+            } else if (type === 'record') {
+                document.querySelector('.struct-row').classList.add('highlight-record');
+                tip.textContent = "記錄 (Record)：橫向的完整資料集";
+            }
+        }
+
+        function clearHighlight() {
+            document.getElementById('structTip').style.opacity = '0';
+            document.querySelectorAll('.struct-col').forEach(el => el.classList.remove('highlight-field'));
+            document.querySelectorAll('.struct-row').forEach(el => el.classList.remove('highlight-record'));
+        }
+
+        // 5.4 PK 模擬器
+        const records = new Set(['101', '102']);
+        function addRecord() {
+            const id = document.getElementById('inputPK').value.trim();
+            const name = document.getElementById('inputName').value.trim();
+            const errorMsg = document.getElementById('pkErrorMsg');
+            const tbody = document.getElementById('pkDemoBody');
+
+            if(!id) {
+                errorMsg.textContent = "錯誤：主關鍵碼不能留空 (Null)！";
+                return;
+            }
+            if(records.has(id)) {
+                errorMsg.textContent = `錯誤：ID "${id}" 已存在！主關鍵碼不能重複。`;
+                return;
+            }
+            
+            errorMsg.textContent = "";
+            errorMsg.className = "mt-3 text-xs font-bold text-green-600 h-4";
+            errorMsg.textContent = "成功新增記錄！";
+            setTimeout(() => errorMsg.className = "mt-3 text-xs font-bold text-red-500 h-4", 2000);
+            
+            records.add(id);
+            const row = document.createElement('tr');
+            row.innerHTML = `<td class="bg-green-50">${id}</td><td>${name || '-'}</td>`;
+            row.className = "animate-pulse";
+            tbody.appendChild(row);
+            
+            document.getElementById('inputPK').value = '';
+            document.getElementById('inputName').value = '';
+        }
+
+        // 5.5 視圖切換
+        function switchView(viewName) {
+            document.querySelectorAll('.view-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.view-tab').forEach(btn => {
+                btn.classList.remove('border-indigo-600', 'text-indigo-600', 'font-bold', 'bg-indigo-50/50');
+                btn.classList.add('border-transparent', 'text-gray-500');
+            });
+
+            document.getElementById('view-' + viewName).classList.remove('hidden');
+            const btns = document.querySelectorAll('.view-tab');
+            let activeBtn;
+            if(viewName === 'table') activeBtn = btns[0];
+            if(viewName === 'form') activeBtn = btns[1];
+            if(viewName === 'report') activeBtn = btns[2];
+            if(viewName === 'query') activeBtn = btns[3];
+            
+            activeBtn.classList.remove('border-transparent', 'text-gray-500');
+            activeBtn.classList.add('border-indigo-600', 'text-indigo-600', 'font-bold', 'bg-indigo-50/50');
+        }
+
+        // 5.7 SQL 模擬器
+        let currentSQL = [];
+        function addToSQL(text) {
+            currentSQL.push(text);
+            updateSQLDisplay();
+        }
+        function clearSQL() {
+            currentSQL = [];
+            updateSQLDisplay();
+            document.getElementById('sqlResultBox').classList.add('hidden');
+        }
+        function updateSQLDisplay() {
+            const display = document.getElementById('sqlDisplay');
+            display.innerHTML = currentSQL.map(word => `<span class="bg-white/10 px-1 rounded">${word}</span>`).join(' ') + '<span class="animate-pulse">_</span>';
+        }
+        function runSQL() {
+            const str = currentSQL.join(' ');
+            if(str.includes('SELECT') && str.includes('FROM') && str.includes('Students')) {
+                document.getElementById('sqlResultBox').classList.remove('hidden');
+                document.getElementById('sqlResultBox').classList.add('animate-bounce-in');
+            } else {
+                alert("SQL 語法似乎不完整，試試：SELECT * FROM Students ...");
+            }
+        }
+
+        // 測驗邏輯
+        function checkFinalQuiz(btn, isCorrect) {
+            if (isCorrect) {
+                btn.classList.add('correct-anim', 'bg-green-600', 'text-white');
+                btn.innerHTML += ' ✅';
+            } else {
+                btn.classList.add('wrong-anim', 'bg-red-600', 'text-white');
+                btn.innerHTML += ' ❌';
+            }
+        }
+    </script>
+</body>
+</html>
