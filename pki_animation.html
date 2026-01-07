@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PKI 多場景互動教學</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f1f5f9;
+            touch-action: none; 
+        }
+
+        .canvas-container {
+            min-height: 600px;
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .draggable-key {
+            cursor: grab;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .draggable-key:active { cursor: grabbing; transform: scale(1.1); }
+
+        .drop-zone {
+            transition: all 0.3s;
+            border: 3px dashed transparent;
+        }
+
+        .drop-zone.active-target {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.05);
+            transform: scale(1.02);
+        }
+
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        .data-terminal {
+            font-family: monospace;
+            background: #0f172a;
+            color: #10b981;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            font-size: 0.8rem;
+            min-height: 80px;
+            word-break: break-all;
+        }
+
+        .scenario-btn.active {
+            background-color: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.5);
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-6 text-center">
+            <h1 class="text-2xl font-bold text-slate-800">PKI 互動實戰：加密與簽署</h1>
+            
+            <!-- 場景切換器 -->
+            <div class="flex justify-center gap-2 mt-4">
+                <button id="btn-conf" onclick="switchScenario('confidentiality')" class="scenario-btn active px-4 py-2 rounded-full text-sm font-bold bg-white text-slate-600 transition-all border">🔐 傳輸加密 (保密性)</button>
+                <button id="btn-auth" onclick="switchScenario('authentication')" class="scenario-btn px-4 py-2 rounded-full text-sm font-bold bg-white text-slate-600 transition-all border">✍️ 數位簽署 (驗證性)</button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
+            <!-- 側邊欄：金鑰庫 -->
+            <div class="xl:col-span-1 space-y-4">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-slate-700 mb-3 text-sm flex items-center gap-2">📦 角色金鑰庫</h3>
+                    
+                    <div class="space-y-3">
+                        <!-- Alice -->
+                        <div class="p-2 border border-red-100 rounded-lg bg-red-50/30">
+                            <div class="text-[10px] font-bold text-red-500 mb-2">ALICE 的金鑰</div>
+                            <div class="flex gap-2">
+                                <div id="key-alice-priv" draggable="true" class="draggable-key text-2xl p-2 bg-red-100 rounded border border-red-200" data-key="alice-priv" title="Alice 的私鑰">🗝️</div>
+                                <div id="key-bob-pub-alice" draggable="true" class="draggable-key text-2xl p-2 bg-white rounded border border-blue-200 text-blue-400" data-key="bob-pub" title="Bob 的公鑰">🔑</div>
+                            </div>
+                        </div>
+
+                        <!-- Bob -->
+                        <div class="p-2 border border-blue-100 rounded-lg bg-blue-50/30">
+                            <div class="text-[10px] font-bold text-blue-500 mb-2">BOB 的金鑰</div>
+                            <div class="flex gap-2">
+                                <div id="key-bob-priv" draggable="true" class="draggable-key text-2xl p-2 bg-blue-100 rounded border border-blue-200" data-key="bob-priv" title="Bob 的私鑰">🗝️</div>
+                                <div id="key-alice-pub-bob" draggable="true" class="draggable-key text-2xl p-2 bg-white rounded border border-red-200 text-red-400" data-key="alice-pub" title="Alice 的公鑰">🔑</div>
+                            </div>
+                        </div>
+
+                        <!-- Eve (現在她有公鑰了) -->
+                        <div class="p-2 border border-slate-200 rounded-lg bg-slate-100">
+                            <div class="text-[10px] font-bold text-slate-600 mb-2">EVE (駭客) 的蒐集</div>
+                            <div class="flex gap-2">
+                                <div id="key-eve-priv" draggable="true" class="draggable-key text-2xl p-2 bg-slate-800 rounded border border-slate-900" data-key="eve-priv" title="Eve 的私鑰">🗝️</div>
+                                <div id="key-alice-pub-eve" draggable="true" class="draggable-key text-2xl p-2 bg-white rounded border border-red-200 text-red-400 opacity-60" data-key="alice-pub" title="盜取的 Alice 公鑰">🔑</div>
+                                <div id="key-bob-pub-eve" draggable="true" class="draggable-key text-2xl p-2 bg-white rounded border border-blue-200 text-blue-400 opacity-60" data-key="bob-pub" title="盜取的 Bob 公鑰">🔑</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-slate-700 mb-2 text-sm">📡 數據流數據</h3>
+                    <div id="sim-data" class="data-terminal">準備就緒...</div>
+                </div>
+                
+                <button onclick="location.reload()" class="w-full py-2 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-lg text-xs font-bold transition-all">🔄 重置實驗室</button>
+            </div>
+
+            <!-- 主畫布 -->
+            <div class="xl:col-span-3">
+                <div class="canvas-container p-8 flex flex-col justify-between">
+                    <!-- 角色層 -->
+                    <div class="flex justify-around items-center">
+                        <div class="text-center relative">
+                            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center text-3xl border-2 border-red-300">👩‍💻</div>
+                            <span class="text-xs font-bold text-slate-600">Alice</span>
+                        </div>
+                        <div class="text-center">
+                            <div id="eve-avatar" class="w-14 h-14 bg-slate-800 rounded-full flex items-center justify-center text-2xl border-2 border-slate-600 opacity-30 grayscale transition-all">🦹</div>
+                            <span class="text-[10px] font-bold text-slate-400">Eve</span>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-3xl border-2 border-blue-300">👨‍💼</div>
+                            <span class="text-xs font-bold text-slate-600">Bob</span>
+                        </div>
+                    </div>
+
+                    <!-- 軌道層 -->
+                    <div class="relative h-40 flex items-center px-12">
+                        <div class="absolute inset-x-12 h-1 bg-slate-200 rounded-full"></div>
+                        <div id="packet-path" class="absolute left-0 transition-all duration-1000 ease-in-out" style="left: 0%;">
+                            <div id="main-packet" class="drop-zone w-24 h-24 bg-white border-2 border-slate-200 rounded-xl shadow-lg flex flex-col items-center justify-center relative">
+                                <span id="packet-icon" class="text-4xl">✉️</span>
+                                <div id="status-badge" class="absolute -top-3 -right-3 text-2xl"></div>
+                                <span id="packet-label" class="text-[9px] font-bold mt-2 text-slate-400">原始郵件</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 引導層 -->
+                    <div id="guide-box" class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg shadow-sm">
+                        <h4 id="guide-title" class="font-bold text-blue-800 mb-1">場景：傳輸加密</h4>
+                        <p id="guide-text" class="text-blue-700 text-sm">請將 <b>Bob 的公鑰 (藍色🔑)</b> 拖到郵件上來加密內容。</p>
+                        <button id="send-btn" class="hidden mt-3 bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold hover:bg-blue-700 transition-all">發送 ➔</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 px-6 py-3 rounded-xl text-white font-bold shadow-2xl opacity-0 transition-all z-50 pointer-events-none"></div>
+
+    <script>
+        let currentScenario = 'confidentiality';
+        let step = 1;
+        let isProcessed = false;
+        const msg = "秘密：明天下午三點開會。";
+        const encryptedMsg = "0xAF882D...[密文]";
+        const signedMsg = "秘密：明天下午三點開會。\n[簽章: 0x92E1...]";
+
+        function switchScenario(type) {
+            currentScenario = type;
+            step = 1;
+            isProcessed = false;
+            
+            document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(type === 'confidentiality' ? 'btn-conf' : 'btn-auth').classList.add('active');
+            
+            resetUI();
+        }
+
+        function resetUI() {
+            const packet = document.getElementById('main-packet');
+            const path = document.getElementById('packet-path');
+            const sendBtn = document.getElementById('send-btn');
+            
+            path.style.left = "0%";
+            packet.classList.remove('shake');
+            document.getElementById('status-badge').innerText = "";
+            document.getElementById('packet-icon').innerText = "✉️";
+            document.getElementById('packet-label').innerText = "原始郵件";
+            document.getElementById('sim-data').innerText = msg;
+            document.getElementById('sim-data').style.color = "#10b981";
+            sendBtn.classList.add('hidden');
+            
+            if (currentScenario === 'confidentiality') {
+                updateGuide("場景：傳輸加密", "目標：確保只有 Bob 能看見。請將 <b>Bob 的公鑰 (藍色🔑)</b> 拖到郵件上進行加密。");
+            } else {
+                updateGuide("場景：數位簽署", "目標：證明信是 Alice 親筆寫的。請將 <b>Alice 的私鑰 (紅色🗝️)</b> 拖到郵件上進行簽署。");
+            }
+        }
+
+        function updateGuide(title, text) {
+            document.getElementById('guide-title').innerText = title;
+            document.getElementById('guide-text').innerHTML = text;
+        }
+
+        // 拖放邏輯
+        let draggedKey = null;
+        document.querySelectorAll('.draggable-key').forEach(k => {
+            k.addEventListener('dragstart', e => draggedKey = e.target.dataset.key);
+        });
+
+        const dropTarget = document.getElementById('main-packet');
+        dropTarget.addEventListener('dragover', e => {
+            e.preventDefault();
+            dropTarget.classList.add('active-target');
+        });
+        dropTarget.addEventListener('dragleave', () => dropTarget.classList.remove('active-target'));
+        dropTarget.addEventListener('drop', e => {
+            e.preventDefault();
+            dropTarget.classList.remove('active-target');
+            handleAction(draggedKey);
+        });
+
+        function handleAction(key) {
+            if (step === 1) {
+                // Alice 階段
+                if (currentScenario === 'confidentiality') {
+                    if (key === 'bob-pub') {
+                        processStep("🔒", "已加密", encryptedMsg, "#f87171", "加密完成！請點擊發送進行傳輸。");
+                    } else {
+                        showToast("加密失敗！必須使用『收件人 Bob 的公鑰』。", "red");
+                        shake(dropTarget);
+                    }
+                } else {
+                    if (key === 'alice-priv') {
+                        processStep("✍️", "已簽署", signedMsg, "#60a5fa", "簽署完成！請點擊發送證明你的身份。");
+                    } else {
+                        showToast("簽署失敗！Alice 必須用自己的『私鑰』才能產生唯一簽章。", "red");
+                        shake(dropTarget);
+                    }
+                }
+            } else if (step === 2) {
+                // 駭客階段
+                if (key === 'eve-priv') {
+                    showToast("駭客 Eve 嘗試解密... 錯誤！她沒有對應的私鑰。", "red");
+                    shake(document.getElementById('eve-avatar'));
+                    document.getElementById('sim-data').innerText = "[ERROR] Decryption Failed: Invalid Private Key.";
+                    document.getElementById('sim-data').style.color = "#ef4444";
+                } else if (key === 'bob-pub' || key === 'alice-pub') {
+                    showToast("Eve 試圖使用盜來的公鑰... 無法解碼！公鑰只能用來加密或驗證。", "orange");
+                }
+            } else if (step === 3) {
+                // Bob 階段
+                if (currentScenario === 'confidentiality') {
+                    if (key === 'bob-priv') {
+                        finish("📖", "已還原", msg, "#10b981", "Bob 使用自己的私鑰成功解密！");
+                    } else {
+                        showToast("解密失敗！只有 Bob 的私鑰能解開此信。", "red");
+                        shake(dropTarget);
+                    }
+                } else {
+                    if (key === 'alice-pub') {
+                        finish("✅", "已驗證", msg, "#10b981", "驗證成功！Bob 使用 Alice 的公鑰確認了這是她的筆跡。");
+                    } else {
+                        showToast("驗證失敗！需使用 Alice 的公鑰來對比簽章。", "red");
+                        shake(dropTarget);
+                    }
+                }
+            }
+        }
+
+        function processStep(badge, label, data, color, guide) {
+            document.getElementById('status-badge').innerText = badge;
+            document.getElementById('packet-label').innerText = label;
+            document.getElementById('sim-data').innerText = data;
+            document.getElementById('sim-data').style.color = color;
+            document.getElementById('send-btn').classList.remove('hidden');
+            document.getElementById('guide-text').innerText = guide;
+            isProcessed = true;
+        }
+
+        document.getElementById('send-btn').onclick = () => {
+            const path = document.getElementById('packet-path');
+            path.style.left = "calc(50% - 48px)";
+            document.getElementById('eve-avatar').classList.remove('opacity-30', 'grayscale');
+            document.getElementById('send-btn').classList.add('hidden');
+            step = 2;
+            updateGuide("資料傳輸中...", "駭客 Eve 正在攔截！試試用她的工具解開信件？");
+            
+            setTimeout(() => {
+                path.style.left = "calc(100% - 110px)";
+                step = 3;
+                if (currentScenario === 'confidentiality') {
+                    updateGuide("Bob 已收到", "請拖曳 <b>Bob 的私鑰 (藍色🗝️)</b> 進行解密。");
+                } else {
+                    updateGuide("Bob 已收到", "請拖曳 <b>Alice 的公鑰 (紅色🔑)</b> 來驗證發件人。");
+                }
+            }, 1500);
+        };
+
+        function finish(icon, label, data, color, guide) {
+            document.getElementById('packet-icon').innerText = icon;
+            document.getElementById('packet-label').innerText = label;
+            document.getElementById('sim-data').innerText = data;
+            document.getElementById('sim-data').style.color = color;
+            document.getElementById('status-badge').innerText = "";
+            updateGuide("任務完成！", guide + "<br><br><b>重點：</b>" + 
+                (currentScenario === 'confidentiality' ? "私鑰解密確保了保密性。" : "公鑰驗證確保了身份真偽。"));
+        }
+
+        function showToast(m, c) {
+            const t = document.getElementById('toast');
+            t.innerText = m;
+            t.style.backgroundColor = c === 'red' ? '#ef4444' : (c === 'orange' ? '#f59e0b' : '#3b82f6');
+            t.classList.add('opacity-100');
+            setTimeout(() => t.classList.remove('opacity-100'), 2500);
+        }
+
+        function shake(el) {
+            el.classList.add('shake');
+            setTimeout(() => el.classList.remove('shake'), 500);
+        }
+
+        // 初始化
+        resetUI();
+    </script>
+</body>
+</html>
