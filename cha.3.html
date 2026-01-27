@@ -146,20 +146,34 @@
         .code-table th { background-color: #f1f5f9; color: #475569; font-weight: 600; text-align: left; padding: 12px; font-size: 0.875rem; }
         .code-table td { border-bottom: 1px solid #e2e8f0; padding: 12px; font-family: 'Courier New', monospace; color: #334155; }
         .code-table tr:last-child td { border-bottom: none; }
+        
+        /* Modal Animation */
+        .modal-enter { animation: modalIn 0.3s ease-out forwards; }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
     </style>
 </head>
 <body class="text-slate-700">
 
-    <!-- Navbar -->
+    <!-- Navbar (UPDATED) -->
     <nav class="bg-white/80 backdrop-blur shadow-sm sticky top-0 z-50">
         <div class="container mx-auto px-4 h-16 flex items-center justify-between">
-            <h1 class="text-xl font-bold text-indigo-600 flex items-center gap-2">
+            <!-- Link to Home -->
+            <a href="index.html" class="text-xl font-bold text-indigo-600 flex items-center gap-2 hover:opacity-80 transition">
                 <i data-lucide="cpu"></i> ICT 學習資源網
-            </h1>
-            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-500">
+            </a>
+            
+            <div class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-500">
                 <a href="#sec3-1" class="hover:text-indigo-600 transition">數值系統</a>
-                <a href="#sec3-1-signed" class="hover:text-indigo-600 transition text-indigo-600">有符號數</a>
-                <a href="#sec3-2" class="hover:text-indigo-600 transition">多媒體表示</a>
+                <a href="#sec3-1-signed" class="hover:text-indigo-600 transition">有符號數</a>
+                <a href="#sec3-2" class="hover:text-indigo-600 transition">多媒體</a>
+                
+                <!-- Random Challenge Button -->
+                <button onclick="triggerRandomChallenge()" class="bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 transition flex items-center gap-2 shadow-sm font-bold">
+                    <i data-lucide="zap" class="w-4 h-4"></i> 隨機挑戰
+                </button>
             </div>
         </div>
     </nav>
@@ -605,7 +619,7 @@
                         </div>
                     </div>
 
-                    <!-- Common Image Formats (NEW) -->
+                    <!-- Common Image Formats -->
                     <div class="mb-8">
                         <h4 class="font-bold text-slate-700 mb-3">常見圖像檔案格式</h4>
                         <div class="overflow-x-auto">
@@ -665,7 +679,7 @@
                 </div>
             </div>
 
-            <!-- Tab Content: Audio (UPDATED) -->
+            <!-- Tab Content: Audio -->
             <div id="content-audio" class="tab-content">
                 <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
                     <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
@@ -746,7 +760,7 @@
                 </div>
             </div>
 
-            <!-- Tab Content: Video (UPDATED) -->
+            <!-- Tab Content: Video -->
             <div id="content-video" class="tab-content">
                 <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
                     <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
@@ -876,12 +890,42 @@
         <p>&copy; 2024 ICT Learning Resources. All rights reserved.</p>
     </footer>
 
+    <!-- Challenge Modal (NEW) -->
+    <div id="challengeModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 relative transform transition-all">
+            <button onclick="closeChallenge()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full mb-4">
+                    <i data-lucide="zap" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-800">隨機挑戰！</h3>
+                <p class="text-sm text-slate-500">考考你對單元 3 的認識</p>
+            </div>
+
+            <div class="bg-slate-50 p-6 rounded-xl border border-slate-100 mb-6 text-center">
+                <p id="challengeQ" class="text-lg font-bold text-slate-800 mb-2">題目載入中...</p>
+                <div id="challengeInputArea" class="mt-4">
+                    <input type="text" id="challengeAns" class="w-full p-3 border border-slate-300 rounded-lg text-center font-mono text-lg mb-3" placeholder="輸入答案">
+                    <button onclick="checkAnswer()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg transition">提交答案</button>
+                </div>
+                <div id="challengeFeedback" class="hidden mt-4 font-bold"></div>
+            </div>
+            
+            <div class="text-center">
+                <button onclick="generateChallenge()" class="text-indigo-600 text-sm font-bold hover:underline">換一題</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Init Lucide Icons
         lucide.createIcons();
 
         // ----------------------------------------------------
-        // 1. 短除法演示邏輯 (UPDATED to support Hex)
+        // 1. 短除法演示邏輯
         // ----------------------------------------------------
         let currentBase = 2;
 
@@ -895,7 +939,6 @@
                 "px-4 py-2 rounded-md text-sm font-bold bg-white shadow text-indigo-600 transition" : 
                 "px-4 py-2 rounded-md text-sm font-bold text-slate-500 hover:text-indigo-600 transition";
             
-            // Auto refresh if already showing
             if(!document.getElementById('division-result').classList.contains('hidden')) {
                 generateShortDivision();
             }
@@ -915,12 +958,10 @@
             let originalNum = num;
             const divisor = currentBase;
 
-            // 進行短除法
             while (num > 0) {
                 let remainder = num % divisor;
                 let quotient = Math.floor(num / divisor);
                 
-                // Format remainder for Hex (10->A etc)
                 let remDisplay = remainder;
                 if (divisor === 16 && remainder >= 10) {
                     const hexChars = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -930,27 +971,22 @@
                 steps.push({ div: divisor, val: num, rem: remDisplay, rawRem: remainder });
                 num = quotient;
             }
-            // Add the final 0 quotient step
             steps.push({ div: divisor, val: 0, rem: '' });
 
-            // 生成 HTML
             let html = `<div class="factorization-wrapper">`;
             
-            // 左側除數列
             html += `<div class="divisors-column">`;
             for(let i=0; i<steps.length - 1; i++) {
                 html += `<div class="divisor">${steps[i].div}</div>`;
             }
             html += `</div>`;
 
-            // 中間被除數列
             html += `<div class="dividends-column">`;
             for(let i=0; i<steps.length; i++) {
                 html += `<div class="dividend">${steps[i].val}</div>`;
             }
             html += `</div>`;
 
-            // 右側餘數列
             html += `<div class="remainders-column">`;
             for(let i=0; i<steps.length - 1; i++) {
                 html += `<div class="remainder">... ${steps[i].rem}</div>`;
@@ -959,12 +995,10 @@
             
             html += `</div>`;
 
-            // 顯示結果字串
             let resultStr = "";
             if(originalNum === 0) {
                 resultStr = "0";
             } else {
-                // Collect remainders in reverse
                 let rawRems = steps.slice(0, -1).map(s => s.rawRem).reverse();
                 if (divisor === 2) {
                     resultStr = rawRems.join('');
@@ -985,7 +1019,7 @@
         }
 
         // ----------------------------------------------------
-        // 2. 二進制直式計算機 (原有)
+        // 2. 二進制直式計算機
         // ----------------------------------------------------
         function calcBinary(op) {
             const strA = document.getElementById('binA').value.trim();
@@ -1011,21 +1045,12 @@
                 operator = '-';
             }
 
-            const resStr = res.toString(2); // 注意：負數這裡會顯示 -10...
-
-            // 構建直式 HTML
             let html = `<div class="binary-calc-box">`;
-            
-            // Carry line (optional, simple logic for display)
-            // 這裡簡化，不顯示進位細節，只顯示算式
-            
             html += `<div class="calc-row">${strA.padStart(maxLen + 1, ' ')}</div>`;
             html += `<div class="calc-row"><span class="calc-operator">${operator}</span>${strB.padStart(maxLen + 1, ' ')}</div>`;
             html += `<div class="calc-line">${res < 0 ? '-' : ''}${Math.abs(res).toString(2).padStart(maxLen + 1, ' ')}</div>`;
-            
             html += `</div>`;
             
-            // 加上十進制對照
             html += `<div class="mt-4 text-xs text-slate-500 font-sans border-t pt-2 w-full text-center">
                         (${numA} ${operator} ${numB} = ${res})
                      </div>`;
@@ -1034,22 +1059,17 @@
         }
 
         // ----------------------------------------------------
-        // 3. 多媒體 Tabs & Size Calc & Text Inspector (UPDATED)
+        // 3. 多媒體 Tabs & Size Calc & Text Inspector
         // ----------------------------------------------------
         function switchTab(tabId, btn) {
-            // Remove active classes
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             
-            // Add active
             btn.classList.add('active');
             document.getElementById('content-' + tabId).classList.add('active');
-            
-            // Re-init icons just in case content was hidden
             lucide.createIcons();
         }
 
-        // NEW: Character Inspector
         function inspectText() {
             const text = document.getElementById('charInput').value;
             const tbody = document.getElementById('char-table-body');
@@ -1063,9 +1083,7 @@
             tbody.innerHTML = '';
             for (let i = 0; i < text.length; i++) {
                 const char = text[i];
-                const code = text.codePointAt(i); // Unicode code point
-                
-                // Adjust index if surrogate pair (emoji etc)
+                const code = text.codePointAt(i); 
                 if (code > 0xFFFF) i++;
 
                 const ascii = code < 128 ? code : "-";
@@ -1106,7 +1124,6 @@
             if(w && h && d) {
                 const bits = w * h * d;
                 const bytes = bits / 8;
-                
                 document.getElementById('sizeResult').classList.remove('hidden');
                 document.getElementById('sizeResult').innerHTML = `
                     <strong>計算結果：</strong><br>
@@ -1116,7 +1133,6 @@
             }
         }
 
-        // NEW: Audio Size Calc
         function calcAudioSize() {
             const rate = document.getElementById('audioRate').value;
             const res = document.getElementById('audioRes').value;
@@ -1126,7 +1142,6 @@
             if(rate && res && ch && time) {
                 const bits = rate * res * ch * time;
                 const bytes = bits / 8;
-                
                 document.getElementById('audioSizeResult').classList.remove('hidden');
                 document.getElementById('audioSizeResult').innerHTML = `
                     <strong>計算結果 (未壓縮)：</strong><br>
@@ -1137,7 +1152,6 @@
             }
         }
 
-        // UPDATED: Toggle Audio Inputs in Video Section
         function toggleVideoAudioInputs() {
             const isChecked = document.getElementById('includeAudio').checked;
             const inputDiv = document.getElementById('videoAudioInputs');
@@ -1148,16 +1162,13 @@
             }
         }
 
-        // UPDATED: Video Size Calc (Includes Audio)
         function calcVideoSize() {
-            // Video Params
             const w = document.getElementById('vidW').value;
             const h = document.getElementById('vidH').value;
             const depth = document.getElementById('vidDepth').value;
             const fps = document.getElementById('vidFps').value;
             const time = document.getElementById('vidTime').value;
             
-            // Audio Params (if checked)
             const includeAudio = document.getElementById('includeAudio').checked;
             let audioBits = 0;
             let audioDetails = "";
@@ -1173,11 +1184,8 @@
             }
 
             if(w && h && depth && fps && time) {
-                // Video Bits
                 const videoBitsPerFrame = w * h * depth;
                 const totalVideoBits = videoBitsPerFrame * fps * time;
-                
-                // Total
                 const grandTotalBits = totalVideoBits + audioBits;
                 const grandTotalBytes = grandTotalBits / 8;
                 
@@ -1194,12 +1202,10 @@
             }
         }
 
-        // ====================================================
-        // NEW JS: 3.1.2 Signed Numbers Logic (原有邏輯)
-        // ====================================================
-        
-        // --- 1. 8-bit Lab Logic ---
-        const bits = [0,0,0,0,0,0,0,0]; // 8 bits
+        // ----------------------------------------------------
+        // 4. 8-bit Lab Logic
+        // ----------------------------------------------------
+        const bits = [0,0,0,0,0,0,0,0];
 
         function initBitLab() {
             const container = document.getElementById('bit-container');
@@ -1208,11 +1214,9 @@
             bits.forEach((bit, index) => {
                 const div = document.createElement('div');
                 div.className = `bit-switch ${bit ? 'on' : 'off'}`;
-                // Index 0 is MSB (Sign bit)
-                if (index === 0) div.style.borderColor = bit ? '#f43f5e' : '#e2e8f0'; // Red border if on
+                if (index === 0) div.style.borderColor = bit ? '#f43f5e' : '#e2e8f0'; 
                 if (index === 0 && bit) div.style.backgroundColor = '#f43f5e';
                 
-                // Updated Label for MSB to show Negative Weight
                 let weightLabel = Math.pow(2, 7-index);
                 if (index === 0) weightLabel = "-128"; 
 
@@ -1228,40 +1232,28 @@
 
         function toggleBit(index) {
             bits[index] = bits[index] ? 0 : 1;
-            initBitLab(); // Re-render to update styles
+            initBitLab();
         }
 
         function updateStats() {
             const binStr = bits.join('');
             const val = parseInt(binStr, 2);
 
-            // 1. Unsigned
             document.getElementById('val-unsigned').innerText = val;
 
-            // 2. Sign & Magnitude
-            // If MSB (bits[0]) is 1, it is negative. Magnitude is the rest 7 bits.
             const signBit = bits[0];
             const magnitude = parseInt(bits.slice(1).join(''), 2);
             let smVal = magnitude;
-            if (signBit === 1) {
-                // Special case for -0? usually presented as -0
-                smVal = "-" + magnitude;
-            }
+            if (signBit === 1) smVal = "-" + magnitude;
             document.getElementById('val-signmag').innerText = smVal;
 
-            // 3. Two's Complement
-            // If MSB is 0, positive. If 1, value is val - 256 (for 8-bit)
             let tcVal = val;
-            if (val >= 128) {
-                tcVal = val - 256;
-            }
+            if (val >= 128) tcVal = val - 256;
             document.getElementById('val-twos').innerText = tcVal;
 
-            // 4. Negative Weight Calculation Display
             let calcStr = "";
             let total = 0;
             
-            // MSB
             if(bits[0] === 1) {
                 calcStr += `<span class="text-rose-600">(-128 × 1)</span>`;
                 total -= 128;
@@ -1269,7 +1261,6 @@
                 calcStr += `<span class="text-slate-400">(-128 × 0)</span>`;
             }
 
-            // Other bits
             for(let i=1; i<8; i++) {
                 const w = Math.pow(2, 7-i);
                 if(bits[i] === 1) {
@@ -1284,11 +1275,11 @@
             document.getElementById('negative-weight-calc').innerHTML = calcStr;
         }
 
-        // Initialize on load
         initBitLab();
 
-
-        // --- 2. Converter Demo Logic ---
+        // ----------------------------------------------------
+        // 5. Converter Demo Logic
+        // ----------------------------------------------------
         function startTwosCompDemo() {
             let num = parseInt(document.getElementById('convertInput').value);
             if(isNaN(num) || num < 0 || num > 127) {
@@ -1296,33 +1287,25 @@
                 return;
             }
 
-            // Step 0: Show Binary
             let bin = num.toString(2).padStart(8, '0');
             document.getElementById('demo-orig').innerText = bin;
             document.getElementById('step1-row').style.opacity = '1';
             
-            // Reset others
             document.getElementById('step2-row').style.opacity = '0.3';
             document.getElementById('demo-inverted').innerText = '--------';
             document.getElementById('step3-row').style.opacity = '0.3';
             document.getElementById('demo-result').innerText = '--------';
 
-            // Animation Sequence
             setTimeout(() => {
-                // Step 1: Invert
                 let inverted = "";
                 for(let char of bin) inverted += (char === '0' ? '1' : '0');
                 document.getElementById('demo-inverted').innerText = inverted;
                 document.getElementById('step2-row').style.opacity = '1';
 
                 setTimeout(() => {
-                    // Step 2: Add 1
-                    // Logic: inverted string is essentially (255 - num)
-                    // Result in 2s comp for negative is (256 - num) which matches bin of (255-num) + 1
                     let valInv = parseInt(inverted, 2);
                     let resultVal = valInv + 1;
                     let resultBin = resultVal.toString(2).padStart(8, '0');
-                    // Ensure we keep only 8 bits if overflow (though inputs 0-127 won't overflow 8 bits neg)
                     if(resultBin.length > 8) resultBin = resultBin.slice(-8);
 
                     document.getElementById('demo-result').innerText = resultBin + ` (-${num})`;
@@ -1330,6 +1313,87 @@
                 }, 1000);
 
             }, 800);
+        }
+
+        // ----------------------------------------------------
+        // 6. Random Challenge Logic (NEW)
+        // ----------------------------------------------------
+        let currentChallenge = null;
+
+        function triggerRandomChallenge() {
+            const modal = document.getElementById('challengeModal');
+            modal.classList.remove('hidden');
+            document.querySelector('.modal-enter')?.classList.remove('modal-enter');
+            void modal.offsetWidth; // trigger reflow
+            modal.querySelector('div').classList.add('modal-enter');
+            
+            generateChallenge();
+        }
+
+        function closeChallenge() {
+            document.getElementById('challengeModal').classList.add('hidden');
+        }
+
+        function generateChallenge() {
+            const types = ['dec2bin', 'bin2dec', 'twosComp', 'fileSize'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            const qEl = document.getElementById('challengeQ');
+            const ansInput = document.getElementById('challengeAns');
+            const feedback = document.getElementById('challengeFeedback');
+            
+            ansInput.value = '';
+            feedback.classList.add('hidden');
+            feedback.className = 'hidden mt-4 font-bold'; // Reset class
+
+            switch(type) {
+                case 'dec2bin':
+                    const d = Math.floor(Math.random() * 64) + 1;
+                    currentChallenge = { ans: d.toString(2), type: 'text' };
+                    qEl.innerText = `將十進制 ${d} 轉換為二進制：`;
+                    ansInput.placeholder = "例如: 10101";
+                    break;
+                case 'bin2dec':
+                    const bVal = Math.floor(Math.random() * 32) + 1;
+                    const bStr = bVal.toString(2);
+                    currentChallenge = { ans: bVal.toString(), type: 'text' };
+                    qEl.innerText = `將二進制 ${bStr} 轉換為十進制：`;
+                    ansInput.placeholder = "輸入數字";
+                    break;
+                case 'twosComp':
+                    const num = Math.floor(Math.random() * 64) + 1; // 1 to 64
+                    // Question: Find 8-bit 2s comp of -num
+                    // Logic: 256 - num
+                    const target = 256 - num;
+                    const targetBin = target.toString(2).padStart(8, '0');
+                    currentChallenge = { ans: targetBin, type: 'text' };
+                    qEl.innerText = `寫出 -${num} 的 8 位元二進制補碼：`;
+                    ansInput.placeholder = "8 位元 (例如: 11110000)";
+                    break;
+                case 'fileSize':
+                    // Simple text calculation: ASCII
+                    const chars = Math.floor(Math.random() * 500) + 100;
+                    currentChallenge = { ans: (chars * 8).toString(), type: 'text' }; // in bits
+                    qEl.innerText = `一份純文字文件包含 ${chars} 個 ASCII 字符。它的檔案大小是多少 bits？`;
+                    ansInput.placeholder = "只輸入數字";
+                    break;
+            }
+        }
+
+        function checkAnswer() {
+            const userAns = document.getElementById('challengeAns').value.trim();
+            const feedback = document.getElementById('challengeFeedback');
+            
+            if(!userAns) return;
+
+            if(userAns === currentChallenge.ans) {
+                feedback.innerText = "答對了！🎉";
+                feedback.classList.remove('hidden', 'text-red-500');
+                feedback.classList.add('text-green-600');
+            } else {
+                feedback.innerText = `答錯了。正確答案是：${currentChallenge.ans}`;
+                feedback.classList.remove('hidden', 'text-green-600');
+                feedback.classList.add('text-red-500');
+            }
         }
 
     </script>
