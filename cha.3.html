@@ -18,7 +18,7 @@
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #f0f9ff; }
         
         /* ----------------------------------------------------
-           短除法樣式 (Final Fix for Line Height)
+           短除法樣式
            ---------------------------------------------------- */
         .factorization-wrapper {
             display: flex;
@@ -43,18 +43,17 @@
         .dividends-column {
             display: flex;
             flex-direction: column;
-            position: relative; /* 關鍵：作為定位基準 */
+            position: relative;
         }
         
-        /* 使用偽元素畫左邊的直線，高度減去最後一行 (36px) */
         .dividends-column::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 2px;
-            height: calc(100% - 36px); /* 扣除最後一格的高度 */
-            background-color: #374151; /* gray-700 */
+            height: calc(100% - 36px);
+            background-color: #374151;
         }
 
         .dividend {
@@ -63,7 +62,6 @@
             text-align: left;
         }
         
-        /* 最後一個商數：無底線 */
         .dividend:last-child {
             border-bottom: none; 
         }
@@ -77,7 +75,6 @@
             text-align: left;
         }
 
-        /* 統一高度，確保 calc 計算準確 */
         .divisor, .dividend, .remainder {
             height: 36px;
             display: flex;
@@ -111,6 +108,29 @@
             letter-spacing: 0.5rem; 
             padding-right: 10px; 
         }
+
+        /* ----------------------------------------------------
+           Bit Toggle Switch
+           ---------------------------------------------------- */
+        .bit-switch {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid #e2e8f0;
+            position: relative;
+        }
+        .bit-switch.on { background-color: #3b82f6; color: white; border-color: #2563eb; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.5); }
+        .bit-switch.off { background-color: #f8fafc; color: #94a3b8; }
+        .bit-switch:hover { transform: translateY(-2px); }
+        .bit-value { font-size: 0.75rem; position: absolute; bottom: -25px; color: #64748b; font-weight: normal; }
         
         /* 卡片特效 */
         .hover-card { transition: all 0.3s ease; }
@@ -121,182 +141,328 @@
         .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* 奇偶檢測位元動畫 */
-        .bit-box { transition: all 0.3s ease; }
-        .bit-new { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        /* 索引演示方塊動畫 */
-        .idx-block { transition: all 0.3s ease; }
-        .idx-scanning { background-color: #fef08a !important; border-color: #eab308 !important; transform: scale(1.1); box-shadow: 0 0 10px rgba(234, 179, 8, 0.5); }
-        .idx-found { background-color: #22c55e !important; color: white !important; border-color: #15803d !important; transform: scale(1.2); box-shadow: 0 0 15px rgba(34, 197, 94, 0.6); z-index: 10; }
-        .idx-visited { background-color: #f1f5f9; color: #cbd5e1; border-color: #e2e8f0; }
-
-        /* 存取動畫樣式 */
-        .access-block { transition: all 0.3s; }
-        .access-active { background-color: #fbbf24 !important; border-color: #d97706 !important; transform: scale(1.1); box-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
-        .head-pointer { transition: left 0.5s ease-in-out, top 0.5s ease-in-out; }
+        
+        /* 表格樣式 */
+        .code-table th { background-color: #f1f5f9; color: #475569; font-weight: 600; text-align: left; padding: 12px; font-size: 0.875rem; }
+        .code-table td { border-bottom: 1px solid #e2e8f0; padding: 12px; font-family: 'Courier New', monospace; color: #334155; }
+        .code-table tr:last-child td { border-bottom: none; }
     </style>
 </head>
-<body class="text-slate-700 flex flex-col min-h-screen">
+<body class="text-slate-700">
 
-    <!-- 頂部導航 -->
-    <header class="bg-indigo-700 text-white shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <a href="index.html" class="hover:bg-indigo-600 p-2 rounded-lg transition" title="回首頁">
-                    <i data-lucide="home" class="w-6 h-6"></i>
-                </a>
-                <span class="font-bold text-lg hidden md:block">必修部分 A > 3. 數據表示</span>
-            </div>
-            <div class="text-sm bg-indigo-800 px-3 py-1 rounded-full flex items-center gap-2">
-                <i data-lucide="binary" class="w-4 h-4"></i> 
-                <span class="hidden sm:inline">進制與多媒體</span>
+    <!-- Navbar -->
+    <nav class="bg-white/80 backdrop-blur shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 h-16 flex items-center justify-between">
+            <h1 class="text-xl font-bold text-indigo-600 flex items-center gap-2">
+                <i data-lucide="cpu"></i> ICT 學習資源網
+            </h1>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-500">
+                <a href="#sec3-1" class="hover:text-indigo-600 transition">數值系統</a>
+                <a href="#sec3-1-signed" class="hover:text-indigo-600 transition text-indigo-600">有符號數</a>
+                <a href="#sec3-2" class="hover:text-indigo-600 transition">多媒體表示</a>
             </div>
         </div>
-        <!-- 進度條 -->
-        <div class="h-1 bg-indigo-900 w-full">
-            <div id="progressBar" class="h-full bg-cyan-400 w-0 transition-all duration-300"></div>
-        </div>
-    </header>
+    </nav>
 
-    <main class="container mx-auto px-4 py-8 max-w-5xl space-y-16 flex-grow">
+    <main class="container mx-auto px-4 py-8 max-w-5xl">
+        
+        <!-- Header -->
+        <header class="mb-12 text-center">
+            <h1 class="text-4xl font-bold text-slate-800 mb-4">單元 3：數據表示 (Data Representation)</h1>
+            <p class="text-lg text-slate-500">深入了解電腦如何儲存數字、字符與多媒體</p>
+        </header>
 
-        <!-- 3.1 數字系統 Number Systems -->
-        <section id="sec3-1" class="scroll-mt-24">
+        <!-- 3.1 數值系統 (原有內容) -->
+        <section id="sec3-1" class="mb-20 scroll-mt-24">
             <div class="flex items-center gap-3 mb-6">
                 <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold text-sm">3.1</span>
-                <h2 class="text-3xl font-bold text-slate-800">數字系統 (Number Systems)</h2>
+                <h2 class="text-3xl font-bold text-slate-800">數值系統 (Number Systems)</h2>
             </div>
 
-            <!-- 概念簡介 -->
-            <div class="grid md:grid-cols-3 gap-6 mb-12">
-                <div class="bg-white p-6 rounded-xl border border-gray-200 hover-card">
-                    <div class="text-blue-600 font-bold text-xl mb-2 flex items-center gap-2">
-                        <i data-lucide="hash" class="w-5 h-5"></i> 十進制
+            <!-- Concept Cards -->
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover-card">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 mb-4">
+                        <span class="font-bold text-lg">2</span>
                     </div>
-                    <p class="text-sm text-slate-600 mb-2">Decimal</p>
-                    <div class="font-mono bg-blue-50 p-2 rounded text-center text-blue-800 text-sm">0, 1, 2 ... 9</div>
-                    <p class="text-xs text-center mt-2 text-slate-400">人類日常使用 (Base 10)</p>
+                    <h3 class="font-bold text-lg mb-2">二進制 (Binary)</h3>
+                    <p class="text-sm text-slate-600 mb-2">只使用 0 和 1</p>
+                    <div class="font-mono bg-blue-50 p-2 rounded text-center text-blue-800 text-sm">1011<sub>(2)</sub></div>
                 </div>
-                <div class="bg-white p-6 rounded-xl border border-gray-200 hover-card">
-                    <div class="text-emerald-600 font-bold text-xl mb-2 flex items-center gap-2">
-                        <i data-lucide="cpu" class="w-5 h-5"></i> 二進制
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover-card">
+                    <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600 mb-4">
+                        <span class="font-bold text-lg">10</span>
                     </div>
-                    <p class="text-sm text-slate-600 mb-2">Binary</p>
-                    <div class="font-mono bg-emerald-50 p-2 rounded text-center text-emerald-800 text-sm">0, 1</div>
-                    <p class="text-xs text-center mt-2 text-slate-400">電腦內部使用 (Base 2)</p>
+                    <h3 class="font-bold text-lg mb-2">十進制 (Decimal)</h3>
+                    <p class="text-sm text-slate-600 mb-2">人類日常使用</p>
+                    <div class="font-mono bg-emerald-50 p-2 rounded text-center text-emerald-800 text-sm">11<sub>(10)</sub></div>
                 </div>
-                <div class="bg-white p-6 rounded-xl border border-gray-200 hover-card">
-                    <div class="text-purple-600 font-bold text-xl mb-2 flex items-center gap-2">
-                        <i data-lucide="palette" class="w-5 h-5"></i> 十六進制
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover-card">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 mb-4">
+                        <span class="font-bold text-lg">16</span>
                     </div>
-                    <p class="text-sm text-slate-600 mb-2">Hexadecimal</p>
-                    <div class="font-mono bg-purple-50 p-2 rounded text-center text-purple-800 text-sm">0-9, A-F</div>
-                    <p class="text-xs text-center mt-2 text-slate-400">簡化二進制顯示 (Base 16)</p>
+                    <h3 class="font-bold text-lg mb-2">十六進制 (Hexadecimal)</h3>
+                    <p class="text-sm text-slate-600 mb-2">0-9, A-F</p>
+                    <div class="font-mono bg-purple-50 p-2 rounded text-center text-purple-800 text-sm">B<sub>(16)</sub></div>
                 </div>
             </div>
 
-            <!-- 互動工具 1: 短除法演示 (Line Height Fix) -->
+            <!-- Interactive Tool 1: Short Division -->
             <div class="bg-white rounded-2xl shadow-lg border border-indigo-100 overflow-hidden mb-12">
                 <div class="bg-indigo-600 p-4 text-white flex justify-between items-center">
                     <h3 class="font-bold text-lg flex items-center gap-2">
                         <i data-lucide="calculator" class="w-5 h-5"></i> 進制轉換：短除法 (Short Division)
                     </h3>
-                    <span class="text-xs bg-indigo-500 px-2 py-1 rounded">參考課本 P.5</span>
                 </div>
-                
-                <div class="p-6 md:flex gap-8">
-                    <!-- 左側控制 -->
-                    <div class="md:w-1/3 space-y-6">
-                        <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">輸入十進制數字 (Decimal)</label>
-                            <input type="number" id="decInput" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-lg font-mono" placeholder="例如: 25" value="25">
+                <div class="p-6">
+                    <div class="flex flex-wrap items-end gap-4 mb-6">
+                        <div class="flex-1 min-w-[200px]">
+                            <label class="block text-sm font-bold text-slate-700 mb-2">輸入十進制數字</label>
+                            <input type="number" id="decimalInput" class="w-full p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="例如: 25" value="25">
                         </div>
-                        
-                        <div class="space-y-3">
-                            <p class="text-sm font-bold text-slate-700">選擇目標進制：</p>
-                            <button onclick="generateShortDivision(2)" class="w-full flex items-center justify-between bg-emerald-50 text-emerald-700 border border-emerald-200 py-3 px-4 rounded-lg hover:bg-emerald-100 transition">
-                                <span class="font-bold">轉二進制 (Base 2)</span>
-                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                            </button>
-                            <button onclick="generateShortDivision(16)" class="w-full flex items-center justify-between bg-purple-50 text-purple-700 border border-purple-200 py-3 px-4 rounded-lg hover:bg-purple-100 transition">
-                                <span class="font-bold">轉十六進制 (Base 16)</span>
-                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                            </button>
+                        <div class="w-full md:w-auto">
+                            <label class="block text-sm font-bold text-slate-700 mb-2">目標進制</label>
+                            <div class="flex bg-slate-100 p-1 rounded-lg">
+                                <button onclick="setBase(2)" id="btnBase2" class="px-4 py-2 rounded-md text-sm font-bold bg-white shadow text-indigo-600 transition">二進制 (2)</button>
+                                <button onclick="setBase(16)" id="btnBase16" class="px-4 py-2 rounded-md text-sm font-bold text-slate-500 hover:text-indigo-600 transition">十六進制 (16)</button>
+                            </div>
                         </div>
-
-                        <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200 text-sm text-yellow-800 leading-relaxed">
-                            <strong class="block mb-1"><i data-lucide="lightbulb" class="w-4 h-4 inline mr-1"></i> 學習提示：</strong>
-                            不斷將數字除以基數 (2 或 16)，記錄餘數，直到商數小於基數為止。最後的答案是由最後的商數開始，由下而上讀取餘數。
-                        </div>
+                        <button onclick="generateShortDivision()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-bold transition flex items-center gap-2">
+                            <i data-lucide="arrow-right-circle" class="w-5 h-5"></i> 開始計算
+                        </button>
                     </div>
 
-                    <!-- 右側演示區 -->
-                    <div class="md:w-2/3 bg-slate-50 rounded-xl border border-slate-200 flex flex-col items-center justify-center p-8 min-h-[400px]">
-                        <div id="divisionOutput" class="text-slate-700 w-full overflow-x-auto flex justify-center">
-                            <p class="text-slate-400 flex flex-col items-center gap-2">
-                                <i data-lucide="mouse-pointer-click" class="w-8 h-8 opacity-50"></i>
-                                請在左側輸入數字並點擊按鈕
-                            </p>
+                    <div id="division-result" class="hidden bg-slate-50 p-8 rounded-xl flex justify-center items-center overflow-x-auto">
+                        <!-- JS Generated Content -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Tool 2: Binary Calculator -->
+            <div class="bg-white rounded-2xl shadow-lg border border-indigo-100 overflow-hidden">
+                <div class="bg-slate-800 p-4 text-white flex justify-between items-center">
+                    <h3 class="font-bold text-lg flex items-center gap-2">
+                        <i data-lucide="plus-square" class="w-5 h-5"></i> 二進制運算 (Binary Arithmetic)
+                    </h3>
+                </div>
+                <div class="p-6 grid md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1">二進制 A</label>
+                            <input type="text" id="binA" class="font-mono w-full p-3 border border-slate-200 rounded-lg" placeholder="1010" value="1010">
                         </div>
-                        <div id="divisionResult" class="mt-8 hidden animate-bounce-in">
-                            <div class="text-xs text-slate-500 uppercase tracking-wider mb-1 text-center">轉換結果</div>
-                            <div class="text-2xl font-bold text-indigo-600 bg-white px-8 py-3 rounded-full shadow-sm border border-indigo-100 font-mono tracking-widest" id="resultText">
-                                <!-- Result -->
-                            </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1">二進制 B</label>
+                            <input type="text" id="binB" class="font-mono w-full p-3 border border-slate-200 rounded-lg" placeholder="0101" value="0101">
+                        </div>
+                        <div class="flex gap-4">
+                            <button onclick="calcBinary('add')" class="flex-1 bg-blue-600 hover:bg-blue-500 py-3 rounded-lg font-bold text-white transition flex justify-center items-center gap-2">
+                                <i data-lucide="plus" class="w-4 h-4"></i> 加法
+                            </button>
+                            <button onclick="calcBinary('sub')" class="flex-1 bg-rose-600 hover:bg-rose-500 py-3 rounded-lg font-bold text-white transition flex justify-center items-center gap-2">
+                                <i data-lucide="minus" class="w-4 h-4"></i> 減法
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 rounded-xl p-4 flex flex-col justify-center items-center min-h-[200px] border border-slate-200">
+                        <div id="calcDisplay" class="text-center text-slate-400 text-sm">
+                            點擊按鈕開始計算...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3.1.2 Signed Numbers -->
+        <section id="sec3-1-signed" class="mb-20 scroll-mt-24">
+            <div class="flex items-center gap-3 mb-6">
+                <span class="bg-rose-100 text-rose-700 px-3 py-1 rounded-full font-bold text-sm">3.1.2</span>
+                <h2 class="text-3xl font-bold text-slate-800">有符號數的表示 (Signed Numbers)</h2>
+            </div>
+            
+            <p class="mb-8 text-slate-600 leading-relaxed">
+                在電腦系統中，我們不僅需要處理正整數 (Unsigned Integer)，還需要處理負數。最常見的表示方法有兩種：<b>符號和值 (Sign and Magnitude)</b> 與 <b>二進制補碼 (Two's Complement)</b>。
+            </p>
+
+            <!-- Theory Cards -->
+            <div class="grid md:grid-cols-2 gap-6 mb-10">
+                <!-- Sign and Magnitude -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-amber-400 hover-card">
+                    <h3 class="text-xl font-bold text-slate-800 mb-3 flex items-center gap-2">
+                        <i data-lucide="type" class="w-5 h-5 text-amber-500"></i> 符號和值 (Sign & Magnitude)
+                    </h3>
+                    <ul class="space-y-2 text-sm text-slate-600 mb-4">
+                        <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-green-500 shrink-0"></i> <span>最高有效位 (MSB) 為<b>符號位</b>：<br><code class="bg-slate-100 px-1 rounded">0</code> 代表正 (+)，<code class="bg-slate-100 px-1 rounded">1</code> 代表負 (-)。</span></li>
+                        <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-green-500 shrink-0"></i> <span>其餘位元代表數值的大小 (Magnitude)。</span></li>
+                        <li class="flex gap-2"><i data-lucide="x" class="w-4 h-4 text-red-500 shrink-0"></i> <span>缺點：有兩個零 (+0 和 -0)，且運算邏輯複雜。</span></li>
+                    </ul>
+                    <div class="bg-amber-50 p-3 rounded text-center font-mono text-sm text-amber-900">
+                        <span class="text-red-600 font-bold">1</span>0000101 = -5
+                    </div>
+                </div>
+
+                <!-- Two's Complement -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border-l-4 border-indigo-500 hover-card">
+                    <h3 class="text-xl font-bold text-slate-800 mb-3 flex items-center gap-2">
+                        <i data-lucide="binary" class="w-5 h-5 text-indigo-500"></i> 二進制補碼數字 (Two's Complement Representation)
+                    </h3>
+                    <ul class="space-y-2 text-sm text-slate-600 mb-4">
+                        <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-green-500 shrink-0"></i> <span><b>表示系統：</b>現代電腦儲存整數的標準方法。</span></li>
+                        <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-green-500 shrink-0"></i> <span><b>負權重 (Negative Weight)：</b>最高有效位 (MSB) 的權重是負數 (例如 8-bit 為 -128)。</span></li>
+                        <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-green-500 shrink-0"></i> <span>優點：只有一個零，加減法運算規則統一。</span></li>
+                    </ul>
+                    <div class="bg-indigo-50 p-3 rounded text-center font-mono text-sm text-indigo-900">
+                        <span class="text-red-600 font-bold">1</span>0000000 = -128 (最小)
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Teacher Note Section -->
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-10 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10">
+                    <i data-lucide="book-open" class="w-24 h-24 text-amber-900"></i>
+                </div>
+                <h4 class="text-amber-800 font-bold text-lg mb-4 flex items-center gap-2 relative z-10">
+                    <i data-lucide="lightbulb" class="w-6 h-6 text-amber-600"></i> 老師重點提提你：定義與概念釐清
+                </h4>
+                <p class="text-sm text-amber-900 mb-4 relative z-10">在考試中，必須清楚區分「數字系統」與「運算動作」：</p>
+                
+                <div class="grid md:grid-cols-2 gap-6 relative z-10">
+                    <!-- 1. The Representation System -->
+                    <div class="bg-white/80 p-5 rounded-lg shadow-sm border-l-4 border-indigo-500">
+                        <strong class="block text-indigo-800 text-lg mb-3">1. 二進制補碼數字 (數字系統)</strong>
+                        <p class="text-sm text-indigo-900 mb-2 font-bold">在此系統下表示數值的方法：</p>
+                        <ul class="space-y-3">
+                            <li class="bg-indigo-50 p-3 rounded text-sm text-indigo-900 border-l-4 border-indigo-300">
+                                <span class="font-bold block text-indigo-700 text-base mb-1">正數 (Positive)</span>
+                                <span class="text-slate-700 font-medium">數值不變。</span>
+                                <span class="block text-xs text-slate-500 mt-1">(即：與無符號二進制相同，符號位為 0)</span>
+                            </li>
+                            <li class="bg-rose-50 p-3 rounded text-sm text-rose-900 border-l-4 border-rose-300">
+                                <span class="font-bold block text-rose-700 text-base mb-1">負數 (Negative)</span>
+                                <span class="font-bold text-rose-600 text-lg">= 對應正數的反碼 + 1</span>
+                                <span class="block text-xs text-slate-500 mt-1">(即：先寫出該數的正數，再取反加一)</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- 2. The Operation -->
+                    <div class="bg-white/80 p-5 rounded-lg shadow-sm border-l-4 border-amber-500">
+                        <strong class="block text-amber-800 text-lg mb-3">2. 二進制補碼 (運算動作)</strong>
+                        <p class="text-sm text-slate-700 mb-3">這是一個「動作」，用來求取一個數的相反數。</p>
+                        <div class="bg-amber-100 p-3 rounded-lg text-amber-900 font-bold text-center text-sm border-2 border-amber-200 border-dashed">
+                            動作：取反碼 (Invert)，然後加 1
+                        </div>
+                        <div class="mt-4 text-xs text-slate-600 bg-slate-50 p-3 rounded border border-slate-100">
+                            <p class="mb-2 font-bold text-slate-700">例子：求 -5 的二進制補碼數字</p>
+                            <ol class="list-decimal pl-4 space-y-2">
+                                <li>
+                                    <span class="text-slate-500">先寫出 +5 (正數不變)：</span><br>
+                                    <code class="font-mono text-indigo-600 font-bold">0000 0101</code>
+                                </li>
+                                <li>
+                                    <span class="text-slate-500">計算補碼 (取反+1)：</span><br>
+                                    反碼：<code class="font-mono text-slate-400">1111 1010</code><br>
+                                    加一：<code class="font-mono text-rose-600 font-bold">1111 1011</code>
+                                </li>
+                                <li>
+                                    <span class="text-slate-500">結果：</span>
+                                    <span class="font-bold">-5 = 1111 1011</span>
+                                </li>
+                            </ol>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 互動工具 2: 二進制直式計算機 -->
-            <div class="bg-slate-800 rounded-2xl shadow-lg overflow-hidden text-white mb-12">
-                <div class="bg-slate-900 p-4 border-b border-slate-700 flex justify-between items-center">
+            <!-- Interactive Tool: 8-bit Lab -->
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden mb-12">
+                <div class="bg-slate-800 p-4 text-white flex justify-between items-center">
                     <h3 class="font-bold text-lg flex items-center gap-2">
-                        <i data-lucide="plus-minus" class="w-5 h-5 text-emerald-400"></i> 二進制運算 (直式)
+                        <i data-lucide="flask-conical" class="w-5 h-5"></i> 8 位元有符號數實驗室 (8-bit Signed Lab)
                     </h3>
-                    <span class="text-xs bg-slate-700 px-2 py-1 rounded text-slate-300">參考課本 P.6</span>
+                    <span class="text-xs bg-slate-700 px-2 py-1 rounded text-slate-300">點擊下方方塊切換 0/1</span>
                 </div>
-
-                <div class="p-6 grid md:grid-cols-2 gap-8">
-                    <!-- 控制區 -->
-                    <div class="space-y-6">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs text-slate-400 mb-1">數字 A (Binary)</label>
-                                <input type="text" id="binA" class="w-full bg-slate-700 border border-slate-600 rounded p-3 text-white font-mono tracking-wider focus:border-emerald-500 focus:outline-none" placeholder="1010" value="1010">
-                            </div>
-                            <div>
-                                <label class="block text-xs text-slate-400 mb-1">數字 B (Binary)</label>
-                                <input type="text" id="binB" class="w-full bg-slate-700 border border-slate-600 rounded p-3 text-white font-mono tracking-wider focus:border-emerald-500 focus:outline-none" placeholder="0101" value="0001">
-                            </div>
-                        </div>
-                        <div class="flex gap-4">
-                            <button onclick="calcBinary('add')" class="flex-1 bg-blue-600 hover:bg-blue-500 py-3 rounded-lg font-bold transition flex justify-center items-center gap-2">
-                                <i data-lucide="plus" class="w-4 h-4"></i> 加法
-                            </button>
-                            <button onclick="calcBinary('sub')" class="flex-1 bg-rose-600 hover:bg-rose-500 py-3 rounded-lg font-bold transition flex justify-center items-center gap-2">
-                                <i data-lucide="minus" class="w-4 h-4"></i> 減法
-                            </button>
-                        </div>
-                        <div class="bg-slate-700/50 p-4 rounded-lg text-xs text-slate-400 space-y-2">
-                            <strong class="text-emerald-400 block mb-1">二進制加法規則：</strong>
-                            <ul class="list-disc list-inside space-y-1">
-                                <li>0 + 0 = 0</li>
-                                <li>0 + 1 = 1</li>
-                                <li>1 + 1 = 10 (進位 1, 寫 0)</li>
-                                <li>1 + 1 + 1 = 11 (進位 1, 寫 1)</li>
-                            </ul>
-                        </div>
+                
+                <div class="p-6">
+                    <!-- Toggle Bits -->
+                    <div class="grid grid-cols-8 gap-2 mb-8 select-none" id="bit-container">
+                        <!-- Generated by JS -->
                     </div>
 
-                    <!-- 直式顯示區 -->
-                    <div class="bg-black/30 rounded-xl p-8 flex items-center justify-center relative min-h-[200px]">
-                        <div class="absolute top-2 right-4 text-xs text-slate-500">Result Display</div>
-                        <div id="calcDisplay" class="binary-calc-box">
-                            <span class="text-slate-500 text-sm tracking-normal">等待運算...</span>
+                    <!-- Analysis Dashboard -->
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <!-- Unsigned -->
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">無符號整數 (Unsigned)</p>
+                            <div class="text-3xl font-mono font-bold text-slate-700" id="val-unsigned">0</div>
+                            <p class="text-xs text-slate-400 mt-2">Range: 0 ~ 255</p>
+                        </div>
+                        
+                        <!-- Sign & Magnitude -->
+                        <div class="bg-amber-50 p-4 rounded-xl border border-amber-200 text-center">
+                            <p class="text-xs font-bold text-amber-600 uppercase tracking-wide mb-1">符號和值 (Sign & Mag)</p>
+                            <div class="text-3xl font-mono font-bold text-amber-700" id="val-signmag">0</div>
+                            <p class="text-xs text-amber-500 mt-2">Range: -127 ~ +127</p>
+                        </div>
+
+                        <!-- Two's Complement -->
+                        <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-200 text-center relative overflow-hidden">
+                            <div class="absolute top-0 right-0 bg-indigo-200 text-indigo-800 text-[10px] px-2 py-0.5 rounded-bl">Standard</div>
+                            <p class="text-xs font-bold text-indigo-600 uppercase tracking-wide mb-1">二進制補碼 (2's Comp)</p>
+                            <div class="text-3xl font-mono font-bold text-indigo-700" id="val-twos">0</div>
+                            <p class="text-xs text-indigo-500 mt-2">Range: -128 ~ +127</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Added Negative Weight Visualization -->
+                    <div class="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                        <p class="text-xs font-bold text-slate-500 mb-2 flex items-center gap-2">
+                            <i data-lucide="calculator" class="w-4 h-4"></i> 二進制補碼數字：負權重計算驗證 (Negative Weight Verification)
+                        </p>
+                        <div id="negative-weight-calc" class="font-mono text-sm text-slate-700 break-all bg-white p-3 rounded border border-slate-100 shadow-inner">
+                            0 = 0
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Tool: Converter -->
+            <div class="bg-gradient-to-r from-indigo-600 to-blue-500 rounded-2xl shadow-lg text-white overflow-hidden">
+                <div class="p-6 md:p-8">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <i data-lucide="refresh-cw" class="w-6 h-6"></i> 補碼轉換器：求負數
+                    </h3>
+                    <p class="text-indigo-100 text-sm mb-6">輸入一個正整數 (0-127)，看看如何將其轉換為負數的二進制補碼。</p>
+
+                    <div class="flex flex-col md:flex-row gap-4 items-start">
+                        <div class="w-full md:w-1/3">
+                            <input type="number" id="convertInput" min="0" max="127" value="18" 
+                                class="w-full p-3 rounded-lg text-slate-800 font-bold border-none outline-none focus:ring-2 focus:ring-indigo-300"
+                                placeholder="輸入正整數">
+                            <button onclick="startTwosCompDemo()" class="mt-3 w-full bg-white/20 hover:bg-white/30 text-white font-bold py-2 rounded-lg transition">
+                                開始轉換
+                            </button>
+                        </div>
+
+                        <div class="w-full md:w-2/3 bg-slate-900/50 rounded-xl p-4 font-mono space-y-4">
+                            <!-- Step 1 -->
+                            <div class="flex justify-between items-center opacity-50" id="step1-row">
+                                <span class="text-xs text-indigo-300">原數值 (二進制)</span>
+                                <span class="text-lg" id="demo-orig">00000000</span>
+                            </div>
+                            <!-- Step 2 -->
+                            <div class="flex justify-between items-center opacity-50" id="step2-row">
+                                <span class="text-xs text-indigo-300">1. 取反 (Invert Bits)</span>
+                                <span class="text-lg text-amber-400" id="demo-inverted">--------</span>
+                            </div>
+                            <!-- Step 3 -->
+                            <div class="flex justify-between items-center border-t border-white/10 pt-2 opacity-50" id="step3-row">
+                                <span class="text-xs text-indigo-300">2. 加 1 (Add 1)</span>
+                                <span class="text-xl font-bold text-green-400" id="demo-result">--------</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -304,160 +470,522 @@
         </section>
 
         <!-- 3.2 數據表示 (多媒體) -->
-        <section id="sec3-2" class="scroll-mt-24">
+        <section id="sec3-2" class="mb-20 scroll-mt-24">
             <div class="flex items-center gap-3 mb-6">
                 <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold text-sm">3.2</span>
                 <h2 class="text-3xl font-bold text-slate-800">數據表示 (多媒體)</h2>
             </div>
-            
-             <!-- Tab Navigation -->
-             <div class="flex border-b border-gray-200 mb-8 overflow-x-auto">
-                <button class="tab-btn active px-6 py-3 text-gray-500 hover:text-indigo-600 transition whitespace-nowrap" onclick="switchTab('text', this)">文本 (Text)</button>
-                <button class="tab-btn px-6 py-3 text-gray-500 hover:text-indigo-600 transition whitespace-nowrap" onclick="switchTab('image', this)">圖像 (Images)</button>
-                <button class="tab-btn px-6 py-3 text-gray-500 hover:text-indigo-600 transition whitespace-nowrap" onclick="switchTab('audio', this)">聲音 (Audio)</button>
-                <button class="tab-btn px-6 py-3 text-gray-500 hover:text-indigo-600 transition whitespace-nowrap" onclick="switchTab('video', this)">視像 (Video)</button>
+
+            <!-- Tabs Navigation -->
+            <div class="flex border-b border-slate-200 mb-6 overflow-x-auto">
+                <button onclick="switchTab('text', this)" class="tab-btn active px-6 py-3 text-slate-600 transition whitespace-nowrap">字符編碼</button>
+                <button onclick="switchTab('image', this)" class="tab-btn px-6 py-3 text-slate-600 transition whitespace-nowrap">位圖與矢量圖</button>
+                <button onclick="switchTab('audio', this)" class="tab-btn px-6 py-3 text-slate-600 transition whitespace-nowrap">聲音</button>
+                <button onclick="switchTab('video', this)" class="tab-btn px-6 py-3 text-slate-600 transition whitespace-nowrap">視像</button>
             </div>
-            
+
+            <!-- Tab Content: Text -->
             <div id="content-text" class="tab-content active">
-                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 mb-8">
-                     <h3 class="text-xl font-bold text-indigo-800 mb-4 flex items-center gap-2">
-                        <i data-lucide="type" class="w-6 h-6"></i> 字符編碼系統
-                    </h3>
-                    <p class="text-slate-600 mb-6">電腦內部只能處理數字 (0和1)。需使用編碼表轉換。</p>
-                    <div class="bg-indigo-900 rounded-xl p-6 text-white">
-                        <h4 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="code" class="w-5 h-5 text-yellow-400"></i> 互動體驗：字符解碼器</h4>
-                        <div class="flex flex-col md:flex-row gap-6 items-center">
-                            <div class="w-full md:w-1/3">
-                                <label class="text-xs text-indigo-200 block mb-2">輸入一個字元</label>
-                                <input type="text" id="charInput" maxlength="1" class="w-full text-center text-5xl font-bold bg-white/10 border border-indigo-500/50 rounded-lg py-4 focus:outline-none focus:bg-white/20 transition text-white" placeholder="A">
+                <div class="space-y-6">
+                    <!-- Theory -->
+                    <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                        <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <i data-lucide="type" class="w-6 h-6 text-indigo-500"></i> ASCII 與 Unicode
+                        </h3>
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="font-bold text-slate-700 mb-2">ASCII (美國標準信息交換碼)</h4>
+                                <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                    <li>使用 7 位元 (Standard) 或 8 位元 (Extended)。</li>
+                                    <li>只能表示英文字母、數字和基本符號。</li>
+                                    <li>佔用空間少 (1 Byte)。</li>
+                                </ul>
                             </div>
-                            <div class="w-full md:w-2/3 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                <div class="bg-black/20 p-3 rounded-lg text-center"><div class="text-xs text-indigo-300 mb-1">ASCII</div><div id="outAscii" class="font-mono text-lg font-bold text-white">-</div></div>
-                                <div class="bg-black/20 p-3 rounded-lg text-center"><div class="text-xs text-indigo-300 mb-1">Unicode</div><div id="outUnicode" class="font-mono text-lg font-bold text-yellow-300">-</div></div>
-                                <div class="bg-black/20 p-3 rounded-lg text-center"><div class="text-xs text-indigo-300 mb-1">Binary</div><div id="outBinary" class="font-mono text-lg font-bold text-emerald-300">-</div></div>
+                            <div>
+                                <h4 class="font-bold text-slate-700 mb-2">Unicode (統一碼)</h4>
+                                <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+                                    <li>旨在包含全球所有文字 (中、日、韓、Emoji)。</li>
+                                    <li>UTF-8 是最常見的實作方式 (可變長度)。</li>
+                                    <li>中文通常佔用 3 個 Byte。</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            
-            <div id="content-image" class="tab-content"></div>
-            <div id="content-audio" class="tab-content"></div>
-            <div id="content-video" class="tab-content"></div>
 
-            <!-- 檔案大小計算機 -->
-            <div class="mt-12 bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                <h3 class="font-bold text-lg text-slate-800 mb-4 flex items-center gap-2"><i data-lucide="hard-drive" class="w-5 h-5 text-slate-500"></i> 簡易檔案大小計算機 (圖像)</h3>
-                <div class="grid md:grid-cols-4 gap-4 items-end">
-                    <div><label class="block text-xs font-bold mb-1 text-slate-500">闊度 (px)</label><input type="number" id="calcW" class="w-full p-2 border rounded" value="1920"></div>
-                    <div><label class="block text-xs font-bold mb-1 text-slate-500">高度 (px)</label><input type="number" id="calcH" class="w-full p-2 border rounded" value="1080"></div>
-                    <div><label class="block text-xs font-bold mb-1 text-slate-500">顏色深度 (Bit)</label><input type="number" id="calcD" class="w-full p-2 border rounded" value="24"></div>
-                    <button onclick="calcFileSize()" class="bg-indigo-600 text-white p-2 rounded font-bold hover:bg-indigo-700 transition">計算大小</button>
+                    <!-- Interactive Character Tool -->
+                    <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
+                        <h3 class="font-bold text-indigo-800 mb-4 flex items-center gap-2">
+                            <i data-lucide="search" class="w-5 h-5"></i> 字符編碼檢查器 (Character Inspector)
+                        </h3>
+                        <div class="flex gap-4 mb-4">
+                            <input type="text" id="charInput" class="flex-1 p-3 border border-indigo-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-400" placeholder="輸入文字 (例如: A, 中, 💻)" maxlength="10">
+                            <button onclick="inspectText()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-indigo-700 transition">
+                                查看編碼
+                            </button>
+                        </div>
+                        
+                        <div id="char-result" class="hidden bg-white rounded-xl shadow-sm overflow-hidden border border-indigo-100">
+                            <table class="w-full text-sm code-table">
+                                <thead>
+                                    <tr>
+                                        <th>字符</th>
+                                        <th>ASCII (Dec)</th>
+                                        <th>Unicode (Hex)</th>
+                                        <th>備註</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="char-table-body">
+                                    <!-- Results here -->
+                                </tbody>
+                            </table>
+                            <div class="p-3 bg-slate-50 text-xs text-slate-500 border-t border-slate-100">
+                                * ASCII 僅適用於 0-127 範圍內的字符。
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Common Codes Reference -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                         <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <i data-lucide="book" class="w-5 h-5 text-emerald-600"></i> 常見中文編碼比較 (Concept)
+                        </h3>
+                        <p class="text-sm text-slate-600 mb-4">由於 Big5 (大五碼) 和 GB (國標碼) 是專為特定地區設計的雙字節 (2 Bytes) 編碼，它們與 Unicode 的對應關係並不直觀。以下是常見字符的對照範例：</p>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left border-collapse">
+                                <thead class="bg-slate-100 text-slate-600">
+                                    <tr>
+                                        <th class="p-3 border border-slate-200">字符</th>
+                                        <th class="p-3 border border-slate-200">Big5 (繁體)</th>
+                                        <th class="p-3 border border-slate-200">GB2312 (簡體)</th>
+                                        <th class="p-3 border border-slate-200">Unicode (UTF-8)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="font-mono text-slate-700">
+                                    <tr>
+                                        <td class="p-3 border border-slate-200 font-sans">中</td>
+                                        <td class="p-3 border border-slate-200">A4 A4</td>
+                                        <td class="p-3 border border-slate-200">D6 D0</td>
+                                        <td class="p-3 border border-slate-200">E4 B8 AD (3 Bytes)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3 border border-slate-200 font-sans">文</td>
+                                        <td class="p-3 border border-slate-200">A4 E5</td>
+                                        <td class="p-3 border border-slate-200">CE C4</td>
+                                        <td class="p-3 border border-slate-200">E6 96 87 (3 Bytes)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="mt-2 text-xs text-slate-400">注意：UTF-8 是 Unicode 的一種編碼方式，中文字通常佔 3 Bytes，而 Big5/GB 通常佔 2 Bytes。</p>
+                    </div>
                 </div>
-                <div id="fileSizeResult" class="mt-6 text-center"><span class="text-sm text-slate-400">點擊計算查看結果</span></div>
             </div>
+
+            <!-- Tab Content: Image -->
+            <div id="content-image" class="tab-content">
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="image" class="w-6 h-6 text-pink-500"></i> 位圖 (Bitmap) vs 矢量圖 (Vector)
+                    </h3>
+                    
+                    <div class="grid md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-slate-50 p-4 rounded-lg">
+                            <strong class="block text-slate-700 mb-2">位圖 (Bitmap/Raster)</strong>
+                            <p class="text-xs text-slate-500 mb-2">由像素 (Pixels) 組成。</p>
+                            <p class="text-xs text-slate-500">優點：色彩豐富，適合照片。</p>
+                            <p class="text-xs text-slate-500">缺點：放大會失真 (鋸齒)。</p>
+                            <p class="text-xs font-mono mt-2 bg-white p-1 rounded inline-block">JPG, PNG, GIF</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-lg">
+                            <strong class="block text-slate-700 mb-2">矢量圖 (Vector)</strong>
+                            <p class="text-xs text-slate-500 mb-2">由數學公式定義路徑。</p>
+                            <p class="text-xs text-slate-500">優點：放大不失真，檔案小。</p>
+                            <p class="text-xs text-slate-500">缺點：不適合複雜照片。</p>
+                            <p class="text-xs font-mono mt-2 bg-white p-1 rounded inline-block">SVG, AI, EPS</p>
+                        </div>
+                    </div>
+
+                    <!-- Common Image Formats (NEW) -->
+                    <div class="mb-8">
+                        <h4 class="font-bold text-slate-700 mb-3">常見圖像檔案格式</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left border-collapse code-table">
+                                <thead>
+                                    <tr>
+                                        <th>格式</th>
+                                        <th>壓縮類型</th>
+                                        <th>適用場景與特點</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="font-bold text-indigo-600">JPEG / JPG</td>
+                                        <td>有損 (Lossy)</td>
+                                        <td>最適合<b>相片</b>。檔案小，但重複儲存會導致畫質下降。不支援透明背景。</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-indigo-600">PNG</td>
+                                        <td>無損 (Lossless)</td>
+                                        <td>適合<b>網頁圖像、截圖</b>。支援透明背景，畫質清晰但檔案較大。</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-indigo-600">GIF</td>
+                                        <td>無損 (8-bit)</td>
+                                        <td>支援<b>簡單動畫</b>。僅支援 256 色，不適合相片。</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-indigo-600">TIFF</td>
+                                        <td>無損 / 未壓縮</td>
+                                        <td>適合<b>印刷出版</b>。檔案極大，保留所有細節。</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-indigo-600">SVG</td>
+                                        <td>矢量 (Vector)</td>
+                                        <td>適合<b>標誌 (Logo)、圖標</b>。放大不失真，實質是 XML 文字檔。</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <hr class="my-6 border-slate-100">
+
+                    <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2">
+                        <i data-lucide="hard-drive" class="w-5 h-5 text-slate-500"></i> 簡易檔案大小計算機 (圖像)
+                    </h3>
+                    <div class="grid md:grid-cols-4 gap-4 items-end">
+                        <div><label class="block text-xs font-bold mb-1 text-slate-500">闊度 (px)</label><input type="number" id="calcW" class="w-full p-2 border rounded" value="1920"></div>
+                        <div><label class="block text-xs font-bold mb-1 text-slate-500">高度 (px)</label><input type="number" id="calcH" class="w-full p-2 border rounded" value="1080"></div>
+                        <div><label class="block text-xs font-bold mb-1 text-slate-500">色彩深度 (bits)</label><input type="number" id="calcD" class="w-full p-2 border rounded" value="24"></div>
+                        <button onclick="calcFileSize()" class="bg-indigo-600 text-white p-2 rounded font-bold hover:bg-indigo-700 transition">計算大小</button>
+                    </div>
+                    <div class="mt-4 p-3 bg-green-50 text-green-800 rounded hidden" id="sizeResult">
+                        <!-- Result -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Audio (UPDATED) -->
+            <div id="content-audio" class="tab-content">
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <i data-lucide="mic" class="w-6 h-6 text-amber-500"></i> 聲音數碼化 (Audio Digitization)
+                    </h3>
+                    
+                    <!-- File Formats Table -->
+                    <div class="mb-8">
+                        <h4 class="font-bold text-slate-700 mb-3">常見聲音檔案格式</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left border-collapse code-table">
+                                <thead>
+                                    <tr>
+                                        <th>格式</th>
+                                        <th>類型</th>
+                                        <th>特點</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="font-bold text-indigo-600">WAV</td>
+                                        <td>未壓縮 (Uncompressed)</td>
+                                        <td>檔案最大，音質最好，保留所有原始數據。</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-indigo-600">MP3</td>
+                                        <td>有損壓縮 (Lossy)</td>
+                                        <td>移除人耳聽不到的聲音，檔案小，最普及。</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-indigo-600">FLAC</td>
+                                        <td>無損壓縮 (Lossless)</td>
+                                        <td>壓縮後不失真，檔案約為 WAV 的一半。</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-indigo-600">AAC</td>
+                                        <td>有損壓縮 (Lossy)</td>
+                                        <td>比 MP3 更高效，常見於 Apple 裝置及 YouTube。</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <hr class="my-6 border-slate-100">
+
+                    <!-- Audio Size Calculator -->
+                    <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2">
+                        <i data-lucide="hard-drive" class="w-5 h-5 text-slate-500"></i> 未壓縮音訊檔案大小計算機
+                    </h3>
+                    <p class="text-sm text-slate-500 mb-4">公式：<code class="bg-slate-100 px-1 rounded">檔案大小 (bits) = 採樣率 × 採樣大小 × 聲道 × 時間</code></p>
+                    
+                    <div class="grid md:grid-cols-5 gap-4 items-end">
+                        <div class="col-span-1">
+                            <label class="block text-xs font-bold mb-1 text-slate-500">採樣率 (Hz)</label>
+                            <input type="number" id="audioRate" class="w-full p-2 border rounded" value="44100" placeholder="e.g., 44100">
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-xs font-bold mb-1 text-slate-500">採樣大小 (bits)</label>
+                            <input type="number" id="audioRes" class="w-full p-2 border rounded" value="16" placeholder="e.g., 16">
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-xs font-bold mb-1 text-slate-500">聲道 (Channel)</label>
+                            <select id="audioCh" class="w-full p-2 border rounded bg-white">
+                                <option value="1">1 (Mono)</option>
+                                <option value="2" selected>2 (Stereo)</option>
+                            </select>
+                        </div>
+                         <div class="col-span-1">
+                            <label class="block text-xs font-bold mb-1 text-slate-500">時間 (秒)</label>
+                            <input type="number" id="audioTime" class="w-full p-2 border rounded" value="60">
+                        </div>
+                        <button onclick="calcAudioSize()" class="bg-amber-500 hover:bg-amber-600 text-white p-2 rounded font-bold transition">計算</button>
+                    </div>
+                    <div class="mt-4 p-3 bg-amber-50 text-amber-900 rounded hidden border border-amber-100" id="audioSizeResult">
+                        <!-- Result -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Video (UPDATED) -->
+            <div id="content-video" class="tab-content">
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <i data-lucide="film" class="w-6 h-6 text-cyan-500"></i> 視像原理 (Video)
+                    </h3>
+
+                    <!-- File Formats Table -->
+                    <div class="mb-8">
+                        <h4 class="font-bold text-slate-700 mb-3">常見視像檔案格式 (容器)</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left border-collapse code-table">
+                                <thead>
+                                    <tr>
+                                        <th>格式 (容器)</th>
+                                        <th>常用編碼</th>
+                                        <th>特點</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="font-bold text-indigo-600">MP4</td>
+                                        <td>H.264, H.265</td>
+                                        <td>兼容性最高，網上串流標準。</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-indigo-600">MOV</td>
+                                        <td>ProRes, H.264</td>
+                                        <td>Apple 開發，常見於 Mac 及 iPhone。</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-indigo-600">AVI</td>
+                                        <td>DivX, Xvid</td>
+                                        <td>微軟開發，較舊，檔案通常較大。</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold text-indigo-600">MKV</td>
+                                        <td>Any</td>
+                                        <td>開放標準，支援多音軌字幕，但部分播放器不支援。</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <hr class="my-6 border-slate-100">
+
+                    <!-- Video Size Calculator -->
+                    <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2">
+                        <i data-lucide="hard-drive" class="w-5 h-5 text-slate-500"></i> 未壓縮視像檔案大小計算機
+                    </h3>
+                    <div class="bg-cyan-50 border-l-4 border-cyan-400 p-4 mb-4 text-xs text-cyan-800">
+                        <strong>公式更新：</strong> 總檔案大小 = (視像大小) + (音訊大小)<br>
+                        <span class="opacity-75">影片不僅有畫面，還有聲音！計算時記得加上音軌的大小。</span>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
+                        <!-- Video Params -->
+                        <div class="col-span-1">
+                            <label class="block text-xs font-bold mb-1 text-slate-500">闊度 (px)</label>
+                            <input type="number" id="vidW" class="w-full p-2 border rounded" value="1920">
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-xs font-bold mb-1 text-slate-500">高度 (px)</label>
+                            <input type="number" id="vidH" class="w-full p-2 border rounded" value="1080">
+                        </div>
+                         <div class="col-span-1">
+                            <label class="block text-xs font-bold mb-1 text-slate-500">色深 (bits)</label>
+                            <input type="number" id="vidDepth" class="w-full p-2 border rounded" value="24">
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-xs font-bold mb-1 text-slate-500">幀率 (fps)</label>
+                            <input type="number" id="vidFps" class="w-full p-2 border rounded" value="30">
+                        </div>
+                         <div class="col-span-1">
+                            <label class="block text-xs font-bold mb-1 text-slate-500">時間 (秒)</label>
+                            <input type="number" id="vidTime" class="w-full p-2 border rounded" value="10">
+                        </div>
+                        
+                        <!-- Audio Toggle -->
+                        <div class="col-span-1 lg:col-span-1 flex items-center h-[42px]">
+                            <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
+                                <input type="checkbox" id="includeAudio" class="w-4 h-4 text-cyan-600 rounded" onchange="toggleVideoAudioInputs()">
+                                包含音訊
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Hidden Audio Params for Video -->
+                    <div id="videoAudioInputs" class="hidden mt-4 pt-4 border-t border-dashed border-slate-300 bg-slate-50 p-3 rounded-lg">
+                        <p class="text-xs font-bold text-slate-500 mb-2 flex items-center gap-1">
+                            <i data-lucide="music" class="w-3 h-3"></i> 附加音訊參數 (Audio Track)
+                        </p>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-[10px] font-bold mb-1 text-slate-400">採樣率 (Hz)</label>
+                                <input type="number" id="vidAudRate" class="w-full p-2 border rounded text-sm" value="44100">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold mb-1 text-slate-400">採樣大小 (bits)</label>
+                                <input type="number" id="vidAudRes" class="w-full p-2 border rounded text-sm" value="16">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold mb-1 text-slate-400">聲道</label>
+                                <select id="vidAudCh" class="w-full p-2 border rounded bg-white text-sm">
+                                    <option value="1">1</option>
+                                    <option value="2" selected>2</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button onclick="calcVideoSize()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-2 rounded font-bold transition w-full md:w-auto">計算總大小</button>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-cyan-50 text-cyan-900 rounded hidden border border-cyan-100" id="vidSizeResult">
+                        <!-- Result -->
+                    </div>
+                </div>
+            </div>
+
         </section>
 
     </main>
 
-    <!-- 頁尾 -->
-    <footer class="bg-slate-100 py-8 mt-12 text-center text-slate-500 text-sm">
-        <p>高中 ICT 學習資源網 &copy; 2025</p>
+    <footer class="bg-white border-t border-slate-200 mt-12 py-8 text-center text-slate-500 text-sm">
+        <p>&copy; 2024 ICT Learning Resources. All rights reserved.</p>
     </footer>
 
     <script>
+        // Init Lucide Icons
         lucide.createIcons();
 
         // ----------------------------------------------------
-        // 1. 短除法生成邏輯 (FINAL Fix for Line Height)
+        // 1. 短除法演示邏輯 (UPDATED to support Hex)
         // ----------------------------------------------------
-        function formatRemainder(remainder) {
-            if (remainder >= 10) {
-                const hexChars = ['A', 'B', 'C', 'D', 'E', 'F'];
-                return `${remainder} (${hexChars[remainder - 10]})`;
+        let currentBase = 2;
+
+        function setBase(base) {
+            currentBase = base;
+            document.getElementById('btnBase2').className = base === 2 ? 
+                "px-4 py-2 rounded-md text-sm font-bold bg-white shadow text-indigo-600 transition" : 
+                "px-4 py-2 rounded-md text-sm font-bold text-slate-500 hover:text-indigo-600 transition";
+            
+            document.getElementById('btnBase16').className = base === 16 ? 
+                "px-4 py-2 rounded-md text-sm font-bold bg-white shadow text-indigo-600 transition" : 
+                "px-4 py-2 rounded-md text-sm font-bold text-slate-500 hover:text-indigo-600 transition";
+            
+            // Auto refresh if already showing
+            if(!document.getElementById('division-result').classList.contains('hidden')) {
+                generateShortDivision();
             }
-            return remainder;
         }
 
-        function generateShortDivision(base) {
-            const decInput = document.getElementById('decInput').value;
-            const outputDiv = document.getElementById('divisionOutput');
-            const resultDiv = document.getElementById('divisionResult');
-            const resultText = document.getElementById('resultText');
+        function generateShortDivision() {
+            const input = document.getElementById('decimalInput').value;
+            const resultDiv = document.getElementById('division-result');
             
-            if(!decInput || decInput < 0) {
+            if (!input || input < 0) {
                 alert("請輸入有效的正整數");
                 return;
             }
 
-            let num = parseInt(decInput);
+            let num = parseInt(input);
+            let steps = [];
+            let originalNum = num;
+            const divisor = currentBase;
+
+            // 進行短除法
+            while (num > 0) {
+                let remainder = num % divisor;
+                let quotient = Math.floor(num / divisor);
+                
+                // Format remainder for Hex (10->A etc)
+                let remDisplay = remainder;
+                if (divisor === 16 && remainder >= 10) {
+                    const hexChars = ['A', 'B', 'C', 'D', 'E', 'F'];
+                    remDisplay = `${remainder} (${hexChars[remainder - 10]})`;
+                }
+
+                steps.push({ div: divisor, val: num, rem: remDisplay, rawRem: remainder });
+                num = quotient;
+            }
+            // Add the final 0 quotient step
+            steps.push({ div: divisor, val: 0, rem: '' });
+
+            // 生成 HTML
+            let html = `<div class="factorization-wrapper">`;
             
-            // 準備數據
-            let quotients = [num]; 
-            let usedDivisors = []; 
-            let remainders = [];
+            // 左側除數列
+            html += `<div class="divisors-column">`;
+            for(let i=0; i<steps.length - 1; i++) {
+                html += `<div class="divisor">${steps[i].div}</div>`;
+            }
+            html += `</div>`;
+
+            // 中間被除數列
+            html += `<div class="dividends-column">`;
+            for(let i=0; i<steps.length; i++) {
+                html += `<div class="dividend">${steps[i].val}</div>`;
+            }
+            html += `</div>`;
+
+            // 右側餘數列
+            html += `<div class="remainders-column">`;
+            for(let i=0; i<steps.length - 1; i++) {
+                html += `<div class="remainder">... ${steps[i].rem}</div>`;
+            }
+            html += `</div>`;
             
-            let currentNum = num;
-            while (currentNum >= base) {
-                let quotient = Math.floor(currentNum / base);
-                let remainder = currentNum % base;
-                remainders.push(remainder);
-                usedDivisors.push(base);
-                quotients.push(quotient);
-                currentNum = quotient;
+            html += `</div>`;
+
+            // 顯示結果字串
+            let resultStr = "";
+            if(originalNum === 0) {
+                resultStr = "0";
+            } else {
+                // Collect remainders in reverse
+                let rawRems = steps.slice(0, -1).map(s => s.rawRem).reverse();
+                if (divisor === 2) {
+                    resultStr = rawRems.join('');
+                } else {
+                    resultStr = rawRems.map(r => r.toString(16).toUpperCase()).join('');
+                }
             }
             
-            outputDiv.innerHTML = ''; 
-            
-            const wrapper = document.createElement('div');
-            wrapper.className = 'factorization-wrapper';
+            html += `<div class="ml-8 flex flex-col justify-center items-start">
+                        <div class="text-sm text-slate-500 font-bold mb-2">讀取方向: 由下至上</div>
+                        <div class="text-3xl font-mono text-indigo-600 font-bold border-2 border-indigo-200 px-4 py-2 rounded-lg bg-white">
+                            ${resultStr}<sub>(${divisor})</sub>
+                        </div>
+                     </div>`;
 
-            const divisorsCol = document.createElement('div');
-            divisorsCol.className = 'divisors-column';
-            usedDivisors.forEach(d => { divisorsCol.innerHTML += `<div class="divisor">${d}</div>`; });
-            divisorsCol.innerHTML += `<div class="divisor">&nbsp;</div>`;
-
-            const dividendsCol = document.createElement('div');
-            dividendsCol.className = 'dividends-column';
-            quotients.forEach(q => { dividendsCol.innerHTML += `<div class="dividend">${q}</div>`; });
-
-            const remaindersCol = document.createElement('div');
-            remaindersCol.className = 'remainders-column';
-            remaindersCol.innerHTML += '<div class="remainder">&nbsp;</div>'; 
-            remainders.forEach(r => {
-                let rText = (base === 16) ? formatRemainder(r) : r;
-                remaindersCol.innerHTML += `<div class="remainder">...${rText}</div>`;
-            });
-            
-            wrapper.appendChild(divisorsCol);
-            wrapper.appendChild(dividendsCol);
-            wrapper.appendChild(remaindersCol);
-            outputDiv.appendChild(wrapper); 
-            
-            const arrowDiv = document.createElement('div');
-            arrowDiv.innerHTML = `<div class="mt-6 flex flex-col items-center gap-1 text-sm text-indigo-500 font-bold animate-pulse"><i data-lucide="arrow-up" class="w-6 h-6"></i>最後商數 + 由下而上讀取餘數</div>`;
-            outputDiv.appendChild(arrowDiv);
-
-            const lastQuotient = quotients[quotients.length - 1];
-            let lastQVal = lastQuotient;
-            if (base === 16 && lastQuotient >= 10) {
-                 const hexChars = ['A', 'B', 'C', 'D', 'E', 'F'];
-                 lastQVal = hexChars[lastQuotient - 10];
-            }
-
-            const remainderStrings = remainders.map(r => {
-                if (base === 16 && r >= 10) return ['A','B','C','D','E','F'][r-10];
-                return r;
-            });
-            
-            const finalResult = lastQVal + remainderStrings.reverse().join('');
-            resultText.innerHTML = `${finalResult}<sub>(${base})</sub>`;
+            resultDiv.innerHTML = html;
             resultDiv.classList.remove('hidden');
-            lucide.createIcons();
         }
 
         // ----------------------------------------------------
-        // 2. 二進制直式計算機
+        // 2. 二進制直式計算機 (原有)
         // ----------------------------------------------------
         function calcBinary(op) {
             const strA = document.getElementById('binA').value.trim();
@@ -470,150 +998,340 @@
             }
 
             const maxLen = Math.max(strA.length, strB.length);
-            const arrA = strA.padStart(maxLen, '0').split('').map(Number);
-            const arrB = strB.padStart(maxLen, '0').split('').map(Number);
-            
-            let resultArr = [];
-            let carryDisplay = Array(maxLen).fill(''); 
-            let note = "";
-            let operatorSymbol = op === 'add' ? '+' : '-';
+            const numA = parseInt(strA, 2);
+            const numB = parseInt(strB, 2);
+            let res = 0;
+            let operator = '+';
 
-            if (op === 'add') {
-                let tempCarry = 0;
-                for(let i = maxLen - 1; i >= 0; i--) {
-                    let sum = arrA[i] + arrB[i] + tempCarry;
-                    resultArr.unshift(sum % 2);
-                    
-                    let nextCarry = Math.floor(sum / 2);
-                    if(nextCarry > 0 && i > 0) {
-                        carryDisplay[i-1] = '1';
-                    }
-                    tempCarry = nextCarry;
-                }
-                if(tempCarry > 0) {
-                    resultArr.unshift(1);
-                    arrA.unshift(0); 
-                    arrB.unshift(0);
-                    carryDisplay.unshift('1'); 
-                }
+            if(op === 'add') {
+                res = numA + numB;
+                operator = '+';
             } else {
-                const numA = parseInt(strA, 2);
-                const numB = parseInt(strB, 2);
-                let res = numA - numB;
-                if(res < 0) {
-                     res = Math.abs(res);
-                     note = "<div class='mt-4 text-xs text-yellow-400 text-right w-full'>注意：結果為負數</div>";
-                     resultArr = res.toString(2).split('');
-                } else {
-                    resultArr = res.toString(2).split('');
-                }
-                while(resultArr.length < maxLen) resultArr.unshift(0);
+                res = numA - numB;
+                operator = '-';
             }
 
-            const finalLen = Math.max(arrA.length, arrB.length, resultArr.length);
-            const dispA = Array(finalLen - strA.length).fill('').concat(strA.split(''));
-            const dispB = Array(finalLen - strB.length).fill('').concat(strB.split(''));
-            const dispRes = Array(finalLen - resultArr.length).fill('').concat(resultArr);
+            const resStr = res.toString(2); // 注意：負數這裡會顯示 -10...
+
+            // 構建直式 HTML
+            let html = `<div class="binary-calc-box">`;
             
-            let finalCarryDisplay = Array(finalLen).fill('');
-            if (op === 'add') {
-                 let c = 0;
-                 const binA = strA.padStart(finalLen, '0').split('').map(Number);
-                 const binB = strB.padStart(finalLen, '0').split('').map(Number);
-                 
-                 for(let i=finalLen-1; i>0; i--) {
-                     let s = binA[i] + binB[i] + c;
-                     if(s >= 2) {
-                         c = 1;
-                         finalCarryDisplay[i-1] = '₁';
-                     } else {
-                         c = 0;
-                     }
-                 }
-            }
-
-            let html = `<div class="binary-calc-container">`;
-            let carryHtml = `<div class="carry-overlay"><div class="operator-cell"></div>`;
-            finalCarryDisplay.forEach(c => { carryHtml += `<div class="carry-cell">${c}</div>`; });
-            carryHtml += `</div>`;
-
-            html += `<div class="calc-row"><div class="operator-cell"></div>`;
-            for(let i=0; i<finalLen; i++) {
-                let char = dispA[i] === '' ? '&nbsp;' : dispA[i];
-                html += `<div class="bit-cell text-slate-300">${char}</div>`;
-            }
+            // Carry line (optional, simple logic for display)
+            // 這裡簡化，不顯示進位細節，只顯示算式
+            
+            html += `<div class="calc-row">${strA.padStart(maxLen + 1, ' ')}</div>`;
+            html += `<div class="calc-row"><span class="calc-operator">${operator}</span>${strB.padStart(maxLen + 1, ' ')}</div>`;
+            html += `<div class="calc-line">${res < 0 ? '-' : ''}${Math.abs(res).toString(2).padStart(maxLen + 1, ' ')}</div>`;
+            
             html += `</div>`;
+            
+            // 加上十進制對照
+            html += `<div class="mt-4 text-xs text-slate-500 font-sans border-t pt-2 w-full text-center">
+                        (${numA} ${operator} ${numB} = ${res})
+                     </div>`;
 
-            html += `<div class="calc-row"><div class="operator-cell">${operatorSymbol}</div>`;
-            for(let i=0; i<finalLen; i++) {
-                let char = dispB[i] === '' ? '&nbsp;' : dispB[i];
-                html += `<div class="bit-cell text-slate-300">${char}</div>`;
-            }
-            html += `</div>`;
-
-            html += `<div class="calc-divider" style="position:relative;">${carryHtml}</div>`;
-
-            html += `<div class="calc-row result-row"><div class="operator-cell"></div>`;
-            for(let i=0; i<finalLen; i++) {
-                let char = dispRes[i] === '' ? '&nbsp;' : dispRes[i];
-                html += `<div class="bit-cell">${char}</div>`;
-            }
-            html += `</div>`;
-
-            html += `</div>${note}`;
             display.innerHTML = html;
         }
 
         // ----------------------------------------------------
-        // 3. 字符編碼 & 4. 多媒體 Tabs & Size Calc
+        // 3. 多媒體 Tabs & Size Calc & Text Inspector (UPDATED)
         // ----------------------------------------------------
-        document.getElementById('charInput').addEventListener('input', function(e) {
-            const char = e.target.value;
-            if (char.length > 0) {
-                const code = char.charCodeAt(0);
-                document.getElementById('outAscii').textContent = (code >= 0 && code <= 127) ? code : "非標準";
-                document.getElementById('outUnicode').textContent = `U+${code.toString(16).toUpperCase().padStart(4, '0')}`;
-                document.getElementById('outBinary').textContent = code.toString(2).padStart(8, '0');
-            }
-        });
-
         function switchTab(tabId, btn) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            // Remove active classes
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('content-' + tabId).classList.add('active');
-            btn.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             
-            // Dynamic content rendering for tab (to save initial HTML space)
-             if(tabId === 'image' && !document.getElementById('content-image').innerHTML) {
-                 document.getElementById('content-image').innerHTML = `<div class="grid md:grid-cols-2 gap-8 mb-8">
-                    <div class="bg-white p-6 rounded-xl border border-gray-200 hover-card">
-                        <div class="flex items-center gap-3 mb-4"><div class="bg-pink-100 p-2 rounded-lg"><i data-lucide="image" class="w-6 h-6 text-pink-600"></i></div><h3 class="font-bold text-xl text-slate-800">點陣圖 (Bitmap)</h3></div>
-                        <ul class="list-disc list-inside text-sm text-slate-600 space-y-2 mb-4"><li>由無數個<span class="font-bold text-pink-600">像素</span>組成。</li><li>放大會失真。</li><li>JPG, PNG。</li></ul>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl border border-gray-200 hover-card">
-                        <div class="flex items-center gap-3 mb-4"><div class="bg-teal-100 p-2 rounded-lg"><i data-lucide="pen-tool" class="w-6 h-6 text-teal-600"></i></div><h3 class="font-bold text-xl text-slate-800">向量圖 (Vector)</h3></div>
-                        <ul class="list-disc list-inside text-sm text-slate-600 space-y-2"><li>由<span class="font-bold text-teal-600">數學公式</span>定義。</li><li>放大不失真。</li><li>SVG, AI。</li></ul>
-                    </div></div>`;
-                 lucide.createIcons();
-             }
-             if(tabId === 'audio' && !document.getElementById('content-audio').innerHTML) {
-                 document.getElementById('content-audio').innerHTML = `<div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200"><h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2"><i data-lucide="mic" class="w-6 h-6 text-amber-500"></i> 聲音數碼化</h3><p class="text-slate-600">涉及採樣率 (Sampling Rate)、採樣大小 (Sample Size) 和聲道。</p></div>`;
-                 lucide.createIcons();
-             }
-             if(tabId === 'video' && !document.getElementById('content-video').innerHTML) {
-                 document.getElementById('content-video').innerHTML = `<div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-200"><h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2"><i data-lucide="film" class="w-6 h-6 text-cyan-500"></i> 視像原理</h3><p class="text-slate-600">連續播放的靜態圖像 (幀 Frame)。關鍵參數：幀率 (fps)、解像度、壓縮編碼。</p></div>`;
-                 lucide.createIcons();
-             }
+            // Add active
+            btn.classList.add('active');
+            document.getElementById('content-' + tabId).classList.add('active');
+            
+            // Re-init icons just in case content was hidden
+            lucide.createIcons();
+        }
+
+        // NEW: Character Inspector
+        function inspectText() {
+            const text = document.getElementById('charInput').value;
+            const tbody = document.getElementById('char-table-body');
+            const resultDiv = document.getElementById('char-result');
+            
+            if(!text) {
+                resultDiv.classList.add('hidden');
+                return;
+            }
+
+            tbody.innerHTML = '';
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                const code = text.codePointAt(i); // Unicode code point
+                
+                // Adjust index if surrogate pair (emoji etc)
+                if (code > 0xFFFF) i++;
+
+                const ascii = code < 128 ? code : "-";
+                const hex = code.toString(16).toUpperCase().padStart(4, '0');
+                
+                let note = "";
+                if(code < 128) note = "Standard ASCII";
+                else if(code >= 0x4E00 && code <= 0x9FFF) note = "CJK Unified Ideograph (中文字)";
+                else if(code > 128) note = "Unicode Character";
+
+                const row = `
+                    <tr>
+                        <td class="font-bold text-lg text-indigo-600">${char}</td>
+                        <td>${ascii}</td>
+                        <td>U+${hex}</td>
+                        <td class="text-xs text-slate-500">${note}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            }
+            resultDiv.classList.remove('hidden');
+        }
+
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
         }
 
         function calcFileSize() {
             const w = document.getElementById('calcW').value;
             const h = document.getElementById('calcH').value;
             const d = document.getElementById('calcD').value;
-            const kb = (w * h * d / 8) / 1024;
-            const mb = kb / 1024;
-            document.getElementById('fileSizeResult').innerHTML = `<div class="text-center"><div class="text-3xl font-bold text-indigo-600">${kb.toFixed(2)} KB</div><div class="text-xs text-slate-500">≈ ${mb.toFixed(2)} MB</div></div>`;
+            
+            if(w && h && d) {
+                const bits = w * h * d;
+                const bytes = bits / 8;
+                
+                document.getElementById('sizeResult').classList.remove('hidden');
+                document.getElementById('sizeResult').innerHTML = `
+                    <strong>計算結果：</strong><br>
+                    ${bits.toLocaleString()} bits<br>
+                    = ${formatBytes(bytes)}
+                `;
+            }
         }
+
+        // NEW: Audio Size Calc
+        function calcAudioSize() {
+            const rate = document.getElementById('audioRate').value;
+            const res = document.getElementById('audioRes').value;
+            const ch = document.getElementById('audioCh').value;
+            const time = document.getElementById('audioTime').value;
+
+            if(rate && res && ch && time) {
+                const bits = rate * res * ch * time;
+                const bytes = bits / 8;
+                
+                document.getElementById('audioSizeResult').classList.remove('hidden');
+                document.getElementById('audioSizeResult').innerHTML = `
+                    <strong>計算結果 (未壓縮)：</strong><br>
+                    Rate(${rate}) × Size(${res}) × Ch(${ch}) × Time(${time})<br>
+                    = ${bits.toLocaleString()} bits<br>
+                    = <span class="text-xl font-bold text-amber-600">${formatBytes(bytes)}</span>
+                `;
+            }
+        }
+
+        // UPDATED: Toggle Audio Inputs in Video Section
+        function toggleVideoAudioInputs() {
+            const isChecked = document.getElementById('includeAudio').checked;
+            const inputDiv = document.getElementById('videoAudioInputs');
+            if(isChecked) {
+                inputDiv.classList.remove('hidden');
+            } else {
+                inputDiv.classList.add('hidden');
+            }
+        }
+
+        // UPDATED: Video Size Calc (Includes Audio)
+        function calcVideoSize() {
+            // Video Params
+            const w = document.getElementById('vidW').value;
+            const h = document.getElementById('vidH').value;
+            const depth = document.getElementById('vidDepth').value;
+            const fps = document.getElementById('vidFps').value;
+            const time = document.getElementById('vidTime').value;
+            
+            // Audio Params (if checked)
+            const includeAudio = document.getElementById('includeAudio').checked;
+            let audioBits = 0;
+            let audioDetails = "";
+
+            if(includeAudio) {
+                const aRate = document.getElementById('vidAudRate').value;
+                const aRes = document.getElementById('vidAudRes').value;
+                const aCh = document.getElementById('vidAudCh').value;
+                audioBits = aRate * aRes * aCh * time;
+                
+                const audioBytes = audioBits / 8;
+                audioDetails = `<br><span class="text-xs text-amber-600">+ 音訊大小: ${formatBytes(audioBytes)}</span>`;
+            }
+
+            if(w && h && depth && fps && time) {
+                // Video Bits
+                const videoBitsPerFrame = w * h * depth;
+                const totalVideoBits = videoBitsPerFrame * fps * time;
+                
+                // Total
+                const grandTotalBits = totalVideoBits + audioBits;
+                const grandTotalBytes = grandTotalBits / 8;
+                
+                document.getElementById('vidSizeResult').classList.remove('hidden');
+                document.getElementById('vidSizeResult').innerHTML = `
+                    <strong>計算結果 (未壓縮)：</strong><br>
+                    <span class="text-sm">視像: Frame(${w}x${h}x${depth}) × FPS(${fps}) × Time(${time})</span>
+                    ${audioDetails}
+                    <hr class="my-2 border-cyan-200">
+                    <span class="text-lg">總計 = ${grandTotalBits.toLocaleString()} bits</span><br>
+                    = <span class="text-xl font-bold text-cyan-600">${formatBytes(grandTotalBytes)}</span><br>
+                    <span class="text-xs text-slate-500 mt-2 block">這還只是 ${time} 秒的影片！這就是為什麼我們需要壓縮。</span>
+                `;
+            }
+        }
+
+        // ====================================================
+        // NEW JS: 3.1.2 Signed Numbers Logic (原有邏輯)
+        // ====================================================
+        
+        // --- 1. 8-bit Lab Logic ---
+        const bits = [0,0,0,0,0,0,0,0]; // 8 bits
+
+        function initBitLab() {
+            const container = document.getElementById('bit-container');
+            container.innerHTML = '';
+            
+            bits.forEach((bit, index) => {
+                const div = document.createElement('div');
+                div.className = `bit-switch ${bit ? 'on' : 'off'}`;
+                // Index 0 is MSB (Sign bit)
+                if (index === 0) div.style.borderColor = bit ? '#f43f5e' : '#e2e8f0'; // Red border if on
+                if (index === 0 && bit) div.style.backgroundColor = '#f43f5e';
+                
+                // Updated Label for MSB to show Negative Weight
+                let weightLabel = Math.pow(2, 7-index);
+                if (index === 0) weightLabel = "-128"; 
+
+                div.innerHTML = `
+                    ${bit}
+                    <span class="bit-value">${weightLabel}</span>
+                `;
+                div.onclick = () => toggleBit(index);
+                container.appendChild(div);
+            });
+            updateStats();
+        }
+
+        function toggleBit(index) {
+            bits[index] = bits[index] ? 0 : 1;
+            initBitLab(); // Re-render to update styles
+        }
+
+        function updateStats() {
+            const binStr = bits.join('');
+            const val = parseInt(binStr, 2);
+
+            // 1. Unsigned
+            document.getElementById('val-unsigned').innerText = val;
+
+            // 2. Sign & Magnitude
+            // If MSB (bits[0]) is 1, it is negative. Magnitude is the rest 7 bits.
+            const signBit = bits[0];
+            const magnitude = parseInt(bits.slice(1).join(''), 2);
+            let smVal = magnitude;
+            if (signBit === 1) {
+                // Special case for -0? usually presented as -0
+                smVal = "-" + magnitude;
+            }
+            document.getElementById('val-signmag').innerText = smVal;
+
+            // 3. Two's Complement
+            // If MSB is 0, positive. If 1, value is val - 256 (for 8-bit)
+            let tcVal = val;
+            if (val >= 128) {
+                tcVal = val - 256;
+            }
+            document.getElementById('val-twos').innerText = tcVal;
+
+            // 4. Negative Weight Calculation Display
+            let calcStr = "";
+            let total = 0;
+            
+            // MSB
+            if(bits[0] === 1) {
+                calcStr += `<span class="text-rose-600">(-128 × 1)</span>`;
+                total -= 128;
+            } else {
+                calcStr += `<span class="text-slate-400">(-128 × 0)</span>`;
+            }
+
+            // Other bits
+            for(let i=1; i<8; i++) {
+                const w = Math.pow(2, 7-i);
+                if(bits[i] === 1) {
+                    calcStr += ` + <span class="text-blue-600">(${w} × 1)</span>`;
+                    total += w;
+                } else {
+                    calcStr += ` + <span class="text-slate-400">(${w} × 0)</span>`;
+                }
+            }
+
+            calcStr += ` = <strong>${total}</strong>`;
+            document.getElementById('negative-weight-calc').innerHTML = calcStr;
+        }
+
+        // Initialize on load
+        initBitLab();
+
+
+        // --- 2. Converter Demo Logic ---
+        function startTwosCompDemo() {
+            let num = parseInt(document.getElementById('convertInput').value);
+            if(isNaN(num) || num < 0 || num > 127) {
+                alert("請輸入 0 至 127 之間的整數");
+                return;
+            }
+
+            // Step 0: Show Binary
+            let bin = num.toString(2).padStart(8, '0');
+            document.getElementById('demo-orig').innerText = bin;
+            document.getElementById('step1-row').style.opacity = '1';
+            
+            // Reset others
+            document.getElementById('step2-row').style.opacity = '0.3';
+            document.getElementById('demo-inverted').innerText = '--------';
+            document.getElementById('step3-row').style.opacity = '0.3';
+            document.getElementById('demo-result').innerText = '--------';
+
+            // Animation Sequence
+            setTimeout(() => {
+                // Step 1: Invert
+                let inverted = "";
+                for(let char of bin) inverted += (char === '0' ? '1' : '0');
+                document.getElementById('demo-inverted').innerText = inverted;
+                document.getElementById('step2-row').style.opacity = '1';
+
+                setTimeout(() => {
+                    // Step 2: Add 1
+                    // Logic: inverted string is essentially (255 - num)
+                    // Result in 2s comp for negative is (256 - num) which matches bin of (255-num) + 1
+                    let valInv = parseInt(inverted, 2);
+                    let resultVal = valInv + 1;
+                    let resultBin = resultVal.toString(2).padStart(8, '0');
+                    // Ensure we keep only 8 bits if overflow (though inputs 0-127 won't overflow 8 bits neg)
+                    if(resultBin.length > 8) resultBin = resultBin.slice(-8);
+
+                    document.getElementById('demo-result').innerText = resultBin + ` (-${num})`;
+                    document.getElementById('step3-row').style.opacity = '1';
+                }, 1000);
+
+            }, 800);
+        }
+
     </script>
 </body>
 </html>
