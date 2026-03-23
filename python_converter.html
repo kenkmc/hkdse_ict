@@ -109,12 +109,18 @@
 
 <div class="container">
     <div class="panel" id="left-panel">
-        <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px; background: #333; padding: 10px; border-radius: 6px;">
+        <!-- 頂部工具列：模式切換 與 範例選擇 -->
+        <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px; background: #333; padding: 10px; border-radius: 6px; flex-wrap: wrap;">
             <label id="mode-label" style="font-weight: bold; color: #61dafb; font-size: 14px;">⚙️ 轉換模式: </label>
-            <select id="mode-select" onchange="changeMode()" style="padding: 5px; border-radius: 4px; background: #222; color: white; border: 1px solid #555; outline: none; cursor: pointer; flex: 1;">
+            <select id="mode-select" onchange="changeMode()" style="padding: 5px; border-radius: 4px; background: #222; color: white; border: 1px solid #555; outline: none; cursor: pointer; flex: 1; min-width: 180px;">
                 <option value="flow">✍️ 互動流程圖編輯器 ➡️ Python</option>
                 <option value="python">🐍 Python ➡️ 偽代碼 / 流程圖</option>
                 <option value="pseudo">📝 偽代碼 ➡️ Python / 流程圖</option>
+            </select>
+
+            <label id="example-label" style="font-weight: bold; color: #ffeb3b; font-size: 14px; margin-left: 10px;">📖 範例: </label>
+            <select id="example-select" onchange="loadExample()" style="padding: 5px; border-radius: 4px; background: #222; color: white; border: 1px solid #555; outline: none; cursor: pointer; flex: 1; min-width: 150px;">
+                <option value="">-- 請選擇範例 --</option>
             </select>
         </div>
 
@@ -135,7 +141,6 @@
             </div>
             
             <div id="flow-workspace">
-                <!-- SVG 只負責畫線條 -->
                 <svg id="flow-lines" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1;">
                     <defs>
                         <marker id="arrowhead" markerWidth="12" markerHeight="9" refX="11" refY="4.5" orient="auto"><polygon points="0 0, 12 4.5, 0 9" fill="#333" /></marker>
@@ -147,10 +152,7 @@
                     <line id="temp-line" x1="0" y1="0" x2="0" y2="0" stroke="#2196f3" stroke-width="3" stroke-dasharray="6" style="display:none;" />
                 </svg>
                 
-                <!-- 節點容器 -->
                 <div id="nodes-container" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:2; pointer-events:none;"></div>
-                
-                <!-- 標籤容器 (獨立的 HTML 層，解決 SVG 無法點擊的問題) -->
                 <div id="labels-container" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:3; pointer-events:none;"></div>
             </div>
             <p style="font-size: 13px; color: #ffeb3b; margin-top: 8px; text-align: center; font-weight: bold;" id="flow-hint">💡 拖曳圖形邊緣的藍點 🔵 連線。若連線來自「判斷(菱形)」，可在線條上的文字欄修改是/否。</p>
@@ -195,8 +197,8 @@
             outputTitle: "📊 結果輸出區", msgEmpty: "請先輸入內容或選擇範例！",
             msgFlowEmpty: "流程圖目前沒有節點，請先繪製！", msgSyntaxOk: "✅ 完美！語法與縮排檢查皆通過！",
             msgCompileSuccess: "✅ 流程圖轉換成功！已自動切換為 Python 模式。",
-            modeLabel: "⚙️ 轉換模式: ", modePy: "🐍 Python ➡️ 偽代碼 / 流程圖", modePs: "📝 偽代碼 ➡️ Python / 流程圖",
-            modeFlow: "✍️ 互動流程圖編輯器 ➡️ Python (本機)",
+            modeLabel: "⚙️ 轉換模式: ", exampleLabel: "📖 範例: ", modePy: "🐍 Python ➡️ 偽代碼 / 流程圖", modePs: "📝 偽代碼 ➡️ Python / 流程圖",
+            modeFlow: "✍️ 互動流程圖編輯器 ➡️ Python (本機)", defaultSelectExample: "-- 請選擇範例 --",
             flowTools: { start: "開始", end: "結束", process: "處理/賦值", io: "輸入/輸出", decision: "判斷", del: "刪除", clear: "清空畫布", hint: "💡 拖曳圖形四角的藍點 🔵 連線。若連線來自「判斷(菱形)」，可在文字欄修改是/否。點擊連線本身可選取刪除。", defaultText: "點擊輸入", decisionPrompt: "請輸入這條路徑的條件：" },
             pseudo: { func: "函數", begin: "開始", if: "如果", then: "則", elif: "否則如果", else: "否則", forEach: "對於每個", in: "在", do: "執行", while: "當", output: "輸出", input: "輸入" }, flow: { start: "開始", end: "結束", true: "是", false: "否", output: "輸出", input: "輸入" }
         },
@@ -209,10 +211,120 @@
             outputTitle: "📊 Output Area", msgEmpty: "Please enter content first!",
             msgFlowEmpty: "Flowchart is empty!", msgSyntaxOk: "✅ Syntax passed!",
             msgCompileSuccess: "✅ Flowchart compiled!",
-            modeLabel: "⚙️ Mode: ", modePy: "🐍 Python ➡️ Pseudo / Flow", modePs: "📝 Pseudo ➡️ Python / Flow",
-            modeFlow: "✍️ Interactive Flowchart ➡️ Python",
+            modeLabel: "⚙️ Mode: ", exampleLabel: "📖 Examples: ", modePy: "🐍 Python ➡️ Pseudo / Flow", modePs: "📝 Pseudo ➡️ Python / Flow",
+            modeFlow: "✍️ Interactive Flowchart ➡️ Python", defaultSelectExample: "-- Select Example --",
             flowTools: { start: "Start", end: "End", process: "Process", io: "I/O", decision: "Decision", del: "Delete", clear: "Clear", hint: "💡 Drag 4-corner blue dot 🔵 to connect. Text boxes only appear for Decision (diamond) edges. Click an edge to select & delete.", defaultText: "Click to edit", decisionPrompt: "Condition:" },
             pseudo: { func: "FUNCTION", begin: "BEGIN", if: "IF", then: "THEN", elif: "ELSE IF", else: "ELSE", forEach: "FOR EACH", in: "IN", do: "DO", while: "WHILE", output: "OUTPUT", input: "INPUT" }, flow: { start: "Start", end: "End", true: "True", false: "False", output: "Output", input: "Input" }
+        }
+    };
+
+    // 範例資料庫 (新增 BMI 輸入與次方計算範例)
+    const examplesData = {
+        zh: {
+            python: [
+                { id: "p1", name: "👋 簡單輸出 (Hello World)", code: 'print("Hello, World!")' },
+                { id: "p2", name: "⚖️ 判斷式 (奇偶數判斷)", code: 'num = 5\nif num % 2 == 0:\n    print("偶數")\nelse:\n    print("奇數")' },
+                { id: "p3", name: "🔁 迴圈 (1到5總和)", code: 'total = 0\nfor i in range(1, 6):\n    total = total + i\nprint(total)' },
+                { id: "p4", name: "🧮 運算與輸入 (BMI計算)", code: 'h = float(input("請輸入身高(cm):")) # 讀取身高(含註解)\nw = float(input("請輸入體重(kg):")) # 讀取體重\n\nbmi = w / ((h/100) ** 2) # 計算 BMI 數值\nif bmi >= 24:\n    print("體重過重")\nelse:\n    print("體重正常")' }
+            ],
+            pseudo: [
+                { id: "ps1", name: "👋 簡單輸出", code: '輸出 "Hello, World!"' },
+                { id: "ps2", name: "⚖️ 判斷式", code: 'num = 5\n如果 num % 2 == 0 則\n    輸出 "偶數"\n否則\n    輸出 "奇數"' },
+                { id: "ps3", name: "🔁 迴圈", code: 'total = 0\n對於每個 i 在 range(1, 6) 執行\n    total = total + i\n輸出 total' },
+                { id: "ps4", name: "🧮 運算與輸入 (BMI計算)", code: '輸出 "請輸入身高(cm):"\n輸入 h\n輸出 "請輸入體重(kg):"\n輸入 w\n\nbmi = w / ((h/100) ^ 2)\n如果 bmi >= 24 則\n    輸出 "體重過重"\n否則\n    輸出 "體重正常"' }
+            ],
+            flow: [
+                {
+                    id: "f1", name: "⚖️ 判斷式 (奇偶數判斷)",
+                    nodes: [
+                        {id: "node_1", type: "start", text: "開始", x: 250, y: 20},
+                        {id: "node_2", type: "process", text: "num = 5", x: 250, y: 100},
+                        {id: "node_3", type: "decision", text: "num % 2 == 0", x: 230, y: 180},
+                        {id: "node_4", type: "io", text: "輸出 偶數", x: 100, y: 280},
+                        {id: "node_5", type: "io", text: "輸出 奇數", x: 400, y: 280},
+                        {id: "node_6", type: "end", text: "結束", x: 250, y: 380}
+                    ],
+                    edges: [
+                        {from: "node_1", to: "node_2", fromPort: "bottom", toPort: "top", label: ""},
+                        {from: "node_2", to: "node_3", fromPort: "bottom", toPort: "top", label: ""},
+                        {from: "node_3", to: "node_4", fromPort: "left", toPort: "top", label: "是"},
+                        {from: "node_3", to: "node_5", fromPort: "right", toPort: "top", label: "否"},
+                        {from: "node_4", to: "node_6", fromPort: "bottom", toPort: "left", label: ""},
+                        {from: "node_5", to: "node_6", fromPort: "bottom", toPort: "right", label: ""}
+                    ]
+                },
+                {
+                    id: "f2", name: "🔁 簡單順序 (加法計算)",
+                    nodes: [
+                        {id: "node_1", type: "start", text: "開始", x: 250, y: 20},
+                        {id: "node_2", type: "process", text: "a = 10", x: 250, y: 100},
+                        {id: "node_3", type: "process", text: "b = 20", x: 250, y: 180},
+                        {id: "node_4", type: "process", text: "c = a + b", x: 250, y: 260},
+                        {id: "node_5", type: "io", text: "輸出 c", x: 250, y: 340},
+                        {id: "node_6", type: "end", text: "結束", x: 250, y: 420}
+                    ],
+                    edges: [
+                        {from: "node_1", to: "node_2", fromPort: "bottom", toPort: "top", label: ""},
+                        {from: "node_2", to: "node_3", fromPort: "bottom", toPort: "top", label: ""},
+                        {from: "node_3", to: "node_4", fromPort: "bottom", toPort: "top", label: ""},
+                        {from: "node_4", to: "node_5", fromPort: "bottom", toPort: "top", label: ""},
+                        {from: "node_5", to: "node_6", fromPort: "bottom", toPort: "top", label: ""}
+                    ]
+                }
+            ]
+        },
+        en: {
+            python: [
+                { id: "p1", name: "👋 Hello World", code: 'print("Hello, World!")' },
+                { id: "p2", name: "⚖️ If-Else (Odd/Even)", code: 'num = 5\nif num % 2 == 0:\n    print("Even")\nelse:\n    print("Odd")' },
+                { id: "p3", name: "🔁 For Loop (Sum)", code: 'total = 0\nfor i in range(1, 6):\n    total = total + i\nprint(total)' },
+                { id: "p4", name: "🧮 Math & Input (BMI)", code: 'h = float(input("Input height(cm):")) # Read height\nw = float(input("Input weight(kg):")) # Read weight\n\nbmi = w / ((h/100) ** 2) # Calculate BMI\nif bmi >= 24:\n    print("Overweight")\nelse:\n    print("Normal")' }
+            ],
+            pseudo: [
+                { id: "ps1", name: "👋 Hello World", code: 'OUTPUT "Hello, World!"' },
+                { id: "ps2", name: "⚖️ If-Else", code: 'num = 5\nIF num % 2 == 0 THEN\n    OUTPUT "Even"\nELSE\n    OUTPUT "Odd"' },
+                { id: "ps3", name: "🔁 For Loop", code: 'total = 0\nFOR EACH i IN range(1, 6) DO\n    total = total + i\nOUTPUT total' },
+                { id: "ps4", name: "🧮 Math & Input (BMI)", code: 'OUTPUT "Input height(cm):"\nINPUT h\nOUTPUT "Input weight(kg):"\nINPUT w\n\nbmi = w / ((h/100) ^ 2)\nIF bmi >= 24 THEN\n    OUTPUT "Overweight"\nELSE\n    OUTPUT "Normal"' }
+            ],
+            flow: [
+                {
+                    id: "f1", name: "⚖️ If-Else (Odd/Even)",
+                    nodes: [
+                        {id: "node_1", type: "start", text: "Start", x: 250, y: 20},
+                        {id: "node_2", type: "process", text: "num = 5", x: 250, y: 100},
+                        {id: "node_3", type: "decision", text: "num % 2 == 0", x: 230, y: 180},
+                        {id: "node_4", type: "io", text: "Output Even", x: 100, y: 280},
+                        {id: "node_5", type: "io", text: "Output Odd", x: 400, y: 280},
+                        {id: "node_6", type: "end", text: "End", x: 250, y: 380}
+                    ],
+                    edges: [
+                        {from: "node_1", to: "node_2", fromPort: "bottom", toPort: "top", label: ""},
+                        {from: "node_2", to: "node_3", fromPort: "bottom", toPort: "top", label: ""},
+                        {from: "node_3", to: "node_4", fromPort: "left", toPort: "top", label: "True"},
+                        {from: "node_3", to: "node_5", fromPort: "right", toPort: "top", label: "False"},
+                        {from: "node_4", to: "node_6", fromPort: "bottom", toPort: "left", label: ""},
+                        {from: "node_5", to: "node_6", fromPort: "bottom", toPort: "right", label: ""}
+                    ]
+                },
+                {
+                    id: "f2", name: "🔁 Sequential (Addition)",
+                    nodes: [
+                        {id: "node_1", type: "start", text: "Start", x: 250, y: 20},
+                        {id: "node_2", type: "process", text: "a = 10", x: 250, y: 100},
+                        {id: "node_3", type: "process", text: "b = 20", x: 250, y: 180},
+                        {id: "node_4", type: "process", text: "c = a + b", x: 250, y: 260},
+                        {id: "node_5", type: "io", text: "Output c", x: 250, y: 340},
+                        {id: "node_6", type: "end", text: "End", x: 250, y: 420}
+                    ],
+                    edges: [
+                        {from: "node_1", to: "node_2", fromPort: "bottom", toPort: "top", label: ""},
+                        {from: "node_2", to: "node_3", fromPort: "bottom", toPort: "top", label: ""},
+                        {from: "node_3", to: "node_4", fromPort: "bottom", toPort: "top", label: ""},
+                        {from: "node_4", to: "node_5", fromPort: "bottom", toPort: "top", label: ""},
+                        {from: "node_5", to: "node_6", fromPort: "bottom", toPort: "top", label: ""}
+                    ]
+                }
+            ]
         }
     };
 
@@ -231,7 +343,6 @@
             document.addEventListener('touchmove', this.onTouchMove.bind(this), {passive: false});
             document.addEventListener('touchend', this.onMouseUp.bind(this));
             
-            // 鍵盤快速刪除支援
             document.addEventListener('keydown', (e) => {
                 if ((e.key === 'Delete' || e.key === 'Backspace') && currentMode === 'flow') {
                     if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') {
@@ -243,12 +354,8 @@
             const workspace = document.getElementById('flow-workspace');
             if(workspace) {
                 const handleWorkspaceClick = (e) => {
-                    // 若點擊的是輸入框本身，則由輸入框自行處理事件，不取消任何選取
-                    if (e.target.tagName === 'INPUT') {
-                        return;
-                    }
+                    if (e.target.tagName === 'INPUT') return;
 
-                    // 點擊到連線
                     const edgeGroup = e.target.closest('.edge-group');
                     if (edgeGroup) {
                         this.selectedEdgeIndex = parseInt(edgeGroup.getAttribute('data-edge-index'));
@@ -259,7 +366,6 @@
                         return;
                     }
 
-                    // 點擊到空白處，取消選取
                     if (e.target.id === 'flow-workspace' || e.target.id === 'flow-lines' || e.target.id === 'nodes-container' || e.target.id === 'labels-container') {
                         this.selectNode(null);
                         this.selectedEdgeIndex = null;
@@ -310,6 +416,7 @@
         clearAll() {
             this.nodes = []; this.edges = []; this.nodeCounter = 0;
             this.selectedNodeId = null; this.selectedEdgeIndex = null;
+            document.getElementById('example-select').value = ""; // 清空範例選取狀態
             this.renderNodes();
             this.renderEdges();
             setStatus(i18n[currentLang].flowTools.clear + " 完成", 'info');
@@ -417,7 +524,6 @@
                 let clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
                 let clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
                 
-                // 瞬間隱藏干擾層 (SVG 與 Labels)，以保證精準抓到滑鼠底下的節點
                 const svgEl = document.getElementById('flow-lines');
                 const labelsEl = document.getElementById('labels-container');
                 const origSvgDisplay = svgEl.style.display;
@@ -426,10 +532,8 @@
                 svgEl.style.display = 'none';
                 labelsEl.style.display = 'none';
                 
-                // 找出滑鼠底下真正的元素
                 const targetEl = document.elementFromPoint(clientX, clientY);
                 
-                // 恢復顯示
                 svgEl.style.display = origSvgDisplay;
                 labelsEl.style.display = origLabelsDisplay;
 
@@ -454,13 +558,11 @@
                     const sourceNode = this.nodes.find(n => n.id === this.connectingFromNode);
                     let label = undefined;
                     
-                    // 只有當來源是判斷節點時，才自動產生是/否標籤
                     if (sourceNode.type === 'decision') {
                         let existingEdgesCount = this.edges.filter(ed => ed.from === sourceNode.id).length;
                         label = existingEdgesCount === 0 ? "是" : (existingEdgesCount === 1 ? "否" : "");
                     }
                     
-                    // 確保沒有重複相同的兩點連線
                     if (!this.edges.some(e => e.from === this.connectingFromNode && e.to === nodeEl.id)) {
                         this.edges.push({ 
                             from: this.connectingFromNode, fromPort: this.connectingFromPort, 
@@ -481,11 +583,10 @@
             if (node) node.text = e.target.value;
         },
 
-        // 更新連線上的文字標籤
         updateEdgeLabel(index, val) {
             if(this.edges[index]) {
                 this.edges[index].label = val.trim();
-                this.renderEdges(); // 重新渲染以更新線條與框的顏色
+                this.renderEdges(); 
             }
         },
 
@@ -494,7 +595,6 @@
             container.innerHTML = '';
             const t = i18n[currentLang];
 
-            // 開啟指標事件，讓節點可以被點擊與拖曳
             container.style.pointerEvents = 'auto';
 
             this.nodes.forEach(node => {
@@ -538,7 +638,7 @@
             if(!svg || !labelsContainer) return;
             
             svg.innerHTML = '';
-            labelsContainer.innerHTML = ''; // 清空標籤容器
+            labelsContainer.innerHTML = ''; 
             
             const trueLabels = ['true', 't', 'yes', 'y', '是', '對', '成立'];
             const falseLabels = ['false', 'f', 'no', 'n', '否', '錯', '不成立'];
@@ -566,19 +666,13 @@
                 let finalWidth = isSelected ? '4' : '2.5';
                 let finalMarker = isSelected ? 'url(#arrowhead-selected)' : marker;
 
-                // 群組化連線，用於 SVG 內部畫線
                 let lineHTML = `<g class="edge-group" data-edge-index="${index}" style="pointer-events: auto; cursor: pointer;">`;
-                
-                // 隱形加粗的線條，增加點擊容錯率
                 lineHTML += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="transparent" stroke-width="20"></line>`;
-                
-                // 實際顯示的線條
                 lineHTML += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${finalColor}" stroke-width="${finalWidth}" marker-end="${finalMarker}"></line>`;
                 lineHTML += `</g>`;
                 
                 svg.innerHTML += lineHTML;
 
-                // 【核心修改】只在來源節點為「decision(判斷)」時，才顯示文字輸入框
                 let sourceNodeType = this.nodes.find(n => n.id === edge.from).type;
                 if (sourceNodeType === 'decision') {
                     let mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
@@ -689,12 +783,63 @@
 
     window.flowApp.init();
 
+    // 更新範例下拉選單
+    function updateExampleOptions() {
+        const t = i18n[currentLang];
+        const exSelect = document.getElementById('example-select');
+        exSelect.innerHTML = `<option value="">${t.defaultSelectExample}</option>`;
+        
+        let targetExamples = examplesData[currentLang][currentMode];
+        if (targetExamples) {
+            targetExamples.forEach(ex => {
+                let opt = document.createElement('option');
+                opt.value = ex.id;
+                opt.textContent = ex.name;
+                exSelect.appendChild(opt);
+            });
+        }
+    }
+
+    // 載入選擇的範例
+    function loadExample() {
+        const exId = document.getElementById('example-select').value;
+        if (!exId) return;
+
+        let targetExamples = examplesData[currentLang][currentMode];
+        let ex = targetExamples.find(e => e.id === exId);
+        
+        if (!ex) return;
+
+        document.getElementById('status-msg').style.display = 'none';
+
+        if (currentMode === 'python' || currentMode === 'pseudo') {
+            document.getElementById('python-code').value = ex.code;
+        } else if (currentMode === 'flow') {
+            // 深拷貝，避免修改原始範例
+            window.flowApp.nodes = JSON.parse(JSON.stringify(ex.nodes));
+            window.flowApp.edges = JSON.parse(JSON.stringify(ex.edges));
+            
+            // 計算下一個可用的 nodeCounter 避免 ID 衝突
+            let maxId = 0;
+            window.flowApp.nodes.forEach(n => {
+                let match = n.id.match(/\d+/);
+                if (match) maxId = Math.max(maxId, parseInt(match[0]));
+            });
+            window.flowApp.nodeCounter = maxId;
+
+            window.flowApp.selectNode(null);
+            window.flowApp.renderNodes();
+            window.flowApp.renderEdges();
+        }
+    }
+
     function changeLang() {
         currentLang = document.getElementById('lang-select').value;
         const t = i18n[currentLang];
         document.getElementById('main-title').textContent = t.mainTitle;
         document.getElementById('output-title').textContent = t.outputTitle;
         document.getElementById('mode-label').textContent = t.modeLabel;
+        document.getElementById('example-label').textContent = t.exampleLabel;
         
         const modeSelect = document.getElementById('mode-select');
         modeSelect.options[0].text = t.modeFlow; modeSelect.options[1].text = t.modePy; modeSelect.options[2].text = t.modePs;
@@ -708,7 +853,8 @@
         document.getElementById('lbl-delete').textContent = t.flowTools.del;
         document.getElementById('lbl-clear-all').textContent = t.flowTools.clear;
         document.getElementById('flow-hint').textContent = t.flowTools.hint;
-        changeMode();
+        
+        changeMode(); // 重新設定介面及範例清單
     }
 
     function changeMode() {
@@ -742,6 +888,8 @@
             document.getElementById('btn-group-flow').style.display = 'flex';
             setTimeout(() => window.flowApp.renderEdges(), 50);
         }
+
+        updateExampleOptions(); // 當模式改變時，切換相應的範例列表
     }
 
     function setStatus(msg, type) { 
@@ -752,29 +900,82 @@
     function getCode() { return document.getElementById('python-code').value; }
     function getPythonCode() { return currentMode === 'pseudo' ? pseudoToPythonInternal(getCode()) : getCode(); }
 
+    // 【升級】 Python 轉偽代碼的核心邏輯
     function pythonToPseudoInternal(code) {
         const t = i18n[currentLang];
-        return code.split('\n').map(line => {
-            if (line.trim() === '') return '';
+        let pseudoLines = [];
+        let lines = code.split('\n');
+
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+
+            // 1. 過濾註解 (處理 # 號，但自動忽略字串內的 #)
+            let inString = false;
+            let quoteChar = null;
+            let commentIdx = -1;
+            for(let j=0; j<line.length; j++){
+                let c = line[j];
+                if((c === '"' || c === "'") && (j === 0 || line[j-1] !== '\\')){
+                    if(!inString) { inString = true; quoteChar = c; }
+                    else if(quoteChar === c) { inString = false; }
+                }
+                if(c === '#' && !inString) {
+                    commentIdx = j;
+                    break;
+                }
+            }
+            if(commentIdx !== -1) {
+                line = line.substring(0, commentIdx);
+            }
+
+            if (line.trim() === '') {
+                // 如果整行只有註解被刪光，可保留空白行維持結構
+                if(lines[i].trim() !== '') continue; 
+                pseudoLines.push('');
+                continue;
+            }
+
             let indent = line.match(/^[ \t]*/)[0];
-            let text = line.trim()
-                .replace(/def (.*?)\((.*?)\):/g, `${t.pseudo.func} $1($2) ${t.pseudo.begin}`)
-                .replace(/if (.*?):/g, `${t.pseudo.if} $1 ${t.pseudo.then}`)
-                .replace(/elif (.*?):/g, `${t.pseudo.elif} $1 ${t.pseudo.then}`)
-                .replace(/else:/g, `${t.pseudo.else}`)
-                .replace(/for (.*?) in (.*?):/g, `${t.pseudo.forEach} $1 ${t.pseudo.in} $2 ${t.pseudo.do}`)
-                .replace(/while (.*?):/g, `${t.pseudo.while} $1 ${t.pseudo.do}`)
-                .replace(/print\((.*?)\)/g, `${t.pseudo.output} $1`)
-                .replace(/input\((.*?)\)/g, `${t.pseudo.input} $1`);
-            return indent + text;
-        }).join('\n');
+            let text = line.trim();
+
+            // 2. 轉換指數符號 (** 轉 ^)
+            text = text.replace(/\*\*/g, '^');
+
+            // 3. 處理 input() 拆分為 輸出與輸入，並忽略資料型態轉換
+            // 匹配格式: var = float(input("prompt")) 或 var = input("prompt")
+            let inputMatch = text.match(/^([a-zA-Z0-9_]+)\s*=\s*(?:int|float|str)?\s*\(\s*input\s*\(\s*(.*?)\s*\)\s*\)*$/);
+            if (inputMatch) {
+                let varName = inputMatch[1];
+                let prompt = inputMatch[2]; 
+                if (prompt) {
+                    pseudoLines.push(indent + `${t.pseudo.output} ${prompt}`);
+                }
+                pseudoLines.push(indent + `${t.pseudo.input} ${varName}`);
+                continue;
+            }
+
+            // 一般取代規則
+            text = text
+                .replace(/^def\s+(.*?)\((.*?)\):/, `${t.pseudo.func} $1($2) ${t.pseudo.begin}`)
+                .replace(/^if\s+(.*?):/, `${t.pseudo.if} $1 ${t.pseudo.then}`)
+                .replace(/^elif\s+(.*?):/, `${t.pseudo.elif} $1 ${t.pseudo.then}`)
+                .replace(/^else:/, `${t.pseudo.else}`)
+                .replace(/^for\s+(.*?)\s+in\s+(.*?):/, `${t.pseudo.forEach} $1 ${t.pseudo.in} $2 ${t.pseudo.do}`)
+                .replace(/^while\s+(.*?):/, `${t.pseudo.while} $1 ${t.pseudo.do}`)
+                .replace(/^print\s*\((.*?)\)$/, `${t.pseudo.output} $1`);
+
+            pseudoLines.push(indent + text);
+        }
+        return pseudoLines.join('\n');
     }
 
+    // 【優化】偽代碼轉回 Python 時也能正確轉回 input
     function pseudoToPythonInternal(code) {
         return code.split('\n').map(line => {
             if (line.trim() === '') return '';
             let indent = line.match(/^[ \t]*/)[0];
             let text = line.trim()
+                .replace(/\^/g, '**') // 處理次方轉換回來
                 .replace(/^(FUNCTION|函數)\s+(.*?)\((.*?)\)\s+(BEGIN|開始)/i, "def $2($3):")
                 .replace(/^(IF|如果)\s+(.*?)\s+(THEN|則)/i, "if $2:")
                 .replace(/^(ELSE IF|否則如果)\s+(.*?)\s+(THEN|則)/i, "elif $2:")
@@ -782,7 +983,7 @@
                 .replace(/^(FOR EACH|對於每個)\s+(.*?)\s+(IN|在)\s+(.*?)\s+(DO|執行)/i, "for $2 in $4:")
                 .replace(/^(WHILE|當)\s+(.*?)\s+(DO|執行)/i, "while $2:")
                 .replace(/^(OUTPUT|輸出)\s+(.*)/i, "print($2)")
-                .replace(/^(INPUT|輸入)\s+(.*)/i, "input($2)");
+                .replace(/^(INPUT|輸入)\s+(.*)/i, "$2 = input()"); // 將 INPUT var 轉回 var = input()
             return indent + text;
         }).join('\n');
     }
@@ -834,8 +1035,13 @@
         }
 
         for (let i = 0; i < lines.length; i++) {
-            let line = lines[i]; let stripped = line.trim();
-            if (!stripped || stripped.startsWith('#')) continue;
+            let line = lines[i]; 
+            // 這裡也需要做 # 註解過濾以免影響流程圖生成
+            let commentIdx = line.indexOf('#');
+            if (commentIdx !== -1) line = line.substring(0, commentIdx);
+            
+            let stripped = line.trim();
+            if (!stripped) continue;
             let indent = line.match(/^[ \t]*/)[0].length;
 
             while (blockStack.length > 0 && indent <= blockStack[blockStack.length - 1].indent && !(stripped.startsWith("elif") || stripped.startsWith("else"))) { popBlock(); }
