@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Converter / 互動流程圖編輯器</title>
+    <!-- 引入外部套件 -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #1e1e1e; color: #f0f0f0; }
+        .header { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto 15px auto; }
+        .header h1 { margin: 0; font-size: 1.5rem; color: #61dafb; display: flex; align-items: center; gap: 10px; }
+        .lang-switch select { padding: 8px 12px; font-size: 14px; background: #333; color: white; border: 1px solid #555; border-radius: 4px; cursor: pointer; outline: none; }
+        
+        .container { display: flex; gap: 20px; max-width: 1200px; margin: auto; min-height: 85vh; flex-wrap: wrap; align-items: stretch; }
+        .panel { flex: 1; min-width: 320px; min-height: 500px; display: flex; flex-direction: column; background: #2d2d2d; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        
+        h2 { margin-top: 0; font-size: 1.2rem; color: #61dafb; display: flex; align-items: center; gap: 10px;}
+        textarea { flex: 1; width: 100%; min-height: 300px; padding: 15px; font-family: 'Consolas', 'Courier New', monospace; font-size: 15px; border: 1px solid #444; border-radius: 6px; resize: none; box-sizing: border-box; background: #1e1e1e; color: #d4d4d4; line-height: 1.5; tab-size: 4;}
+        textarea:focus { outline: none; border-color: #61dafb; }
+        .controls { margin: 15px 0; display: flex; gap: 10px; flex-wrap: wrap; }
+        button { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: all 0.2s; font-size: 14px; }
+        button.primary { background: #4CAF50; color: white; }
+        button.primary:hover { background: #45a049; transform: translateY(-2px); }
+        button.secondary { background: #007acc; color: white; }
+        button.secondary:hover { background: #005f9e; transform: translateY(-2px); }
+        button.ai-btn { background: #9c27b0; color: white; width: 100%; font-size: 16px; padding: 12px; margin-top: 10px;}
+        button.ai-btn:hover { background: #7b1fa2; transform: translateY(-2px); }
+        #status-msg { margin-top: 10px; padding: 10px; border-radius: 4px; display: none; font-weight: bold; }
+        .error { background: #ffebee; color: #d32f2f; display: block !important; border-left: 5px solid #d32f2f; }
+        .success { background: #e8f5e9; color: #2e7d32; display: block !important; border-left: 5px solid #2e7d32; }
+        .info { background: #e3f2fd; color: #1565c0; display: block !important; border-left: 5px solid #1565c0; }
+        #output-area { flex: 1; min-height: 300px; border: 1px solid #444; border-radius: 6px; padding: 15px; background: #1e1e1e; overflow-y: auto; white-space: pre-wrap; font-family: 'Consolas', 'Courier New', monospace; font-size: 15px; color: #d4d4d4;}
+        
+        #flow-editor-container { flex: 1; display: none; flex-direction: column; min-height: 450px; }
+        .flow-toolbar { display: flex; gap: 8px; margin-bottom: 10px; background: #333; padding: 8px; border-radius: 6px; flex-wrap: wrap; align-items: center; }
+        .flow-btn { padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; color: white; display: flex; align-items: center; gap: 5px; }
+        
+        #flow-workspace { position: relative; flex: 1; min-height: 450px; width: 100%; background: #eceff1; border-radius: 6px; border: 1px solid #555; overflow: hidden; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); touch-action: none; }
+        
+        /* 節點樣式 */
+        .flow-node { position: absolute; min-width: 120px; padding: 10px; background: white; border: 2px solid #333; display: flex; align-items: center; justify-content: center; cursor: move; user-select: none; box-shadow: 2px 2px 6px rgba(0,0,0,0.3); z-index: 10; font-size: 14px; color: #333; transition: box-shadow 0.2s; }
+        .flow-node.selected { border-color: #ff5722; box-shadow: 0 0 12px #ff5722; z-index: 12; }
+        .flow-node input { width: 90%; border: none; background: transparent; text-align: center; font-size: 14px; outline: none; font-weight: bold; font-family: 'Segoe UI', sans-serif; }
+        .flow-node input::placeholder { color: #888; font-weight: normal; }
+        
+        /* 四角拖曳連線手把設計 */
+        .connect-port { position: absolute; width: 14px; height: 14px; background-color: #2196f3; border: 2px solid #fff; border-radius: 50%; cursor: crosshair; z-index: 15; box-shadow: 0 0 4px rgba(0,0,0,0.5); display: none; transition: transform 0.1s, background-color 0.1s; }
+        .connect-port:hover { transform: scale(1.4); background-color: #ff5722; }
+        .port-top { top: -7px; left: 50%; margin-left: -7px; }
+        .port-bottom { bottom: -7px; left: 50%; margin-left: -7px; }
+        .port-left { left: -7px; top: 50%; margin-top: -7px; }
+        .port-right { right: -7px; top: 50%; margin-top: -7px; }
+        
+        .flow-node.selected .connect-port, .flow-node:hover .connect-port { display: block; }
+
+        .node-start { border-radius: 30px; background: #c8e6c9; border-color: #388e3c; }
+        .node-end { border-radius: 30px; background: #ffccbc; border-color: #d32f2f; }
+        .node-process { border-radius: 6px; background: #bbdefb; border-color: #1976d2; }
+        .node-io { border-radius: 6px; background: #ffe082; border-color: #f57c00; transform: skewX(-10deg); }
+        .node-io input { transform: skewX(10deg); }
+        
+        .node-decision {
+            background: url('data:image/svg+xml;utf8,<svg preserveAspectRatio="none" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,2 98,50 50,98 2,50" fill="%23e1bee7" stroke="%238e24aa" stroke-width="3" stroke-linejoin="round"/></svg>') no-repeat center center;
+            background-size: 100% 100%;
+            border: none;
+            border-radius: 0;
+            min-width: 140px;
+            min-height: 90px;
+            padding: 0 25px;
+            box-shadow: none !important;
+        }
+        .flow-node.node-decision.selected {
+            background: url('data:image/svg+xml;utf8,<svg preserveAspectRatio="none" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,2 98,50 50,98 2,50" fill="%23e1bee7" stroke="%23ff5722" stroke-width="4" stroke-linejoin="round"/></svg>') no-repeat center center;
+            background-size: 100% 100%;
+            border: none;
+            box-shadow: none;
+            filter: drop-shadow(0 0 8px #ff5722);
+            z-index: 12;
+        }
+        .node-decision input { width: 100%; }
+        
+        /* 獨立出來的文字欄樣式 */
+        .edge-label-input {
+            width: 70px; height: 28px; 
+            border-radius: 4px; 
+            text-align: center; font-size: 13px; font-weight: bold; 
+            outline: none; font-family: sans-serif; 
+            box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+        .edge-label-input:focus { border-color: #ff5722 !important; box-shadow: 0 0 8px #ff5722; }
+
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1 id="main-title">🚀 系統開發生命週期 (SDLC) 輔助工具</h1>
+    <div class="lang-switch">
+        <select id="lang-select" onchange="changeLang()">
+            <option value="zh">繁體中文</option>
+            <option value="en">English</option>
+        </select>
+    </div>
+</div>
+
+<div class="container">
+    <div class="panel" id="left-panel">
+        <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px; background: #333; padding: 10px; border-radius: 6px;">
+            <label id="mode-label" style="font-weight: bold; color: #61dafb; font-size: 14px;">⚙️ 轉換模式: </label>
+            <select id="mode-select" onchange="changeMode()" style="padding: 5px; border-radius: 4px; background: #222; color: white; border: 1px solid #555; outline: none; cursor: pointer; flex: 1;">
+                <option value="flow">✍️ 互動流程圖編輯器 ➡️ Python</option>
+                <option value="python">🐍 Python ➡️ 偽代碼 / 流程圖</option>
+                <option value="pseudo">📝 偽代碼 ➡️ Python / 流程圖</option>
+            </select>
+        </div>
+
+        <h2 id="input-title">✍️ 互動流程圖編輯器</h2>
+        
+        <textarea id="python-code" style="display:none;" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'    '+v.substring(e);this.selectionStart=this.selectionEnd=s+4;return false;}"></textarea>
+        
+        <div id="flow-editor-container" style="display: flex;">
+            <div class="flow-toolbar">
+                <button class="flow-btn" onclick="window.flowApp.addNode('start')" style="background:#4caf50;">🟢 <span id="lbl-add-start">開始</span></button>
+                <button class="flow-btn" onclick="window.flowApp.addNode('end')" style="background:#f44336;">🔴 <span id="lbl-add-end">結束</span></button>
+                <button class="flow-btn" onclick="window.flowApp.addNode('process')" style="background:#2196f3;">▭ <span id="lbl-add-process">處理/賦值</span></button>
+                <button class="flow-btn" onclick="window.flowApp.addNode('io')" style="background:#ff9800;">▱ <span id="lbl-add-io">輸入/輸出</span></button>
+                <button class="flow-btn" onclick="window.flowApp.addNode('decision')" style="background:#9c27b0;">◇ <span id="lbl-add-decision">判斷</span></button>
+                <div style="width: 2px; height: 20px; background: #555; margin: 0 5px;"></div>
+                <button class="flow-btn" onclick="window.flowApp.deleteSelected()" style="background:#795548;" title="快捷鍵: Delete / Backspace">✂️ <span id="lbl-delete">刪除</span></button>
+                <button class="flow-btn" onclick="window.flowApp.clearAll()" style="background:#d32f2f; margin-left:auto;">🗑️ <span id="lbl-clear-all">清空</span></button>
+            </div>
+            
+            <div id="flow-workspace">
+                <!-- SVG 只負責畫線條 -->
+                <svg id="flow-lines" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1;">
+                    <defs>
+                        <marker id="arrowhead" markerWidth="12" markerHeight="9" refX="11" refY="4.5" orient="auto"><polygon points="0 0, 12 4.5, 0 9" fill="#333" /></marker>
+                        <marker id="arrowhead-true" markerWidth="12" markerHeight="9" refX="11" refY="4.5" orient="auto"><polygon points="0 0, 12 4.5, 0 9" fill="#2e7d32" /></marker>
+                        <marker id="arrowhead-false" markerWidth="12" markerHeight="9" refX="11" refY="4.5" orient="auto"><polygon points="0 0, 12 4.5, 0 9" fill="#c62828" /></marker>
+                        <marker id="arrowhead-selected" markerWidth="12" markerHeight="9" refX="11" refY="4.5" orient="auto"><polygon points="0 0, 12 4.5, 0 9" fill="#ff5722" /></marker>
+                    </defs>
+                    <g id="lines-group"></g>
+                    <line id="temp-line" x1="0" y1="0" x2="0" y2="0" stroke="#2196f3" stroke-width="3" stroke-dasharray="6" style="display:none;" />
+                </svg>
+                
+                <!-- 節點容器 -->
+                <div id="nodes-container" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:2; pointer-events:none;"></div>
+                
+                <!-- 標籤容器 (獨立的 HTML 層，解決 SVG 無法點擊的問題) -->
+                <div id="labels-container" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:3; pointer-events:none;"></div>
+            </div>
+            <p style="font-size: 13px; color: #ffeb3b; margin-top: 8px; text-align: center; font-weight: bold;" id="flow-hint">💡 拖曳圖形邊緣的藍點 🔵 連線。若連線來自「判斷(菱形)」，可在線條上的文字欄修改是/否。</p>
+        </div>
+
+        <div class="controls" id="btn-group-standard" style="display:none;">
+            <button class="primary" id="btn-check" onclick="checkSyntax()">1. 檢查語法</button>
+            <button class="secondary" id="btn-pseudo" onclick="toPseudoCode()">2. 轉為偽代碼</button>
+            <button class="primary" id="btn-to-python" style="display: none;" onclick="toPythonAction()">1. 轉為 Python</button>
+            <button class="secondary" id="btn-flow" onclick="toFlowchart()">3. 轉為流程圖</button>
+            <button class="primary" id="btn-run" style="background: #e91e63;" onclick="runPython()">▶️ 4. 執行程式</button>
+        </div>
+
+        <div class="controls" id="btn-group-flow">
+            <button class="ai-btn" id="btn-compile-flow" onclick="window.flowApp.compileToPython()" style="background:#009688;">⚙️ 1. 轉換流程圖為 Python 程式碼 (本機轉換)</button>
+        </div>
+
+        <div id="status-msg"></div>
+    </div>
+
+    <div class="panel">
+        <h2 id="output-title">📊 結果輸出區</h2>
+        <div id="output-area"></div>
+    </div>
+</div>
+
+<script>
+    try {
+        if(typeof mermaid !== 'undefined') {
+            mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+        }
+    } catch(e) { console.warn("Mermaid載入失敗", e); }
+
+    const i18n = {
+        zh: {
+            mainTitle: "🚀 邏輯與程式碼雙向轉換工具", inputTitlePy: "🐍 Python 程式碼", inputTitlePs: "📝 偽代碼 (Pseudo-code)",
+            inputTitleFlow: "✍️ 互動流程圖編輯器",
+            placeholderPy: "請輸入 Python 程式碼...\n\n# 範例\nfor i in range(1, 5):\n    print(i)",
+            placeholderPs: "請輸入偽代碼...\n\n# 範例\n對於每個 i 在 range(1, 5) 執行\n    輸出 i",
+            btnCheck: "1. 檢查語法", btnPseudo: "2. 轉為偽代碼", btnToPython: "1. 轉為 Python", btnFlow: "轉為流程圖", btnRun: "▶️ 執行程式",
+            btnCompileFlow: "⚙️ 1. 轉換流程圖為 Python 程式碼",
+            outputTitle: "📊 結果輸出區", msgEmpty: "請先輸入內容或選擇範例！",
+            msgFlowEmpty: "流程圖目前沒有節點，請先繪製！", msgSyntaxOk: "✅ 完美！語法與縮排檢查皆通過！",
+            msgCompileSuccess: "✅ 流程圖轉換成功！已自動切換為 Python 模式。",
+            modeLabel: "⚙️ 轉換模式: ", modePy: "🐍 Python ➡️ 偽代碼 / 流程圖", modePs: "📝 偽代碼 ➡️ Python / 流程圖",
+            modeFlow: "✍️ 互動流程圖編輯器 ➡️ Python (本機)",
+            flowTools: { start: "開始", end: "結束", process: "處理/賦值", io: "輸入/輸出", decision: "判斷", del: "刪除", clear: "清空畫布", hint: "💡 拖曳圖形四角的藍點 🔵 連線。若連線來自「判斷(菱形)」，可在文字欄修改是/否。點擊連線本身可選取刪除。", defaultText: "點擊輸入", decisionPrompt: "請輸入這條路徑的條件：" },
+            pseudo: { func: "函數", begin: "開始", if: "如果", then: "則", elif: "否則如果", else: "否則", forEach: "對於每個", in: "在", do: "執行", while: "當", output: "輸出", input: "輸入" }, flow: { start: "開始", end: "結束", true: "是", false: "否", output: "輸出", input: "輸入" }
+        },
+        en: {
+            mainTitle: "🚀 Logic & Code Bidirectional Tool", inputTitlePy: "🐍 Python Code Input", inputTitlePs: "📝 Pseudo-code Input",
+            inputTitleFlow: "✍️ Interactive Flowchart",
+            placeholderPy: "Enter Python code here...", placeholderPs: "Enter Pseudo-code here...",
+            btnCheck: "1. Check Syntax", btnPseudo: "2. To Pseudo-code", btnToPython: "1. To Python", btnFlow: "To Flowchart", btnRun: "▶️ Run Code",
+            btnCompileFlow: "⚙️ 1. Compile Flowchart to Python",
+            outputTitle: "📊 Output Area", msgEmpty: "Please enter content first!",
+            msgFlowEmpty: "Flowchart is empty!", msgSyntaxOk: "✅ Syntax passed!",
+            msgCompileSuccess: "✅ Flowchart compiled!",
+            modeLabel: "⚙️ Mode: ", modePy: "🐍 Python ➡️ Pseudo / Flow", modePs: "📝 Pseudo ➡️ Python / Flow",
+            modeFlow: "✍️ Interactive Flowchart ➡️ Python",
+            flowTools: { start: "Start", end: "End", process: "Process", io: "I/O", decision: "Decision", del: "Delete", clear: "Clear", hint: "💡 Drag 4-corner blue dot 🔵 to connect. Text boxes only appear for Decision (diamond) edges. Click an edge to select & delete.", defaultText: "Click to edit", decisionPrompt: "Condition:" },
+            pseudo: { func: "FUNCTION", begin: "BEGIN", if: "IF", then: "THEN", elif: "ELSE IF", else: "ELSE", forEach: "FOR EACH", in: "IN", do: "DO", while: "WHILE", output: "OUTPUT", input: "INPUT" }, flow: { start: "Start", end: "End", true: "True", false: "False", output: "Output", input: "Input" }
+        }
+    };
+
+    let currentLang = 'zh';
+    let currentMode = 'flow';
+
+    window.flowApp = {
+        nodes: [], edges: [], nodeCounter: 0,
+        selectedNodeId: null, selectedEdgeIndex: null, draggedNode: null,
+        connectingFromNode: null, connectingFromPort: null,
+        offsetX: 0, offsetY: 0, tempLineStartX: 0, tempLineStartY: 0,
+
+        init() {
+            document.addEventListener('mousemove', this.onMouseMove.bind(this));
+            document.addEventListener('mouseup', this.onMouseUp.bind(this));
+            document.addEventListener('touchmove', this.onTouchMove.bind(this), {passive: false});
+            document.addEventListener('touchend', this.onMouseUp.bind(this));
+            
+            // 鍵盤快速刪除支援
+            document.addEventListener('keydown', (e) => {
+                if ((e.key === 'Delete' || e.key === 'Backspace') && currentMode === 'flow') {
+                    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') {
+                        this.deleteSelected();
+                    }
+                }
+            });
+
+            const workspace = document.getElementById('flow-workspace');
+            if(workspace) {
+                const handleWorkspaceClick = (e) => {
+                    // 若點擊的是輸入框本身，則由輸入框自行處理事件，不取消任何選取
+                    if (e.target.tagName === 'INPUT') {
+                        return;
+                    }
+
+                    // 點擊到連線
+                    const edgeGroup = e.target.closest('.edge-group');
+                    if (edgeGroup) {
+                        this.selectedEdgeIndex = parseInt(edgeGroup.getAttribute('data-edge-index'));
+                        this.selectedNodeId = null;
+                        this.renderNodes();
+                        this.renderEdges();
+                        e.stopPropagation();
+                        return;
+                    }
+
+                    // 點擊到空白處，取消選取
+                    if (e.target.id === 'flow-workspace' || e.target.id === 'flow-lines' || e.target.id === 'nodes-container' || e.target.id === 'labels-container') {
+                        this.selectNode(null);
+                        this.selectedEdgeIndex = null;
+                        this.renderEdges();
+                    }
+                };
+                workspace.addEventListener('mousedown', handleWorkspaceClick);
+                workspace.addEventListener('touchstart', handleWorkspaceClick, {passive: true});
+            }
+        },
+
+        addNode(type) {
+            const container = document.getElementById('flow-workspace');
+            const id = 'node_' + (++this.nodeCounter);
+            let text = "";
+            const t = i18n[currentLang];
+            
+            if (type === 'start') text = t.flowTools.start;
+            else if (type === 'end') text = t.flowTools.end;
+
+            const cWidth = container.clientWidth || 400; 
+            const node = { id, type, text, x: cWidth/2 - 60, y: 50 + (this.nodeCounter * 20) % 200 };
+            this.nodes.push(node);
+            this.selectNode(id);
+            this.renderNodes();
+        },
+
+        selectNode(id) {
+            this.selectedNodeId = id;
+            if (id !== null) this.selectedEdgeIndex = null; 
+            this.renderNodes();
+            this.renderEdges();
+        },
+
+        deleteSelected() {
+            if (this.selectedNodeId) {
+                this.nodes = this.nodes.filter(n => n.id !== this.selectedNodeId);
+                this.edges = this.edges.filter(e => e.from !== this.selectedNodeId && e.to !== this.selectedNodeId);
+                this.selectedNodeId = null;
+            } else if (this.selectedEdgeIndex !== null) {
+                this.edges.splice(this.selectedEdgeIndex, 1);
+                this.selectedEdgeIndex = null;
+            }
+            this.renderNodes();
+            this.renderEdges();
+        },
+
+        clearAll() {
+            this.nodes = []; this.edges = []; this.nodeCounter = 0;
+            this.selectedNodeId = null; this.selectedEdgeIndex = null;
+            this.renderNodes();
+            this.renderEdges();
+            setStatus(i18n[currentLang].flowTools.clear + " 完成", 'info');
+        },
+
+        getPortCoords(nodeId, pos) {
+            const el = document.getElementById(nodeId);
+            if (!el) return { x: 0, y: 0 };
+            const w = el.offsetWidth, h = el.offsetHeight;
+            const left = el.offsetLeft, top = el.offsetTop;
+            
+            switch(pos) {
+                case 'top': return { x: left + w/2, y: top };
+                case 'bottom': return { x: left + w/2, y: top + h };
+                case 'left': return { x: left, y: top + h/2 };
+                case 'right': return { x: left + w, y: top + h/2 };
+                default: return { x: left + w/2, y: top + h/2 };
+            }
+        },
+
+        startConnect(e, nodeId, pos) {
+            e.stopPropagation();
+            this.connectingFromNode = nodeId;
+            this.connectingFromPort = pos;
+            this.selectNode(nodeId);
+            
+            const coords = this.getPortCoords(nodeId, pos);
+            this.tempLineStartX = coords.x;
+            this.tempLineStartY = coords.y;
+            
+            const tempLine = document.getElementById('temp-line');
+            tempLine.setAttribute('x1', this.tempLineStartX);
+            tempLine.setAttribute('y1', this.tempLineStartY);
+            
+            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const containerRect = document.getElementById('flow-workspace').getBoundingClientRect();
+            tempLine.setAttribute('x2', clientX - containerRect.left);
+            tempLine.setAttribute('y2', clientY - containerRect.top);
+            tempLine.style.display = 'block';
+        },
+
+        onNodeMouseDown(e, id) {
+            if (e.target.tagName === 'INPUT' || e.target.classList.contains('connect-port')) return;
+            e.stopPropagation();
+            this.selectNode(id);
+            this.draggedNode = this.nodes.find(n => n.id === id);
+            const rect = document.getElementById(id).getBoundingClientRect();
+            this.offsetX = e.clientX - rect.left;
+            this.offsetY = e.clientY - rect.top;
+        },
+        
+        onNodeTouchStart(e, id) {
+            if (e.target.tagName === 'INPUT' || e.target.classList.contains('connect-port')) return;
+            e.stopPropagation();
+            let touch = e.touches[0];
+            this.selectNode(id);
+            this.draggedNode = this.nodes.find(n => n.id === id);
+            const rect = document.getElementById(id).getBoundingClientRect();
+            this.offsetX = touch.clientX - rect.left;
+            this.offsetY = touch.clientY - rect.top;
+        },
+
+        handleDrag(clientX, clientY) {
+            const containerRect = document.getElementById('flow-workspace').getBoundingClientRect();
+            let x = clientX - containerRect.left - this.offsetX;
+            let y = clientY - containerRect.top - this.offsetY;
+            this.draggedNode.x = Math.max(0, Math.min(x, containerRect.width - 120));
+            this.draggedNode.y = Math.max(0, Math.min(y, containerRect.height - 40));
+            
+            const el = document.getElementById(this.draggedNode.id);
+            if(el) { el.style.left = this.draggedNode.x + 'px'; el.style.top = this.draggedNode.y + 'px'; }
+            this.renderEdges();
+        },
+
+        onMouseMove(e) {
+            if (this.connectingFromNode) {
+                const containerRect = document.getElementById('flow-workspace').getBoundingClientRect();
+                const tempLine = document.getElementById('temp-line');
+                tempLine.setAttribute('x2', e.clientX - containerRect.left);
+                tempLine.setAttribute('y2', e.clientY - containerRect.top);
+            } else if (this.draggedNode) {
+                this.handleDrag(e.clientX, e.clientY);
+            }
+        },
+        
+        onTouchMove(e) { 
+            if (this.connectingFromNode) {
+                e.preventDefault();
+                const containerRect = document.getElementById('flow-workspace').getBoundingClientRect();
+                const tempLine = document.getElementById('temp-line');
+                tempLine.setAttribute('x2', e.touches[0].clientX - containerRect.left);
+                tempLine.setAttribute('y2', e.touches[0].clientY - containerRect.top);
+            } else if (this.draggedNode) {
+                e.preventDefault();
+                this.handleDrag(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        },
+
+        onMouseUp(e) {
+            if (this.connectingFromNode) {
+                const tempLine = document.getElementById('temp-line');
+                tempLine.style.display = 'none';
+                
+                let clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+                let clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+                
+                // 瞬間隱藏干擾層 (SVG 與 Labels)，以保證精準抓到滑鼠底下的節點
+                const svgEl = document.getElementById('flow-lines');
+                const labelsEl = document.getElementById('labels-container');
+                const origSvgDisplay = svgEl.style.display;
+                const origLabelsDisplay = labelsEl.style.display;
+                
+                svgEl.style.display = 'none';
+                labelsEl.style.display = 'none';
+                
+                // 找出滑鼠底下真正的元素
+                const targetEl = document.elementFromPoint(clientX, clientY);
+                
+                // 恢復顯示
+                svgEl.style.display = origSvgDisplay;
+                labelsEl.style.display = origLabelsDisplay;
+
+                const nodeEl = targetEl ? targetEl.closest('.flow-node') : null;
+                
+                if (nodeEl && nodeEl.id !== this.connectingFromNode) {
+                    const containerRect = document.getElementById('flow-workspace').getBoundingClientRect();
+                    const dropX = clientX - containerRect.left;
+                    const dropY = clientY - containerRect.top;
+                    
+                    const w = nodeEl.offsetWidth, h = nodeEl.offsetHeight;
+                    const left = nodeEl.offsetLeft, top = nodeEl.offsetTop;
+                    const ports = [
+                        { pos: 'top', x: left + w/2, y: top },
+                        { pos: 'bottom', x: left + w/2, y: top + h },
+                        { pos: 'left', x: left, y: top + h/2 },
+                        { pos: 'right', x: left + w, y: top + h/2 }
+                    ];
+                    ports.sort((a, b) => (Math.pow(a.x - dropX, 2) + Math.pow(a.y - dropY, 2)) - (Math.pow(b.x - dropX, 2) + Math.pow(b.y - dropY, 2)));
+                    const targetPort = ports[0].pos;
+
+                    const sourceNode = this.nodes.find(n => n.id === this.connectingFromNode);
+                    let label = undefined;
+                    
+                    // 只有當來源是判斷節點時，才自動產生是/否標籤
+                    if (sourceNode.type === 'decision') {
+                        let existingEdgesCount = this.edges.filter(ed => ed.from === sourceNode.id).length;
+                        label = existingEdgesCount === 0 ? "是" : (existingEdgesCount === 1 ? "否" : "");
+                    }
+                    
+                    // 確保沒有重複相同的兩點連線
+                    if (!this.edges.some(e => e.from === this.connectingFromNode && e.to === nodeEl.id)) {
+                        this.edges.push({ 
+                            from: this.connectingFromNode, fromPort: this.connectingFromPort, 
+                            to: nodeEl.id, toPort: targetPort, 
+                            label: label 
+                        });
+                        this.renderEdges();
+                    }
+                }
+                this.connectingFromNode = null;
+                this.connectingFromPort = null;
+            }
+            this.draggedNode = null; 
+        },
+
+        onInputChanged(e, id) {
+            const node = this.nodes.find(n => n.id === id);
+            if (node) node.text = e.target.value;
+        },
+
+        // 更新連線上的文字標籤
+        updateEdgeLabel(index, val) {
+            if(this.edges[index]) {
+                this.edges[index].label = val.trim();
+                this.renderEdges(); // 重新渲染以更新線條與框的顏色
+            }
+        },
+
+        renderNodes() {
+            const container = document.getElementById('nodes-container');
+            container.innerHTML = '';
+            const t = i18n[currentLang];
+
+            // 開啟指標事件，讓節點可以被點擊與拖曳
+            container.style.pointerEvents = 'auto';
+
+            this.nodes.forEach(node => {
+                const el = document.createElement('div');
+                el.className = `flow-node node-${node.type}`;
+                if (node.id === this.selectedNodeId) el.classList.add('selected');
+
+                el.id = node.id;
+                el.style.left = node.x + 'px';
+                el.style.top = node.y + 'px';
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = node.text;
+                input.placeholder = t.flowTools.defaultText;
+                input.oninput = (e) => this.onInputChanged(e, node.id);
+                if (node.type === 'start' || node.type === 'end') {
+                    input.readOnly = true;
+                    input.style.cursor = 'pointer';
+                }
+                el.appendChild(input);
+                
+                ['top', 'bottom', 'left', 'right'].forEach(pos => {
+                    const port = document.createElement('div');
+                    port.className = `connect-port port-${pos}`;
+                    port.onmousedown = (e) => this.startConnect(e, node.id, pos);
+                    port.ontouchstart = (e) => this.startConnect(e, node.id, pos);
+                    el.appendChild(port);
+                });
+
+                el.onmousedown = (e) => this.onNodeMouseDown(e, node.id);
+                el.ontouchstart = (e) => this.onNodeTouchStart(e, node.id);
+                container.appendChild(el);
+            });
+            setTimeout(() => this.renderEdges(), 10);
+        },
+
+        renderEdges() {
+            const svg = document.getElementById('lines-group');
+            const labelsContainer = document.getElementById('labels-container');
+            if(!svg || !labelsContainer) return;
+            
+            svg.innerHTML = '';
+            labelsContainer.innerHTML = ''; // 清空標籤容器
+            
+            const trueLabels = ['true', 't', 'yes', 'y', '是', '對', '成立'];
+            const falseLabels = ['false', 'f', 'no', 'n', '否', '錯', '不成立'];
+
+            this.edges.forEach((edge, index) => {
+                const fromEl = document.getElementById(edge.from);
+                const toEl = document.getElementById(edge.to);
+                if (!fromEl || !toEl) return;
+
+                const startCoords = this.getPortCoords(edge.from, edge.fromPort || 'right');
+                const endCoords = this.getPortCoords(edge.to, edge.toPort || 'left');
+                const x1 = startCoords.x, y1 = startCoords.y;
+                const x2 = endCoords.x, y2 = endCoords.y;
+
+                let isSelected = (this.selectedEdgeIndex === index);
+                
+                let text = edge.label || "";
+                let isTrue = trueLabels.includes(text.toLowerCase());
+                let isFalse = falseLabels.includes(text.toLowerCase());
+
+                let baseColor = isTrue ? '#2e7d32' : (isFalse ? '#c62828' : '#333');
+                let marker = isTrue ? 'url(#arrowhead-true)' : (isFalse ? 'url(#arrowhead-false)' : 'url(#arrowhead)');
+                
+                let finalColor = isSelected ? '#ff5722' : baseColor;
+                let finalWidth = isSelected ? '4' : '2.5';
+                let finalMarker = isSelected ? 'url(#arrowhead-selected)' : marker;
+
+                // 群組化連線，用於 SVG 內部畫線
+                let lineHTML = `<g class="edge-group" data-edge-index="${index}" style="pointer-events: auto; cursor: pointer;">`;
+                
+                // 隱形加粗的線條，增加點擊容錯率
+                lineHTML += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="transparent" stroke-width="20"></line>`;
+                
+                // 實際顯示的線條
+                lineHTML += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${finalColor}" stroke-width="${finalWidth}" marker-end="${finalMarker}"></line>`;
+                lineHTML += `</g>`;
+                
+                svg.innerHTML += lineHTML;
+
+                // 【核心修改】只在來源節點為「decision(判斷)」時，才顯示文字輸入框
+                let sourceNodeType = this.nodes.find(n => n.id === edge.from).type;
+                if (sourceNodeType === 'decision') {
+                    let mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+                    let bgCol = isTrue ? "#e8f5e9" : (isFalse ? "#ffebee" : "#ffffff");
+                    let txtCol = isTrue ? "#2e7d32" : (isFalse ? "#c62828" : "#333");
+                    let borderColor = isSelected ? "#ff5722" : (isTrue ? "#2e7d32" : (isFalse ? "#c62828" : "#999"));
+
+                    let labelHTML = `<input type="text" class="edge-label-input" value="${text}" placeholder="?"
+                           onchange="window.flowApp.updateEdgeLabel(${index}, this.value)"
+                           onmousedown="event.stopPropagation()"
+                           ontouchstart="event.stopPropagation()"
+                           title="直接修改條件"
+                           style="position:absolute; left:${mx - 35}px; top:${my - 14}px; 
+                                  border: 2px solid ${borderColor}; background: ${bgCol}; color: ${txtCol}; 
+                                  pointer-events:auto; z-index:4;">`;
+                                  
+                    labelsContainer.innerHTML += labelHTML;
+                }
+            });
+        },
+
+        compileToPython() {
+            const t = i18n[currentLang];
+            if (this.nodes.length === 0) return setStatus(t.msgFlowEmpty, 'error');
+
+            const startNode = this.nodes.find(n => n.type === 'start');
+            if (!startNode) return setStatus("錯誤：流程圖必須包含一個「開始」節點！", 'error');
+
+            let codeStr = "";
+            const processTextToPython = (rawText) => {
+                let text = rawText.trim();
+                if (text.match(/^(輸出|output)\s*(.*)/i)) {
+                    let content = text.replace(/^(輸出|output)\s*/i, "");
+                    if(!content.startsWith("(")) text = `print(${content})`;
+                    else text = `print${content}`;
+                }
+                if (text.match(/^(輸入|input)\s+(.*)/i)) {
+                    let varName = text.replace(/^(輸入|input)\s+/i, "");
+                    text = `${varName} = input()`;
+                }
+                return text;
+            };
+
+            const trueLabels = ['true', 't', 'yes', 'y', '是', '對', '成立'];
+            const falseLabels = ['false', 'f', 'no', 'n', '否', '錯', '不成立'];
+
+            const traverse = (nodeId, indent, pathVisited) => {
+                if (pathVisited.has(nodeId)) {
+                    codeStr += "    ".repeat(indent) + "# (迴圈連線返回上層節點)\n";
+                    return;
+                }
+                let currentPathVisited = new Set(pathVisited);
+                currentPathVisited.add(nodeId);
+
+                const node = this.nodes.find(n => n.id === nodeId);
+                if (!node || node.type === 'end') return;
+
+                const prefix = "    ".repeat(indent);
+                let outgoingEdges = this.edges.filter(e => e.from === nodeId);
+
+                if (node.type === 'process' || node.type === 'io') {
+                    if (node.text.trim()) {
+                        codeStr += prefix + processTextToPython(node.text) + "\n";
+                    }
+                    outgoingEdges.forEach(e => traverse(e.to, indent, currentPathVisited));
+                } else if (node.type === 'decision') {
+                    let cond = node.text.trim();
+                    if (!cond) cond = "True"; 
+                    codeStr += prefix + "if " + cond + ":\n";
+                    
+                    let trueEdges = outgoingEdges.filter(e => e.label && trueLabels.includes(e.label.trim().toLowerCase()));
+                    let falseEdges = outgoingEdges.filter(e => e.label && falseLabels.includes(e.label.trim().toLowerCase()));
+                    
+                    if (trueEdges.length === 0 && falseEdges.length === 0 && outgoingEdges.length > 0) {
+                        trueEdges = [outgoingEdges[0]];
+                        if (outgoingEdges.length > 1) falseEdges = [outgoingEdges[1]];
+                    }
+
+                    let lenBeforeTrue = codeStr.length;
+                    trueEdges.forEach(e => traverse(e.to, indent + 1, currentPathVisited));
+                    if (codeStr.length === lenBeforeTrue) codeStr += prefix + "    pass\n"; 
+
+                    if (falseEdges.length > 0) {
+                        codeStr += prefix + "else:\n";
+                        let lenBeforeFalse = codeStr.length;
+                        falseEdges.forEach(e => traverse(e.to, indent + 1, currentPathVisited));
+                        if (codeStr.length === lenBeforeFalse) codeStr += prefix + "    pass\n";
+                    }
+                } else {
+                    outgoingEdges.forEach(e => traverse(e.to, indent, currentPathVisited));
+                }
+            };
+
+            let firstEdge = this.edges.find(e => e.from === startNode.id);
+            if (firstEdge) {
+                traverse(firstEdge.to, 0, new Set([startNode.id]));
+            }
+            
+            if (!codeStr.trim()) codeStr = "# 未產生程式碼，請確認連線箭頭是否從「開始」節點出發！";
+
+            document.getElementById('python-code').value = codeStr;
+            document.getElementById('mode-select').value = 'python';
+            changeMode();
+            document.getElementById('output-area').textContent = "【 本機編譯結果 】\n\n" + codeStr;
+            setStatus(t.msgCompileSuccess, 'success');
+        }
+    };
+
+    window.flowApp.init();
+
+    function changeLang() {
+        currentLang = document.getElementById('lang-select').value;
+        const t = i18n[currentLang];
+        document.getElementById('main-title').textContent = t.mainTitle;
+        document.getElementById('output-title').textContent = t.outputTitle;
+        document.getElementById('mode-label').textContent = t.modeLabel;
+        
+        const modeSelect = document.getElementById('mode-select');
+        modeSelect.options[0].text = t.modeFlow; modeSelect.options[1].text = t.modePy; modeSelect.options[2].text = t.modePs;
+        
+        document.getElementById('btn-compile-flow').textContent = t.btnCompileFlow;
+        document.getElementById('lbl-add-start').textContent = t.flowTools.start;
+        document.getElementById('lbl-add-end').textContent = t.flowTools.end;
+        document.getElementById('lbl-add-process').textContent = t.flowTools.process;
+        document.getElementById('lbl-add-io').textContent = t.flowTools.io;
+        document.getElementById('lbl-add-decision').textContent = t.flowTools.decision;
+        document.getElementById('lbl-delete').textContent = t.flowTools.del;
+        document.getElementById('lbl-clear-all').textContent = t.flowTools.clear;
+        document.getElementById('flow-hint').textContent = t.flowTools.hint;
+        changeMode();
+    }
+
+    function changeMode() {
+        currentMode = document.getElementById('mode-select').value;
+        const t = i18n[currentLang];
+        
+        document.getElementById('status-msg').style.display = 'none';
+        document.getElementById('python-code').style.display = 'none';
+        document.getElementById('flow-editor-container').style.display = 'none';
+        document.getElementById('btn-group-standard').style.display = 'none';
+        document.getElementById('btn-group-flow').style.display = 'none';
+
+        if (currentMode === 'python' || currentMode === 'pseudo') {
+            document.getElementById('input-title').textContent = currentMode === 'python' ? t.inputTitlePy : t.inputTitlePs;
+            document.getElementById('python-code').style.display = 'block'; 
+            document.getElementById('python-code').placeholder = currentMode === 'python' ? t.placeholderPy : t.placeholderPs;
+            document.getElementById('btn-group-standard').style.display = 'flex';
+            
+            document.getElementById('btn-check').style.display = currentMode === 'python' ? 'inline-block' : 'none';
+            document.getElementById('btn-pseudo').style.display = currentMode === 'python' ? 'inline-block' : 'none';
+            document.getElementById('btn-to-python').style.display = currentMode === 'pseudo' ? 'inline-block' : 'none';
+            
+            document.getElementById('btn-check').textContent = t.btnCheck;
+            document.getElementById('btn-pseudo').textContent = t.btnPseudo;
+            document.getElementById('btn-to-python').textContent = t.btnToPython;
+            document.getElementById('btn-flow').textContent = t.btnFlow;
+            document.getElementById('btn-run').textContent = t.btnRun;
+        } else if (currentMode === 'flow') {
+            document.getElementById('input-title').textContent = t.inputTitleFlow;
+            document.getElementById('flow-editor-container').style.display = 'flex';
+            document.getElementById('btn-group-flow').style.display = 'flex';
+            setTimeout(() => window.flowApp.renderEdges(), 50);
+        }
+    }
+
+    function setStatus(msg, type) { 
+        const statusEl = document.getElementById('status-msg');
+        statusEl.textContent = msg; statusEl.className = type; statusEl.style.display = 'block';
+    }
+
+    function getCode() { return document.getElementById('python-code').value; }
+    function getPythonCode() { return currentMode === 'pseudo' ? pseudoToPythonInternal(getCode()) : getCode(); }
+
+    function pythonToPseudoInternal(code) {
+        const t = i18n[currentLang];
+        return code.split('\n').map(line => {
+            if (line.trim() === '') return '';
+            let indent = line.match(/^[ \t]*/)[0];
+            let text = line.trim()
+                .replace(/def (.*?)\((.*?)\):/g, `${t.pseudo.func} $1($2) ${t.pseudo.begin}`)
+                .replace(/if (.*?):/g, `${t.pseudo.if} $1 ${t.pseudo.then}`)
+                .replace(/elif (.*?):/g, `${t.pseudo.elif} $1 ${t.pseudo.then}`)
+                .replace(/else:/g, `${t.pseudo.else}`)
+                .replace(/for (.*?) in (.*?):/g, `${t.pseudo.forEach} $1 ${t.pseudo.in} $2 ${t.pseudo.do}`)
+                .replace(/while (.*?):/g, `${t.pseudo.while} $1 ${t.pseudo.do}`)
+                .replace(/print\((.*?)\)/g, `${t.pseudo.output} $1`)
+                .replace(/input\((.*?)\)/g, `${t.pseudo.input} $1`);
+            return indent + text;
+        }).join('\n');
+    }
+
+    function pseudoToPythonInternal(code) {
+        return code.split('\n').map(line => {
+            if (line.trim() === '') return '';
+            let indent = line.match(/^[ \t]*/)[0];
+            let text = line.trim()
+                .replace(/^(FUNCTION|函數)\s+(.*?)\((.*?)\)\s+(BEGIN|開始)/i, "def $2($3):")
+                .replace(/^(IF|如果)\s+(.*?)\s+(THEN|則)/i, "if $2:")
+                .replace(/^(ELSE IF|否則如果)\s+(.*?)\s+(THEN|則)/i, "elif $2:")
+                .replace(/^(ELSE|否則)/i, "else:")
+                .replace(/^(FOR EACH|對於每個)\s+(.*?)\s+(IN|在)\s+(.*?)\s+(DO|執行)/i, "for $2 in $4:")
+                .replace(/^(WHILE|當)\s+(.*?)\s+(DO|執行)/i, "while $2:")
+                .replace(/^(OUTPUT|輸出)\s+(.*)/i, "print($2)")
+                .replace(/^(INPUT|輸入)\s+(.*)/i, "input($2)");
+            return indent + text;
+        }).join('\n');
+    }
+
+    function checkSyntax() {
+        const code = getPythonCode();
+        if (!code.trim()) { setStatus(i18n[currentLang].msgEmpty, 'error'); return false; }
+        setStatus(i18n[currentLang].msgSyntaxOk, 'success'); return true;
+    }
+
+    function toPseudoCode() {
+        if (!checkSyntax()) return;
+        document.getElementById('output-area').textContent = "【 Pseudo-code 】\n\n" + pythonToPseudoInternal(getCode());
+    }
+
+    function toPythonAction() {
+        const code = getCode();
+        if (!code.trim()) return setStatus(i18n[currentLang].msgEmpty, 'error');
+        document.getElementById('output-area').textContent = "【 Python Code 】\n\n" + pseudoToPythonInternal(code);
+        setStatus("✅ 轉換成功！", 'success');
+    }
+
+    function toFlowchart() {
+        if (!checkSyntax()) return;
+        const t = i18n[currentLang]; const lines = getPythonCode().split('\n');
+        let mermaidGraph = "flowchart TD\nStart([" + t.flow.start + "])\n";
+        let nodeId = 0, activePaths = [{source: "Start", label: null}], blockStack = [];
+
+        function connectPathsTo(targetNodeId) {
+            activePaths.forEach(path => {
+                let edge = path.label ? ` -- ${path.label} --> ` : ` --> `;
+                mermaidGraph += `${path.source}${edge}${targetNodeId}\n`;
+            });
+            activePaths = [];
+        }
+
+        function popBlock() {
+            let block = blockStack.pop();
+            if (block.type === 'if') {
+                if (block.noPath) activePaths.push(block.noPath);
+                activePaths.push(...block.donePaths);
+            } else if (block.type === 'while' || block.type === 'for') {
+                if (block.type === 'for' && block.incCode) {
+                    nodeId++; let incId = "N" + nodeId; mermaidGraph += `${incId}["${block.incCode}"]\n`;
+                    connectPathsTo(incId); mermaidGraph += `${incId} --> ${block.condNode}\n`;
+                } else connectPathsTo(block.condNode);
+                activePaths = [ block.noPath ];
+            }
+        }
+
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i]; let stripped = line.trim();
+            if (!stripped || stripped.startsWith('#')) continue;
+            let indent = line.match(/^[ \t]*/)[0].length;
+
+            while (blockStack.length > 0 && indent <= blockStack[blockStack.length - 1].indent && !(stripped.startsWith("elif") || stripped.startsWith("else"))) { popBlock(); }
+
+            if (stripped.startsWith("if ")) {
+                nodeId++; let condId = "N" + nodeId;
+                mermaidGraph += `${condId}{"${stripped.replace(/if (.*?):/, "$1")}"}\n`;
+                connectPathsTo(condId);
+                blockStack.push({ type: 'if', indent: indent, donePaths: [], noPath: {source: condId, label: t.flow.false} });
+                activePaths = [ {source: condId, label: t.flow.true} ];
+            } else if (stripped.startsWith("else:")) {
+                let block = blockStack[blockStack.length - 1];
+                block.donePaths.push(...activePaths); activePaths = [ block.noPath ]; block.noPath = null;
+            } else if (stripped.startsWith("for ") || stripped.startsWith("while ")) {
+                nodeId++; let condId = "N" + nodeId;
+                let condText = stripped.startsWith("for") ? stripped.replace(/for (.*?) in (.*?):/, "Has next $1 in $2?") : stripped.replace(/while (.*?):/, "$1");
+                mermaidGraph += `${condId}{"${condText}"}\n`;
+                connectPathsTo(condId);
+                blockStack.push({ type: 'while', indent: indent, condNode: condId, noPath: {source: condId, label: t.flow.false} });
+                activePaths = [ {source: condId, label: t.flow.true} ];
+            } else {
+                nodeId++; let currentId = "N" + nodeId;
+                let text = stripped.replace(/"/g, "'");
+                if (text.includes("print(") || text.includes("input(")) {
+                    text = text.replace(/print\s*\(/g, t.flow.output + " (").replace(/input\s*\(/g, t.flow.input + " (");
+                    mermaidGraph += `${currentId}[/"${text}"/]\n`;
+                } else {
+                    mermaidGraph += `${currentId}["${text}"]\n`;
+                }
+                connectPathsTo(currentId);
+                activePaths = [ {source: currentId, label: null} ];
+            }
+        }
+        while (blockStack.length > 0) popBlock();
+        mermaidGraph += `End([${t.flow.end}])\n`; connectPathsTo("End");
+
+        document.getElementById('output-area').innerHTML = `<div class="mermaid">${mermaidGraph}</div>`;
+        if(typeof mermaid !== 'undefined') setTimeout(() => mermaid.init(undefined, document.querySelectorAll('.mermaid')), 100);
+    }
+
+    let pyodideReadyPromise;
+    async function initPyodide() {
+        if (!pyodideReadyPromise) {
+            pyodideReadyPromise = loadPyodide({
+                stdout: (text) => { document.getElementById('output-area').textContent += text + "\n"; },
+                stderr: (text) => { document.getElementById('output-area').textContent += text + "\n"; }
+            });
+        }
+        return await pyodideReadyPromise;
+    }
+
+    async function runPython() {
+        if (!checkSyntax()) return;
+        const code = getPythonCode();
+        document.getElementById('output-area').textContent = "⏳ 執行中...\n";
+        try {
+            let pyodide = await initPyodide();
+            document.getElementById('output-area').textContent = ""; 
+            await pyodide.runPythonAsync(code);
+            setStatus("✅ 執行完畢！", 'success');
+        } catch (err) {
+            document.getElementById('output-area').textContent += `\n[Error]\n${err.message}`;
+            setStatus("❌ 執行錯誤", 'error');
+        }
+    }
+    
+    changeLang();
+</script>
+
+</body>
+</html>
