@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -194,18 +195,18 @@
             inputTitleFlow: "✍️ 互動流程圖編輯器",
             placeholderPy: "請輸入 Python 程式碼...\n\n# 範例\nfor i in range(1, 5):\n    print(i)",
             placeholderPs: "請輸入偽代碼...\n\n# 範例\n對於每個 i 在 range(1, 5) 執行\n    輸出 i",
-            btnCheck: "1. 檢查語法", btnPseudo: "2. 轉為偽代碼", btnToPython: "1. 轉為 Python", btnFlow: "轉為流程圖", btnRun: "▶️ 執行程式",
+            btnCheck: "1. 檢查語法", btnPseudo: "2. 轉為偽代碼", btnToPython: "1. 轉為 Python", btnFlow: "轉為流程圖", btnRun: "▶️ 執行程式", btnRunTitle: "若程式使用 input()，因目前網頁版尚未提供頁面內輸入欄位，執行時會改以彈出式視窗請您輸入。",
             btnCompileFlow: "⚙️ 1. 轉換流程圖為 Python 程式碼",
             outputTitle: "📊 結果輸出區", msgEmpty: "請先輸入內容或選擇範例！",
             msgFlowEmpty: "流程圖目前沒有節點，請先繪製！", msgSyntaxOk: "✅ 完美！語法與縮排檢查皆通過！",
-            msgCompileSuccess: "✅ 流程圖轉換成功！已自動切換為 Python 模式。",
+            msgCompileSuccess: "✅ 流程圖轉換成功！已自動切換為 Python 模式。", msgInputPopup: "ℹ️ 程式含有 input()；因網頁版目前未提供頁面內輸入欄位，執行時會改用彈出式視窗請您輸入。", inputPromptNote: "提示：此網頁目前尚未提供頁面內輸入欄位，所以程式執行到 input() 時，會以彈出式視窗請您輸入。",
             modeLabel: "⚙️ 轉換模式: ", exampleLabel: "📖 範例: ", modePy: "🐍 Python ➡️ 偽代碼 / 流程圖", modePs: "📝 偽代碼 ➡️ Python / 流程圖",
             modeFlow: "✍️ 互動流程圖編輯器 ➡️ Python (本機)", defaultSelectExample: "-- 請選擇教學範例 --",
             flowTools: { start: "開始", end: "結束", process: "處理/賦值", io: "輸入/輸出", decision: "判斷", del: "刪除", clear: "清空畫布", maximize: "最大化", restore: "還原", hint: "💡 畫布可向下捲動。拖曳圖形邊緣的藍點 🔵 連線。若連線來自「判斷(菱形)」，可在文字欄修改是/否。點擊連線本身可選取刪除。", defaultText: "點擊輸入", decisionPrompt: "請輸入這條路徑的條件：" },
             pseudo: { func: "函數", begin: "開始", if: "如果", then: "則", elif: "否則如果", else: "否則", forEach: "對於每個", in: "在", do: "執行", while: "當", output: "輸出", input: "輸入" }, flow: { start: "開始", end: "結束", true: "是", false: "否", output: "輸出", input: "輸入" }
         },
         en: {
-            mainTitle: "🚀 Logic & Code Bidirectional Tool", inputTitlePy: "🐍 Python Code Input", inputTitlePs: "📝 Pseudo-code Input", inputTitleFlow: "✍️ Interactive Flowchart", placeholderPy: "Enter Python code here...", placeholderPs: "Enter Pseudo-code here...", btnCheck: "1. Check Syntax", btnPseudo: "2. To Pseudo-code", btnToPython: "1. To Python", btnFlow: "To Flowchart", btnRun: "▶️ Run Code", btnCompileFlow: "⚙️ 1. Compile Flowchart to Python", outputTitle: "📊 Output Area", msgEmpty: "Please enter content first!", msgFlowEmpty: "Flowchart is empty!", msgSyntaxOk: "✅ Syntax passed!", msgCompileSuccess: "✅ Flowchart compiled!", modeLabel: "⚙️ Mode: ", exampleLabel: "📖 Examples: ", modePy: "🐍 Python ➡️ Pseudo / Flow", modePs: "📝 Pseudo ➡️ Python / Flow", modeFlow: "✍️ Interactive Flowchart ➡️ Python", defaultSelectExample: "-- Select Example --", flowTools: { start: "Start", end: "End", process: "Process", io: "I/O", decision: "Decision", del: "Delete", clear: "Clear", maximize: "Maximize", restore: "Restore", hint: "💡 Drag blue dot 🔵 to connect.", defaultText: "Click to edit" }, pseudo: { func: "FUNCTION", begin: "BEGIN", if: "IF", then: "THEN", elif: "ELSE IF", else: "ELSE", forEach: "FOR EACH", in: "IN", do: "DO", while: "WHILE", output: "OUTPUT", input: "INPUT" }, flow: { start: "Start", end: "End", true: "True", false: "False", output: "Output", input: "Input" }
+            mainTitle: "🚀 Logic & Code Bidirectional Tool", inputTitlePy: "🐍 Python Code Input", inputTitlePs: "📝 Pseudo-code Input", inputTitleFlow: "✍️ Interactive Flowchart", placeholderPy: "Enter Python code here...", placeholderPs: "Enter Pseudo-code here...", btnCheck: "1. Check Syntax", btnPseudo: "2. To Pseudo-code", btnToPython: "1. To Python", btnFlow: "To Flowchart", btnRun: "▶️ Run Code", btnRunTitle: "If the program uses input(), the web version currently falls back to a popup dialog because inline input fields are not yet available.", btnCompileFlow: "⚙️ 1. Compile Flowchart to Python", outputTitle: "📊 Output Area", msgEmpty: "Please enter content first!", msgFlowEmpty: "Flowchart is empty!", msgSyntaxOk: "✅ Syntax passed!", msgCompileSuccess: "✅ Flowchart compiled!", msgInputPopup: "ℹ️ This program uses input(); because the web version does not yet provide inline input fields, it will ask through popup dialogs.", inputPromptNote: "Note: Inline input fields are not yet available in this web page, so when the program reaches input(), a popup dialog will be used for your entry.", modeLabel: "⚙️ Mode: ", exampleLabel: "📖 Examples: ", modePy: "🐍 Python ➡️ Pseudo / Flow", modePs: "📝 Pseudo ➡️ Python / Flow", modeFlow: "✍️ Interactive Flowchart ➡️ Python", defaultSelectExample: "-- Select Example --", flowTools: { start: "Start", end: "End", process: "Process", io: "I/O", decision: "Decision", del: "Delete", clear: "Clear", maximize: "Maximize", restore: "Restore", hint: "💡 Drag blue dot 🔵 to connect.", defaultText: "Click to edit" }, pseudo: { func: "FUNCTION", begin: "BEGIN", if: "IF", then: "THEN", elif: "ELSE IF", else: "ELSE", forEach: "FOR EACH", in: "IN", do: "DO", while: "WHILE", output: "OUTPUT", input: "INPUT" }, flow: { start: "Start", end: "End", true: "True", false: "False", output: "Output", input: "Input" }
         }
     };
 
@@ -213,7 +214,7 @@
     const N = (id, type, text, x, y) => ({ id, type, text, x, y });
     const E = (from, to, label = "", fromPort = "bottom", toPort = "top") => ({ from, to, label, fromPort, toPort });
 
-    // === 20個 漸進式且統一的教學範例庫 ===
+    // === 漸進式且統一的教學範例庫 ===
     const universalExamples = [
         // --- 基礎篇 ---
         { id: "b1", group: "[基礎]", name: "1. 簡單輸出 (Hello World)", 
@@ -290,15 +291,31 @@
           py: 'i = 1\nwhile i <= 5:\n    print(i)\n    i = i + 1\nprint("結束")', 
           ps: 'i = 1\n當 i <= 5 執行\n    輸出 i\n    i = i + 1\n輸出 "結束"',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","i = 1",250,100), N("n3","decision","i <= 5",250,180), N("n4","io","輸出 i",100,280), N("n5","process","i = i + 1",100,360), N("n6","io","輸出 結束",400,280), N("n7","end","結束",400,360)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n6","否","right","top"), E("n4","n5"), E("n5","n3","","left","left"), E("n6","n7")] } },
-        { id: "l3", group: "[迴圈]", name: "3. 累加計算 (1加到N)", 
+                { id: "l2f", group: "[迴圈]", name: "3. for 迴圈 (印出 1 到 5)", 
+                    py: 'for i in range(1, 6):\n    print(i)\nprint("結束")', 
+                    ps: '對於每個 i 在 range(1, 6) 執行\n    輸出 i\n輸出 "結束"',
+                    fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","i = 1",250,100), N("n3","decision","i <= 5",250,180), N("n4","io","輸出 i",100,280), N("n5","process","i = i + 1",100,360), N("n6","io","輸出 結束",400,280), N("n7","end","結束",400,360)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n6","否","right","top"), E("n4","n5"), E("n5","n3","","left","left"), E("n6","n7")] } },
+                { id: "l2g", group: "[迴圈]", name: "4. for 迴圈 (印出偶數)", 
+                    py: 'for i in range(2, 11, 2):\n    print(i)\nprint("完成")', 
+                    ps: '對於每個 i 在 range(2, 11, 2) 執行\n    輸出 i\n輸出 "完成"',
+                    fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","i = 2",250,100), N("n3","decision","i <= 10",250,180), N("n4","io","輸出 i",100,280), N("n5","process","i = i + 2",100,360), N("n6","io","輸出 完成",400,280), N("n7","end","結束",400,360)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n6","否","right","top"), E("n4","n5"), E("n5","n3","","left","left"), E("n6","n7")] } },
+                { id: "l2h", group: "[迴圈]", name: "5. for 迴圈 (累加 1 到 5)", 
+                    py: 'total = 0\nfor i in range(1, 6):\n    total = total + i\nprint("總和:")\nprint(total)', 
+                    ps: 'total = 0\n對於每個 i 在 range(1, 6) 執行\n    total = total + i\n輸出 "總和:"\n輸出 total',
+                    fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","total = 0",250,100), N("n3","process","i = 1",250,180), N("n4","decision","i <= 5",250,260), N("n5","process","total = total + i",100,360), N("n6","process","i = i + 1",100,440), N("n7","io","輸出 總和:",400,360), N("n8","io","輸出 total",400,440), N("n9","end","結束",400,520)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5","是","left","top"), E("n4","n7","否","right","top"), E("n5","n6"), E("n6","n4","","left","left"), E("n7","n8"), E("n8","n9")] } },
+                { id: "l2i", group: "[迴圈]", name: "6. for 迴圈 (3 的乘法練習)", 
+                    py: 'for i in range(1, 10):\n    print(3 * i)\nprint("完成")', 
+                    ps: '對於每個 i 在 range(1, 10) 執行\n    輸出 3 * i\n輸出 "完成"',
+                    fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","i = 1",250,100), N("n3","decision","i <= 9",250,180), N("n4","io","輸出 3 * i",100,280), N("n5","process","i = i + 1",100,360), N("n6","io","輸出 完成",400,280), N("n7","end","結束",400,360)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n6","否","right","top"), E("n4","n5"), E("n5","n3","","left","left"), E("n6","n7")] } },
+                { id: "l3", group: "[迴圈]", name: "7. 累加計算 (1加到N)", 
           py: 'target = int(input("加到多少?"))\ntotal = 0\ni = 1\nwhile i <= target:\n    total = total + i\n    i = i + 1\nprint("總和:")\nprint(total)', 
           ps: '輸出 "加到多少?"\n輸入 target\ntotal = 0\ni = 1\n當 i <= target 執行\n    total = total + i\n    i = i + 1\n輸出 "總和:"\n輸出 total',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 target",250,100), N("n3","process","total = 0",250,180), N("n4","process","i = 1",250,260), N("n5","decision","i <= target",250,340), N("n6","process","total = total + i",100,440), N("n7","process","i = i + 1",100,520), N("n8","io","輸出 total",400,440), N("n9","end","結束",400,520)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5"), E("n5","n6","是","left","top"), E("n5","n8","否","right","top"), E("n6","n7"), E("n7","n5","","left","left"), E("n8","n9")] } },
-        { id: "l4", group: "[迴圈]", name: "4. 密碼重試機制", 
+                { id: "l4", group: "[迴圈]", name: "8. 密碼重試機制", 
           py: 'pwd = ""\nwhile pwd != "1234":\n    pwd = input("請輸入密碼:")\nprint("登入成功")', 
           ps: 'pwd = ""\n當 pwd != "1234" 執行\n    輸出 "請輸入密碼:"\n    輸入 pwd\n輸出 "登入成功"',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","process",'pwd = ""',250,100), N("n3","decision",'pwd != "1234"',250,180), N("n4","io","輸入 pwd",100,280), N("n5","io","輸出 登入成功",400,280), N("n6","end","結束",400,360)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n5","否","right","top"), E("n4","n3","","left","left"), E("n5","n6")] } },
-        { id: "l5", group: "[迴圈]", name: "5. 存錢筒 (累計到目標金額)", 
+                { id: "l5", group: "[迴圈]", name: "9. 存錢筒 (累計到目標金額)", 
           py: 'saved = 0\nwhile saved < 100:\n    add = int(input("存入金額:"))\n    saved = saved + add\n    print(saved)\nprint("目標達成!")', 
           ps: 'saved = 0\n當 saved < 100 執行\n    輸出 "存入金額:"\n    輸入 add\n    saved = saved + add\n    輸出 saved\n輸出 "目標達成!"',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","saved = 0",250,100), N("n3","decision","saved < 100",250,180), N("n4","io","輸入 add",100,280), N("n5","process","saved = saved + add",100,360), N("n6","io","輸出 saved",100,440), N("n7","io","輸出 目標達成!",400,280), N("n8","end","結束",400,360)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n7","否","right","top"), E("n4","n5"), E("n5","n6"), E("n6","n3","","left","left"), E("n7","n8")] } }
@@ -901,6 +918,7 @@
             document.getElementById('btn-to-python').textContent = t.btnToPython;
             document.getElementById('btn-flow').textContent = t.btnFlow;
             document.getElementById('btn-run').textContent = t.btnRun;
+            document.getElementById('btn-run').title = t.btnRunTitle;
         } else if (currentMode === 'flow') {
             document.getElementById('input-title').textContent = t.inputTitleFlow;
             document.getElementById('flow-editor-container').style.display = 'flex';
@@ -1087,25 +1105,73 @@
     }
 
     let pyodideReadyPromise;
+    let inputNoticeShown = false;
+
+    function codeUsesInput(code) {
+        return /\binput\s*\(/.test(code);
+    }
+
+    function appendToOutput(text, addNewLine = true) {
+        const outputEl = document.getElementById('output-area');
+        outputEl.textContent += addNewLine ? `${text}\n` : text;
+    }
+
+    function ensureInputNoticeShown() {
+        if (inputNoticeShown) return;
+        appendToOutput(i18n[currentLang].inputPromptNote);
+        appendToOutput("");
+        inputNoticeShown = true;
+    }
+
+    function promptForPythonInput(promptText = "") {
+        const promptMessage = String(promptText ?? "");
+        ensureInputNoticeShown();
+        const userInput = window.prompt(promptMessage, "");
+
+        if (userInput === null) {
+            throw new Error(currentLang === 'zh' ? '已取消輸入。' : 'Input cancelled.');
+        }
+
+        if (promptMessage) appendToOutput(promptMessage, false);
+        appendToOutput(userInput);
+        return userInput;
+    }
+
     async function initPyodide() {
         if (!pyodideReadyPromise) {
-            pyodideReadyPromise = loadPyodide({
-                stdout: (text) => { document.getElementById('output-area').textContent += text + "\n"; },
-                stderr: (text) => { document.getElementById('output-area').textContent += text + "\n"; }
-            });
+            pyodideReadyPromise = (async () => {
+                const pyodide = await loadPyodide({
+                    stdout: (text) => { appendToOutput(text); },
+                    stderr: (text) => { appendToOutput(text); }
+                });
+
+                pyodide.globals.set('__browser_input__', (promptText = '') => promptForPythonInput(promptText));
+                await pyodide.runPythonAsync(`
+import builtins
+
+def __pyodide_browser_input(prompt=''):
+    return str(__browser_input__(prompt))
+
+builtins.input = __pyodide_browser_input
+                `);
+
+                return pyodide;
+            })();
         }
         return await pyodideReadyPromise;
     }
 
     async function runPython() {
         if (!checkSyntax()) return;
+        const t = i18n[currentLang];
         const code = getPythonCode();
+        inputNoticeShown = false;
         document.getElementById('output-area').textContent = "⏳ 執行中...\n";
         try {
             let pyodide = await initPyodide();
             document.getElementById('output-area').textContent = ""; 
+            if (codeUsesInput(code)) setStatus(t.msgInputPopup, 'info');
             
-            // Pyodide 會自動將 Python 的 input() 映射為瀏覽器的 window.prompt
             await pyodide.runPythonAsync(code);
             setStatus("✅ 執行完畢！", 'success');
         } catch (err) {
