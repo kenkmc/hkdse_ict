@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HKDSE ICT SQL 學習平台</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- SQL.js (WebAssembly SQLite) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+
+    <!-- Mermaid.js for ER Diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Microsoft JhengHei'; }
+        .sql-editor { font-family: 'Courier New', Courier, monospace; }
+        
+        /* Custom Scrollbar for tables and sidebar */
+        .table-container::-webkit-scrollbar, .sidebar-scroll::-webkit-scrollbar { height: 8px; width: 8px; }
+        .table-container::-webkit-scrollbar-track, .sidebar-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
+        .table-container::-webkit-scrollbar-thumb, .sidebar-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .table-container::-webkit-scrollbar-thumb:hover, .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen flex flex-col overflow-hidden">
+    <div id="root" class="h-full flex flex-col"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // DSE Dummy Database Initialization SQL
+        const initSqlSchema = `
+            CREATE TABLE STUDENT (
+                SID VARCHAR(4) PRIMARY KEY, 
+                SName VARCHAR(20), 
+                SClass VARCHAR(2), 
+                SGender VARCHAR(1)
+            );
+            
+            CREATE TABLE SUBJECT (
+                SubCode VARCHAR(4) PRIMARY KEY, 
+                SubName VARCHAR(20)
+            );
+            
+            CREATE TABLE EXAM (
+                SID VARCHAR(4), 
+                SubCode VARCHAR(4), 
+                Mark INTEGER, 
+                PRIMARY KEY (SID, SubCode),
+                FOREIGN KEY (SID) REFERENCES STUDENT(SID),
+                FOREIGN KEY (SubCode) REFERENCES SUBJECT(SubCode)
+            );
+
+            INSERT INTO STUDENT VALUES ('S001', '陳大文', '4A', 'M');
+            INSERT INTO STUDENT VALUES ('S002', '李嘉欣', '4A', 'F');
+            INSERT INTO STUDENT VALUES ('S003', '張子強', '4B', 'M');
+            INSERT INTO STUDENT VALUES ('S004', '黃小玲', '4B', 'F');
+            INSERT INTO STUDENT VALUES ('S005', '林浩然', '5A', 'M');
+
+            INSERT INTO SUBJECT VALUES ('ICT', '資訊及通訊科技');
+            INSERT INTO SUBJECT VALUES ('ENG', '英國語文');
+            INSERT INTO SUBJECT VALUES ('MATH', '數學');
+
+            INSERT INTO EXAM VALUES ('S001', 'ICT', 85);
+            INSERT INTO EXAM VALUES ('S001', 'ENG', 70);
+            INSERT INTO EXAM VALUES ('S001', 'MATH', 90);
+            INSERT INTO EXAM VALUES ('S002', 'ICT', 92);
+            INSERT INTO EXAM VALUES ('S002', 'ENG', 88);
+            INSERT INTO EXAM VALUES ('S003', 'MATH', 45);
+            INSERT INTO EXAM VALUES ('S004', 'ENG', 78);
+            INSERT INTO EXAM VALUES ('S004', 'ICT', 60);
+        `;
+
+        // SVG Icons
+        const Icons = {
+            Database: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>,
+            Code: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>,
+            Play: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>,
+            Network: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="16" y="16" width="6" height="6" rx="1"></rect><rect x="2" y="16" width="6" height="6" rx="1"></rect><rect x="9" y="2" width="6" height="6" rx="1"></rect><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"></path><path d="M12 12V8"></path></svg>,
+            BookOpen: () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+        };
+
+        const App = () => {
+            const [db, setDb] = useState(null);
+            const [query, setQuery] = useState("SELECT * FROM STUDENT;\n-- 嘗試修改這句 SQL，然後點擊「執行」");
+            const [results, setResults] = useState(null);
+            const [error, setError] = useState(null);
+            const [activeTab, setActiveTab] = useState('sql'); // 'sql', 'er', 'schema'
+            const [isLoading, setIsLoading] = useState(true);
+            const mermaidRef = useRef(null);
+
+            // 新增：儲存動態抓取的資料庫結構
+            const [dbSchema, setDbSchema] = useState({});
+
+            // 解析 SQLite 系統表以獲取結構 (Schema)
+            const extractSchema = (database) => {
+                try {
+                    const tablesRes = database.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';");
+                    if (tablesRes.length === 0) return {};
+                    
+                    const tables = tablesRes[0].values.map(row => row[0]);
+                    const schema = {};
+                    
+                    tables.forEach(tableName => {
+                        const infoRes = database.exec(`PRAGMA table_info('${tableName}');`);
+                        const fkRes = database.exec(`PRAGMA foreign_key_list('${tableName}');`);
+                        
+                        schema[tableName] = {
+                            columns: infoRes.length > 0 ? infoRes[0].values.map(row => ({ name: row[1], type: row[2], pk: row[5] > 0 })) : [],
+                            foreignKeys: fkRes.length > 0 ? fkRes[0].values.map(row => ({ table: row[2], from: row[3], to: row[4] })) : []
+                        };
+                    });
+                    return schema;
+                } catch (e) { 
+                    console.error("Schema extraction failed:", e);
+                    return {}; 
+                }
+            };
+
+            // Initialize Database
+            useEffect(() => {
+                const init = async () => {
+                    try {
+                        const SQL = await window.initSqlJs({
+                            locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+                        });
+                        const newDb = new SQL.Database();
+                        newDb.run(initSqlSchema);
+                        setDb(newDb);
+                        setIsLoading(false);
+                        
+                        // Run initial query
+                        executeSql(newDb, "SELECT * FROM STUDENT;");
+                        setDbSchema(extractSchema(newDb)); // 初始化時載入結構
+                    } catch (err) {
+                        console.error("Database initialization failed:", err);
+                        setError("資料庫初始化失敗，請檢查網絡連線。");
+                        setIsLoading(false);
+                    }
+                };
+                init();
+                
+                // Init Mermaid
+                mermaid.initialize({ startOnLoad: false, theme: 'default' });
+            }, []);
+
+            // Render Mermaid diagram when tab changes
+            useEffect(() => {
+                if (activeTab === 'er' && mermaidRef.current) {
+                    // 如果沒有任何資料表，顯示提示訊息並清空圖表
+                    if (Object.keys(dbSchema).length === 0) {
+                        mermaidRef.current.innerHTML = `<div class="text-gray-400 italic py-10">目前沒有資料表可供繪製 ER 圖。請使用 SQL 建立。</div>`;
+                        return;
+                    }
+
+                    const drawDiagram = async () => {
+                        try {
+                            // 動態生成 Mermaid 語法
+                            let mCode = "erDiagram\n";
+                            Object.entries(dbSchema).forEach(([tableName, tableDef]) => {
+                                tableDef.foreignKeys.forEach(fk => { 
+                                    // 關鍵修復：確保被參考的資料表 (fk.table) 仍然存在，才畫出關聯線
+                                    if (dbSchema[fk.table]) {
+                                        mCode += `    ${fk.table} ||--o{ ${tableName} : "references"\n`; 
+                                    }
+                                });
+                                mCode += `    ${tableName} {\n`;
+                                tableDef.columns.forEach(col => {
+                                    const isFk = tableDef.foreignKeys.some(fk => fk.from === col.name);
+                                    let keys = []; 
+                                    if (col.pk) keys.push("PK"); 
+                                    if (isFk) keys.push("FK");
+                                    const keyStr = keys.length > 0 ? ` ${keys.join(",")}` : "";
+                                    // 格式化資料類型以符合 Mermaid 限制
+                                    const typeStr = (col.type || 'TEXT').replace(/ /g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+                                    mCode += `        ${typeStr} ${col.name}${keyStr}\n`;
+                                });
+                                mCode += `    }\n`;
+                            });
+
+                            mermaidRef.current.removeAttribute('data-processed');
+                            const { svg } = await mermaid.render('er-diagram-svg', mCode);
+                            mermaidRef.current.innerHTML = svg;
+                        } catch (err) {
+                            console.error("Mermaid error:", err);
+                            mermaidRef.current.innerHTML = `<div class="text-red-500">無法繪製 ER 圖。請確保資料表名稱不含特殊字元。</div>`;
+                        }
+                    };
+                    drawDiagram();
+                }
+            }, [activeTab, dbSchema]);
+
+            const executeSql = (database, sqlString) => {
+                setError(null);
+                try {
+                    const res = database.exec(sqlString);
+                    if (res.length > 0) {
+                        setResults(res[res.length - 1]); // 如果有多句SQL，顯示最後一個有回傳的結果
+                    } else {
+                        // For INSERT/UPDATE/DELETE which return no rows
+                        const rowsModified = database.getRowsModified();
+                        setResults({ message: `執行成功。受影響的資料列：${rowsModified}` });
+                    }
+                    // 每次執行成功後重新整理 Schema
+                    setDbSchema(extractSchema(database));
+                } catch (err) {
+                    setResults(null);
+                    setError(err.message);
+                }
+            };
+
+            const handleRun = () => {
+                if (db) executeSql(db, query);
+            };
+
+            const handleExampleClick = (exampleSql) => {
+                setQuery(exampleSql);
+                if (db) executeSql(db, exampleSql);
+            };
+
+            // 動態顏色配置，為不同資料表分配不同顏色
+            const tableColors = ['bg-indigo-600', 'bg-emerald-600', 'bg-amber-600', 'bg-rose-600', 'bg-cyan-600', 'bg-violet-600'];
+
+            if (isLoading) {
+                return <div className="flex items-center justify-center h-screen bg-white">
+                    <div className="text-xl text-blue-600 font-semibold animate-pulse">正在載入 WebAssembly 資料庫引擎...</div>
+                </div>;
+            }
+
+            return (
+                <div className="flex flex-col h-screen bg-gray-100">
+                    {/* Header */}
+                    <header className="bg-blue-800 text-white p-4 shadow-md flex items-center justify-between z-10">
+                        <div className="flex items-center gap-2">
+                            <Icons.Database />
+                            <h1 className="text-xl font-bold tracking-wider">HKDSE ICT 互動 SQL 學習平台</h1>
+                        </div>
+                        <div className="text-sm bg-blue-700 px-3 py-1 rounded-full border border-blue-600">
+                            SQLite (WASM) 引擎運行中
+                        </div>
+                    </header>
+
+                    {/* Main Content */}
+                    <div className="flex flex-1 overflow-hidden">
+                        
+                        {/* Sidebar */}
+                        <aside className="w-64 bg-white border-r border-gray-200 flex flex-col hidden md:flex">
+                            <div className="p-4 border-b border-gray-200">
+                                <h2 className="font-bold text-gray-700 flex items-center gap-2 mb-4">
+                                    <Icons.BookOpen />
+                                    DSE 常見題型示例
+                                </h2>
+                                <div className="space-y-2 text-sm max-h-[50vh] overflow-y-auto pr-2 sidebar-scroll">
+                                    <button onClick={() => handleExampleClick("CREATE TABLE TEACHER (\n    TID VARCHAR(4) PRIMARY KEY,\n    TName VARCHAR(20),\n    Subject VARCHAR(4)\n);\n\nINSERT INTO TEACHER VALUES ('T001', '王老師', 'ICT');\nINSERT INTO TEACHER VALUES ('T002', '李老師', 'MATH');\n\nSELECT * FROM TEACHER;")} className="w-full text-left px-3 py-2 bg-gray-50 hover:bg-blue-50 hover:text-blue-700 rounded transition border border-gray-100">1. 建立資料表 (CREATE TABLE)</button>
+                                    <button onClick={() => handleExampleClick("SELECT * FROM STUDENT;")} className="w-full text-left px-3 py-2 bg-gray-50 hover:bg-blue-50 hover:text-blue-700 rounded transition border border-gray-100">2. 基本查詢 (SELECT)</button>
+                                    <button onClick={() => handleExampleClick("SELECT SName, SClass FROM STUDENT\nWHERE SGender = 'F';")} className="w-full text-left px-3 py-2 bg-gray-50 hover:bg-blue-50 hover:text-blue-700 rounded transition border border-gray-100">3. 條件篩選 (WHERE)</button>
+                                    <button onClick={() => handleExampleClick("SELECT * FROM EXAM\nORDER BY Mark DESC;")} className="w-full text-left px-3 py-2 bg-gray-50 hover:bg-blue-50 hover:text-blue-700 rounded transition border border-gray-100">4. 排序結果 (ORDER BY)</button>
+                                    <button onClick={() => handleExampleClick("SELECT S.SName, E.Mark\nFROM STUDENT S, EXAM E\nWHERE S.SID = E.SID AND E.SubCode = 'ICT';")} className="w-full text-left px-3 py-2 bg-gray-50 hover:bg-blue-50 hover:text-blue-700 rounded transition border border-gray-100">5. 跨表查詢 (JOIN)</button>
+                                    <button onClick={() => handleExampleClick("SELECT SubCode, AVG(Mark) AS AvgMark, COUNT(*) AS StudentCount\nFROM EXAM\nGROUP BY SubCode;")} className="w-full text-left px-3 py-2 bg-gray-50 hover:bg-blue-50 hover:text-blue-700 rounded transition border border-gray-100">6. 分組與聚合 (GROUP BY)</button>
+                                    <button onClick={() => handleExampleClick("-- 找出 ICT 科成績高於該科平均分的學生\nSELECT S.SName, E.Mark\nFROM STUDENT S, EXAM E\nWHERE S.SID = E.SID \n  AND E.SubCode = 'ICT'\n  AND E.Mark > (\n      SELECT AVG(Mark) FROM EXAM WHERE SubCode = 'ICT'\n  );")} className="w-full text-left px-3 py-2 bg-gray-50 hover:bg-blue-50 hover:text-blue-700 rounded transition border border-gray-100">7. 子查詢 (Subquery)</button>
+                                    <button onClick={() => handleExampleClick("-- 列出有修讀 ICT 或 MATH 的學生編號\nSELECT SID FROM EXAM WHERE SubCode = 'ICT'\nUNION\nSELECT SID FROM EXAM WHERE SubCode = 'MATH';")} className="w-full text-left px-3 py-2 bg-gray-50 hover:bg-blue-50 hover:text-blue-700 rounded transition border border-gray-100">8. 聯集 (UNION)</button>
+                                    <button onClick={() => handleExampleClick("UPDATE EXAM\nSET Mark = Mark + 5\nWHERE SubCode = 'ENG';\n\nSELECT * FROM EXAM WHERE SubCode = 'ENG';")} className="w-full text-left px-3 py-2 bg-gray-50 hover:bg-blue-50 hover:text-blue-700 rounded transition border border-gray-100">9. 更新資料 (UPDATE)</button>
+                                </div>
+                            </div>
+                            <div className="p-4 flex-1 bg-blue-50/50">
+                                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">學習小貼士</h3>
+                                <p className="text-xs text-gray-600 leading-relaxed">
+                                    在 DSE 卷一及卷二 (Databases) 中，經常要求同學根據資料表結構編寫 SQL 指令。請注意<b>主鍵 (Primary Key)</b> 和 <b>外鍵 (Foreign Key)</b> 在 `JOIN` 時的關係。
+                                </p>
+                            </div>
+                        </aside>
+
+                        {/* Main Work Area */}
+                        <main className="flex-1 flex flex-col relative">
+                            {/* Tabs */}
+                            <div className="flex bg-gray-200 px-2 pt-2 gap-1 border-b border-gray-300">
+                                <button 
+                                    onClick={() => setActiveTab('sql')}
+                                    className={`px-4 py-2 rounded-t-lg font-medium text-sm flex items-center gap-2 transition-colors ${activeTab === 'sql' ? 'bg-white text-blue-700 shadow-[0_-2px_5px_rgba(0,0,0,0.05)]' : 'bg-gray-300 text-gray-600 hover:bg-gray-100'}`}
+                                >
+                                    <Icons.Code /> SQL 編輯器
+                                </button>
+                                <button 
+                                    onClick={() => setActiveTab('er')}
+                                    className={`px-4 py-2 rounded-t-lg font-medium text-sm flex items-center gap-2 transition-colors ${activeTab === 'er' ? 'bg-white text-blue-700 shadow-[0_-2px_5px_rgba(0,0,0,0.05)]' : 'bg-gray-300 text-gray-600 hover:bg-gray-100'}`}
+                                >
+                                    <Icons.Network /> 實體關係圖 (ER Diagram)
+                                </button>
+                                <button 
+                                    onClick={() => setActiveTab('schema')}
+                                    className={`px-4 py-2 rounded-t-lg font-medium text-sm flex items-center gap-2 transition-colors ${activeTab === 'schema' ? 'bg-white text-blue-700 shadow-[0_-2px_5px_rgba(0,0,0,0.05)]' : 'bg-gray-300 text-gray-600 hover:bg-gray-100'}`}
+                                >
+                                    <Icons.Database /> 資料庫綱要 (Schema)
+                                </button>
+                            </div>
+
+                            {/* Tab Content */}
+                            <div className="flex-1 overflow-hidden bg-white flex flex-col">
+                                
+                                {/* SQL Editor Tab */}
+                                {activeTab === 'sql' && (
+                                    <div className="flex-1 flex flex-col h-full">
+                                        {/* Editor Section */}
+                                        <div className="h-1/2 border-b border-gray-300 flex flex-col relative group">
+                                            <div className="bg-gray-800 text-gray-300 px-4 py-1.5 text-xs flex justify-between items-center">
+                                                <span>輸入 SQL 指令</span>
+                                                <button 
+                                                    onClick={handleRun}
+                                                    className="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded flex items-center gap-1 font-bold transition-colors"
+                                                >
+                                                    <Icons.Play /> 執行 (Run)
+                                                </button>
+                                            </div>
+                                            <textarea 
+                                                className="sql-editor flex-1 w-full p-4 bg-gray-900 text-blue-100 focus:outline-none resize-none"
+                                                value={query}
+                                                onChange={(e) => setQuery(e.target.value)}
+                                                placeholder="在此輸入 SELECT, INSERT, UPDATE, DELETE 等指令..."
+                                                spellCheck="false"
+                                            ></textarea>
+                                        </div>
+
+                                        {/* Results Section */}
+                                        <div className="h-1/2 bg-white flex flex-col">
+                                            <div className="bg-gray-100 text-gray-700 px-4 py-1.5 text-xs font-bold border-b border-gray-200">
+                                                執行結果
+                                            </div>
+                                            <div className="flex-1 overflow-auto p-4 table-container bg-gray-50">
+                                                {error && (
+                                                    <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-sm">
+                                                        <p className="font-bold">SQL 錯誤：</p>
+                                                        <p className="font-mono mt-1 text-sm">{error}</p>
+                                                    </div>
+                                                )}
+                                                
+                                                {results && !error && results.columns && (
+                                                    <table className="min-w-full bg-white border border-gray-300 shadow-sm rounded-lg overflow-hidden text-sm">
+                                                        <thead className="bg-gray-200 text-gray-700">
+                                                            <tr>
+                                                                {results.columns.map((col, index) => (
+                                                                    <th key={index} className="py-2 px-4 border-b border-gray-300 text-left font-semibold uppercase tracking-wider">{col}</th>
+                                                                ))}
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody className="divide-y divide-gray-200">
+                                                            {results.values.map((row, rowIndex) => (
+                                                                <tr key={rowIndex} className="hover:bg-blue-50 transition-colors">
+                                                                    {row.map((val, colIndex) => (
+                                                                        <td key={colIndex} className="py-2 px-4 whitespace-nowrap text-gray-800">
+                                                                            {val !== null ? val.toString() : <span className="text-gray-400 italic">NULL</span>}
+                                                                        </td>
+                                                                    ))}
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                )}
+
+                                                {results && !error && results.message && (
+                                                    <div className="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-sm">
+                                                        <p>{results.message}</p>
+                                                    </div>
+                                                )}
+
+                                                {!results && !error && (
+                                                    <div className="text-gray-400 flex h-full items-center justify-center italic">
+                                                        點擊「執行」查看結果
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* ER Diagram Tab */}
+                                {activeTab === 'er' && (
+                                    <div className="flex-1 overflow-auto p-8 bg-gray-50 flex items-center justify-center">
+                                        <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 max-w-4xl w-full">
+                                            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">實體關係圖 (自動生成)</h2>
+                                            <div className="flex justify-center">
+                                                <div ref={mermaidRef} className="mermaid text-center">
+                                                    {/* Mermaid SVG will be injected here */}
+                                                </div>
+                                            </div>
+                                            <div className="mt-8 p-4 bg-blue-50 rounded-lg text-sm text-gray-700">
+                                                <ul className="list-disc pl-5 space-y-2">
+                                                    <li>此圖表會根據您使用 <code className="bg-white px-1 py-0.5 rounded border border-gray-200">CREATE TABLE</code> 創建的資料表自動更新。</li>
+                                                    <li><code className="bg-white px-1 py-0.5 rounded border border-gray-200 text-red-600">PK</code> 代表主鍵 (Primary Key)。</li>
+                                                    <li><code className="bg-white px-1 py-0.5 rounded border border-gray-200 text-blue-600">FK</code> 代表外鍵 (Foreign Key)，若設定了 <code>FOREIGN KEY ... REFERENCES</code> 則會自動繪製連線。</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Schema Tab */}
+                                {activeTab === 'schema' && (
+                                    <div className="flex-1 overflow-auto p-6 bg-gray-50">
+                                        <h2 className="text-xl font-bold mb-6 text-gray-800">資料庫綱要設計 (自動更新)</h2>
+                                        
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                            {Object.entries(dbSchema).map(([tableName, tableDef], index) => {
+                                                const colorClass = tableColors[index % tableColors.length];
+                                                const darkColorClass = colorClass.replace('600', '800');
+                                                
+                                                return (
+                                                    <div key={tableName} className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+                                                        <div className={`${colorClass} text-white px-4 py-2 font-bold text-lg flex justify-between items-center`}>
+                                                            {tableName}
+                                                            <span className={`text-xs ${darkColorClass} px-2 py-1 rounded`}>資料表</span>
+                                                        </div>
+                                                        <table className="min-w-full text-sm">
+                                                            <thead className="bg-gray-100 text-gray-600">
+                                                                <tr><th className="px-4 py-2 text-left">欄位名稱</th><th className="px-4 py-2 text-left">資料類型</th><th className="px-4 py-2 text-left">屬性</th></tr>
+                                                            </thead>
+                                                            <tbody className="divide-y divide-gray-100">
+                                                                {tableDef.columns.map(col => {
+                                                                    const isFk = tableDef.foreignKeys.some(fk => fk.from === col.name);
+                                                                    const fkInfo = tableDef.foreignKeys.find(fk => fk.from === col.name);
+                                                                    return (
+                                                                        <tr key={col.name}>
+                                                                            <td className={`px-4 py-2 font-mono ${col.pk ? 'font-bold text-red-600' : isFk ? 'font-bold text-purple-600' : ''}`}>
+                                                                                {col.name}
+                                                                            </td>
+                                                                            <td className="px-4 py-2 text-gray-500">{col.type}</td>
+                                                                            <td className="px-4 py-2 text-xs">
+                                                                                {col.pk && <span className="bg-red-100 text-red-700 px-1 py-0.5 rounded mr-1">PK</span>}
+                                                                                {isFk && <span className="bg-purple-100 text-purple-700 px-1 py-0.5 rounded">FK ({fkInfo.table})</span>}
+                                                                            </td>
+                                                                        </tr>
+                                                                    );
+                                                                })}
+                                                                {tableDef.columns.length === 0 && (
+                                                                    <tr><td colSpan="3" className="px-4 py-4 text-center text-gray-400 italic">無欄位資料</td></tr>
+                                                                )}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                );
+                                            })}
+                                            
+                                            {Object.keys(dbSchema).length === 0 && (
+                                                <div className="col-span-full p-8 text-center text-gray-500 bg-white rounded-lg border border-dashed border-gray-300">
+                                                    目前沒有任何資料表。請使用 SQL 建立。
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </main>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
