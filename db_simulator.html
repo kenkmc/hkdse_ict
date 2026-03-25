@@ -97,8 +97,9 @@
                 examples: [
                     { name: "1.1 顯示所有資料 (*)", sql: "SELECT * FROM STUDENT;" },
                     { name: "1.2 指定欄位與條件 (=)", sql: "SELECT SName, SClass \nFROM STUDENT \nWHERE SGender = 'F';" },
-                    { name: "1.3 多重條件 (AND/OR, BETWEEN)", sql: "SELECT * \nFROM EXAM \nWHERE Mark BETWEEN 80 AND 100 \n   OR SubCode = 'MATH';" },
-                    { name: "1.4 模糊搜尋 (LIKE) 與集合 (IN)", sql: "SELECT * \nFROM STUDENT \nWHERE SName LIKE '陳%' \n   OR SClass IN ('4A', '5A');" }
+                    { name: "1.3 消除重複 (DISTINCT)", sql: "-- 列出所有學生所屬的班別，不重複顯示\nSELECT DISTINCT SClass \nFROM STUDENT;" },
+                    { name: "1.4 排序結果 (ORDER BY)", sql: "-- 依據分數由高至低 (DESC) 排序\nSELECT * \nFROM EXAM \nORDER BY Mark DESC;" },
+                    { name: "1.5 多重條件與模糊搜尋", sql: "SELECT * \nFROM STUDENT \nWHERE SName LIKE '陳%' \n   OR SClass IN ('4A', '5A');" }
                 ]
             },
             {
@@ -227,9 +228,10 @@
                             let mCode = "erDiagram\n";
                             Object.entries(dbSchema).forEach(([tableName, tableDef]) => {
                                 tableDef.foreignKeys.forEach(fk => { 
-                                    // 關鍵修復：確保被參考的資料表 (fk.table) 仍然存在，才畫出關聯線
+                                    // 關鍵修復：修正 ERD 的關聯線方向
+                                    // tableName (含有 FK 的 Child 表, 多端 }o ) 指向 fk.table (被參考的 Parent 表, 一端 || )
                                     if (dbSchema[fk.table]) {
-                                        mCode += `    ${fk.table} ||--o{ ${tableName} : "references"\n`; 
+                                        mCode += `    ${tableName} }o--|| ${fk.table} : "references"\n`; 
                                     }
                                 });
                                 mCode += `    ${tableName} {\n`;
