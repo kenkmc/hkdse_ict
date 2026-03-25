@@ -30,6 +30,15 @@
         .table-container::-webkit-scrollbar-track, .sidebar-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
         .table-container::-webkit-scrollbar-thumb, .sidebar-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .table-container::-webkit-scrollbar-thumb:hover, .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* 隱藏 Mermaid ER 圖的 3叉線和 || 符號，改為顯示純直線 (符合 DSE 習慣) */
+        .mermaid marker {
+            display: none !important;
+        }
+        .mermaid .er.relationshipLine {
+            marker-start: none !important;
+            marker-end: none !important;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 h-screen flex flex-col overflow-hidden">
@@ -228,10 +237,10 @@
                             let mCode = "erDiagram\n";
                             Object.entries(dbSchema).forEach(([tableName, tableDef]) => {
                                 tableDef.foreignKeys.forEach(fk => { 
-                                    // 關鍵修復：修正 ERD 的關聯線方向
-                                    // tableName (含有 FK 的 Child 表, 多端 }o ) 指向 fk.table (被參考的 Parent 表, 一端 || )
+                                    // 關鍵修復：雖然語法上仍保留 }o--|| 讓 Mermaid 正常運作，
+                                    // 但畫出來的符號已被上方 CSS 隱藏，並將標籤改為 "N : 1"
                                     if (dbSchema[fk.table]) {
-                                        mCode += `    ${tableName} }o--|| ${fk.table} : "references"\n`; 
+                                        mCode += `    ${tableName} }o--|| ${fk.table} : "N : 1"\n`; 
                                     }
                                 });
                                 mCode += `    ${tableName} {\n`;
@@ -466,7 +475,7 @@
                                                 <ul className="list-disc pl-5 space-y-2">
                                                     <li>此圖表會根據您使用 <code className="bg-white px-1 py-0.5 rounded border border-gray-200">CREATE TABLE</code> 創建的資料表自動更新。</li>
                                                     <li><code className="bg-white px-1 py-0.5 rounded border border-gray-200 text-red-600">PK</code> 代表主鍵 (Primary Key)。</li>
-                                                    <li><code className="bg-white px-1 py-0.5 rounded border border-gray-200 text-blue-600">FK</code> 代表外鍵 (Foreign Key)，若設定了 <code>FOREIGN KEY ... REFERENCES</code> 則會自動繪製連線。</li>
+                                                    <li><code className="bg-white px-1 py-0.5 rounded border border-gray-200 text-blue-600">FK</code> 代表外鍵 (Foreign Key)，系統會自動繪製 <b>N : 1</b> 的直線關聯（符合 DSE 常見畫法）。</li>
                                                 </ul>
                                             </div>
                                         </div>
