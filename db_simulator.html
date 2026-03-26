@@ -30,15 +30,6 @@
         .table-container::-webkit-scrollbar-track, .sidebar-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
         .table-container::-webkit-scrollbar-thumb, .sidebar-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .table-container::-webkit-scrollbar-thumb:hover, .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* 隱藏 Mermaid ER 圖的 3叉線和 || 符號，改為顯示純直線 (符合 DSE 習慣) */
-        .mermaid marker {
-            display: none !important;
-        }
-        .mermaid .er.relationshipLine {
-            marker-start: none !important;
-            marker-end: none !important;
-        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 h-screen flex flex-col overflow-hidden">
@@ -135,7 +126,9 @@
                     { name: "4.1 排序 (ORDER BY 多個欄位)", sql: "SELECT * \nFROM EXAM \nORDER BY SubCode ASC, Mark DESC;" },
                     { name: "4.2 子查詢 (與聚合函數比較)", sql: "-- 找出成績高於全校總平均分的記錄\nSELECT * \nFROM EXAM \nWHERE Mark > (\n  SELECT AVG(Mark) FROM EXAM\n);" },
                     { name: "4.3 子查詢 (使用 IN 條件)", sql: "-- 找出有選修 ICT 的學生姓名\nSELECT SName \nFROM STUDENT \nWHERE SID IN (\n  SELECT SID FROM EXAM WHERE SubCode = 'ICT'\n);" },
-                    { name: "4.4 聯集 (UNION)", sql: "-- 將選修 ICT 與 MATH 的學生編號合併列出\nSELECT SID FROM EXAM WHERE SubCode = 'ICT'\nUNION\nSELECT SID FROM EXAM WHERE SubCode = 'MATH';" }
+                    { name: "4.4 聯集 (UNION)", sql: "-- 將選修 ICT 與 MATH 的學生編號合併列出\nSELECT SID FROM EXAM WHERE SubCode = 'ICT'\nUNION\nSELECT SID FROM EXAM WHERE SubCode = 'MATH';" },
+                    { name: "4.5 存在測試 (EXISTS)", sql: "-- 找出有報考 ICT 的學生資料\nSELECT * \nFROM STUDENT S \nWHERE EXISTS (\n  SELECT 1 FROM EXAM E \n  WHERE S.SID = E.SID AND SubCode = 'ICT'\n);" },
+                    { name: "4.6 差集 (MINUS / EXCEPT)", sql: "-- 找出沒有任何考試記錄的學生編號\n-- 注意：DSE 語法為 MINUS，但實際 SQL (如 SQLite) 通常使用 EXCEPT\nSELECT SID FROM STUDENT \nEXCEPT \nSELECT SID FROM EXAM;" }
                 ]
             },
             {
@@ -233,36 +226,78 @@
 
                     const drawDiagram = async () => {
                         try {
-                            // 動態生成 Mermaid 語法
+                            // 重新採用標準的 erDiagram，因為它能精確表示 Crow's foot (圓和三叉) 及 0 的概念
                             let mCode = "erDiagram\n";
+                            
+                            // 1. 建立關係 (連線與中文文字)
                             Object.entries(dbSchema).forEach(([tableName, tableDef]) => {
                                 tableDef.foreignKeys.forEach(fk => { 
-                                    // 關鍵修復：雖然語法上仍保留 }o--|| 讓 Mermaid 正常運作，
-                                    // 但畫出來的符號已被上方 CSS 隱藏，並將標籤改為 "N : 1"
                                     if (dbSchema[fk.table]) {
-                                        mCode += `    ${tableName} }o--|| ${fk.table} : "N : 1"\n`; 
+                                        // fk.table (父表, 必須為1) ||--o{ tableName (子表, 允許為0到多)
+                                        mCode += `    ${fk.table} ||--o{ ${tableName} : "關聯"\n`; 
                                     }
                                 });
+                            });
+
+                            // 2. 建立實體與內部欄位
+                            Object.entries(dbSchema).forEach(([tableName, tableDef]) => {
                                 mCode += `    ${tableName} {\n`;
                                 tableDef.columns.forEach(col => {
                                     const isFk = tableDef.foreignKeys.some(fk => fk.from === col.name);
                                     let keys = []; 
                                     if (col.pk) keys.push("PK"); 
                                     if (isFk) keys.push("FK");
-                                    const keyStr = keys.length > 0 ? ` ${keys.join(",")}` : "";
-                                    // 格式化資料類型以符合 Mermaid 限制
-                                    const typeStr = (col.type || 'TEXT').replace(/ /g, '_').replace(/[^a-zA-Z0-9_]/g, '');
-                                    mCode += `        ${typeStr} ${col.name}${keyStr}\n`;
+                                    const keyStr = keys.length > 0 ? keys.join(",") : "";
+                                    
+                                    // 清理資料類型字串，確保沒有特殊字元破壞 Mermaid 語法
+                                    const safeType = (col.type || "VARCHAR").replace(/\s+/g, '_');
+                                    
+                                    mCode += `        ${safeType} ${col.name} ${keyStr}\n`;
                                 });
                                 mCode += `    }\n`;
                             });
 
                             mermaidRef.current.removeAttribute('data-processed');
                             const { svg } = await mermaid.render('er-diagram-svg', mCode);
-                            mermaidRef.current.innerHTML = svg;
+                            
+                            // --- 魔法：將 Mermaid 原生的方形 Label Box 替換成 SVG 菱形 (符合 DSE 標準) ---
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(svg, "image/svg+xml");
+                            
+                            // 找出所有關係的文字背景框 (rect)
+                            const labelBoxes = doc.querySelectorAll('rect.er.relationshipLabelBox');
+                            labelBoxes.forEach(box => {
+                                const x = parseFloat(box.getAttribute('x') || 0);
+                                const y = parseFloat(box.getAttribute('y') || 0);
+                                const width = parseFloat(box.getAttribute('width') || 40);
+                                const height = parseFloat(box.getAttribute('height') || 20);
+                                
+                                // 找出中心點
+                                const cx = x + width / 2;
+                                const cy = y + height / 2;
+                                
+                                // 設定菱形的寬高 (比原本的文字框稍大，確保文字被完整包覆)
+                                const rw = width + 30; 
+                                const rh = height + 30; 
+                                
+                                // 計算菱形的四個頂點座標
+                                const points = `${cx},${cy - rh/2} ${cx + rw/2},${cy} ${cx},${cy + rh/2} ${cx - rw/2},${cy}`;
+                                
+                                // 創建多邊形 (菱形)
+                                const polygon = doc.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                                polygon.setAttribute("points", points);
+                                polygon.setAttribute("fill", "#e1f5fe"); // 淺藍底
+                                polygon.setAttribute("stroke", "#0288d1"); // 深藍邊框
+                                polygon.setAttribute("stroke-width", "2");
+                                
+                                // 將原有的方形替換成菱形 (文字保留在原位且會在最上層)
+                                box.parentNode.replaceChild(polygon, box);
+                            });
+
+                            mermaidRef.current.innerHTML = new XMLSerializer().serializeToString(doc);
                         } catch (err) {
                             console.error("Mermaid error:", err);
-                            mermaidRef.current.innerHTML = `<div class="text-red-500">無法繪製 ER 圖。請確保資料表名稱不含特殊字元。</div>`;
+                            mermaidRef.current.innerHTML = `<div class="text-red-500">無法繪製 ER 圖。請檢查資料表結構。</div>`;
                         }
                     };
                     drawDiagram();
@@ -473,9 +508,16 @@
                                             </div>
                                             <div className="mt-8 p-4 bg-blue-50 rounded-lg text-sm text-gray-700">
                                                 <ul className="list-disc pl-5 space-y-2">
+                                                    <li className="text-red-600 font-bold">注意：由於網頁繪圖技術所限，此實體關係圖的畫法與 HKDSE 的標準版本可能有少許分別。</li>
                                                     <li>此圖表會根據您使用 <code className="bg-white px-1 py-0.5 rounded border border-gray-200">CREATE TABLE</code> 創建的資料表自動更新。</li>
-                                                    <li><code className="bg-white px-1 py-0.5 rounded border border-gray-200 text-red-600">PK</code> 代表主鍵 (Primary Key)。</li>
-                                                    <li><code className="bg-white px-1 py-0.5 rounded border border-gray-200 text-blue-600">FK</code> 代表外鍵 (Foreign Key)，系統會自動繪製 <b>N : 1</b> 的直線關聯（符合 DSE 常見畫法）。</li>
+                                                    <li><b>實體與欄位</b>：方框代表實體，內部列出資料類型與欄位名稱。<code className="text-gray-800 font-bold">PK</code> 為主鍵，<code className="text-gray-800 font-bold">FK</code> 為外鍵。</li>
+                                                    <li><b>關係 (Relationship)</b>：系統已透過動態技術將關聯文字加上<b>菱形邊框</b>，完全符合 DSE 實體關係圖的繪圖標準。</li>
+                                                    <li><b>基數表示法 (Crow's Foot Notation)</b>：採用標準的「鳥足符號」精確表達基數與 <b>0</b> 的概念：
+                                                        <div className="mt-1 ml-4 text-gray-600 space-y-1">
+                                                            - <b>雙直線 <code className="font-bold text-gray-800">||</code></b>：代表「必須存在且只有 1 個」(Exactly 1)。<br/>
+                                                            - <b>圓圈與三叉 <code className="font-bold text-gray-800">o&#123;</code></b>：三叉代表「多個 (M)」，圓圈代表「可以為零 (0)」。這精準表達了「一個學生可以有 0 到多個考試紀錄」。
+                                                        </div>
+                                                    </li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -484,55 +526,38 @@
 
                                 {/* Schema Tab */}
                                 {activeTab === 'schema' && (
-                                    <div className="flex-1 overflow-auto p-6 bg-gray-50">
-                                        <h2 className="text-xl font-bold mb-6 text-gray-800">資料庫綱要設計 (自動更新)</h2>
-                                        
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                            {Object.entries(dbSchema).map(([tableName, tableDef], index) => {
-                                                const colorClass = tableColors[index % tableColors.length];
-                                                const darkColorClass = colorClass.replace('600', '800');
-                                                
-                                                return (
-                                                    <div key={tableName} className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
-                                                        <div className={`${colorClass} text-white px-4 py-2 font-bold text-lg flex justify-between items-center`}>
-                                                            {tableName}
-                                                            <span className={`text-xs ${darkColorClass} px-2 py-1 rounded`}>資料表</span>
-                                                        </div>
-                                                        <table className="min-w-full text-sm">
-                                                            <thead className="bg-gray-100 text-gray-600">
-                                                                <tr><th className="px-4 py-2 text-left">欄位名稱</th><th className="px-4 py-2 text-left">資料類型</th><th className="px-4 py-2 text-left">屬性</th></tr>
-                                                            </thead>
-                                                            <tbody className="divide-y divide-gray-100">
-                                                                {tableDef.columns.map(col => {
-                                                                    const isFk = tableDef.foreignKeys.some(fk => fk.from === col.name);
-                                                                    const fkInfo = tableDef.foreignKeys.find(fk => fk.from === col.name);
-                                                                    return (
-                                                                        <tr key={col.name}>
-                                                                            <td className={`px-4 py-2 font-mono ${col.pk ? 'font-bold text-red-600' : isFk ? 'font-bold text-purple-600' : ''}`}>
-                                                                                {col.name}
-                                                                            </td>
-                                                                            <td className="px-4 py-2 text-gray-500">{col.type}</td>
-                                                                            <td className="px-4 py-2 text-xs">
-                                                                                {col.pk && <span className="bg-red-100 text-red-700 px-1 py-0.5 rounded mr-1">PK</span>}
-                                                                                {isFk && <span className="bg-purple-100 text-purple-700 px-1 py-0.5 rounded">FK ({fkInfo.table})</span>}
-                                                                            </td>
-                                                                        </tr>
-                                                                    );
-                                                                })}
-                                                                {tableDef.columns.length === 0 && (
-                                                                    <tr><td colSpan="3" className="px-4 py-4 text-center text-gray-400 italic">無欄位資料</td></tr>
-                                                                )}
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                );
-                                            })}
+                                    <div className="flex-1 overflow-auto p-8 bg-gray-50 flex flex-col items-center">
+                                        <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 max-w-4xl w-full">
+                                            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center border-b pb-4">數據庫模式 (Database Schema)</h2>
                                             
-                                            {Object.keys(dbSchema).length === 0 && (
-                                                <div className="col-span-full p-8 text-center text-gray-500 bg-white rounded-lg border border-dashed border-gray-300">
-                                                    目前沒有任何資料表。請使用 SQL 建立。
-                                                </div>
-                                            )}
+                                            <div className="space-y-4 text-lg font-mono text-gray-800 my-8 pl-4">
+                                                {Object.entries(dbSchema).map(([tableName, tableDef]) => {
+                                                    return (
+                                                        <div key={tableName} className="flex flex-wrap items-center">
+                                                            <span className="font-bold text-blue-800 mr-1">{tableName}</span>
+                                                            <span>(</span>
+                                                            {tableDef.columns.map((col, idx) => (
+                                                                <React.Fragment key={col.name}>
+                                                                    {col.pk ? <u className="font-bold">{col.name}</u> : col.name}
+                                                                    {idx < tableDef.columns.length - 1 ? ', ' : ''}
+                                                                </React.Fragment>
+                                                            ))}
+                                                            <span>)</span>
+                                                        </div>
+                                                    );
+                                                })}
+                                                {Object.keys(dbSchema).length === 0 && (
+                                                    <div className="text-center text-gray-500 italic">目前沒有任何資料表。請使用 SQL 建立。</div>
+                                                )}
+                                            </div>
+                                            
+                                            <div className="mt-8 p-4 bg-blue-50 rounded-lg text-sm text-gray-700">
+                                                <ul className="list-disc pl-5 space-y-2">
+                                                    <li>此格式為 HKDSE 試卷中常見的「數據庫模式」(Database Schema) 表示法。</li>
+                                                    <li>附有<u className="font-bold">底線</u>的欄位代表該資料表的<b>主關鍵碼 (Primary Key)</b>。</li>
+                                                    <li>這是一個動態生成的視圖，會根據您在 SQL 編輯器中的 <code className="bg-white px-1 py-0.5 rounded border border-gray-200">CREATE</code> 或 <code className="bg-white px-1 py-0.5 rounded border border-gray-200">ALTER</code> 指令即時更新。</li>
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
                                 )}
