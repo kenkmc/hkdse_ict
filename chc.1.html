@@ -3,263 +3,304 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C1 建網及互聯網基本知識 - ICT 學習筆記</title>
+    <title>C1 建網及互聯網基本知識 - ICT 學習資源網</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    
     <style>
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f8fafc; scroll-behavior: smooth; }
-        .section-card { background: white; border-radius: 1rem; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05); border: 1px solid #e2e8f0; }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f0f9ff; scroll-behavior: smooth; }
+        
+        /* 基礎卡片佈局 */
+        .section-card { background: white; border-radius: 1.5rem; padding: 2rem; margin-bottom: 2.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; }
         
         /* 硬件外觀模擬 */
-        .hw-svg { width: 80px; height: 60px; margin-bottom: 8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+        .hw-svg { width: 80px; height: 60px; margin-bottom: 8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); transition: transform 0.3s; }
+        .hw-card:hover .hw-svg { transform: scale(1.1); }
         
-        /* 網絡架構繪圖 */
-        .network-diagram { background: #fdfdfd; border: 1px solid #edf2f7; border-radius: 12px; padding: 20px; position: relative; }
-        .node { width: 50px; height: 50px; background: white; border: 2px solid #6366f1; border-radius: 8px; display: flex; align-items: center; justify-content: center; z-index: 2; position: relative; font-size: 10px; font-weight: bold; flex-direction: column; }
-        .node-server { width: 60px; height: 70px; border-color: #f59e0b; background: #fffbeb; }
-        .line { position: absolute; background: #cbd5e1; height: 2px; z-index: 1; transform-origin: left center; }
+        /* 網絡架構繪圖容器 */
+        .network-diagram { background: #fdfdfd; border: 1px solid #edf2f7; border-radius: 12px; padding: 0; position: relative; overflow: hidden; width: 100%; height: 260px; }
+        
+        /* 節點定位 */
+        .node { width: 60px; height: 60px; background: white; border: 2px solid #0369a1; border-radius: 12px; display: flex; align-items: center; justify-content: center; z-index: 10; position: absolute; font-size: 10px; font-weight: bold; flex-direction: column; color: #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .node-server { width: 70px; height: 80px; border-color: #f59e0b; background: #fffbeb; }
+        
+        /* SVG 連線樣式 */
+        .connection-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+        .network-line { stroke: #cbd5e1; stroke-width: 3; stroke-linecap: round; }
 
-        .drop-target { border: 2px dashed #cbd5e1; border-radius: 0.75rem; background: #f1f5f9; transition: all 0.2s; min-height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0.5rem; }
-        .drop-target.active { border-color: #6366f1; background: #eef2ff; }
+        /* 拖放遊戲樣式 */
+        .drop-target { border: 2px dashed #94a3b8; border-radius: 1rem; background: #f8fafc; transition: all 0.2s; min-height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0.5rem; }
+        .drop-target.active { border-color: #0284c7; background: #e0f2fe; }
         .drop-target.correct { border: 2px solid #10b981; background: #ecfdf5; }
         .draggable { cursor: grab; user-select: none; transition: transform 0.2s; }
+        .draggable:active { cursor: grabbing; transform: scale(1.05); }
     </style>
 </head>
 <body class="text-slate-800">
 
-    <header class="bg-indigo-700 text-white sticky top-0 z-50 shadow-md">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-xl font-bold flex items-center gap-2">
-                <i data-lucide="network"></i> C1 建網及互聯網基本知識
-            </h1>
-            <nav class="hidden md:flex gap-6 text-sm">
-                <a href="#s2" class="hover:text-indigo-200">網絡架構</a>
-                <a href="#s4" class="hover:text-indigo-200">硬件圖鑑</a>
-                <a href="#game" class="bg-white text-indigo-700 px-4 py-1 rounded-full font-bold hover:bg-indigo-50">互動組網</a>
+    <!-- 頂部導航 -->
+    <header class="bg-sky-700 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="flex items-center gap-2 bg-sky-800 hover:bg-sky-600 transition px-3 py-2 rounded-xl text-sm font-bold shadow-inner border border-sky-600">
+                    <i data-lucide="home" class="w-4 h-4"></i> 返回首頁
+                </a>
+                <h1 class="text-xl font-bold flex items-center gap-2">
+                    <i data-lucide="network"></i> C1 建網及互聯網基本知識
+                </h1>
+            </div>
+            <nav class="hidden md:flex gap-6 text-sm font-medium items-center">
+                <a href="#s1" class="hover:text-sky-200 transition">網絡規模</a>
+                <a href="#s2" class="hover:text-sky-200 transition">服務與模式</a>
+                <a href="#s3" class="hover:text-sky-200 transition">硬件圖鑑</a>
+                <a href="#game" class="bg-white text-sky-800 px-4 py-2 rounded-full font-bold shadow hover:bg-sky-50 transition">互動組網</a>
             </nav>
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto px-4 py-8">
+    <main class="container mx-auto px-4 py-10 max-w-5xl">
 
-        <!-- 1.2 網絡架構 (包含繪圖) -->
+        <!-- 1.1 電腦網絡與規模 -->
+        <section id="s1" class="section-card">
+            <h2 class="text-2xl font-bold text-sky-800 mb-6 flex items-center gap-2 border-b pb-4 border-slate-100">
+                <i data-lucide="globe-2" class="text-sky-600"></i> 1.1 電腦網絡簡介與規模
+            </h2>
+            <p class="text-slate-600 mb-8 leading-relaxed">
+                電腦網絡是將兩部或以上的電腦及周邊設備連接起來，以達到通訊及共享資源的目的。
+            </p>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- LAN -->
+                <div class="bg-emerald-50 p-6 rounded-3xl border border-emerald-100 shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-emerald-200 text-emerald-800 px-4 py-1 rounded-bl-xl font-bold text-xs">LAN</div>
+                    <h3 class="text-xl font-bold text-emerald-800 mb-2 flex items-center gap-2">
+                        <i data-lucide="building"></i> 局部區域網絡
+                    </h3>
+                    <p class="text-[11px] text-emerald-600 font-mono mb-4">Local Area Network</p>
+                    <ul class="text-sm space-y-3 text-slate-700">
+                        <li class="flex items-start gap-2"><i data-lucide="map-pin" class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5"></i> <b>地理範圍：</b> 覆蓋面積較小（如學校）。</li>
+                        <li class="flex items-start gap-2"><i data-lucide="zap" class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5"></i> <b>傳輸速度：</b> 快且錯誤率低。</li>
+                    </ul>
+                </div>
+
+                <!-- WAN -->
+                <div class="bg-sky-50 p-6 rounded-3xl border border-sky-100 shadow-sm relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-sky-200 text-sky-800 px-4 py-1 rounded-bl-xl font-bold text-xs">WAN</div>
+                    <h3 class="text-xl font-bold text-sky-800 mb-2 flex items-center gap-2">
+                        <i data-lucide="globe" class="w-5 h-5"></i> 廣域網絡
+                    </h3>
+                    <p class="text-[11px] text-sky-600 font-mono mb-4">Wide Area Network</p>
+                    <ul class="text-sm space-y-3 text-slate-700">
+                        <li class="flex items-start gap-2"><i data-lucide="map" class="w-4 h-4 text-sky-500 shrink-0 mt-0.5"></i> <b>地理範圍：</b> 跨城市、國家（如互聯網）。</li>
+                        <li class="flex items-start gap-2"><i data-lucide="activity" class="w-4 h-4 text-sky-500 shrink-0 mt-0.5"></i> <b>傳輸媒介：</b> 依賴 ISP 公共線路。</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1.3 網絡模式 (SVG 精準連線版) -->
         <section id="s2" class="section-card">
-            <h2 class="text-2xl font-bold text-indigo-800 mb-8 flex items-center gap-2 border-b pb-4">
-                <i data-lucide="share-2"></i> 1.2 網絡模式 (Network Models)
+            <h2 class="text-2xl font-bold text-sky-800 mb-8 flex items-center gap-2 border-b pb-4 border-slate-100">
+                <i data-lucide="server-cog" class="text-sky-600"></i> 1.3 網絡模式 (Network Models)
             </h2>
             
             <div class="grid md:grid-cols-2 gap-10">
                 <!-- 客戶端-伺服器網絡 -->
                 <div class="space-y-4">
                     <div class="flex items-center gap-2 mb-2">
-                        <span class="bg-amber-100 text-amber-700 px-2 py-1 rounded text-xs font-bold">中心化</span>
-                        <h3 class="text-lg font-bold">客戶端-伺服器網絡</h3>
+                        <span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm">中心化管理</span>
+                        <h3 class="text-lg font-bold text-slate-700">客戶端-伺服器網絡</h3>
                     </div>
                     
-                    <!-- HTML 繪圖: Client-Server -->
-                    <div class="network-diagram h-48 flex items-center justify-center">
-                        <div class="relative w-full h-full flex items-center justify-center">
-                            <!-- 中心伺服器 -->
-                            <div class="node node-server">
-                                <i data-lucide="database" class="w-6 h-6 text-amber-600"></i>
-                                <span>伺服器</span>
-                            </div>
-                            <!-- 連線與客戶端 -->
-                            <div class="absolute top-4 left-10 node"><i data-lucide="monitor" class="w-4 h-4"></i>PC 1</div>
-                            <div class="absolute top-4 right-10 node"><i data-lucide="monitor" class="w-4 h-4"></i>PC 2</div>
-                            <div class="absolute bottom-4 left-10 node"><i data-lucide="laptop" class="w-4 h-4"></i>PC 3</div>
-                            <div class="absolute bottom-4 right-10 node"><i data-lucide="smartphone" class="w-4 h-4"></i>Mobile</div>
-                            
-                            <!-- 示意連線 (CSS) -->
-                            <div class="absolute w-24 h-px bg-slate-300 rotate-[135deg] top-12 left-16"></div>
-                            <div class="absolute w-24 h-px bg-slate-300 rotate-[45deg] top-12 right-16"></div>
-                            <div class="absolute w-24 h-px bg-slate-300 rotate-[45deg] bottom-12 left-16"></div>
-                            <div class="absolute w-24 h-px bg-slate-300 rotate-[135deg] bottom-12 right-16"></div>
+                    <div class="network-diagram bg-slate-50">
+                        <!-- SVG 連線層 -->
+                        <svg class="connection-layer">
+                            <!-- 連接點均指向中心 (50%, 50%) -->
+                            <line x1="15%" y1="20%" x2="50%" y2="50%" class="network-line" />
+                            <line x1="85%" y1="20%" x2="50%" y2="50%" class="network-line" />
+                            <line x1="15%" y1="80%" x2="50%" y2="50%" class="network-line" />
+                            <line x1="85%" y1="80%" x2="50%" y2="50%" class="network-line" />
+                        </svg>
+
+                        <!-- 中心伺服器 (置中) -->
+                        <div class="node node-server left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                            <i data-lucide="database" class="w-6 h-6 text-amber-600 mb-1"></i>
+                            <span>伺服器</span>
                         </div>
+                        
+                        <!-- 四周客戶端 (使用百分比定位與連線座標一致) -->
+                        <div class="node left-[5%] top-[5%]"><i data-lucide="monitor" class="w-4 h-4 mb-1"></i>PC 1</div>
+                        <div class="node right-[5%] top-[5%]"><i data-lucide="monitor" class="w-4 h-4 mb-1"></i>PC 2</div>
+                        <div class="node left-[5%] bottom-[5%]"><i data-lucide="laptop" class="w-4 h-4 mb-1"></i>PC 3</div>
+                        <div class="node right-[5%] bottom-[5%]"><i data-lucide="smartphone" class="w-4 h-4 mb-1"></i>手機</div>
                     </div>
                     
-                    <ul class="text-sm space-y-2 text-slate-600 list-disc pl-5">
-                        <li><b>伺服器 (Server)</b>：提供專用資源（如檔案、網頁）。</li>
-                        <li><b>客戶端 (Client)</b>：請求服務的電腦。</li>
-                        <li>優點：安全性高、集中備份、效能穩定。</li>
+                    <ul class="text-sm space-y-2 text-slate-600 bg-sky-50/50 p-4 rounded-2xl border border-sky-100">
+                        <li class="flex items-start gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-sky-500 mt-0.5 shrink-0"></i> <b>伺服器</b>：提供服務與資源給客戶端。</li>
+                        <li class="flex items-start gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-500 mt-0.5 shrink-0"></i> <b>特點</b>：管理方便、安全性較高。</li>
                     </ul>
                 </div>
 
-                <!-- 對等網絡 -->
+                <!-- 對等網絡 (P2P) -->
                 <div class="space-y-4">
                     <div class="flex items-center gap-2 mb-2">
-                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-bold">非中心化</span>
-                        <h3 class="text-lg font-bold">對等網絡 (P2P)</h3>
+                        <span class="bg-sky-100 text-sky-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm">分散式對接</span>
+                        <h3 class="text-lg font-bold text-slate-700">對等網絡 (P2P)</h3>
                     </div>
 
-                    <!-- HTML 繪圖: P2P -->
-                    <div class="network-diagram h-48 flex items-center justify-center">
-                        <div class="relative w-full h-full flex items-center justify-center">
-                            <div class="absolute top-4 left-1/2 -translate-x-1/2 node"><i data-lucide="monitor" class="w-4 h-4"></i>PC A</div>
-                            <div class="absolute bottom-4 left-8 node"><i data-lucide="monitor" class="w-4 h-4"></i>PC B</div>
-                            <div class="absolute bottom-4 right-8 node"><i data-lucide="monitor" class="w-4 h-4"></i>PC C</div>
-                            
-                            <!-- 三角連線 -->
-                            <div class="absolute w-28 h-px bg-indigo-200 rotate-[120deg] top-16 left-28"></div>
-                            <div class="absolute w-28 h-px bg-indigo-200 rotate-[60deg] top-16 right-28"></div>
-                            <div class="absolute w-36 h-px bg-indigo-200 bottom-10"></div>
-                        </div>
+                    <div class="network-diagram bg-slate-50">
+                        <!-- SVG 連線層 -->
+                        <svg class="connection-layer">
+                            <!-- 繪製三角形連線 -->
+                            <line x1="50%" y1="20%" x2="20%" y2="80%" class="network-line" /> <!-- A to B -->
+                            <line x1="50%" y1="20%" x2="80%" y2="80%" class="network-line" /> <!-- A to C -->
+                            <line x1="20%" y1="80%" x2="80%" y2="80%" class="network-line" /> <!-- B to C -->
+                        </svg>
+
+                        <!-- PC 節點 (與 SVG 座標對齊) -->
+                        <div class="node left-1/2 top-[5%] -translate-x-1/2 shadow-md"><i data-lucide="monitor" class="w-4 h-4 mb-1"></i>PC A</div>
+                        <div class="node left-[5%] bottom-[5%] shadow-md"><i data-lucide="monitor" class="w-4 h-4 mb-1"></i>PC B</div>
+                        <div class="node right-[5%] bottom-[5%] shadow-md"><i data-lucide="monitor" class="w-4 h-4 mb-1"></i>PC C</div>
                     </div>
 
-                    <ul class="text-sm space-y-2 text-slate-600 list-disc pl-5">
-                        <li><b>地位相等</b>：每台電腦既是伺服器也是客戶端。</li>
-                        <li>沒有專用的中央控制器。</li>
-                        <li>優點：安裝簡單、成本低。</li>
-                        <li>缺點：安全性低、難以集中備份數據。</li>
+                    <ul class="text-sm space-y-2 text-slate-600 bg-sky-50/50 p-4 rounded-2xl border border-sky-100">
+                        <li class="flex items-start gap-2"><i data-lucide="users" class="w-4 h-4 text-sky-500 mt-0.5 shrink-0"></i> <b>人人平等</b>：每台電腦既是客戶端也是伺服器。</li>
+                        <li class="flex items-start gap-2"><i data-lucide="coins" class="w-4 h-4 text-emerald-500 mt-0.5 shrink-0"></i> <b>特點</b>：低成本，適合小型家庭網絡。</li>
                     </ul>
                 </div>
             </div>
         </section>
 
-        <!-- 1.4 硬件圖鑑 (擬真 SVG) -->
-        <section id="s4" class="section-card">
-            <h2 class="text-2xl font-bold text-indigo-800 mb-8 border-b pb-4 flex items-center gap-2">
-                <i data-lucide="box"></i> 1.4 網絡硬件圖鑑
+        <!-- 1.4 硬件圖鑑 -->
+        <section id="s3" class="section-card">
+            <h2 class="text-2xl font-bold text-sky-800 mb-8 border-b pb-4 flex items-center gap-2 border-slate-100">
+                <i data-lucide="box" class="text-sky-600"></i> 1.4 網絡硬件圖鑑
             </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                <!-- NIC -->
-                <div class="p-4 border rounded-2xl text-center bg-slate-50 hover:shadow-md transition-all">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                <!-- 每一張卡片展示一個硬件 -->
+                <div class="hw-card p-4 border rounded-2xl text-center bg-slate-50 border-slate-200">
                     <svg class="hw-svg mx-auto" viewBox="0 0 100 60">
-                        <rect x="10" y="10" width="80" height="40" rx="2" fill="#334155" />
+                        <rect x="10" y="10" width="80" height="40" rx="3" fill="#334155" />
                         <rect x="5" y="20" width="10" height="20" fill="#94a3b8" />
                         <rect x="85" y="25" width="10" height="10" fill="#f59e0b" />
-                        <circle cx="25" cy="30" r="5" fill="#1e293b" />
-                        <path d="M40 20 h30 M40 30 h30 M40 40 h30" stroke="#475569" stroke-width="2" />
+                        <circle cx="25" cy="30" r="4" fill="#1e293b" />
                     </svg>
-                    <p class="font-bold text-indigo-700">網絡介面卡 (NIC)</p>
-                    <p class="text-[11px] text-slate-500">電腦與網絡的物理連接點</p>
+                    <p class="font-bold text-sky-800 mt-2 text-sm">網絡介面卡</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase">NIC</p>
                 </div>
-
-                <!-- Modem -->
-                <div class="p-4 border rounded-2xl text-center bg-slate-50 hover:shadow-md transition-all">
+                <div class="hw-card p-4 border rounded-2xl text-center bg-slate-50 border-slate-200">
                     <svg class="hw-svg mx-auto" viewBox="0 0 100 60">
-                        <rect x="10" y="30" width="80" height="20" rx="2" fill="#1e293b" />
-                        <rect x="15" y="35" width="4" height="4" fill="#22c55e" />
-                        <rect x="25" y="35" width="4" height="4" fill="#22c55e" />
-                        <rect x="70" y="35" width="15" height="10" fill="#334155" />
-                        <path d="M50 30 V15" stroke="#1e293b" stroke-width="2" />
-                    </svg>
-                    <p class="font-bold text-indigo-700">數據機 (Modem)</p>
-                    <p class="text-[11px] text-slate-500">轉換模擬訊號與數碼訊號</p>
-                </div>
-
-                <!-- Router -->
-                <div class="p-4 border rounded-2xl text-center bg-slate-50 hover:shadow-md transition-all">
-                    <svg class="hw-svg mx-auto" viewBox="0 0 100 60">
-                        <rect x="15" y="35" width="70" height="15" rx="3" fill="#334155" />
+                        <rect x="15" y="35" width="70" height="15" rx="4" fill="#334155" />
                         <line x1="25" y1="35" x2="25" y2="10" stroke="#334155" stroke-width="3" />
                         <line x1="75" y1="35" x2="75" y2="10" stroke="#334155" stroke-width="3" />
-                        <circle cx="50" cy="42" r="3" fill="#60a5fa" />
                     </svg>
-                    <p class="font-bold text-indigo-700">路由器 (Router)</p>
-                    <p class="text-[11px] text-slate-500">連接不同網絡，決定路徑</p>
+                    <p class="font-bold text-sky-800 mt-2 text-sm">路由器</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase">Router</p>
                 </div>
-
-                <!-- Switch -->
-                <div class="p-4 border rounded-2xl text-center bg-slate-50 hover:shadow-md transition-all">
+                <div class="hw-card p-4 border rounded-2xl text-center bg-slate-50 border-slate-200">
                     <svg class="hw-svg mx-auto" viewBox="0 0 100 60">
-                        <rect x="5" y="20" width="90" height="25" fill="#0f172a" />
-                        <g fill="#cbd5e1">
-                            <rect x="15" y="25" width="8" height="6" /> <rect x="30" y="25" width="8" height="6" />
-                            <rect x="45" y="25" width="8" height="6" /> <rect x="60" y="25" width="8" height="6" />
-                            <rect x="75" y="25" width="8" height="6" />
-                        </g>
+                        <rect x="5" y="20" width="90" height="25" rx="3" fill="#0f172a" />
+                        <rect x="15" y="27" width="8" height="8" rx="1" fill="#cbd5e1"/>
+                        <rect x="30" y="27" width="8" height="8" rx="1" fill="#cbd5e1"/>
+                        <rect x="45" y="27" width="8" height="8" rx="1" fill="#cbd5e1"/>
                     </svg>
-                    <p class="font-bold text-indigo-700">交換器 (Switch)</p>
-                    <p class="text-[11px] text-slate-500">連接 LAN 內多台裝置</p>
+                    <p class="font-bold text-sky-800 mt-2 text-sm">交換器</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase">Switch</p>
                 </div>
-
-                <!-- AP -->
-                <div class="p-4 border rounded-2xl text-center bg-slate-50 hover:shadow-md transition-all">
+                <div class="hw-card p-4 border rounded-2xl text-center bg-slate-50 border-slate-200">
                     <svg class="hw-svg mx-auto" viewBox="0 0 100 60">
-                        <circle cx="50" cy="30" r="15" fill="#f8fafc" stroke="#334155" stroke-width="2" />
-                        <path d="M40 25 Q50 15 60 25" fill="none" stroke="#6366f1" stroke-width="2" />
-                        <path d="M35 20 Q50 5 65 20" fill="none" stroke="#818cf8" stroke-width="1" />
-                        <circle cx="50" cy="30" r="2" fill="#334155" />
+                        <rect x="10" y="30" width="80" height="20" rx="3" fill="#1e293b" />
+                        <circle cx="20" cy="40" r="2" fill="#22c55e" />
                     </svg>
-                    <p class="font-bold text-indigo-700">無線接達點 (AP)</p>
-                    <p class="text-[11px] text-slate-500">提供無線連接功能</p>
+                    <p class="font-bold text-sky-800 mt-2 text-sm">數據機</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase">Modem</p>
+                </div>
+                <div class="hw-card p-4 border rounded-2xl text-center bg-slate-50 border-slate-200">
+                    <svg class="hw-svg mx-auto" viewBox="0 0 100 60">
+                        <circle cx="50" cy="30" r="15" fill="none" stroke="#334155" stroke-width="2"/>
+                        <circle cx="50" cy="30" r="3" fill="#334155"/>
+                    </svg>
+                    <p class="font-bold text-sky-800 mt-2 text-sm">網絡接達點</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase">AP</p>
                 </div>
             </div>
         </section>
 
-        <!-- 互動遊戲 -->
-        <section id="game" class="section-card border-2 border-indigo-600">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-indigo-800">組網小測試：搭建局部區域網絡 (LAN)</h2>
-                <div class="flex gap-4">
-                    <span id="score" class="bg-indigo-100 text-indigo-700 px-4 py-1 rounded-full font-bold">已完成: 0/4</span>
-                    <button onclick="window.location.reload()" class="text-slate-400 hover:text-indigo-600"><i data-lucide="rotate-ccw" class="w-5 h-5"></i></button>
+        <!-- 互動組網遊戲 -->
+        <section id="game" class="section-card border-2 border-sky-400 bg-sky-50/30">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-sky-900 flex items-center gap-2">
+                        <i data-lucide="mouse-pointer-click" class="text-sky-600"></i> 互動組網：搭建 LAN
+                    </h2>
+                    <p class="text-sm text-slate-500 mt-1">請按正確順序將硬件拖入對應位置。</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span id="score" class="bg-white text-sky-700 border border-sky-200 px-4 py-2 rounded-full font-bold shadow-sm">已完成: 0/4</span>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div class="space-y-3">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">拖動硬件</p>
-                    <div id="hw-modem" draggable="true" class="draggable p-3 bg-white border rounded-xl shadow-sm flex items-center gap-3">
-                        <i data-lucide="zap" class="text-amber-500 w-4 h-4"></i> <span class="text-sm font-bold">數據機</span>
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <!-- 拖動物件區 -->
+                <div class="space-y-4">
+                    <div id="hw-modem" draggable="true" class="draggable p-4 bg-white border rounded-2xl shadow-sm flex items-center gap-3">
+                        <i data-lucide="zap" class="text-amber-500"></i> <span class="text-sm font-bold">數據機</span>
                     </div>
-                    <div id="hw-router" draggable="true" class="draggable p-3 bg-white border rounded-xl shadow-sm flex items-center gap-3">
-                        <i data-lucide="router" class="text-indigo-500 w-4 h-4"></i> <span class="text-sm font-bold">路由器</span>
+                    <div id="hw-router" draggable="true" class="draggable p-4 bg-white border rounded-2xl shadow-sm flex items-center gap-3">
+                        <i data-lucide="router" class="text-sky-500"></i> <span class="text-sm font-bold">路由器</span>
                     </div>
-                    <div id="hw-switch" draggable="true" class="draggable p-3 bg-white border rounded-xl shadow-sm flex items-center gap-3">
-                        <i data-lucide="layers" class="text-blue-500 w-4 h-4"></i> <span class="text-sm font-bold">交換器</span>
+                    <div id="hw-switch" draggable="true" class="draggable p-4 bg-white border rounded-2xl shadow-sm flex items-center gap-3">
+                        <i data-lucide="layers" class="text-indigo-500"></i> <span class="text-sm font-bold">交換器</span>
                     </div>
-                    <div id="hw-ap" draggable="true" class="draggable p-3 bg-white border rounded-xl shadow-sm flex items-center gap-3">
-                        <i data-lucide="wifi" class="text-sky-500 w-4 h-4"></i> <span class="text-sm font-bold">無線接達點</span>
+                    <div id="hw-ap" draggable="true" class="draggable p-4 bg-white border rounded-2xl shadow-sm flex items-center gap-3">
+                        <i data-lucide="wifi" class="text-emerald-500"></i> <span class="text-sm font-bold">網絡接達點</span>
                     </div>
                 </div>
 
-                <div class="md:col-span-3 bg-slate-100 p-8 rounded-3xl border-4 border-white shadow-inner flex flex-col items-center gap-4">
-                    <div class="bg-sky-400 text-white p-3 rounded-full flex flex-col items-center"><i data-lucide="cloud"></i><span class="text-[8px]">Internet</span></div>
-                    <div class="w-1 h-6 bg-slate-300"></div>
-                    
-                    <!-- Drop Targets -->
-                    <div class="drop-target w-48" data-answer="hw-modem">數據機 (Modem) 位置</div>
-                    <div class="w-1 h-6 bg-slate-300"></div>
-                    <div class="drop-target w-48" data-answer="hw-router">路由器 (Router) 位置</div>
-                    <div class="w-1 h-6 bg-slate-300"></div>
-                    <div class="drop-target w-48" data-answer="hw-switch">交換器 (Switch) 位置</div>
-                    
+                <!-- 放置區 -->
+                <div class="lg:col-span-3 bg-white p-6 rounded-3xl border flex flex-col items-center gap-4 min-h-[400px]">
+                    <div class="bg-sky-500 text-white p-3 rounded-full"><i data-lucide="cloud"></i></div>
+                    <div class="w-px h-6 bg-slate-200"></div>
+                    <div class="drop-target w-48 h-16" data-answer="hw-modem"><span class="text-xs text-slate-300 italic">放置數據機</span></div>
+                    <div class="w-px h-6 bg-slate-200"></div>
+                    <div class="drop-target w-48 h-16" data-answer="hw-router"><span class="text-xs text-slate-300 italic">放置路由器</span></div>
+                    <div class="w-px h-6 bg-slate-200"></div>
+                    <div class="drop-target w-48 h-16" data-answer="hw-switch"><span class="text-xs text-slate-300 italic">放置交換器</span></div>
                     <div class="flex gap-10 mt-4">
-                        <div class="drop-target w-32" data-answer="hw-ap">無線接達點</div>
-                        <div class="p-4 border-2 border-slate-200 rounded-xl bg-white flex flex-col items-center">
-                            <div class="flex gap-2"><i data-lucide="monitor" class="text-slate-400"></i><i data-lucide="printer" class="text-slate-400"></i></div>
-                            <span class="text-[10px] mt-2">有線終端</span>
+                        <div class="flex flex-col items-center">
+                            <div class="w-px h-6 bg-slate-200"></div>
+                            <div class="drop-target w-32 h-16" data-answer="hw-ap"><span class="text-xs text-slate-300 italic">AP</span></div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <div class="w-px h-6 bg-slate-200"></div>
+                            <div class="p-4 bg-slate-50 border rounded-xl"><i data-lucide="monitor" class="text-slate-300"></i></div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div id="win" class="hidden fixed inset-0 bg-indigo-900/80 flex items-center justify-center z-[100]">
-                <div class="bg-white p-10 rounded-3xl text-center shadow-2xl scale-up">
-                    <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <i data-lucide="check-circle" class="w-12 h-12"></i>
-                    </div>
-                    <h3 class="text-3xl font-bold text-slate-800 mb-2">搭建成功！</h3>
-                    <p class="text-slate-500 mb-6">你已經成功建立了標準的局部區域網絡拓撲結構。</p>
-                    <button onclick="location.reload()" class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold">重新挑戰</button>
+            <!-- 通關畫面 -->
+            <div id="win" class="hidden fixed inset-0 bg-slate-900/60 flex items-center justify-center z-[100]">
+                <div class="bg-white p-10 rounded-[2rem] text-center shadow-2xl">
+                    <h3 class="text-2xl font-bold text-slate-800 mb-6">網絡搭建成功！</h3>
+                    <button onclick="location.reload()" class="bg-sky-600 text-white px-8 py-3 rounded-xl font-bold">再次挑戰</button>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <footer class="bg-slate-900 text-slate-500 py-10 text-center">
-        <p class="text-sm">單元 C1：建網及互聯網基本知識</p>
-        <p class="text-[10px] mt-2">使用 HTML/Tailwind/Lucide 繪製</p>
+    <footer class="bg-slate-100 text-slate-500 py-10 text-center border-t border-slate-200 text-sm">
+        <p class="font-bold">ICT 學習資源網 - 單元 C</p>
     </footer>
 
     <script>
         lucide.createIcons();
 
-        // 遊戲邏輯
         const draggables = document.querySelectorAll('.draggable');
         const targets = document.querySelectorAll('.drop-target');
         let solved = 0;
@@ -273,7 +314,9 @@
                 e.preventDefault();
                 tar.classList.add('active');
             });
+
             tar.addEventListener('dragleave', () => tar.classList.remove('active'));
+
             tar.addEventListener('drop', (e) => {
                 e.preventDefault();
                 tar.classList.remove('active');
@@ -284,7 +327,6 @@
                     tar.innerHTML = "";
                     tar.appendChild(el);
                     tar.classList.add('correct');
-                    el.classList.add('!border-0', '!shadow-none', 'bg-transparent');
                     el.setAttribute('draggable', 'false');
                     solved++;
                     document.getElementById('score').innerText = `已完成: ${solved}/4`;
