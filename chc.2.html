@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C1-2 互聯網協定 - ICT 學習資源網</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f8fafc; scroll-behavior: smooth; }
+        .section-card { background: white; border-radius: 1.5rem; padding: 2rem; margin-bottom: 2.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; }
+        
+        /* TCP/IP 實驗室樣式 */
+        .packet { 
+            width: 40px; height: 40px; 
+            background: #3b82f6; 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: bold; 
+            font-size: 12px;
+            border-radius: 6px; 
+            position: absolute; 
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transform: translate(-50%, -50%); /* 置中對齊 */
+        }
+        .packet.visible { opacity: 1; }
+        .packet.header { border: 2px solid #fbbf24; } /* 代表加上了 IP Header */
+
+        .lab-container { 
+            height: 320px; 
+            background: #0f172a; 
+            border-radius: 1.5rem; 
+            position: relative; 
+            overflow: hidden; 
+            margin: 1.5rem 0;
+        }
+
+        .node-icon { 
+            position: absolute; 
+            text-align: center; 
+            color: white; 
+            z-index: 20; 
+            width: 80px;
+            transform: translate(-50%, -50%);
+        }
+
+        /* 終端機模擬器樣式 */
+        .terminal { background-color: #000; color: #00ff00; font-family: 'Courier New', Courier, monospace; padding: 1rem; border-radius: 0.5rem; overflow-hidden; }
+        
+        /* 協定卡片 */
+        .protocol-card { transition: all 0.3s ease; border: 1px solid #e2e8f0; }
+        .protocol-card:hover { transform: translateY(-5px); border-color: #6366f1; box-shadow: 0 10px 20px -5px rgba(0,0,0,0.1); }
+
+        /* 動畫 Keyframes */
+        @keyframes slidePacket {
+            0% { left: 15%; opacity: 0; }
+            10% { opacity: 1; left: 20%; }
+            90% { opacity: 1; left: 80%; }
+            100% { left: 85%; opacity: 0; }
+        }
+        @keyframes hackerSee {
+            0%, 40% { opacity: 0; transform: translate(-50%, 0); }
+            50% { opacity: 1; transform: translate(-50%, -3px); }
+            60%, 100% { opacity: 0; transform: translate(-50%, 0); }
+        }
+        @keyframes encryptText {
+            0%, 20% { content: "PWD:123"; background: white; color: #334155; }
+            25%, 75% { content: "!#@%&*"; background: #10b981; color: white; }
+            80%, 100% { content: "PWD:123"; background: white; color: #334155; }
+        }
+        @keyframes mailSMTP {
+            0% { left: 10%; opacity: 0; transform: translateY(0); }
+            10% { opacity: 1; left: 15%; transform: translateY(0); }
+            45% { left: 45%; opacity: 1; transform: translateY(0); }
+            49% { left: 50%; opacity: 0; transform: translateY(10px); }
+            100% { left: 50%; opacity: 0; }
+        }
+        @keyframes mailPOP {
+            0%, 50% { left: 50%; opacity: 0; transform: translateY(-10px); }
+            51% { left: 50%; opacity: 1; transform: translateY(0); }
+            90% { left: 85%; opacity: 1; transform: translateY(0); }
+            100% { left: 90%; opacity: 0; transform: translateY(0); }
+        }
+
+        /* 可控動畫類別 (按鈕觸發) */
+        .anim-slide { animation: slidePacket 4s linear forwards; }
+        .anim-hacker { animation: hackerSee 4s linear forwards; }
+        .anim-slide-secure { animation: slidePacket 4s linear forwards; }
+        .anim-slide-secure::after { animation: encryptText 4s linear forwards; }
+        .anim-smtp { animation: mailSMTP 4s linear forwards; }
+        .anim-pop { animation: mailPOP 4s linear forwards; }
+
+        .packet-secure::after {
+            content: "PWD:123";
+            display: block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+            font-size: 10px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- 頂部導航 -->
+    <header class="bg-indigo-700 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div class="bg-indigo-800 p-2 rounded-lg">
+                    <i data-lucide="network" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold">第 2 章：互聯網協定 (Internet Protocols)</h1>
+                    <p class="text-xs text-indigo-200 mt-1">參考課本 ICT_C1_ch2.pdf 編寫</p>
+                </div>
+            </div>
+            <nav class="hidden md:flex gap-6 text-sm font-medium">
+                <a href="#tcpip" class="hover:text-indigo-200 transition">2.1 TCP/IP</a>
+                <a href="#ip" class="hover:text-indigo-200 transition">2.2 IP 位址</a>
+                <a href="#dns" class="hover:text-indigo-200 transition">2.3 DNS</a>
+                <a href="#url" class="hover:text-indigo-200 transition">2.4 URL</a>
+                <a href="#protocols" class="hover:text-indigo-200 transition">2.5 網絡協定</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-10 max-w-5xl">
+
+        <!-- 2.1 TCP/IP 數據傳輸實驗室 -->
+        <section id="tcpip" class="section-card">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-indigo-800 flex items-center gap-2">
+                        <i data-lucide="microscope"></i> 2.1 傳輸控制協定 / 互聯網協定 (TCP/IP)
+                    </h2>
+                    <p class="text-sm text-slate-500 mt-1">解釋數據傳輸的原理：數據如何在網絡中被拆分與重組。</p>
+                </div>
+                <div class="flex gap-2">
+                    <button id="btn-start" onclick="startTransmission()" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-md">
+                        <i data-lucide="play" class="w-4 h-4"></i> 開始傳輸
+                    </button>
+                    <button id="btn-pause" onclick="togglePause()" class="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg font-bold transition shadow-md" disabled>
+                        <i data-lucide="pause" class="w-4 h-4"></i> 暫停
+                    </button>
+                    <button onclick="resetTransmission()" class="flex items-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg font-bold transition">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i> 重置
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 mb-6 rounded-r-xl">
+                <p id="status-text" class="text-indigo-900 font-medium">點擊「開始傳輸」觀察 TCP 與 IP 如何分工合作。</p>
+            </div>
+
+            <!-- 實驗室畫布 -->
+            <div class="lab-container">
+                <div class="node-icon left-[10%] top-1/2">
+                    <i data-lucide="image" class="w-10 h-10 sm:w-12 sm:h-12 text-indigo-400 mx-auto"></i>
+                    <p class="text-[10px] mt-2 font-bold uppercase tracking-widest text-indigo-300">傳送端 (TCP)</p>
+                </div>
+
+                <div class="node-icon left-[90%] top-1/2 relative">
+                    <div id="receiver-image" class="hidden absolute -top-16 left-1/2 -translate-x-1/2 text-emerald-400 bg-slate-800 p-2 rounded-lg border border-emerald-500 shadow-lg z-30">
+                        <i data-lucide="image" class="w-8 h-8"></i>
+                    </div>
+                    <i data-lucide="monitor" class="w-10 h-10 sm:w-12 sm:h-12 text-emerald-400 mx-auto relative z-20"></i>
+                    <p class="text-[10px] mt-2 font-bold uppercase tracking-widest text-emerald-300">接收端 (TCP)</p>
+                </div>
+
+                <div class="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none z-10">
+                    <div class="w-full h-px bg-slate-500 border-dashed border-b-2 absolute"></div>
+                    <div class="absolute top-[25%] left-[35%] text-slate-400 flex flex-col items-center opacity-50"><i data-lucide="router" class="w-8 h-8 text-sky-400"></i></div>
+                    <div class="absolute top-[50%] left-[50%] text-slate-400 flex flex-col items-center opacity-50 -translate-y-1/2"><i data-lucide="router" class="w-8 h-8 text-indigo-400"></i></div>
+                    <div class="absolute top-[75%] left-[65%] text-slate-400 flex flex-col items-center opacity-50 -translate-y-full"><i data-lucide="router" class="w-8 h-8 text-amber-400"></i></div>
+                </div>
+
+                <div id="packets-area"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                <div class="flex items-start gap-4">
+                    <div class="bg-indigo-100 p-3 rounded-xl text-indigo-600"><i data-lucide="split"></i></div>
+                    <div>
+                        <h4 class="font-bold text-slate-800">1. 傳輸控制協定 (TCP)</h4>
+                        <p class="text-sm text-slate-500">負責將大型數據拆分成多個<b>封包 (Packets)</b>並編號；在接收端重新組合封包，確保數據準確無誤。</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-4">
+                    <div class="bg-amber-100 p-3 rounded-xl text-amber-600"><i data-lucide="map"></i></div>
+                    <div>
+                        <h4 class="font-bold text-slate-800">2. 互聯網協定 (IP)</h4>
+                        <p class="text-sm text-slate-500">負責為每個封包加上目的地 IP 位址，並透過路由器尋找最佳傳輸路徑送達目的地。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2.2 IP 位址 -->
+        <section id="ip" class="section-card">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2 border-b pb-4">
+                <i data-lucide="map-pin" class="text-indigo-600"></i> 2.2 互聯網協定 (IP) 位址
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-6 mb-10">
+                <div class="p-6 bg-slate-50 rounded-3xl border border-slate-200">
+                    <div class="flex justify-between mb-4">
+                        <span class="text-xs font-bold px-2 py-1 bg-amber-100 text-amber-700 rounded">32 位元 (32-bit)</span>
+                        <h3 class="text-lg font-bold">IPv4 格式</h3>
+                    </div>
+                    <code class="text-2xl block text-center py-4 text-indigo-700 font-bold">192.168.1.254</code>
+                    <p class="text-sm text-slate-500 mt-2">由四組 0-255 的數字組成。因互聯網普及，IPv4 地址已不敷使用。</p>
+                </div>
+                <div class="p-6 bg-slate-50 rounded-3xl border border-slate-200">
+                    <div class="flex justify-between mb-4">
+                        <span class="text-xs font-bold px-2 py-1 bg-emerald-100 text-emerald-700 rounded">128 位元 (128-bit)</span>
+                        <h3 class="text-lg font-bold">IPv6 格式</h3>
+                    </div>
+                    <code class="text-sm block text-center py-4 text-emerald-700 font-bold break-all">2001:0DB8:AC10:FE01:0000:0000:0000:0001</code>
+                    <p class="text-sm text-slate-500 mt-2">使用十六進制表示，提供近乎無限的位址數量以解決 IPv4 枯竭問題。</p>
+                </div>
+            </div>
+
+            <!-- ipconfig 模擬器 -->
+            <div class="bg-white rounded-2xl border border-slate-300 overflow-hidden shadow-sm">
+                <div class="bg-slate-100 px-4 py-3 border-b flex items-center justify-between">
+                    <span class="font-bold text-sm text-slate-700 flex items-center gap-2">
+                        <i data-lucide="terminal" class="w-4 h-4"></i> 檢查你的 IP 設定 (命令提示字元)
+                    </span>
+                    <button onclick="runIpconfig()" class="bg-slate-800 text-white text-xs px-3 py-1 rounded hover:bg-slate-700 transition">執行 ipconfig</button>
+                </div>
+                <div class="terminal text-xs h-48" id="cmd-screen">
+                    <div class="text-slate-400 mb-2">Microsoft Windows [Version 10.0.19041.985]<br>(c) Microsoft Corporation. All rights reserved.</div>
+                    <div>C:\Users\Student> <span id="cmd-typing" class="text-white"></span><span class="animate-pulse">_</span></div>
+                    <div id="cmd-output" class="hidden mt-2 space-y-1 text-slate-300">
+                        <div>Windows IP Configuration</div>
+                        <br>
+                        <div>Ethernet adapter Ethernet:</div>
+                        <div class="pl-4">Connection-specific DNS Suffix  . :</div>
+                        <div class="pl-4">Link-local IPv6 Address . . . . . : fe80::a1b2:c3d4:e5f6:7890%12</div>
+                        <div class="pl-4 text-green-400 font-bold">IPv4 Address. . . . . . . . . . . : 192.168.0.15</div>
+                        <div class="pl-4">Subnet Mask . . . . . . . . . . . : 255.255.255.0</div>
+                        <div class="pl-4">Default Gateway . . . . . . . . . : 192.168.0.1</div>
+                        <br>
+                        <div>C:\Users\Student> <span class="animate-pulse">_</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2.3 DNS 與 URL -->
+        <section id="dns" class="section-card">
+            <h2 class="text-2xl font-bold text-slate-800 mb-8 flex items-center gap-2 border-b pb-4">
+                <i data-lucide="search" class="text-indigo-600"></i> 2.3 網域名稱系統 (DNS)
+            </h2>
+            <p class="text-slate-600 mb-6">
+                因為人類很難記住像 <code>142.250.190.46</code> 這樣的 IP 位址，所以發明了<b>網域名稱系統 (DNS)</b>。它就像互聯網的「電話簿」，負責將人類易讀的域名（Domain Name）轉換為電腦使用的 IP 位址。
+            </p>
+
+            <div class="bg-slate-900 p-8 rounded-[2rem] text-center text-white shadow-lg">
+                <div class="flex max-w-md mx-auto bg-slate-800 rounded-xl overflow-hidden p-1 border border-slate-700">
+                    <input id="dns-input" type="text" value="www.hkeaa.edu.hk" class="bg-transparent flex-1 px-4 py-2 outline-none font-mono">
+                    <button onclick="simulateDNS()" class="bg-indigo-600 px-6 py-2 rounded-lg font-bold hover:bg-indigo-500 transition">DNS 解析</button>
+                </div>
+                <div id="dns-console" class="mt-6 font-mono text-left max-w-md mx-auto space-y-2 h-20 text-xs text-emerald-400 overflow-y-auto">
+                    > 等待輸入域名查詢...
+                </div>
+            </div>
+        </section>
+
+        <!-- 2.4 URL (包含連接埠) -->
+        <section id="url" class="section-card">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2 border-b pb-4">
+                <i data-lucide="link" class="text-indigo-600"></i> 2.4 劃一資源定位符 (URL)
+            </h2>
+            <p class="text-slate-600 mb-6">URL (Uniform Resource Locator) 就是我們常說的「網址」，用來指示網頁或檔案在互聯網上的確切位置。完整的 URL 包含以下四個部分：</p>
+            
+            <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                <!-- 網址拆解展示 -->
+                <div class="flex flex-wrap gap-2 text-lg sm:text-xl font-mono justify-center mb-8">
+                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded border border-blue-200 shadow-sm" title="通訊協定">https://</span>
+                    <span class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded border border-emerald-200 shadow-sm" title="網域名稱">www.school.edu.hk</span>
+                    <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded border border-purple-200 shadow-sm" title="連接埠">:443</span>
+                    <span class="px-2 py-1 bg-amber-100 text-amber-800 rounded border border-amber-200 shadow-sm" title="檔案路徑">/index.html</span>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="text-center p-4 bg-white rounded-xl shadow-sm border">
+                        <div class="font-bold text-blue-800 mb-1">1. 通訊協定</div>
+                        <p class="text-xs text-slate-500">指定使用的資料傳輸規則（如 HTTP/HTTPS 或 FTP）。</p>
+                    </div>
+                    <div class="text-center p-4 bg-white rounded-xl shadow-sm border">
+                        <div class="font-bold text-emerald-800 mb-1">2. 網域名稱</div>
+                        <p class="text-xs text-slate-500">識別互聯網上寄存該網頁的伺服器名稱。</p>
+                    </div>
+                    <div class="text-center p-4 bg-white rounded-xl shadow-sm border">
+                        <div class="font-bold text-purple-800 mb-1">3. 連接埠 (Port)</div>
+                        <p class="text-xs text-slate-500">指定伺服器提供服務的特定通道（HTTPS 預設為 443）。</p>
+                    </div>
+                    <div class="text-center p-4 bg-white rounded-xl shadow-sm border">
+                        <div class="font-bold text-amber-800 mb-1">4. 檔案路徑</div>
+                        <p class="text-xs text-slate-500">資源在伺服器上的特定資料夾與檔案名稱。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2.5 常見網絡協定 (包含加密及電郵動畫) -->
+        <section id="protocols" class="section-card">
+            <h2 class="text-2xl font-bold text-slate-800 mb-8 flex items-center gap-2 border-b pb-4">
+                <i data-lucide="list-checks" class="text-indigo-600"></i> 2.5 常見網絡協定 (Network Protocols)
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+                <!-- HTTP/HTTPS 詳細對比與加密動畫 -->
+                <div class="protocol-card p-6 rounded-2xl lg:col-span-3 bg-white shadow-sm border-blue-200">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-blue-50 w-12 h-12 flex items-center justify-center rounded-xl text-blue-600"><i data-lucide="globe"></i></div>
+                            <div>
+                                <h3 class="font-bold text-lg">HTTP 與 HTTPS 的分別 (加密概念)</h3>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wide">Hypertext Transfer Protocol (Secure)</p>
+                            </div>
+                        </div>
+                        <button onclick="playHttpAnim()" class="shrink-0 flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition shadow-sm">
+                            <i data-lucide="play" class="w-4 h-4"></i> 開始動畫
+                        </button>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mt-6">
+                        <!-- HTTP -->
+                        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 flex flex-col">
+                            <h4 class="font-bold text-slate-700 flex items-center gap-2 mb-2">
+                                <i data-lucide="unlock" class="w-4 h-4 text-slate-400"></i> HTTP (明文傳輸)
+                            </h4>
+                            <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                                數據未經加密。若在傳輸過程中被黑客攔截，他們可以直接讀取你的敏感資料（如密碼）。
+                            </p>
+                            <!-- HTTP 動畫 -->
+                            <div class="mt-auto relative h-20 bg-slate-200 rounded-lg overflow-hidden flex items-center shadow-inner border border-slate-300">
+                                <div class="absolute left-4 z-10"><i data-lucide="laptop" class="text-slate-500"></i></div>
+                                <div class="absolute right-4 z-10"><i data-lucide="server" class="text-slate-500"></i></div>
+                                <!-- 黑客 -->
+                                <div class="absolute left-1/2 -translate-x-1/2 top-1 z-10 text-rose-500 flex flex-col items-center">
+                                    <i data-lucide="eye" class="w-5 h-5"></i>
+                                </div>
+                                <!-- 明文封包 -->
+                                <div id="http-packet" class="absolute px-2 py-0.5 bg-white border border-slate-400 rounded text-[10px] font-mono text-slate-700 z-20 opacity-0">
+                                    PWD:123
+                                </div>
+                                <!-- 黑客解讀提示 -->
+                                <div id="http-hacker" class="absolute left-1/2 -translate-x-1/2 top-8 text-[9px] text-rose-600 font-bold opacity-0">
+                                    攔截: PWD:123
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- HTTPS -->
+                        <div class="bg-emerald-50 p-5 rounded-xl border border-emerald-200 flex flex-col">
+                            <h4 class="font-bold text-emerald-800 flex items-center gap-2 mb-2">
+                                <i data-lucide="lock" class="w-4 h-4 text-emerald-600"></i> HTTPS (加密傳輸)
+                            </h4>
+                            <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                                傳送前會將數據進行<b>加密 (Encryption)</b> 變成亂碼。黑客即使攔截也無法解讀，到達伺服器後才會解密。
+                            </p>
+                            <!-- HTTPS 動畫 -->
+                            <div class="mt-auto relative h-20 bg-emerald-100/50 rounded-lg overflow-hidden flex items-center shadow-inner border border-emerald-200">
+                                <div class="absolute left-4 z-10"><i data-lucide="laptop" class="text-slate-500"></i></div>
+                                <div class="absolute right-4 z-10"><i data-lucide="server" class="text-emerald-600"></i></div>
+                                <!-- 黑客 -->
+                                <div class="absolute left-1/2 -translate-x-1/2 top-1 z-10 text-rose-400 flex flex-col items-center">
+                                    <i data-lucide="eye-off" class="w-5 h-5"></i>
+                                </div>
+                                <!-- 加密封包 -->
+                                <div id="https-packet" class="packet-secure absolute z-20 opacity-0"></div>
+                                <!-- 黑客解讀提示 -->
+                                <div id="https-hacker" class="absolute left-1/2 -translate-x-1/2 top-8 text-[9px] text-emerald-700 font-bold opacity-0">
+                                    無法解讀: !#@%&*
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Protocols (加入動畫) -->
+                <div class="protocol-card p-6 rounded-2xl lg:col-span-2 bg-white shadow-sm border-indigo-200">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                        <div class="flex items-center gap-4">
+                            <div class="bg-indigo-50 w-12 h-12 flex items-center justify-center rounded-xl text-indigo-600"><i data-lucide="mail"></i></div>
+                            <div>
+                                <h3 class="font-bold text-lg mb-1">SMTP / POP3 / IMAP</h3>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wide">Email Protocols</p>
+                            </div>
+                        </div>
+                        <button onclick="playEmailAnim()" class="shrink-0 flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition shadow-sm">
+                            <i data-lucide="play" class="w-4 h-4"></i> 開始動畫
+                        </button>
+                    </div>
+                    <p class="text-sm text-slate-600">電子郵件的運作依賴不同協定分工：<br>
+                    • <b>SMTP</b>：負責將郵件<b>發送</b>到伺服器。<br>
+                    • <b>POP3 / IMAP</b>：負責從郵件伺服器<b>接收/下載</b>電子郵件到使用者的裝置。</p>
+                    
+                    <!-- 電郵傳輸動畫 -->
+                    <div class="relative h-24 mt-6 bg-slate-50 rounded-xl overflow-hidden flex items-center shadow-inner border border-slate-200">
+                        <!-- 節點圖示 -->
+                        <div class="absolute left-4 z-10 flex flex-col items-center"><i data-lucide="laptop" class="text-slate-500 w-6 h-6"></i><span class="text-[8px] mt-1 font-bold">寄件人</span></div>
+                        <div class="absolute left-1/2 -translate-x-1/2 z-10 flex flex-col items-center"><i data-lucide="server" class="text-indigo-500 w-8 h-8"></i><span class="text-[8px] mt-1 font-bold">郵件伺服器</span></div>
+                        <div class="absolute right-4 z-10 flex flex-col items-center"><i data-lucide="smartphone" class="text-slate-500 w-6 h-6"></i><span class="text-[8px] mt-1 font-bold">收件人</span></div>
+
+                        <!-- SMTP 動畫 (寄件人 -> 伺服器) -->
+                        <div id="email-smtp" class="absolute z-20 flex flex-col items-center opacity-0">
+                            <span class="text-[9px] font-bold text-blue-600 mb-1 bg-white/90 px-1 rounded shadow-sm border border-blue-100">SMTP (寄出)</span>
+                            <i data-lucide="mail" class="w-6 h-6 text-blue-500 fill-blue-100"></i>
+                        </div>
+
+                        <!-- POP3/IMAP 動畫 (伺服器 -> 收件人) -->
+                        <div id="email-pop" class="absolute z-20 flex flex-col items-center opacity-0">
+                            <span class="text-[9px] font-bold text-emerald-600 mb-1 bg-white/90 px-1 rounded shadow-sm border border-emerald-100">IMAP/POP3 (接收)</span>
+                            <i data-lucide="mail" class="w-6 h-6 text-emerald-500 fill-emerald-100"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FTP -->
+                <div class="protocol-card p-6 rounded-2xl lg:col-span-1 bg-white shadow-sm border-amber-200">
+                    <div class="flex items-center gap-4 mb-4 lg:block">
+                        <div class="bg-amber-50 w-12 h-12 flex items-center justify-center rounded-xl lg:mb-4 text-amber-600"><i data-lucide="file-up"></i></div>
+                        <div>
+                            <h3 class="font-bold text-lg mb-1">FTP</h3>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wide">File Transfer Protocol</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-slate-600">檔案傳輸協定。常用於客戶端與伺服器之間上載或下載大型檔案（例如網頁管理員上傳網站檔案）。</p>
+                </div>
+            </div>
+
+            <!-- HTTP 狀態信息 (參考 PDF P.2) -->
+            <div class="bg-slate-50 border-l-4 border-slate-400 p-6 rounded-r-2xl mt-8">
+                <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2"><i data-lucide="alert-circle" class="w-5 h-5 text-slate-500"></i> HTTP 狀態信息 (Status Codes)</h3>
+                <p class="text-sm text-slate-600 mb-4">當瀏覽器請求網頁時，伺服器會傳回狀態碼：</p>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="bg-white p-3 border rounded text-center shadow-sm">
+                        <div class="text-emerald-600 font-black text-xl mb-1">200 OK</div>
+                        <div class="text-xs text-slate-500">請求成功，網頁正常載入。</div>
+                    </div>
+                    <div class="bg-white p-3 border rounded text-center shadow-sm">
+                        <div class="text-amber-600 font-black text-xl mb-1">404 Not Found</div>
+                        <div class="text-xs text-slate-500">客戶端錯誤，找不到請求的網頁。</div>
+                    </div>
+                    <div class="bg-white p-3 border rounded text-center shadow-sm">
+                        <div class="text-rose-600 font-black text-xl mb-1">500 Error</div>
+                        <div class="text-xs text-slate-500">伺服器發生內部意外錯誤。</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-12 text-center text-sm">
+        <div class="container mx-auto px-6">
+            <p class="font-bold text-white mb-2">ICT 學習資源網 - 單元 C：互聯網及其應用</p>
+            <p>第 2 章：互聯網協定 (Internet Protocols) | 參考課本內容編寫</p>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // 獨立重播動畫控制函式
+        function replayAnimations(elements) {
+            elements.forEach(item => {
+                const el = document.getElementById(item.id);
+                if (el) {
+                    el.classList.remove(item.cls);
+                    void el.offsetWidth; // 觸發重繪 (Reflow) 重置動畫
+                    el.classList.add(item.cls);
+                }
+            });
+        }
+
+        // 播放 HTTP/HTTPS 加密動畫
+        function playHttpAnim() {
+            replayAnimations([
+                { id: 'http-packet', cls: 'anim-slide' },
+                { id: 'http-hacker', cls: 'anim-hacker' },
+                { id: 'https-packet', cls: 'anim-slide-secure' },
+                { id: 'https-hacker', cls: 'anim-hacker' }
+            ]);
+        }
+
+        // 播放 Email SMTP/POP3 動畫
+        function playEmailAnim() {
+            replayAnimations([
+                { id: 'email-smtp', cls: 'anim-smtp' },
+                { id: 'email-pop', cls: 'anim-pop' }
+            ]);
+        }
+
+        // TCP/IP 傳輸動畫邏輯
+        let step = 0;
+        let isPaused = false;
+        let timer = null;
+        const packets = [];
+        const statusText = document.getElementById('status-text');
+        const packetArea = document.getElementById('packets-area');
+        const btnStart = document.getElementById('btn-start');
+        const btnPause = document.getElementById('btn-pause');
+
+        function createPackets() {
+            packetArea.innerHTML = '';
+            for (let i = 1; i <= 3; i++) {
+                const p = document.createElement('div');
+                p.className = 'packet';
+                p.id = `pkt-${i}`;
+                p.innerText = `#${i}`;
+                p.style.left = '20%';
+                p.style.top = `${25 + i * 15}%`; 
+                packetArea.appendChild(p);
+                packets.push(p);
+            }
+        }
+
+        async function startTransmission() {
+            if (timer) return;
+            btnStart.disabled = true;
+            btnPause.disabled = false;
+            
+            if (step === 0) {
+                createPackets();
+                await wait(500);
+            }
+            runStepByStep();
+        }
+
+        async function runStepByStep() {
+            while (step < 4 && !isPaused) {
+                step++;
+                updateUIForStep(step);
+                await wait(2800); 
+            }
+            if (step >= 4) {
+                btnPause.disabled = true;
+                btnStart.disabled = true;
+            }
+        }
+
+        function updateUIForStep(s) {
+            switch(s) {
+                case 1:
+                    statusText.innerText = "第一階段：TCP 正在將大檔案分割成 3 個小封包 (Packets)，並標上序號。";
+                    packets.forEach(p => p.classList.add('visible'));
+                    break;
+                case 2:
+                    statusText.innerText = "第二階段：IP 為每個封包加上標頭 (Header)，內含目的地 IP 位址。";
+                    packets.forEach(p => p.classList.add('header'));
+                    break;
+                case 3:
+                    statusText.innerHTML = "第三階段：封包在互聯網傳輸。中間包含多個<span class='font-bold text-amber-500'>路由器 (Routers)</span>，引導它們走不同路徑！";
+                    packets.forEach((p, idx) => {
+                        p.style.transition = 'all 1.2s ease-in-out';
+                        p.style.left = idx === 0 ? '35%' : (idx === 1 ? '50%' : '65%');
+                        p.style.top = idx === 0 ? '25%' : (idx === 1 ? '50%' : '75%');
+                    });
+                    setTimeout(() => {
+                        if (step !== 3) return;
+                        packets.forEach((p, idx) => {
+                            p.style.left = '75%';
+                            p.style.top = `${25 + idx * 15}%`;
+                        });
+                    }, 1400);
+                    break;
+                case 4:
+                    statusText.innerText = "第四階段：接收端 TCP 檢查封包，重新組合成原始檔案。";
+                    packets.forEach((p, idx) => {
+                        p.style.left = '90%';
+                        p.style.top = '50%'; 
+                        p.style.opacity = '0';
+                        p.style.transform = 'translate(-50%, -50%) scale(0.5)';
+                    });
+                    setTimeout(() => {
+                        if (step !== 4) return;
+                        const rxImg = document.getElementById('receiver-image');
+                        if(rxImg) {
+                            rxImg.classList.remove('hidden');
+                            rxImg.classList.add('animate-bounce');
+                        }
+                        statusText.innerHTML = "<span class='text-emerald-600 font-bold'>傳輸成功！數據已完整重組。</span>";
+                    }, 800);
+                    break;
+            }
+        }
+
+        function togglePause() {
+            isPaused = !isPaused;
+            btnPause.innerHTML = isPaused ? 
+                '<i data-lucide="play" class="w-4 h-4"></i> 恢復' : 
+                '<i data-lucide="pause" class="w-4 h-4"></i> 暫停';
+            lucide.createIcons();
+            if (!isPaused) runStepByStep();
+        }
+
+        function resetTransmission() {
+            step = 0;
+            isPaused = false;
+            clearTimeout(timer);
+            timer = null;
+            packetArea.innerHTML = '';
+            
+            const rxImg = document.getElementById('receiver-image');
+            if(rxImg) {
+                rxImg.classList.add('hidden');
+                rxImg.classList.remove('animate-bounce');
+            }
+
+            statusText.innerText = "點擊「開始傳輸」觀察 TCP 與 IP 如何分工合作。";
+            btnStart.disabled = false;
+            btnPause.disabled = true;
+            btnPause.innerHTML = '<i data-lucide="pause" class="w-4 h-4"></i> 暫停';
+            lucide.createIcons();
+        }
+
+        function wait(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // ipconfig 模擬邏輯
+        function runIpconfig() {
+            const typing = document.getElementById('cmd-typing');
+            const output = document.getElementById('cmd-output');
+            
+            typing.innerText = "";
+            output.classList.add('hidden');
+            
+            const text = "ipconfig";
+            let i = 0;
+            
+            function typeWriter() {
+                if (i < text.length) {
+                    typing.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 100);
+                } else {
+                    setTimeout(() => {
+                        output.classList.remove('hidden');
+                    }, 200);
+                }
+            }
+            typeWriter();
+        }
+
+        // DNS 模擬邏輯
+        function simulateDNS() {
+            const input = document.getElementById('dns-input').value;
+            const consoleBox = document.getElementById('dns-console');
+            consoleBox.innerHTML = `> 正在查詢域名：${input}...`;
+            
+            setTimeout(() => {
+                consoleBox.innerHTML += `<br>> 聯絡 DNS 伺服器進行解析...`;
+            }, 600);
+            
+            setTimeout(() => {
+                const fakeIp = `142.250.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}`;
+                consoleBox.innerHTML += `<br>> 解析成功！回傳 IP 位址: <span class="text-white font-bold">${fakeIp}</span>`;
+                consoleBox.innerHTML += `<br><span class='text-sky-400'>> 電腦正使用此 IP 位址建立連線...</span>`;
+                consoleBox.scrollTop = consoleBox.scrollHeight;
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
