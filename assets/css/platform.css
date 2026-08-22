@@ -12,6 +12,7 @@
 }
 
 .platform-page {
+    margin: 0;
     color: var(--platform-ink);
     -webkit-font-smoothing: antialiased;
 }
@@ -46,8 +47,8 @@
     color: #fff;
     box-shadow: 0 5px 20px rgb(15 23 42 / 0.16);
     font-family: "Noto Sans TC", system-ui, sans-serif;
-    width: 100vw;
-    margin-left: calc(50% - 50vw);
+    width: calc(100% + var(--platform-body-padding-left, 0px) + var(--platform-body-padding-right, 0px));
+    margin-left: calc(-1 * var(--platform-body-padding-left, 0px));
 }
 
 .platform-brand {
@@ -151,8 +152,8 @@
     color: #cbd5e1;
     font: 400 12px/1.7 "Noto Sans TC", system-ui, sans-serif;
     text-align: center;
-    width: 100vw;
-    margin-left: calc(50% - 50vw);
+    width: calc(100% + var(--platform-body-padding-left, 0px) + var(--platform-body-padding-right, 0px));
+    margin-left: calc(-1 * var(--platform-body-padding-left, 0px));
 }
 
 .platform-footer p { margin: 0; }
@@ -187,6 +188,15 @@ body.maximized > .platform-shell-nav,
 body.maximized > .platform-footer { display: none; }
 
 @media (max-width: 760px) {
+    body[data-content-id="tool-python-converter"] { padding: 12px; transition: none; }
+    body[data-content-id="tool-python-converter"] > .container { width: 100%; }
+    body[data-content-id="tool-python-converter"] .panel {
+        flex-basis: 100%;
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
     .platform-shell-nav {
         flex-wrap: wrap;
         gap: 9px 12px;

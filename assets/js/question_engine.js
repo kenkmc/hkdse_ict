@@ -233,6 +233,10 @@
     }
 
     populateTopics();
+    const requestedTopic = new URLSearchParams(window.location.search).get("topic");
+    if (requestedTopic && [...topicSelect.options].some(option => option.value === requestedTopic)) {
+        topicSelect.value = requestedTopic;
+    }
     updateAvailableCount();
     topicSelect.addEventListener("change", updateAvailableCount);
     difficultySelect.addEventListener("change", updateAvailableCount);

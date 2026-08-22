@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assets/css/platform.css">
+    <link rel="stylesheet" href="assets/css/platform.css?v=4">
+    <link rel="stylesheet" href="assets/css/learning.css?v=1">
     <title>PKI 多場景互動教學</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -219,9 +220,9 @@
             document.getElementById('eve-avatar').classList.add('opacity-30', 'grayscale');
             
             if (currentScenario === 'confidentiality') {
-                updateGuide("場景：傳輸加密", "目標：確保只有 Bob 能看見內容。請將 <b>Bob 的公開密碼匙 (藍色🔑)</b> 拖到郵件上進行加密。");
+                updateGuide("場景：傳輸加密", "目標：確保只有 Bob 能看見內容。請點按或拖曳 <b>Bob 的公開密碼匙 (藍色🔑)</b> 到郵件上進行加密。");
             } else {
-                updateGuide("場景：數碼簽署", "目標：確認文件由持有 Alice 私人密碼匙的人簽署，而且內容未被更改。請將 <b>Alice 的私人密碼匙 (紅色🗝️)</b> 拖到郵件上進行簽署。");
+                updateGuide("場景：數碼簽署", "目標：確認文件由持有 Alice 私人密碼匙的人簽署，而且內容未被更改。請點按或拖曳 <b>Alice 的私人密碼匙 (紅色🗝️)</b> 到郵件上進行簽署。");
             }
         }
 
@@ -230,10 +231,20 @@
             document.getElementById('guide-text').innerHTML = text;
         }
 
-        // 拖放邏輯
+        // 密碼匙可拖放、點按或以鍵盤操作，照顧手機及鍵盤使用者。
         let draggedKey = null;
         document.querySelectorAll('.draggable-key').forEach(k => {
-            k.addEventListener('dragstart', e => draggedKey = e.target.dataset.key);
+            k.setAttribute('role', 'button');
+            k.setAttribute('tabindex', '0');
+            k.setAttribute('aria-label', `${k.title}；按下以套用到目前封包`);
+            k.addEventListener('dragstart', e => draggedKey = e.currentTarget.dataset.key);
+            k.addEventListener('click', () => handleAction(k.dataset.key));
+            k.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    handleAction(k.dataset.key);
+                }
+            });
         });
 
         const dropTarget = document.getElementById('main-packet');
@@ -339,9 +350,9 @@
             
             setTimeout(() => {
                 if (currentScenario === 'confidentiality') {
-                    updateGuide("Bob 已收到密文", "數據已送達。請將 <b>Bob 的私人密碼匙 (藍色🗝️)</b> 拖到封包上解密內容。");
+                    updateGuide("Bob 已收到密文", "數據已送達。請點按或拖曳 <b>Bob 的私人密碼匙 (藍色🗝️)</b> 到封包上解密內容。");
                 } else {
-                    updateGuide("Bob 已收到簽署文件", "數據已送達。請將 <b>Alice 的公開密碼匙 (紅色🔑)</b> 拖到封包上驗證簽署及文件完整性。");
+                    updateGuide("Bob 已收到簽署文件", "數據已送達。請點按或拖曳 <b>Alice 的公開密碼匙 (紅色🔑)</b> 到封包上驗證簽署及文件完整性。");
                 }
             }, 700);
         };
@@ -378,6 +389,8 @@
         resetUI();
     </script>
     <script src="course_data.js"></script>
-    <script src="assets/js/site_navigation.js"></script>
+    <script src="assets/js/site_navigation.js?v=4"></script>
+    <script src="learning_data.js?v=1"></script>
+    <script src="assets/js/lesson_companion.js?v=1"></script>
 </body>
 </html>

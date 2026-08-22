@@ -18,6 +18,10 @@
         document.title = `${currentItem.title.replace(/^[ivx]+\.\s*/i, "")} | ${platform.config.siteName}`;
     }
 
+    const bodyStyle = window.getComputedStyle(document.body);
+    document.body.style.setProperty("--platform-body-padding-left", bodyStyle.paddingLeft);
+    document.body.style.setProperty("--platform-body-padding-right", bodyStyle.paddingRight);
+
     const nav = document.createElement("nav");
     nav.className = "platform-shell-nav";
     nav.setAttribute("aria-label", "全站導覽");
