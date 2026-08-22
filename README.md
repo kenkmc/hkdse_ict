@@ -21,6 +21,8 @@
 
 第 1 章：建網及互聯網基本知識（網絡架構、硬件、通訊協定）
 
+互動工具：SQL 學習平台、Python／偽代碼／流程圖工具、PKI 實驗室
+
 
 
 🛠️ 技術棧
@@ -37,3 +39,15 @@ Animation: CSS3 Keyframes & JavaScript DOM Manipulation
 https://kenkmc.github.io/hkdse_ict/
 
 本資源僅供教育用途參考。
+
+## 內容目錄與擴充方式
+
+`course_data.js` 是全站課程及工具的唯一資料來源。首頁、隨機學習及共用導覽都從這個檔案讀取內容；請勿在個別 HTML 頁面另外建立課程清單。
+
+每項內容都有不可重用的穩定 `id`、實際頁面路徑、內容類型、課程參照及搜尋標籤。這些欄位預留給日後的 DSE 題目引擎及學習進度記錄使用。新增頁面的流程如下：
+
+1. 建立 HTML 頁面。
+2. 在 `course_data.js` 的合適章節加入一個項目。
+3. 在提交前執行 `node scripts/validate_catalog.js`。
+
+驗證程式會檢查重複識別碼、目錄所列檔案、未列入目錄的 HTML 頁面，以及所有本機 `href`／`src` 連結。
