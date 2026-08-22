@@ -91,10 +91,10 @@ const courseData = [
                 id: "chc-1",
                 title: "i. 建網及互聯網基本知識",
                 file: "chc.1.html",
-                desc: "網絡規模、服務模式、網絡硬件及互動組網",
+                desc: "LAN／WAN、網絡服務、硬件實物、通訊鏈路及情境題",
                 type: "lesson",
                 syllabusRef: "C(a) · 網絡",
-                tags: ["網絡", "拓撲", "LAN", "網絡硬件"]
+                tags: ["LAN", "WAN", "網絡硬件", "光纖", "無線網絡", "DSE 情境題"]
             },
             {
                 id: "chc-2",

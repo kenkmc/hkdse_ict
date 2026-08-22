@@ -133,6 +133,52 @@ const questionData = [
         explanation: "交換器通常連接同一 LAN 內的裝置；路由器連接不同網絡。"
     },
     {
+        id: "q-c-a-network-002",
+        topicId: "chc-1",
+        syllabusRef: "C(a)",
+        difficulty: "standard",
+        marks: 2,
+        type: "short-answer",
+        question: "某電腦室以網絡線把多部桌面電腦接入同一 LAN。分別說明網絡介面卡（NIC）和交換器的主要功能。",
+        answer: "NIC 為每部電腦提供網絡介面以傳送及接收數據；交換器連接同一 LAN 內多部裝置，並把訊框轉送至合適連接埠。",
+        markingScheme: [
+            { marks: 1, criterion: "NIC：讓電腦接入網絡並傳送／接收網絡數據。", anyOf: ["網絡介面", "接入網絡", "傳送", "接收"] },
+            { marks: 1, criterion: "交換器：連接同一 LAN 內的裝置並轉送訊框。", anyOf: ["同一 LAN", "同一局部區域網絡", "連接多部", "轉送", "連接埠"] }
+        ],
+        explanation: "硬件功能題應寫出連接對象及數據處理作用，而不只是寫『用來上網』。"
+    },
+    {
+        id: "q-c-a-network-003",
+        topicId: "chc-1",
+        syllabusRef: "C(a)",
+        difficulty: "standard",
+        marks: 2,
+        type: "short-answer",
+        question: "學校圖書館讓學生使用平板電腦接入校內 LAN。建議一種合適的網絡裝置，並說明一項與平板電腦使用情境相關的理由。",
+        answer: "使用無線接達點（AP），讓平板透過 Wi-Fi 接入有線 LAN，學生毋須接駁固定網絡線並可在覆蓋範圍內移動。",
+        markingScheme: [
+            { marks: 1, criterion: "建議無線接達點（AP）。", anyOf: ["無線接達點", "無線接入點", "AP", "access point"] },
+            { marks: 1, criterion: "指出以無線方式接入 LAN，讓平板毋須固定接線／可移動使用。", anyOf: ["Wi-Fi", "無線", "毋須網絡線", "不用網絡線", "移動", "流動"] }
+        ],
+        explanation: "答案要把 AP 的無線接入功能連結到平板裝置的流動使用需要。"
+    },
+    {
+        id: "q-c-a-network-004",
+        topicId: "chc-1",
+        syllabusRef: "C(a)",
+        difficulty: "advanced",
+        marks: 3,
+        type: "short-answer",
+        question: "某學校經常進行多班同步視像會議。比較光纖和流動網絡，建議較合適的主要互聯網連接方法，並說明兩項理由。",
+        answer: "建議光纖；它通常有較高頻寬，可支援多路視像傳輸，而且固定線路較少受無線覆蓋、用戶量或干擾影響，連線一般較穩定。",
+        markingScheme: [
+            { marks: 1, criterion: "在題目情境下建議光纖。", anyOf: ["光纖", "fibre", "fiber"] },
+            { marks: 1, criterion: "比較速度／頻寬，並連結多路視像傳輸需要。", anyOf: ["頻寬", "速度", "多路", "視像", "video"] },
+            { marks: 1, criterion: "比較穩定性／可用性，指出較少受覆蓋、負載或無線干擾影響。", anyOf: ["穩定", "覆蓋", "負載", "用戶量", "干擾"] }
+        ],
+        explanation: "建議題要先作選擇，再以相同準則比較選項，理由亦須回應題目的服務需要。"
+    },
+    {
         id: "q-c-a-dns-001",
         topicId: "chc-2",
         syllabusRef: "C(a)",

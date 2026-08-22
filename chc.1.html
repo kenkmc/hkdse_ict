@@ -3,343 +3,329 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assets/css/platform.css?v=4">
-    <link rel="stylesheet" href="assets/css/learning.css?v=1">
     <title>C1 建網及互聯網基本知識 - ICT 學習資源網</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <style>
-        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f0f9ff; scroll-behavior: smooth; }
-        
-        /* 基礎卡片佈局 */
-        .section-card { background: white; border-radius: 1.5rem; padding: 2rem; margin-bottom: 2.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; }
-        
-        /* 硬件外觀模擬 */
-        .hw-svg { width: 80px; height: 60px; margin-bottom: 8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); transition: transform 0.3s; }
-        .hw-card:hover .hw-svg { transform: scale(1.1); }
-        
-        /* 網絡架構繪圖容器 */
-        .network-diagram { background: #fdfdfd; border: 1px solid #edf2f7; border-radius: 12px; padding: 0; position: relative; overflow: hidden; width: 100%; height: 260px; }
-        
-        /* 節點定位 */
-        .node { width: 60px; height: 60px; background: white; border: 2px solid #0369a1; border-radius: 12px; display: flex; align-items: center; justify-content: center; z-index: 10; position: absolute; font-size: 10px; font-weight: bold; flex-direction: column; color: #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .node-server { width: 70px; height: 80px; border-color: #f59e0b; background: #fffbeb; }
-        
-        /* SVG 連線樣式 */
-        .connection-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
-        .network-line { stroke: #cbd5e1; stroke-width: 3; stroke-linecap: round; }
-
-        /* 拖放遊戲樣式 */
-        .drop-target { border: 2px dashed #94a3b8; border-radius: 1rem; background: #f8fafc; transition: all 0.2s; min-height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0.5rem; }
-        .drop-target.active { border-color: #0284c7; background: #e0f2fe; }
-        .drop-target.correct { border: 2px solid #10b981; background: #ecfdf5; }
-        .draggable { cursor: grab; user-select: none; transition: transform 0.2s; }
-        .draggable:active { cursor: grabbing; transform: scale(1.05); }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/platform.css?v=4">
+    <link rel="stylesheet" href="assets/css/learning.css?v=2">
+    <link rel="stylesheet" href="assets/css/network-lesson.css?v=1">
 </head>
-<body class="text-slate-800">
+<body>
+    <nav class="nw-lesson-nav" aria-label="本課導覽">
+        <a href="#scope">課程重點</a>
+        <a href="#services">網絡服務</a>
+        <a href="#hardware">硬件實物</a>
+        <a href="#connections">連接方法</a>
+        <a href="#dse-practice">DSE 情境題</a>
+    </nav>
 
-    <!-- 頂部導航 -->
-    <header class="bg-sky-700 text-white shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-4">
-                <a href="index.html" class="flex items-center gap-2 bg-sky-800 hover:bg-sky-600 transition px-3 py-2 rounded-xl text-sm font-bold shadow-inner border border-sky-600">
-                    <i data-lucide="home" class="w-4 h-4"></i> 返回首頁
-                </a>
-                <h1 class="text-xl font-bold flex items-center gap-2">
-                    <i data-lucide="network"></i> C1 建網及互聯網基本知識
-                </h1>
-            </div>
-            <nav class="hidden md:flex gap-6 text-sm font-medium items-center">
-                <a href="#s1" class="hover:text-sky-200 transition">網絡規模</a>
-                <a href="#s2" class="hover:text-sky-200 transition">服務與模式</a>
-                <a href="#s3" class="hover:text-sky-200 transition">硬件圖鑑</a>
-                <a href="#game" class="bg-white text-sky-800 px-4 py-2 rounded-full font-bold shadow hover:bg-sky-50 transition">互動組網</a>
-            </nav>
-        </div>
-    </header>
-
-    <main class="container mx-auto px-4 py-10 max-w-5xl">
-
-        <!-- 1.1 電腦網絡與規模 -->
-        <section id="s1" class="section-card">
-            <h2 class="text-2xl font-bold text-sky-800 mb-6 flex items-center gap-2 border-b pb-4 border-slate-100">
-                <i data-lucide="globe-2" class="text-sky-600"></i> 1.1 電腦網絡簡介與規模
-            </h2>
-            <p class="text-slate-600 mb-8 leading-relaxed">
-                電腦網絡是將兩部或以上的電腦及周邊設備連接起來，以達到通訊及共享資源的目的。
-            </p>
-            
-            <div class="grid md:grid-cols-2 gap-8">
-                <!-- LAN -->
-                <div class="bg-emerald-50 p-6 rounded-3xl border border-emerald-100 shadow-sm relative overflow-hidden">
-                    <div class="absolute top-0 right-0 bg-emerald-200 text-emerald-800 px-4 py-1 rounded-bl-xl font-bold text-xs">LAN</div>
-                    <h3 class="text-xl font-bold text-emerald-800 mb-2 flex items-center gap-2">
-                        <i data-lucide="building"></i> 局部區域網絡
-                    </h3>
-                    <p class="text-[11px] text-emerald-600 font-mono mb-4">Local Area Network</p>
-                    <ul class="text-sm space-y-3 text-slate-700">
-                        <li class="flex items-start gap-2"><i data-lucide="map-pin" class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5"></i> <b>地理範圍：</b> 覆蓋面積較小（如學校）。</li>
-                        <li class="flex items-start gap-2"><i data-lucide="zap" class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5"></i> <b>一般表現：</b> 在相近技術及負載下，通常延遲較低、速度較高。</li>
-                    </ul>
-                </div>
-
-                <!-- WAN -->
-                <div class="bg-sky-50 p-6 rounded-3xl border border-sky-100 shadow-sm relative overflow-hidden">
-                    <div class="absolute top-0 right-0 bg-sky-200 text-sky-800 px-4 py-1 rounded-bl-xl font-bold text-xs">WAN</div>
-                    <h3 class="text-xl font-bold text-sky-800 mb-2 flex items-center gap-2">
-                        <i data-lucide="globe" class="w-5 h-5"></i> 廣域網絡
-                    </h3>
-                    <p class="text-[11px] text-sky-600 font-mono mb-4">Wide Area Network</p>
-                    <ul class="text-sm space-y-3 text-slate-700">
-                        <li class="flex items-start gap-2"><i data-lucide="map" class="w-4 h-4 text-sky-500 shrink-0 mt-0.5"></i> <b>地理範圍：</b> 跨城市、國家（如互聯網）。</li>
-                        <li class="flex items-start gap-2"><i data-lucide="activity" class="w-4 h-4 text-sky-500 shrink-0 mt-0.5"></i> <b>連接方式：</b> 可使用電訊服務供應商網絡、租用線路或互聯網連接遠端地點。</li>
-                    </ul>
+    <main class="nw-page">
+        <section class="nw-hero" aria-labelledby="page-title">
+            <div class="nw-hero-copy">
+                <p class="nw-eyebrow">必修部分 C(a) · 基本網絡概念</p>
+                <h1 id="page-title">懂得辨認硬件，更要懂得按情境解釋用途</h1>
+                <p>HKDSE 不只問名詞定義。你需要根據學校、辦公室或家庭網絡的需要，選擇合適裝置及連接方法，並用技術理由支持答案。</p>
+                <div class="nw-hero-actions">
+                    <a class="nw-button nw-button-primary" href="#hardware">從實物硬件開始</a>
+                    <a class="nw-button nw-button-secondary" href="#dse-practice">挑戰 8 分情境題</a>
                 </div>
             </div>
+            <aside class="nw-exam-card" aria-label="常見題目指令詞">
+                <span>答題焦點</span>
+                <h2>看清楚指令詞</h2>
+                <dl>
+                    <div><dt>指出</dt><dd>寫出裝置或概念名稱</dd></div>
+                    <div><dt>解釋</dt><dd>交代功能和產生的效果</dd></div>
+                    <div><dt>比較</dt><dd>用相同準則寫出兩者差異</dd></div>
+                    <div><dt>建議</dt><dd>先作選擇，再連結題目需要</dd></div>
+                </dl>
+            </aside>
         </section>
 
-        <!-- 1.3 網絡模式 (SVG 精準連線版) -->
-        <section id="s2" class="section-card">
-            <h2 class="text-2xl font-bold text-sky-800 mb-8 flex items-center gap-2 border-b pb-4 border-slate-100">
-                <i data-lucide="server-cog" class="text-sky-600"></i> 1.3 網絡模式 (Network Models)
-            </h2>
-            
-            <div class="grid md:grid-cols-2 gap-10">
-                <!-- 客戶端-伺服器網絡 -->
-                <div class="space-y-4">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm">中心化管理</span>
-                        <h3 class="text-lg font-bold text-slate-700">客戶端-伺服器網絡</h3>
-                    </div>
-                    
-                    <div class="network-diagram bg-slate-50">
-                        <!-- SVG 連線層 -->
-                        <svg class="connection-layer">
-                            <!-- 連接點均指向中心 (50%, 50%) -->
-                            <line x1="15%" y1="20%" x2="50%" y2="50%" class="network-line" />
-                            <line x1="85%" y1="20%" x2="50%" y2="50%" class="network-line" />
-                            <line x1="15%" y1="80%" x2="50%" y2="50%" class="network-line" />
-                            <line x1="85%" y1="80%" x2="50%" y2="50%" class="network-line" />
-                        </svg>
-
-                        <!-- 中心伺服器 (置中) -->
-                        <div class="node node-server left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                            <i data-lucide="database" class="w-6 h-6 text-amber-600 mb-1"></i>
-                            <span>伺服器</span>
-                        </div>
-                        
-                        <!-- 四周客戶端 (使用百分比定位與連線座標一致) -->
-                        <div class="node left-[5%] top-[5%]"><i data-lucide="monitor" class="w-4 h-4 mb-1"></i>PC 1</div>
-                        <div class="node right-[5%] top-[5%]"><i data-lucide="monitor" class="w-4 h-4 mb-1"></i>PC 2</div>
-                        <div class="node left-[5%] bottom-[5%]"><i data-lucide="laptop" class="w-4 h-4 mb-1"></i>PC 3</div>
-                        <div class="node right-[5%] bottom-[5%]"><i data-lucide="smartphone" class="w-4 h-4 mb-1"></i>手機</div>
-                    </div>
-                    
-                    <ul class="text-sm space-y-2 text-slate-600 bg-sky-50/50 p-4 rounded-2xl border border-sky-100">
-                        <li class="flex items-start gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-sky-500 mt-0.5 shrink-0"></i> <b>伺服器</b>：提供服務與資源給客戶端。</li>
-                        <li class="flex items-start gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-500 mt-0.5 shrink-0"></i> <b>特點</b>：管理方便、安全性較高。</li>
-                    </ul>
-                </div>
-
-                <!-- 對等網絡 (P2P) -->
-                <div class="space-y-4">
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="bg-sky-100 text-sky-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm">分散式對接</span>
-                        <h3 class="text-lg font-bold text-slate-700">對等網絡 (P2P)</h3>
-                    </div>
-
-                    <div class="network-diagram bg-slate-50">
-                        <!-- SVG 連線層 -->
-                        <svg class="connection-layer">
-                            <!-- 繪製三角形連線 -->
-                            <line x1="50%" y1="20%" x2="20%" y2="80%" class="network-line" /> <!-- A to B -->
-                            <line x1="50%" y1="20%" x2="80%" y2="80%" class="network-line" /> <!-- A to C -->
-                            <line x1="20%" y1="80%" x2="80%" y2="80%" class="network-line" /> <!-- B to C -->
-                        </svg>
-
-                        <!-- PC 節點 (與 SVG 座標對齊) -->
-                        <div class="node left-1/2 top-[5%] -translate-x-1/2 shadow-md"><i data-lucide="monitor" class="w-4 h-4 mb-1"></i>PC A</div>
-                        <div class="node left-[5%] bottom-[5%] shadow-md"><i data-lucide="monitor" class="w-4 h-4 mb-1"></i>PC B</div>
-                        <div class="node right-[5%] bottom-[5%] shadow-md"><i data-lucide="monitor" class="w-4 h-4 mb-1"></i>PC C</div>
-                    </div>
-
-                    <ul class="text-sm space-y-2 text-slate-600 bg-sky-50/50 p-4 rounded-2xl border border-sky-100">
-                        <li class="flex items-start gap-2"><i data-lucide="users" class="w-4 h-4 text-sky-500 mt-0.5 shrink-0"></i> <b>人人平等</b>：每台電腦既是客戶端也是伺服器。</li>
-                        <li class="flex items-start gap-2"><i data-lucide="coins" class="w-4 h-4 text-emerald-500 mt-0.5 shrink-0"></i> <b>特點</b>：低成本，適合小型家庭網絡。</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <!-- 1.4 硬件圖鑑 -->
-        <section id="s3" class="section-card">
-            <h2 class="text-2xl font-bold text-sky-800 mb-8 border-b pb-4 flex items-center gap-2 border-slate-100">
-                <i data-lucide="box" class="text-sky-600"></i> 1.4 網絡硬件圖鑑
-            </h2>
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                <!-- 每一張卡片展示一個硬件 -->
-                <div class="hw-card p-4 border rounded-2xl text-center bg-slate-50 border-slate-200">
-                    <svg class="hw-svg mx-auto" viewBox="0 0 100 60">
-                        <rect x="10" y="10" width="80" height="40" rx="3" fill="#334155" />
-                        <rect x="5" y="20" width="10" height="20" fill="#94a3b8" />
-                        <rect x="85" y="25" width="10" height="10" fill="#f59e0b" />
-                        <circle cx="25" cy="30" r="4" fill="#1e293b" />
-                    </svg>
-                    <p class="font-bold text-sky-800 mt-2 text-sm">網絡介面卡</p>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase">NIC</p>
-                </div>
-                <div class="hw-card p-4 border rounded-2xl text-center bg-slate-50 border-slate-200">
-                    <svg class="hw-svg mx-auto" viewBox="0 0 100 60">
-                        <rect x="15" y="35" width="70" height="15" rx="4" fill="#334155" />
-                        <line x1="25" y1="35" x2="25" y2="10" stroke="#334155" stroke-width="3" />
-                        <line x1="75" y1="35" x2="75" y2="10" stroke="#334155" stroke-width="3" />
-                    </svg>
-                    <p class="font-bold text-sky-800 mt-2 text-sm">路由器</p>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase">Router</p>
-                </div>
-                <div class="hw-card p-4 border rounded-2xl text-center bg-slate-50 border-slate-200">
-                    <svg class="hw-svg mx-auto" viewBox="0 0 100 60">
-                        <rect x="5" y="20" width="90" height="25" rx="3" fill="#0f172a" />
-                        <rect x="15" y="27" width="8" height="8" rx="1" fill="#cbd5e1"/>
-                        <rect x="30" y="27" width="8" height="8" rx="1" fill="#cbd5e1"/>
-                        <rect x="45" y="27" width="8" height="8" rx="1" fill="#cbd5e1"/>
-                    </svg>
-                    <p class="font-bold text-sky-800 mt-2 text-sm">交換器</p>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase">Switch</p>
-                </div>
-                <div class="hw-card p-4 border rounded-2xl text-center bg-slate-50 border-slate-200">
-                    <svg class="hw-svg mx-auto" viewBox="0 0 100 60">
-                        <rect x="10" y="30" width="80" height="20" rx="3" fill="#1e293b" />
-                        <circle cx="20" cy="40" r="2" fill="#22c55e" />
-                    </svg>
-                    <p class="font-bold text-sky-800 mt-2 text-sm">數據機</p>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase">Modem</p>
-                </div>
-                <div class="hw-card p-4 border rounded-2xl text-center bg-slate-50 border-slate-200">
-                    <svg class="hw-svg mx-auto" viewBox="0 0 100 60">
-                        <circle cx="50" cy="30" r="15" fill="none" stroke="#334155" stroke-width="2"/>
-                        <circle cx="50" cy="30" r="3" fill="#334155"/>
-                    </svg>
-                    <p class="font-bold text-sky-800 mt-2 text-sm">網絡接達點</p>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase">AP</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- 互動組網遊戲 -->
-        <section id="game" class="section-card border-2 border-sky-400 bg-sky-50/30">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+        <section id="scope" class="nw-section" aria-labelledby="scope-title">
+            <div class="nw-section-heading">
                 <div>
-                    <h2 class="text-2xl font-bold text-sky-900 flex items-center gap-2">
-                        <i data-lucide="mouse-pointer-click" class="text-sky-600"></i> 互動組網：搭建 LAN
-                    </h2>
-                    <p class="text-sm text-slate-500 mt-1">請按正確順序將硬件拖入對應位置。</p>
+                    <p class="nw-kicker">01 · Network scale</p>
+                    <h2 id="scope-title">LAN 與 WAN：從覆蓋範圍判斷</h2>
                 </div>
-                <div class="flex items-center gap-4">
-                    <span id="score" class="bg-white text-sky-700 border border-sky-200 px-4 py-2 rounded-full font-bold shadow-sm">已完成: 0/4</span>
+                <span class="nw-syllabus-tag">核心課程</span>
+            </div>
+            <div class="nw-scale-grid">
+                <article class="nw-scale-card nw-scale-card-lan">
+                    <div class="nw-scale-icon" aria-hidden="true">校</div>
+                    <p class="nw-card-label">Local Area Network</p>
+                    <h3>局部區域網絡（LAN）</h3>
+                    <ul>
+                        <li>覆蓋較小的地理範圍，例如同一學校、辦公室或家居。</li>
+                        <li>通常由同一機構管理網絡設備及存取權限。</li>
+                        <li>可讓裝置共享檔案、打印機和互聯網連線。</li>
+                    </ul>
+                </article>
+                <article class="nw-scale-card nw-scale-card-wan">
+                    <div class="nw-scale-icon" aria-hidden="true">港</div>
+                    <p class="nw-card-label">Wide Area Network</p>
+                    <h3>廣域網絡（WAN）</h3>
+                    <ul>
+                        <li>跨越較大的地理範圍，可連接不同地區的 LAN。</li>
+                        <li>通常使用電訊服務供應商提供的通訊鏈路。</li>
+                        <li>互聯網是規模龐大的互聯網絡，而不是單一 LAN。</li>
+                    </ul>
+                </article>
+            </div>
+            <div class="nw-checkpoint" data-scale-check>
+                <div>
+                    <p class="nw-kicker">即時判斷</p>
+                    <h3>學校把香港校舍的 LAN 連接到海外交流學校的網絡，整體連接較接近哪一類？</h3>
+                </div>
+                <div class="nw-choice-row" role="group" aria-label="選擇網絡類別">
+                    <button type="button" data-scale-answer="LAN">LAN</button>
+                    <button type="button" data-scale-answer="WAN">WAN</button>
+                </div>
+                <p class="nw-feedback" data-scale-feedback aria-live="polite"></p>
+            </div>
+        </section>
+
+        <section id="services" class="nw-section" aria-labelledby="services-title">
+            <div class="nw-section-heading">
+                <div>
+                    <p class="nw-kicker">02 · Network services</p>
+                    <h2 id="services-title">網絡的價值：通訊、會議、共享資源</h2>
                 </div>
             </div>
+            <p class="nw-lead">作答時不要只寫「方便」。應指出所傳送或共享的資源，以及如何滿足題目情境。</p>
+            <div class="nw-service-grid">
+                <article>
+                    <div class="nw-service-icon" aria-hidden="true">✉</div>
+                    <h3>內部通訊</h3>
+                    <p>教師可透過校內訊息系統傳送通告，減少紙張並讓訊息迅速送到多名使用者。</p>
+                    <span>答題詞：訊息、即時、多名使用者</span>
+                </article>
+                <article>
+                    <div class="nw-service-icon" aria-hidden="true">▣</div>
+                    <h3>視像會議</h3>
+                    <p>不同地點的參與者可即時傳送聲音及影像，進行遙距課堂或會議。</p>
+                    <span>答題詞：即時、聲音／影像、不同地點</span>
+                </article>
+                <article>
+                    <div class="nw-service-icon" aria-hidden="true">⇄</div>
+                    <h3>資源共享</h3>
+                    <p>多部電腦可共用網絡打印機、檔案及互聯網連線，減少重複購置設備。</p>
+                    <span>答題詞：共用、集中存取、成本</span>
+                </article>
+            </div>
+        </section>
 
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                <!-- 拖動物件區 -->
-                <div class="space-y-4">
-                    <div id="hw-modem" draggable="true" class="draggable p-4 bg-white border rounded-2xl shadow-sm flex items-center gap-3">
-                        <i data-lucide="zap" class="text-amber-500"></i> <span class="text-sm font-bold">數據機</span>
-                    </div>
-                    <div id="hw-router" draggable="true" class="draggable p-4 bg-white border rounded-2xl shadow-sm flex items-center gap-3">
-                        <i data-lucide="router" class="text-sky-500"></i> <span class="text-sm font-bold">路由器</span>
-                    </div>
-                    <div id="hw-switch" draggable="true" class="draggable p-4 bg-white border rounded-2xl shadow-sm flex items-center gap-3">
-                        <i data-lucide="layers" class="text-indigo-500"></i> <span class="text-sm font-bold">交換器</span>
-                    </div>
-                    <div id="hw-ap" draggable="true" class="draggable p-4 bg-white border rounded-2xl shadow-sm flex items-center gap-3">
-                        <i data-lucide="wifi" class="text-emerald-500"></i> <span class="text-sm font-bold">網絡接達點</span>
-                    </div>
+        <section id="hardware" class="nw-section" aria-labelledby="hardware-title">
+            <div class="nw-section-heading">
+                <div>
+                    <p class="nw-kicker">03 · Real hardware</p>
+                    <h2 id="hardware-title">由實物外觀連結到考試功能</h2>
                 </div>
-
-                <!-- 放置區 -->
-                <div class="lg:col-span-3 bg-white p-6 rounded-3xl border flex flex-col items-center gap-4 min-h-[400px]">
-                    <div class="bg-sky-500 text-white p-3 rounded-full"><i data-lucide="cloud"></i></div>
-                    <div class="w-px h-6 bg-slate-200"></div>
-                    <div class="drop-target w-48 h-16" data-answer="hw-modem"><span class="text-xs text-slate-300 italic">放置數據機</span></div>
-                    <div class="w-px h-6 bg-slate-200"></div>
-                    <div class="drop-target w-48 h-16" data-answer="hw-router"><span class="text-xs text-slate-300 italic">放置路由器</span></div>
-                    <div class="w-px h-6 bg-slate-200"></div>
-                    <div class="drop-target w-48 h-16" data-answer="hw-switch"><span class="text-xs text-slate-300 italic">放置交換器</span></div>
-                    <div class="flex gap-10 mt-4">
-                        <div class="flex flex-col items-center">
-                            <div class="w-px h-6 bg-slate-200"></div>
-                            <div class="drop-target w-32 h-16" data-answer="hw-ap"><span class="text-xs text-slate-300 italic">AP</span></div>
-                        </div>
-                        <div class="flex flex-col items-center">
-                            <div class="w-px h-6 bg-slate-200"></div>
-                            <div class="p-4 bg-slate-50 border rounded-xl"><i data-lucide="monitor" class="text-slate-300"></i></div>
-                        </div>
+                <span class="nw-photo-tag">真實硬件相片</span>
+            </div>
+            <p class="nw-lead">外觀會因品牌和型號而不同，考試答案應以功能為準。按卡片查看可取分的完整句式。</p>
+            <div class="nw-hardware-grid">
+                <article class="nw-hardware-card" data-hardware-card>
+                    <figure>
+                        <img src="assets/images/network/network-interface-card.jpg" alt="具有 RJ45 接口的 PCI 網絡介面卡" loading="lazy">
+                        <figcaption>電腦內置或外接的網絡介面</figcaption>
+                    </figure>
+                    <div class="nw-hardware-copy">
+                        <p class="nw-card-label">NIC</p><h3>網絡介面卡</h3>
+                        <p>讓電腦或其他裝置接入網絡，並傳送和接收網絡數據。</p>
+                        <button type="button" aria-expanded="false">顯示 DSE 作答句式</button>
+                        <div class="nw-answer-note" hidden><strong>可取分句：</strong>NIC 為電腦提供網絡介面，使它能經通訊鏈路傳送及接收數據。</div>
                     </div>
+                </article>
+                <article class="nw-hardware-card" data-hardware-card>
+                    <figure>
+                        <img src="assets/images/network/utp-cable.jpg" alt="藍色雙絞網絡線及透明 RJ45 插頭" loading="lazy">
+                        <figcaption>常見 RJ45 插頭的雙絞線</figcaption>
+                    </figure>
+                    <div class="nw-hardware-copy">
+                        <p class="nw-card-label">UTP cable</p><h3>非屏蔽雙絞線</h3>
+                        <p>在 LAN 中形成有線通訊鏈路，連接電腦、交換器等設備。</p>
+                        <button type="button" aria-expanded="false">顯示 DSE 作答句式</button>
+                        <div class="nw-answer-note" hidden><strong>可取分句：</strong>UTP 線提供有線傳輸媒介，把裝置的數據訊號傳送至交換器。</div>
+                    </div>
+                </article>
+                <article class="nw-hardware-card" data-hardware-card>
+                    <figure>
+                        <img src="assets/images/network/network-switch.jpg" alt="接上多條 Ethernet 網絡線的交換器" loading="lazy">
+                        <figcaption>具有多個 Ethernet 連接埠</figcaption>
+                    </figure>
+                    <div class="nw-hardware-copy">
+                        <p class="nw-card-label">Switch</p><h3>交換器</h3>
+                        <p>連接同一 LAN 內多部有線裝置，並把訊框轉送至合適連接埠。</p>
+                        <button type="button" aria-expanded="false">顯示 DSE 作答句式</button>
+                        <div class="nw-answer-note" hidden><strong>不要混淆：</strong>交換器主要連接同一 LAN 內的裝置；路由器則連接不同網絡。</div>
+                    </div>
+                </article>
+                <article class="nw-hardware-card" data-hardware-card>
+                    <figure>
+                        <img src="assets/images/network/wifi-router.jpg" alt="家居無線路由器背面的 Ethernet 連接埠及天線" loading="lazy">
+                        <figcaption>家用型號常把多項功能整合</figcaption>
+                    </figure>
+                    <div class="nw-hardware-copy">
+                        <p class="nw-card-label">Router</p><h3>路由器</h3>
+                        <p>連接不同網絡，按目的地 IP 位址把封包轉送至合適路徑。</p>
+                        <button type="button" aria-expanded="false">顯示 DSE 作答句式</button>
+                        <div class="nw-answer-note" hidden><strong>情境連結：</strong>把學校 LAN 連接到 ISP／互聯網時，應使用路由器在兩個網絡之間轉送封包。</div>
+                    </div>
+                </article>
+                <article class="nw-hardware-card" data-hardware-card>
+                    <figure>
+                        <img src="assets/images/network/wireless-access-point.jpg" alt="可供無線裝置接入網絡的無線接達點" loading="lazy">
+                        <figcaption>商用 AP 可安裝於室內高處</figcaption>
+                    </figure>
+                    <div class="nw-hardware-copy">
+                        <p class="nw-card-label">Wireless AP</p><h3>無線接達點</h3>
+                        <p>利用無線電訊號，讓 Wi-Fi 裝置接入有線 LAN。</p>
+                        <button type="button" aria-expanded="false">顯示 DSE 作答句式</button>
+                        <div class="nw-answer-note" hidden><strong>高分理由：</strong>平板電腦不需固定網絡線，使用者可在覆蓋範圍內移動並保持接入網絡。</div>
+                    </div>
+                </article>
+                <article class="nw-hardware-card" data-hardware-card>
+                    <figure>
+                        <img src="assets/images/network/adsl-modem.jpg" alt="具有狀態燈的 ADSL 數據機" loading="lazy">
+                        <figcaption>數據機外觀會按接入技術而異</figcaption>
+                    </figure>
+                    <div class="nw-hardware-copy">
+                        <p class="nw-card-label">Modem</p><h3>數據機</h3>
+                        <p>按通訊線路需要調變及解調訊號，使數據可經服務供應商的線路傳輸。</p>
+                        <button type="button" aria-expanded="false">顯示 DSE 作答句式</button>
+                        <div class="nw-answer-note" hidden><strong>不要只寫：</strong>「連接上網」。較完整答案要指出它轉換／調變與解調訊號以配合通訊線路。</div>
+                    </div>
+                </article>
+            </div>
+            <aside class="nw-device-warning">
+                <strong>實物判讀提醒</strong>
+                <p>家用「Wi-Fi 路由器」可能同時包含路由器、交換器和無線接達點功能。題目若問個別裝置，仍要按指定功能作答，不能把三者視為完全相同。</p>
+            </aside>
+        </section>
+
+        <section id="connections" class="nw-section" aria-labelledby="connections-title">
+            <div class="nw-section-heading">
+                <div>
+                    <p class="nw-kicker">04 · Communication links</p>
+                    <h2 id="connections-title">連接方法：按四項準則作選擇</h2>
                 </div>
             </div>
-
-            <!-- 通關畫面 -->
-            <div id="win" class="hidden fixed inset-0 bg-slate-900/60 flex items-center justify-center z-[100]">
-                <div class="bg-white p-10 rounded-[2rem] text-center shadow-2xl">
-                    <h3 class="text-2xl font-bold text-slate-800 mb-6">網絡搭建成功！</h3>
-                    <button onclick="location.reload()" class="bg-sky-600 text-white px-8 py-3 rounded-xl font-bold">再次挑戰</button>
+            <p class="nw-lead">HKDSE 常把需要放進情境。請同時考慮速度、成本、安全性及可用性，而不是背誦單一「最佳」答案。</p>
+            <div class="nw-compare" data-medium-comparison>
+                <div class="nw-medium-tabs" role="tablist" aria-label="選擇通訊媒介">
+                    <button type="button" role="tab" aria-selected="true" data-medium="utp">UTP 雙絞線</button>
+                    <button type="button" role="tab" aria-selected="false" data-medium="fibre">光纖</button>
+                    <button type="button" role="tab" aria-selected="false" data-medium="microwave">地面微波</button>
+                    <button type="button" role="tab" aria-selected="false" data-medium="satellite">衛星</button>
+                </div>
+                <div class="nw-medium-panel" role="tabpanel" tabindex="0">
+                    <div>
+                        <p class="nw-card-label" data-medium-en>Unshielded twisted pair</p>
+                        <h3 data-medium-title>UTP 雙絞線</h3>
+                        <p data-medium-summary>常用於建築物內的 Ethernet LAN，鋪設成本較低，但距離及抗干擾能力不及光纖。</p>
+                    </div>
+                    <dl class="nw-rating-grid">
+                        <div><dt>速度</dt><dd data-rating-speed>中至高</dd></div>
+                        <div><dt>成本</dt><dd data-rating-cost>低</dd></div>
+                        <div><dt>安全／抗干擾</dt><dd data-rating-security>中</dd></div>
+                        <div><dt>可用性</dt><dd data-rating-availability>建築物內普及</dd></div>
+                    </dl>
+                    <div class="nw-scenario-fit"><strong>適合情境：</strong><span data-medium-fit>連接電腦室內的桌面電腦與交換器。</span></div>
+                </div>
+            </div>
+            <div class="nw-internet-methods">
+                <h3>常見互聯網接入方法</h3>
+                <p>同一方法的實際表現會受服務計劃、覆蓋和用戶量影響；以下是情境比較的起點。</p>
+                <div>
+                    <article><strong>固網光纖寬頻</strong><span>通常速度高而穩定；需要線路覆蓋及安裝，固定地點使用。</span></article>
+                    <article><strong>4G／5G 流動數據</strong><span>部署快並可流動使用；速度及可用性受訊號覆蓋、干擾和同區用戶量影響。</span></article>
+                    <article><strong>公共 Wi-Fi</strong><span>使用成本可較低；覆蓋有限，使用敏感服務時要考慮網絡真確性及加密保護。</span></article>
+                    <article><strong>衛星互聯網</strong><span>偏遠地區亦可能接達；設備及服務成本、天氣影響和延遲均須考慮。</span></article>
+                </div>
+            </div>
+            <div class="nw-wireless-strip">
+                <h3>無線網絡四個必懂概念</h3>
+                <div>
+                    <article><strong>頻率</strong><span>無線訊號使用的電磁波頻段。</span></article>
+                    <article><strong>頻寬</strong><span>影響通訊鏈路可承載的數據量。</span></article>
+                    <article><strong>干擾</strong><span>其他訊號或障礙可令連線變慢或不穩。</span></article>
+                    <article><strong>漫遊</strong><span>裝置移動時可轉接至另一個 AP，維持網絡服務。</span></article>
                 </div>
             </div>
         </section>
 
+        <section id="dse-practice" class="nw-section nw-practice" aria-labelledby="practice-title">
+            <div class="nw-section-heading">
+                <div>
+                    <p class="nw-kicker">05 · Original DSE-style practice</p>
+                    <h2 id="practice-title">校園網絡更新：8 分情境題</h2>
+                </div>
+                <span class="nw-marks">8 分</span>
+            </div>
+            <div class="nw-original-note">
+                <strong>原創練習</strong>
+                <span>參考公開評核資料的情境式問法編寫，並非歷屆試題或官方擬題。</span>
+            </div>
+            <div class="nw-case-intro">
+                <p>某中學更新圖書館網絡。30 部桌面電腦以網絡線連接；60 部平板電腦需要無線連線；所有裝置均要使用校內檔案服務及互聯網。</p>
+                <div class="nw-case-diagram" aria-label="由互聯網依次連接數據機、路由器、交換器，再連接桌面電腦和無線接達點的網絡圖">
+                    <div class="nw-diagram-node nw-cloud">互聯網</div><span aria-hidden="true">→</span>
+                    <div class="nw-diagram-node">數據機</div><span aria-hidden="true">→</span>
+                    <div class="nw-diagram-node nw-node-x">裝置 X</div><span aria-hidden="true">→</span>
+                    <div class="nw-diagram-node nw-node-y">裝置 Y</div>
+                    <div class="nw-diagram-branches"><span>↙</span><span>↘</span><div>30 部桌面電腦</div><div>無線接達點 → 60 部平板</div></div>
+                </div>
+            </div>
+            <ol class="nw-question-list">
+                <li data-exam-question>
+                    <div class="nw-question-row"><p><span>(a)</span> 指出裝置 X 及裝置 Y。</p><b>[2 分]</b></div>
+                    <textarea rows="2" aria-label="第 a 題答案" placeholder="X：……；Y：……"></textarea>
+                    <button type="button" class="nw-reveal" aria-expanded="false">查看評分準則</button>
+                    <div class="nw-marking" hidden><p><strong>X：路由器</strong>，負責連接校內 LAN 和互聯網。（1）</p><p><strong>Y：交換器</strong>，連接同一 LAN 內多部有線裝置。（1）</p></div>
+                </li>
+                <li data-exam-question>
+                    <div class="nw-question-row"><p><span>(b)</span> 解釋每部桌面電腦為何需要網絡介面卡。</p><b>[1 分]</b></div>
+                    <textarea rows="2" aria-label="第 b 題答案" placeholder="用「功能 → 效果」句式作答……"></textarea>
+                    <button type="button" class="nw-reveal" aria-expanded="false">查看評分準則</button>
+                    <div class="nw-marking" hidden><p>NIC 為桌面電腦提供網絡介面，使電腦能經網絡線傳送及接收數據。（1）</p></div>
+                </li>
+                <li data-exam-question>
+                    <div class="nw-question-row"><p><span>(c)</span> 說明使用無線接達點連接平板電腦的兩項好處。</p><b>[2 分]</b></div>
+                    <textarea rows="3" aria-label="第 c 題答案" placeholder="每項好處必須連結到平板／圖書館情境……"></textarea>
+                    <button type="button" class="nw-reveal" aria-expanded="false">查看評分準則</button>
+                    <div class="nw-marking" hidden><p>每項合理好處 1 分，例如：</p><ul><li>平板不需逐部接駁網絡線，使用者可在覆蓋範圍內移動。</li><li>新增／重新擺放平板時毋須加設固定網絡插座，部署較靈活。</li></ul></div>
+                </li>
+                <li data-exam-question>
+                    <div class="nw-question-row"><p><span>(d)</span> 圖書館經常舉行大型視像會議。比較光纖和流動網絡，建議較合適的主要互聯網連接方法，並從速度、穩定性或可用性說明兩項理由。</p><b>[3 分]</b></div>
+                    <textarea rows="4" aria-label="第 d 題答案" placeholder="選擇（1）＋兩項與情境相關的比較理由（2）……"></textarea>
+                    <button type="button" class="nw-reveal" aria-expanded="false">查看評分準則</button>
+                    <div class="nw-marking" hidden><p><strong>建議光纖</strong>（1），合理比較理由每項 1 分，例如：</p><ul><li>通常提供較高頻寬，較能同時傳送多路視像及聲音。</li><li>固定線路一般較少受流動網絡覆蓋或無線干擾影響，連線較穩定。</li></ul><p class="nw-marker-note">答案須把所選方法和題目中的大型視像會議需要連結；只寫「較好／較快」不足以完整解釋。</p></div>
+                </li>
+            </ol>
+            <button type="button" class="nw-button nw-button-primary nw-reveal-all" data-reveal-all>顯示全部評分準則</button>
+        </section>
+
+        <section class="nw-section nw-exam-summary" aria-labelledby="summary-title">
+            <div><p class="nw-kicker">Before you leave</p><h2 id="summary-title">三句答題自檢</h2></div>
+            <ol>
+                <li><span>1</span>我有沒有指出裝置「連接甚麼」？</li>
+                <li><span>2</span>我有沒有解釋它「如何處理數據／訊號」？</li>
+                <li><span>3</span>我的理由有沒有連結題目的使用者、設備或服務需要？</li>
+            </ol>
+            <a href="chc.2.html">下一課：互聯網協定、IP、DNS 與 URL →</a>
+        </section>
+        <section class="nw-credits" aria-labelledby="credits-title">
+            <h2 id="credits-title">圖片來源及授權</h2>
+            <p><a href="https://commons.wikimedia.org/wiki/File:EthernetSwitch2.jpg" target="_blank" rel="noopener">交換器</a>、<a href="https://commons.wikimedia.org/wiki/File:ResidentialGatewayCloseup.jpg" target="_blank" rel="noopener">家居路由器</a>及 <a href="https://commons.wikimedia.org/wiki/File:EthernetCableBlue2.jpg" target="_blank" rel="noopener">UTP 線</a>：Raysonho，CC0；<a href="https://commons.wikimedia.org/wiki/File:Wireless_access_point.jpg" target="_blank" rel="noopener">無線接達點</a>：Pjpearce，CC0；<a href="https://commons.wikimedia.org/wiki/File:Telekom_Teledat_431_LAN_Front.jpg" target="_blank" rel="noopener">ADSL 數據機</a>：Tors，CC0。<a href="https://commons.wikimedia.org/wiki/File:Ethernet_network_card_05-01-0248-02-5009.jpg" target="_blank" rel="noopener">網絡介面卡</a>：© Raimond Spekking / <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>（via Wikimedia Commons）。完整記錄見 <a href="assets/images/network/README.md">圖片資料檔</a>。</p>
+        </section>
     </main>
 
-    <footer class="bg-slate-100 text-slate-500 py-10 text-center border-t border-slate-200 text-sm">
-        <p class="font-bold">ICT 學習資源網 - 單元 C</p>
-    </footer>
-
-    <script>
-        lucide.createIcons();
-
-        const draggables = document.querySelectorAll('.draggable');
-        const targets = document.querySelectorAll('.drop-target');
-        let solved = 0;
-
-        draggables.forEach(dr => {
-            dr.addEventListener('dragstart', (e) => e.dataTransfer.setData('text', dr.id));
-        });
-
-        targets.forEach(tar => {
-            tar.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                tar.classList.add('active');
-            });
-
-            tar.addEventListener('dragleave', () => tar.classList.remove('active'));
-
-            tar.addEventListener('drop', (e) => {
-                e.preventDefault();
-                tar.classList.remove('active');
-                const id = e.dataTransfer.getData('text');
-                
-                if (tar.dataset.answer === id) {
-                    const el = document.getElementById(id);
-                    tar.innerHTML = "";
-                    tar.appendChild(el);
-                    tar.classList.add('correct');
-                    el.setAttribute('draggable', 'false');
-                    solved++;
-                    document.getElementById('score').innerText = `已完成: ${solved}/4`;
-                    if (solved === 4) document.getElementById('win').classList.remove('hidden');
-                }
-            });
-        });
-    </script>
     <script src="course_data.js"></script>
     <script src="assets/js/site_navigation.js?v=4"></script>
-    <script src="learning_data.js?v=1"></script>
+    <script src="learning_data.js?v=2"></script>
+    <script src="assets/js/network-lesson.js?v=1"></script>
     <script src="assets/js/lesson_companion.js?v=1"></script>
 </body>
 </html>

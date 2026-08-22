@@ -61,6 +61,8 @@
     gap: 0;
 }
 
+.lesson-companion-content[hidden] { display: none; }
+
 .lesson-objectives,
 .lesson-concept-explorer,
 .lesson-mistakes,

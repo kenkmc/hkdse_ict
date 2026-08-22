@@ -129,19 +129,19 @@ const learningData = {
         },
         "chc-1": {
             objectives: [
-                "按覆蓋範圍分辨 LAN、MAN 及 WAN",
-                "分辨 NIC、交換器、無線接入點及路由器的用途",
-                "比較不同網絡拓撲的連接方式及故障影響"
+                "按覆蓋範圍比較 LAN 與 WAN",
+                "解釋數據機、NIC、通訊鏈路、交換器、路由器及無線接達點的功能",
+                "按速度、成本、安全性及可用性比較通訊及互聯網連接方法"
             ],
             concepts: [
-                { icon: "💻", label: "終端裝置", detail: "電腦、電話或打印機透過網絡介面卡接入網絡。" },
-                { icon: "🔀", label: "交換器", detail: "在同一局域網內按目的地把訊框轉送至合適連接埠。" },
-                { icon: "📡", label: "接入點", detail: "讓無線裝置接入有線局域網。" },
-                { icon: "🌐", label: "路由器", detail: "連接不同網絡，並按 IP 位址選擇封包轉送路徑。" }
+                { icon: "💻", label: "NIC 與鏈路", detail: "NIC 提供網絡介面；UTP、光纖或無線鏈路負責承載訊號。" },
+                { icon: "🔀", label: "交換器", detail: "連接同一 LAN 內多部有線裝置，並把訊框轉送至合適連接埠。" },
+                { icon: "📡", label: "接達點", detail: "利用無線電訊號，讓 Wi-Fi 裝置接入有線 LAN。" },
+                { icon: "🌐", label: "路由器", detail: "連接不同網絡，並按目的地 IP 位址轉送封包。" }
             ],
             misconceptions: [
                 { claim: "交換器和路由器的功能完全相同。", correction: "交換器主要連接同一 LAN 內的裝置；路由器則連接不同網絡。" },
-                { claim: "星形拓撲任何一條線故障都會令全網停頓。", correction: "一般裝置連線故障只影響該裝置；中央設備故障才可能影響整個網絡。" }
+                { claim: "家用 Wi-Fi 路由器的外觀代表路由器、交換器和 AP 是同一種裝置。", correction: "家用產品可整合多項功能；考試仍要按題目指定的個別網絡功能作答。" }
             ],
             quickCheck: {
                 question: "學校要把校內 LAN 連接到互聯網，主要需要哪種設備？",
@@ -149,7 +149,7 @@ const learningData = {
                 answerIndex: 0,
                 explanation: "路由器負責在校內 LAN 與外部網絡之間轉送封包。"
             },
-            examTip: "比較拓撲時應從佈線成本、擴充、效能及單點故障等指定準則作答。"
+            examTip: "回答硬件功能時，寫清楚它連接甚麼、如何處理數據或訊號，以及為何符合題目情境。"
         },
         "chc-2": {
             objectives: [
