@@ -24,6 +24,22 @@ const questionData = [
         explanation: "交易記錄是數據；經整理、分析並能支援決策的結果才是資訊。"
     },
     {
+        id: "q-a-a-002",
+        topicId: "cha-1",
+        syllabusRef: "A(a)",
+        difficulty: "standard",
+        marks: 3,
+        type: "short-answer",
+        question: "學校小食部保存每宗交易的貨品編號、數量和時間。系統其後產生『本週午膳時段最暢銷貨品』報告。解釋交易記錄與報告分別屬於數據還是資訊，並說明報告如何支援一項決策。",
+        answer: "每宗未經整理的交易記錄是原始數據；報告是交易記錄經分類及統計後所得、具有意義的資訊。管理員可按最暢銷貨品增加訂貨量或安排存貨。",
+        markingScheme: [
+            { marks: 1, criterion: "指出個別交易記錄是尚未整理的原始數據。", anyOf: ["原始數據", "未經處理", "未經整理", "data"] },
+            { marks: 1, criterion: "指出報告是數據經分類／統計後所得的有意義資訊。", anyOf: ["資訊", "分類", "統計", "處理", "information"] },
+            { marks: 1, criterion: "提出一項與報告相關的合理決策，例如調整訂貨量或存貨。", anyOf: ["訂貨", "入貨", "存貨", "庫存", "供應", "補貨"] }
+        ],
+        explanation: "完整答案需要交代處理過程及資訊的用途，不能只把兩個名詞配對。"
+    },
+    {
         id: "q-a-b-001",
         topicId: "cha-2",
         syllabusRef: "A(b)",
@@ -37,6 +53,22 @@ const questionData = [
             { marks: 1, criterion: "驗證：把輸入與原始資料比較，檢查抄錄準確性。", anyOf: ["原始資料", "原始文件", "比對", "比較", "準確"] }
         ],
         explanation: "通過有效性檢驗不代表數據一定正確；例如合理的年齡仍可能與原始表格不符。"
+    },
+    {
+        id: "q-a-b-002",
+        topicId: "cha-2",
+        syllabusRef: "A(b)",
+        difficulty: "standard",
+        marks: 3,
+        type: "short-answer",
+        question: "網上活動報名表的名額欄 QUOTA 只接受 1 至 40 的整數。建議兩項合適的有效性檢驗，並指出一種可減少抄錄錯誤的數據驗證方法。",
+        answer: "使用數據類型檢查，確保輸入是整數；使用範圍檢查，確保數值介乎 1 至 40；再以雙重輸入或與原始資料逐項比較來驗證輸入。",
+        markingScheme: [
+            { marks: 1, criterion: "數據類型檢查：QUOTA 必須是整數／數值。", anyOf: ["類型檢查", "數據類型", "整數", "數值", "type check"] },
+            { marks: 1, criterion: "範圍檢查：QUOTA 必須在 1 至 40 之間。", anyOf: ["範圍檢查", "1 至 40", "1-40", "1 到 40", "range check"] },
+            { marks: 1, criterion: "驗證：雙重輸入或把輸入與原始資料比較。", anyOf: ["雙重輸入", "輸入兩次", "原始資料", "原始文件", "比較", "核對"] }
+        ],
+        explanation: "有效性檢驗按規則拒絕不合理輸入；驗證則檢查輸入是否準確抄錄。"
     },
     {
         id: "q-a-c-001",
@@ -68,6 +100,22 @@ const questionData = [
         explanation: "+18 = 00010010；位元反轉得 11101101，再加 1 得 11101110。"
     },
     {
+        id: "q-a-c-003",
+        topicId: "cha-3",
+        syllabusRef: "A(c)",
+        difficulty: "standard",
+        marks: 3,
+        type: "short-answer",
+        question: "一幅未壓縮點陣圖的解像度為 800 × 600，每像素使用 24 bit。計算圖像的檔案大小（以 byte 表示），並說明色彩深度增至 48 bit、解像度不變時，檔案大小有何變化。",
+        answer: "800 × 600 × 24 ÷ 8 = 1,440,000 byte。色彩深度由 24 bit 加倍至 48 bit，所以每像素位元數加倍，未壓縮檔案大小亦加倍。",
+        markingScheme: [
+            { marks: 1, criterion: "使用寬 × 高 × 色彩深度計算總位元，再除以 8。", anyOf: ["800", "600", "24", "除以 8", "÷ 8", "/ 8"] },
+            { marks: 1, criterion: "正確答案為 1,440,000 byte。", anyOf: ["1440000", "1,440,000"] },
+            { marks: 1, criterion: "色彩深度加倍令每像素位元數及未壓縮大小加倍。", anyOf: ["加倍", "兩倍", "2 倍", "2倍", "每像素"] }
+        ],
+        explanation: "點陣圖未壓縮大小 = 像素數 × 每像素位元數；bit 轉 byte 要除以 8。"
+    },
+    {
         id: "q-a-d-sheet-001",
         topicId: "cha-4",
         syllabusRef: "A(d)",
@@ -97,6 +145,22 @@ const questionData = [
         explanation: "A2 是相對參照；$F$1 的欄和列都被鎖定。"
     },
     {
+        id: "q-a-d-sheet-003",
+        topicId: "cha-4",
+        syllabusRef: "A(d)",
+        difficulty: "standard",
+        marks: 3,
+        type: "short-answer",
+        question: "工作表以 B2 儲存學生分數，F1 儲存及格分數。寫出可複製至 C3:C101 的 C2 公式，及在 C102 計算『Pass』總數的公式。",
+        answer: "C2：=IF(B2>=$F$1,\"Pass\",\"Fail\")；C102：=COUNTIF(C2:C101,\"Pass\")。",
+        markingScheme: [
+            { marks: 1, criterion: "C2 使用 IF 比較 B2 與及格分數。", anyOf: ["IF", "B2", ">="] },
+            { marks: 1, criterion: "以絕對參照 $F$1 鎖定及格分數。", anyOf: ["$F$1"] },
+            { marks: 1, criterion: "C102 使用 COUNTIF 計算 C2:C101 中的 Pass。", anyOf: ["COUNTIF", "C2:C101", "Pass"] }
+        ],
+        explanation: "B2 應隨列數改變；及格標準 F1 必須鎖定。COUNTIF 則按文字條件計算符合的儲存格。"
+    },
+    {
         id: "q-a-d-db-001",
         topicId: "cha-5",
         syllabusRef: "A(d)",
@@ -113,6 +177,23 @@ const questionData = [
         answer: "B",
         markingScheme: [{ marks: 1, criterion: "指出主關鍵碼須唯一且不可為 NULL。" }],
         explanation: "主關鍵碼用來唯一識別每筆記錄，因此不可重複或留空。"
+    },
+    {
+        id: "q-a-d-db-002",
+        topicId: "cha-5",
+        syllabusRef: "A(d)",
+        difficulty: "standard",
+        marks: 4,
+        type: "short-answer",
+        question: "圖書館以 BORROW(LoanID, StudentID, BookID, Returned) 記錄借書，每名學生可借多本書。解釋 StudentID 為何不適合作主關鍵碼，指出較合適的主關鍵碼，並寫出 SQL 顯示所有尚未還書記錄的 StudentID 和 BookID。",
+        answer: "StudentID 可在同一學生借多本書時重複，因此不能唯一識別記錄；LoanID 較適合作主關鍵碼。SQL：SELECT StudentID, BookID FROM BORROW WHERE Returned = 'No';",
+        markingScheme: [
+            { marks: 1, criterion: "指出 StudentID 可能重複，不能唯一識別每筆借書記錄。", anyOf: ["重複", "不唯一", "不能唯一", "多本"] },
+            { marks: 1, criterion: "選擇 LoanID 作主關鍵碼。", anyOf: ["LoanID", "loan id"] },
+            { marks: 1, criterion: "SELECT StudentID, BookID FROM BORROW。", anyOf: ["SELECT StudentID, BookID", "SELECT StudentID,BookID", "FROM BORROW"] },
+            { marks: 1, criterion: "WHERE Returned = 'No'。", anyOf: ["WHERE", "Returned", "No"] }
+        ],
+        explanation: "主關鍵碼必須唯一；簡單 SELECT 查詢要依次處理輸出欄、來源表及篩選條件。"
     },
     {
         id: "q-c-a-network-001",
@@ -210,6 +291,23 @@ const questionData = [
         answer: "B",
         markingScheme: [{ marks: 1, criterion: "指出加密傳輸及／或伺服器身分驗證。" }],
         explanation: "HTTPS 保護傳輸中的資料，但不代表網站內容本身必然真確或安全。"
+    },
+    {
+        id: "q-c-a-url-001",
+        topicId: "chc-2",
+        syllabusRef: "C(a)",
+        difficulty: "standard",
+        marks: 4,
+        type: "short-answer",
+        question: "某學習網站的 URL 是 https://learn.example.edu.hk/notes/unit1.html。指出所用協定、網域名稱及路徑，並說明 DNS 在瀏覽此網站時的功能。",
+        answer: "協定是 HTTPS；網域名稱是 learn.example.edu.hk；路徑是 /notes/unit1.html；DNS 把網域名稱解析成相應的 IP 位址，讓裝置找到網站伺服器。",
+        markingScheme: [
+            { marks: 1, criterion: "協定：HTTPS。", anyOf: ["HTTPS", "https"] },
+            { marks: 1, criterion: "網域名稱：learn.example.edu.hk。", anyOf: ["learn.example.edu.hk"] },
+            { marks: 1, criterion: "路徑：/notes/unit1.html。", anyOf: ["/notes/unit1.html", "notes/unit1.html"] },
+            { marks: 1, criterion: "DNS 把網域名稱解析成相應 IP 位址。", anyOf: ["網域名稱", "域名", "解析", "IP 位址", "IP地址"] }
+        ],
+        explanation: "URL 各部分負責指出協定、主機及資源位置；DNS 只負責名稱解析，不會傳送整個網頁。"
     },
     {
         id: "q-c-d-pki-001",

@@ -13,6 +13,8 @@ const learningData = {
                 "辨認資訊系統的輸入、處理、輸出及儲存",
                 "從生活例子分析資訊科技帶來的影響"
             ],
+            scopeNote: "本課集中資訊系統、數據與資訊、資訊處理及資訊時代影響；字符和多媒體的編碼及檔案大小會在 A(c) 深入處理。",
+            featuredQuestionId: "q-a-a-002",
             concepts: [
                 { icon: "⌨️", label: "輸入", detail: "收集原始數據，例如掃描條碼、填寫表格或感應溫度。" },
                 { icon: "⚙️", label: "處理", detail: "按規則計算、分類、比較或整理數據，使其產生意義。" },
@@ -37,6 +39,8 @@ const learningData = {
                 "分辨有效性檢驗、驗證及錯誤檢測",
                 "為指定輸入選擇合適的檢查方法"
             ],
+            scopeNote: "必修重點包括數據分級、有效性檢驗、驗證、錯誤檢測、數據庫功能，以及順序與直接檔案存取。",
+            featuredQuestionId: "q-a-b-002",
             concepts: [
                 { icon: "🔤", label: "字符", detail: "數據表示的基本符號，例如字母、數字或標點。" },
                 { icon: "🏷️", label: "欄", detail: "描述一項屬性，例如姓名、出生日期或班別。" },
@@ -61,6 +65,8 @@ const learningData = {
                 "解釋文字、圖像、聲音及視像如何數碼化",
                 "利用位元數、解像度及取樣參數估算檔案大小"
             ],
+            scopeNote: "計算題須分清 bit 和 byte；壓縮率、檔案格式或編碼標準的答案亦要按題目給定資料作判斷。",
+            featuredQuestionId: "q-a-c-003",
             concepts: [
                 { icon: "01", label: "位元模式", detail: "電腦以 0 和 1 表示數值、字符及其他數碼資料。" },
                 { icon: "🔡", label: "字符編碼", detail: "編碼標準把字符對應至碼位；UTF-8 再以不同位元組序列儲存 Unicode 字符。" },
@@ -85,6 +91,8 @@ const learningData = {
                 "預測相對、絕對及混合參照複製後的變化",
                 "選擇合適工具整理、分析及演示數據"
             ],
+            scopeNote: "試算表題通常把公式、函數、參照、排序／篩選及圖表放在同一工作表情境中，需留意公式複製方向。",
+            featuredQuestionId: "q-a-d-sheet-003",
             concepts: [
                 { icon: "🧮", label: "公式", detail: "以等號開始，利用運算子、常數及儲存格參照進行計算。" },
                 { icon: "ƒ", label: "函數", detail: "預先定義的運算，例如 SUM、AVERAGE、MAX、MIN 及 COUNT。" },
@@ -109,6 +117,8 @@ const learningData = {
                 "解釋主關鍵碼與外關鍵碼的用途",
                 "追蹤及解釋簡單單一數據表 SQL 查詢"
             ],
+            scopeNote: "必修部分集中基本數據庫結構、關鍵碼、數據庫物件及簡單單表 SQL；多表 JOIN 和較深入設計屬選修延伸。",
+            featuredQuestionId: "q-a-d-db-002",
             concepts: [
                 { icon: "▦", label: "數據表", detail: "以欄定義屬性、以記錄保存每個實體的資料。" },
                 { icon: "🔑", label: "主關鍵碼", detail: "以唯一而且非空的值辨認每筆記錄。" },
@@ -133,6 +143,8 @@ const learningData = {
                 "解釋數據機、NIC、通訊鏈路、交換器、路由器及無線接達點的功能",
                 "按速度、成本、安全性及可用性比較通訊及互聯網連接方法"
             ],
+            scopeNote: "本頁依核心 C(a) 處理 LAN／WAN、網絡服務、硬件、通訊鏈路及無線概念；詳細網絡設計屬選修延伸。",
+            embeddedExamPractice: true,
             concepts: [
                 { icon: "💻", label: "NIC 與鏈路", detail: "NIC 提供網絡介面；UTP、光纖或無線鏈路負責承載訊號。" },
                 { icon: "🔀", label: "交換器", detail: "連接同一 LAN 內多部有線裝置，並把訊框轉送至合適連接埠。" },
@@ -157,6 +169,8 @@ const learningData = {
                 "解釋 IP 位址、網域名稱、DNS 及 URL 的關係",
                 "按服務用途配對常見互聯網協定"
             ],
+            scopeNote: "本課集中 TCP／IP、IPv4／IPv6、網域名稱、DNS、URL 及常見互聯網協定之間的功能關係。",
+            featuredQuestionId: "q-c-a-url-001",
             concepts: [
                 { icon: "🧩", label: "TCP", detail: "把資料分段、標上序號，並在接收端檢查和重組。" },
                 { icon: "📍", label: "IP", detail: "使用來源及目的地 IP 位址協助封包在網絡間傳送。" },

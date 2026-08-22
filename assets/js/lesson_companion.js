@@ -3,6 +3,7 @@
 
     const platform = window.HKDSE_ICT;
     const learning = window.HKDSE_ICT_LEARNING;
+    const questionBank = window.HKDSE_ICT_QUESTIONS || [];
     if (!platform || !learning?.pages) return;
 
     const item = platform.getItemByPath(window.location.pathname);
@@ -10,6 +11,12 @@
     const nav = document.querySelector(".platform-shell-nav");
     if (!item || !page || !nav || document.querySelector(".lesson-companion")) return;
     const expandedByDefault = item.type === "lesson" || item.id === "tool-dse-practice";
+    const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, character => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+    })[character]);
+    const featuredQuestion = page.featuredQuestionId
+        ? questionBank.find(question => question.id === page.featuredQuestionId)
+        : null;
 
     const section = document.createElement("section");
     section.className = "lesson-companion";
@@ -37,6 +44,35 @@
         ? ""
         : `<a class="lesson-practice-link" href="practice.html?topic=${encodeURIComponent(item.id)}">練習此課題 →</a>`;
 
+    const scopeNote = page.scopeNote
+        ? `<p class="lesson-scope-note"><strong>課程界線：</strong>${escapeHTML(page.scopeNote)}</p>`
+        : "";
+
+    const featuredPractice = featuredQuestion ? `
+        <div class="lesson-featured-practice" data-lesson-featured>
+            <div class="lesson-featured-heading">
+                <div>
+                    <p class="lesson-check-label">原創 DSE 題型</p>
+                    <h3>把概念放回考試情境</h3>
+                </div>
+                <span>${featuredQuestion.marks} 分 · ${featuredQuestion.difficulty === "advanced" ? "進階" : featuredQuestion.difficulty === "standard" ? "標準" : "基礎"}</span>
+            </div>
+            <p class="lesson-featured-question">${escapeHTML(featuredQuestion.question)}</p>
+            ${featuredQuestion.questionCode ? `<pre class="lesson-featured-code"><code>${escapeHTML(featuredQuestion.questionCode)}</code></pre>` : ""}
+            ${featuredQuestion.type === "mcq" ? `
+                <div class="lesson-featured-options" role="group" aria-label="題目選項">
+                    ${featuredQuestion.options.map(option => `<button type="button" data-featured-option="${escapeHTML(option.value)}" aria-pressed="false">${escapeHTML(option.value)}. ${escapeHTML(option.label)}</button>`).join("")}
+                </div>
+            ` : `<textarea class="lesson-featured-response" rows="3" aria-label="原創 DSE 題型答案" placeholder="先按題目指令詞作答，再逐點對照評分準則……"></textarea>`}
+            <button class="lesson-featured-reveal" type="button" aria-expanded="false">提交並查看評分準則</button>
+            <div class="lesson-featured-scheme" hidden>
+                <p><strong>參考答案：</strong>${escapeHTML(featuredQuestion.answer)}</p>
+                <ol>${featuredQuestion.markingScheme.map(point => `<li><b>${point.marks} 分</b>${escapeHTML(point.criterion)}</li>`).join("")}</ol>
+                <p class="lesson-featured-explanation">${escapeHTML(featuredQuestion.explanation)}</p>
+            </div>
+        </div>
+    ` : "";
+
     section.innerHTML = `
         <div class="lesson-companion-heading">
             <div>
@@ -49,6 +85,7 @@
             <div class="lesson-objectives">
                 <h3>完成本頁後，你應能夠</h3>
                 <ul>${page.objectives.map(objective => `<li>${objective}</li>`).join("")}</ul>
+                ${scopeNote}
             </div>
             <div class="lesson-concept-explorer">
                 <div class="lesson-section-heading">
@@ -72,6 +109,7 @@
                 <div class="lesson-check-options">${quickOptions}</div>
                 <p class="lesson-check-feedback" aria-live="polite">選擇答案後會顯示解釋。</p>
             </div>
+            ${featuredPractice}
         </div>
     `;
 
@@ -115,4 +153,33 @@
             feedback.textContent = `${correct ? "答對。" : "未正確。"}${page.quickCheck.explanation}`;
         });
     });
+
+    const featured = section.querySelector("[data-lesson-featured]");
+    if (featured && featuredQuestion) {
+        featured.querySelectorAll("[data-featured-option]").forEach(option => {
+            option.addEventListener("click", () => {
+                featured.querySelectorAll("[data-featured-option]").forEach(candidate => {
+                    const selected = candidate === option;
+                    candidate.classList.toggle("is-selected", selected);
+                    candidate.setAttribute("aria-pressed", String(selected));
+                });
+            });
+        });
+
+        const reveal = featured.querySelector(".lesson-featured-reveal");
+        const scheme = featured.querySelector(".lesson-featured-scheme");
+        reveal.addEventListener("click", () => {
+            const willOpen = scheme.hidden;
+            scheme.hidden = !willOpen;
+            reveal.setAttribute("aria-expanded", String(willOpen));
+            reveal.textContent = willOpen ? "收起評分準則" : "提交並查看評分準則";
+            featured.querySelectorAll("[data-featured-option]").forEach(option => {
+                option.classList.remove("is-correct", "is-incorrect");
+                if (willOpen && option.dataset.featuredOption === featuredQuestion.answer) option.classList.add("is-correct");
+                if (willOpen && option.classList.contains("is-selected") && option.dataset.featuredOption !== featuredQuestion.answer) {
+                    option.classList.add("is-incorrect");
+                }
+            });
+        });
+    }
 })();

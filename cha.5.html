@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/css/platform.css?v=4">
-    <link rel="stylesheet" href="assets/css/learning.css?v=1">
+    <link rel="stylesheet" href="assets/css/learning.css?v=3">
+    <link rel="stylesheet" href="assets/css/core-lesson-refresh.css?v=1">
     <title>5. 數據庫 - ICT 學習資源網</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -371,7 +372,7 @@
                 <p class="text-slate-600 mb-6 text-center">同一個數據庫，可以透過不同的「物件」來檢視和操作。</p>
 
                 <!-- 模擬切換介面 -->
-                <div class="flex border-b border-gray-200 mb-6">
+                <div class="flex overflow-x-auto border-b border-gray-200 mb-6" aria-label="數據庫物件檢視切換">
                     <button onclick="switchView('table')" class="view-tab px-6 py-3 border-b-2 border-indigo-600 text-indigo-600 font-bold bg-indigo-50/50 transition">數據表 (Table)</button>
                     <button onclick="switchView('form')" class="view-tab px-6 py-3 border-b-2 border-transparent text-gray-500 hover:text-indigo-600 transition">表單 (Form)</button>
                     <button onclick="switchView('report')" class="view-tab px-6 py-3 border-b-2 border-transparent text-gray-500 hover:text-indigo-600 transition">報告 (Report)</button>
@@ -736,7 +737,8 @@
     </script>
     <script src="course_data.js"></script>
     <script src="assets/js/site_navigation.js?v=4"></script>
-    <script src="learning_data.js?v=1"></script>
-    <script src="assets/js/lesson_companion.js?v=1"></script>
+    <script src="question_data.js?v=3"></script>
+    <script src="learning_data.js?v=3"></script>
+    <script src="assets/js/lesson_companion.js?v=3"></script>
 </body>
 </html>

@@ -1,0 +1,30 @@
+body[data-content-type="lesson"] {
+    background: #edf5f5 !important;
+}
+
+body[data-content-type="lesson"] > header:not(.platform-footer) {
+    border-bottom: 1px solid rgb(255 255 255 / .14);
+    background: linear-gradient(115deg, #102a43, #174e5b 72%, #087e8b) !important;
+}
+
+body[data-content-type="lesson"] > nav:not(.platform-shell-nav):not(.nw-lesson-nav) {
+    border-bottom-color: #dbe5ea !important;
+    background: rgb(255 255 255 / .96) !important;
+    backdrop-filter: blur(12px);
+}
+
+body[data-content-type="lesson"] .section-card {
+    border-color: #dbe5ea;
+    box-shadow: 0 18px 48px rgb(22 50 79 / .08);
+}
+
+body[data-content-type="lesson"] main > section {
+    scroll-margin-top: 112px;
+}
+
+@media (max-width: 760px) {
+    body[data-content-type="lesson"] main {
+        padding-right: 11px !important;
+        padding-left: 11px !important;
+    }
+}
