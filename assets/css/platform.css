@@ -1,0 +1,207 @@
+:root {
+    --platform-ink: #172033;
+    --platform-muted: #64748b;
+    --platform-line: #e2e8f0;
+    --platform-surface: #ffffff;
+    --platform-soft: #f8fafc;
+    --platform-brand: #4338ca;
+    --platform-brand-dark: #312e81;
+    --platform-accent: #0f766e;
+    --platform-radius: 14px;
+    --platform-shadow: 0 12px 32px rgb(15 23 42 / 0.12);
+}
+
+.platform-page {
+    color: var(--platform-ink);
+    -webkit-font-smoothing: antialiased;
+}
+
+.platform-home-header {
+    background: linear-gradient(120deg, #1e1b4b, #3730a3 62%, #0f766e) !important;
+}
+
+.platform-page :focus-visible {
+    outline: 3px solid #fbbf24 !important;
+    outline-offset: 3px;
+}
+
+.platform-shell-nav,
+.platform-shell-nav *,
+.platform-footer,
+.platform-footer * {
+    box-sizing: border-box;
+}
+
+.platform-shell-nav {
+    position: relative;
+    z-index: 10000;
+    display: flex;
+    min-height: 64px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 10px max(16px, calc((100vw - 1180px) / 2));
+    border-bottom: 1px solid rgb(255 255 255 / 0.14);
+    background: linear-gradient(120deg, #1e1b4b, #3730a3 62%, #0f766e);
+    color: #fff;
+    box-shadow: 0 5px 20px rgb(15 23 42 / 0.16);
+    font-family: "Noto Sans TC", system-ui, sans-serif;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+}
+
+.platform-brand {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    text-decoration: none;
+}
+
+.platform-brand-mark {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    border: 1px solid rgb(255 255 255 / 0.3);
+    border-radius: 12px;
+    background: rgb(255 255 255 / 0.13);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+}
+
+.platform-brand-copy {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.platform-brand-copy strong { font-size: 14px; }
+.platform-brand-copy span { color: #c7d2fe; font-size: 11px; }
+
+.platform-context {
+    min-width: 0;
+    flex: 1 1 auto;
+    text-align: center;
+}
+
+.platform-context small {
+    display: block;
+    margin-bottom: 2px;
+    color: #c7d2fe;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.platform-context strong {
+    display: block;
+    overflow: hidden;
+    color: #fff;
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.platform-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 8px;
+}
+
+.platform-action {
+    display: inline-flex;
+    min-height: 38px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px solid rgb(255 255 255 / 0.24);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.1);
+    color: #fff;
+    cursor: pointer;
+    font: 700 12px/1 "Noto Sans TC", system-ui, sans-serif;
+    text-decoration: none;
+    transition: background 160ms ease, transform 160ms ease;
+}
+
+.platform-action:hover {
+    background: rgb(255 255 255 / 0.2);
+    transform: translateY(-1px);
+}
+
+.platform-action-primary {
+    border-color: #fde68a;
+    background: #fbbf24;
+    color: #422006;
+}
+
+.platform-action-primary:hover { background: #fcd34d; }
+
+.platform-footer {
+    margin-top: 48px;
+    padding: 24px 18px;
+    border-top: 1px solid var(--platform-line);
+    background: #0f172a;
+    color: #cbd5e1;
+    font: 400 12px/1.7 "Noto Sans TC", system-ui, sans-serif;
+    text-align: center;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+}
+
+.platform-footer p { margin: 0; }
+.platform-footer a { color: #a5b4fc; text-decoration: none; }
+.platform-footer a:hover { color: #fff; text-decoration: underline; }
+.platform-footer-links { margin-top: 4px !important; }
+
+.platform-syllabus-note {
+    margin: 18px 0;
+    padding: 14px 16px;
+    border: 1px solid #bae6fd;
+    border-left: 4px solid #0284c7;
+    border-radius: 10px;
+    background: #f0f9ff;
+    color: #0c4a6e;
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+body[data-content-id="tool-sql-simulator"] > #root {
+    height: auto !important;
+    min-height: 0;
+    flex: 1 1 auto;
+}
+
+body[data-content-id="tool-sql-simulator"] > .platform-shell-nav {
+    flex: 0 0 auto;
+}
+
+body[data-content-id="tool-sql-simulator"] > .platform-footer { display: none; }
+body.maximized > .platform-shell-nav,
+body.maximized > .platform-footer { display: none; }
+
+@media (max-width: 760px) {
+    .platform-shell-nav {
+        flex-wrap: wrap;
+        gap: 9px 12px;
+        padding: 9px 12px;
+    }
+
+    .platform-brand-mark { width: 36px; height: 36px; }
+    .platform-brand-copy span { display: none; }
+    .platform-context { order: 3; flex-basis: 100%; text-align: left; }
+    .platform-context small { display: none; }
+    .platform-context strong { font-size: 12px; }
+    .platform-action { min-height: 34px; padding: 7px 10px; }
+    .platform-action-random { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .platform-action { transition: none; }
+}

@@ -1,53 +1,55 @@
-高中 ICT 學習資源網 (ICT Learning Resources Portal)
+# 高中 ICT 學習資源網
 
-這是一個專為高中資訊及通訊科技科 (ICT) 學生及教師設計的互動式門戶網站。本項目將課程中的抽象概念（如網絡拓撲、CSMA/CD、數據庫設計等）轉化為直觀的網頁互動體驗，旨在提高學習動機與理解深度。
+專為 HKDSE 資訊及通訊科技科學生及教師設計的互動學習平台。項目以課程內容、動畫、模擬器、程式碼執行及題型練習，把抽象概念轉化成可操作的學習體驗。
 
-🚀 項目特色
+## 目前功能
 
-互動式模擬器：內置網絡拓撲（匯流排、環狀、星狀）視覺化工具，讓學生即時切換並觀察結構差異。
+- 必修 A「資訊處理」：資訊處理簡介、數據組織及數據控制、數據表示、試算表和數據庫。
+- 必修 C「互聯網及其應用」：建網基礎及互聯網協定。
+- DSE 題型練習：中央題庫、課題／難度篩選、自動評分、評分準則和解釋。
+- SQL 互動學習平台：瀏覽器內執行 SQLite、檢視資料表、關係及 ER 圖。
+- Python／偽代碼／流程圖工具：雙向轉換、語法檢查及程式執行。
+- PKI 實驗室：公開／私人密碼匙加密及數碼簽署概念模型。
+- 網絡及多媒體互動示範，以及部分章節的即時回饋測驗。
 
-動態動畫演示：透過 HTML5 Canvas/JavaScript 模擬 CSMA/CD 碰撞偵測過程，具體化網絡通訊協定。
+## 課程依據
 
-自適應設計 (Responsive Design)：採用 Tailwind CSS 構建，支援電腦、平板及手機瀏覽，方便隨時隨地複習。
+內容範圍以教育局 2021《資訊及通訊科技課程及評估指引（中四至中六）》為基準，並參考考評局最新 HKDSE ICT 評核大綱。本站的題目及教材均為原創內容，並非官方歷屆試題或評分參考。
 
-即時回饋測驗：每個章節末尾設有小測驗，幫助學生鞏固所學知識點。
+## 內容與程式結構
 
-多媒體整合：結合高品質圖像與 Lucide 圖標，清晰展示網絡硬件（NIC, Router, Modem）及傳輸媒介。
+- `course_data.js`：課程、工具、路徑及穩定內容 ID 的唯一資料來源。
+- `question_data.js`：DSE 題型中央題庫；每題以 `topicId` 連結一項課程或工具。
+- `assets/css/platform.css`：所有頁面的共用視覺系統。
+- `assets/js/site_navigation.js`：共用全站導覽、頁面識別及課程來源頁尾。
+- `assets/js/catalog.js`：首頁目錄及搜尋。
+- `assets/js/question_engine.js`：題目篩選、作答、評分及回饋流程。
 
-📂 目前收錄內容
-單元 A：資訊處理
+內容的永久 `id` 會供下一階段的學習進度記錄使用。即使標題或檔名改變，也不應重用或隨意修改既有 ID。
 
-單元 C：互聯網及其應用
+## 新增課程或工具
 
-第 1 章：建網及互聯網基本知識（網絡架構、硬件、通訊協定）
+1. 建立 HTML 頁面，載入 `platform.css`、`course_data.js` 及 `site_navigation.js`。
+2. 在 `course_data.js` 的合適章節加入項目。
+3. 執行 `node scripts/validate_catalog.js`。
 
-互動工具：SQL 學習平台、Python／偽代碼／流程圖工具、PKI 實驗室
+## 新增練習題
 
+1. 在 `question_data.js` 加入題目，提供 `id`、`topicId`、`difficulty`、`marks`、`answer`、`markingScheme` 及 `explanation`。
+2. 確保 `topicId` 對應 `course_data.js` 的內容 ID。
+3. 執行 `node scripts/validate_questions.js`。
 
+## 驗證
 
-🛠️ 技術棧
+```text
+node scripts/validate_catalog.js
+node scripts/validate_questions.js
+```
 
-Frontend: HTML5, Tailwind CSS, JavaScript (ES6+)
+目錄驗證會檢查重複識別碼、實際頁面、未列入目錄的 HTML，以及本機 `href`／`src`。題庫驗證會檢查題型、難度、課題連結、答案及評分準則分數。
 
-Icons: Lucide Icons
+## 技術
 
-Animation: CSS3 Keyframes & JavaScript DOM Manipulation
+HTML5、JavaScript、Tailwind CSS、React、SQLite WebAssembly、Pyodide、Mermaid 及 Lucide Icons。網站可直接透過 GitHub Pages 使用，毋須後端服務。
 
-🌐 在線預覽
-
-你可以透過 GitHub Pages 直接訪問本項目：
-https://kenkmc.github.io/hkdse_ict/
-
-本資源僅供教育用途參考。
-
-## 內容目錄與擴充方式
-
-`course_data.js` 是全站課程及工具的唯一資料來源。首頁、隨機學習及共用導覽都從這個檔案讀取內容；請勿在個別 HTML 頁面另外建立課程清單。
-
-每項內容都有不可重用的穩定 `id`、實際頁面路徑、內容類型、課程參照及搜尋標籤。這些欄位預留給日後的 DSE 題目引擎及學習進度記錄使用。新增頁面的流程如下：
-
-1. 建立 HTML 頁面。
-2. 在 `course_data.js` 的合適章節加入一個項目。
-3. 在提交前執行 `node scripts/validate_catalog.js`。
-
-驗證程式會檢查重複識別碼、目錄所列檔案、未列入目錄的 HTML 頁面，以及所有本機 `href`／`src` 連結。
+線上版本：https://kenkmc.github.io/hkdse_ict/

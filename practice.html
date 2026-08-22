@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="按 HKDSE ICT 課題及難度練習原創 DSE 題型。">
+    <title>DSE 題型練習 | ICT 學習資源網</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/platform.css">
+    <link rel="stylesheet" href="assets/css/practice.css">
+</head>
+<body class="practice-page">
+    <main class="practice-main">
+        <header class="practice-hero">
+            <div>
+                <p class="practice-kicker">Phase 2 · Question Engine</p>
+                <h1>DSE 題型練習</h1>
+                <p>按課題及難度練習，提交後即時按評分準則檢討。短答題的自動評分只作學習提示，請同時閱讀完整參考答案。</p>
+            </div>
+            <span class="practice-badge">原創題目 · 非歷屆試題</span>
+        </header>
+
+        <div class="practice-grid">
+            <aside class="practice-panel practice-controls" aria-label="練習設定">
+                <h2>選擇練習範圍</h2>
+                <div class="practice-field">
+                    <label for="practice-topic">課題</label>
+                    <select id="practice-topic">
+                        <option value="">全部課題</option>
+                    </select>
+                </div>
+                <div class="practice-field">
+                    <label for="practice-difficulty">難度</label>
+                    <select id="practice-difficulty">
+                        <option value="">全部難度</option>
+                        <option value="foundation">基礎</option>
+                        <option value="standard">標準</option>
+                        <option value="advanced">進階</option>
+                    </select>
+                </div>
+                <button id="practice-start" class="practice-button" type="button">開始練習</button>
+
+                <div class="practice-session" aria-live="polite">
+                    <p><span>符合條件</span><strong><span id="session-available">0</span> 題</strong></p>
+                    <p><span>目前進度</span><strong id="session-position">—</strong></p>
+                    <p><span>本次得分</span><strong id="session-score">0 / 0</strong></p>
+                </div>
+            </aside>
+
+            <section id="practice-question" class="practice-panel practice-question" aria-live="polite">
+                <div class="practice-empty">
+                    <div>
+                        <div class="practice-empty-icon">?</div>
+                        <h2>準備開始</h2>
+                        <p>選擇範圍後按「開始練習」。</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <p class="practice-disclaimer">
+            本站題目依據 2021《資訊及通訊科技課程及評估指引》自行編寫，並非考評局歷屆試題或官方評分參考。正式考核要求以教育局及考評局最新文件為準。
+        </p>
+    </main>
+
+    <script src="course_data.js"></script>
+    <script src="question_data.js"></script>
+    <script src="assets/js/question_engine.js"></script>
+    <script src="assets/js/site_navigation.js"></script>
+</body>
+</html>

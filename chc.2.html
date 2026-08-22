@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C1-2 互聯網協定 - ICT 學習資源網</title>
+    <link rel="stylesheet" href="assets/css/platform.css">
+    <title>C(a)-2 互聯網協定 - ICT 學習資源網</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -120,7 +121,7 @@
                     <i data-lucide="network" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold">第 2 章：互聯網協定 (Internet Protocols)</h1>
+                    <h1 class="text-xl font-bold">C(a)-2：互聯網協定 (Internet Protocols)</h1>
                 </div>
             </div>
             <nav class="hidden md:flex gap-6 text-sm font-medium">
@@ -217,7 +218,7 @@
                         <h3 class="text-lg font-bold">IPv4 格式</h3>
                     </div>
                     <code class="text-2xl block text-center py-4 text-indigo-700 font-bold">192.168.1.254</code>
-                    <p class="text-sm text-slate-500 mt-2">由四組 0-255 的數字組成。因互聯網普及，IPv4 地址已不敷使用。</p>
+                    <p class="text-sm text-slate-500 mt-2">由四組 0–255 的十進制數字組成。IPv4 只有 2<sup>32</sup> 個位址，公用位址供應有限。</p>
                 </div>
                 <div class="p-6 bg-slate-50 rounded-3xl border border-slate-200">
                     <div class="flex justify-between mb-4">
@@ -225,7 +226,7 @@
                         <h3 class="text-lg font-bold">IPv6 格式</h3>
                     </div>
                     <code class="text-sm block text-center py-4 text-emerald-700 font-bold break-all">2001:0DB8:AC10:FE01:0000:0000:0000:0001</code>
-                    <p class="text-sm text-slate-500 mt-2">使用十六進制表示，提供近乎無限的位址數量以解決 IPv4 枯竭問題。</p>
+                    <p class="text-sm text-slate-500 mt-2">以十六進制表示，共有 2<sup>128</sup> 個位址，數量遠多於 IPv4，但並非無限。</p>
                 </div>
             </div>
 
@@ -262,7 +263,7 @@
                 <i data-lucide="search" class="text-indigo-600"></i> 2.3 網域名稱系統 (DNS)
             </h2>
             <p class="text-slate-600 mb-6">
-                因為人類很難記住像 <code>142.250.190.46</code> 這樣的 IP 位址，所以發明了<b>網域名稱系統 (DNS)</b>。它就像互聯網的「電話簿」，負責將人類易讀的域名（Domain Name）轉換為電腦使用的 IP 位址。
+                人類較難記住像 <code>203.0.113.10</code> 這樣的 IP 位址，因此使用<b>網域名稱系統 (DNS)</b> 提供名稱解析。DNS 把人類易讀的網域名稱（domain name）轉換成裝置連線所需的 IP 位址。
             </p>
 
             <div class="bg-slate-900 p-8 rounded-[2rem] text-center text-white shadow-lg">
@@ -468,7 +469,7 @@
     <footer class="bg-slate-900 text-slate-400 py-12 text-center text-sm">
         <div class="container mx-auto px-6">
             <p class="font-bold text-white mb-2">ICT 學習資源網 - 單元 C：互聯網及其應用</p>
-            <p>第 2 章：互聯網協定 (Internet Protocols) | 參考課本內容編寫</p>
+            <p>C(a) 建網及互聯網基本知識：互聯網協定 | 原創教學內容</p>
         </div>
     </footer>
 
@@ -668,8 +669,8 @@
             }, 600);
             
             setTimeout(() => {
-                const fakeIp = `142.250.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}`;
-                consoleBox.innerHTML += `<br>> 解析成功！回傳 IP 位址: <span class="text-white font-bold">${fakeIp}</span>`;
+                const fakeIp = `203.0.113.${Math.floor(Math.random()*254) + 1}`;
+                consoleBox.innerHTML += `<br>> 模擬解析成功！示例 IP 位址: <span class="text-white font-bold">${fakeIp}</span>`;
                 consoleBox.innerHTML += `<br><span class='text-sky-400'>> 電腦正使用此 IP 位址建立連線...</span>`;
                 consoleBox.scrollTop = consoleBox.scrollHeight;
             }, 1500);

@@ -15,8 +15,10 @@ const siteConfig = {
     canonicalUrl: "https://kenkmc.github.io/hkdse_ict/",
     searchSite: "kenkmc.github.io/hkdse_ict",
     repositoryUrl: "https://github.com/kenkmc/hkdse_ict",
+    curriculumUrl: "https://www.edb.gov.hk/attachment/tc/curriculum-development/kla/technology-edu/curriculum-doc/ICT_C%26A%20Guide_c_final.pdf",
+    assessmentUrl: "https://www.hkeaa.edu.hk/DocLibrary/HKDSE/Subject_Information/ict/2027hkdse-e-ict.pdf",
     features: {
-        questionEngine: false,
+        questionEngine: true,
         progressTracking: false
     }
 };
@@ -36,16 +38,16 @@ const courseData = [
                 file: "cha.1.html",
                 desc: "資訊系統、數據與資訊、資訊處理及資訊時代",
                 type: "lesson",
-                syllabusRef: "A1",
+                syllabusRef: "A(a)",
                 tags: ["IPO", "資訊系統", "數據", "資訊"]
             },
             {
                 id: "cha-2",
-                title: "ii. 數據控制及數據組織",
+                title: "ii. 數據組織及數據控制",
                 file: "cha.2.html",
                 desc: "數據分級、驗證與校驗、數據庫功能及檔案存取",
                 type: "lesson",
-                syllabusRef: "A2",
+                syllabusRef: "A(b)",
                 tags: ["數據控制", "校驗", "數據庫", "檔案存取"]
             },
             {
@@ -54,25 +56,25 @@ const courseData = [
                 file: "cha.3.html",
                 desc: "數值系統、有符號數，以及文字、圖像、聲音和視像",
                 type: "lesson",
-                syllabusRef: "A3",
+                syllabusRef: "A(c)",
                 tags: ["二進制", "十六進制", "多媒體", "字符編碼"]
             },
             {
                 id: "cha-4",
-                title: "iv. 試算表",
+                title: "iv. 數據操縱和分析：試算表",
                 file: "cha.4.html",
                 desc: "公式、函數、儲存格參照、數據分析及圖表",
                 type: "lesson",
-                syllabusRef: "A4",
+                syllabusRef: "A(d) · 試算表",
                 tags: ["試算表", "Excel", "公式", "函數", "圖表"]
             },
             {
                 id: "cha-5",
-                title: "v. 數據庫",
+                title: "v. 數據操縱和分析：數據庫",
                 file: "cha.5.html",
                 desc: "數據庫結構、關鍵碼、數據庫物件及 SQL 基礎",
                 type: "lesson",
-                syllabusRef: "A5",
+                syllabusRef: "A(d) · 數據庫",
                 tags: ["數據庫", "Access", "SQL", "關鍵碼"]
             }
         ]
@@ -91,7 +93,7 @@ const courseData = [
                 file: "chc.1.html",
                 desc: "網絡規模、服務模式、網絡硬件及互動組網",
                 type: "lesson",
-                syllabusRef: "C1",
+                syllabusRef: "C(a) · 網絡",
                 tags: ["網絡", "拓撲", "LAN", "網絡硬件"]
             },
             {
@@ -100,7 +102,7 @@ const courseData = [
                 file: "chc.2.html",
                 desc: "TCP/IP、IP 位址、DNS、URL 及常用網絡協定",
                 type: "lesson",
-                syllabusRef: "C2",
+                syllabusRef: "C(a) · 協定",
                 tags: ["TCP/IP", "IP Address", "DNS", "URL", "網絡協定"]
             }
         ]
@@ -113,6 +115,15 @@ const courseData = [
         color: "bg-violet-50 text-violet-700",
         icon: "wrench",
         items: [
+            {
+                id: "tool-dse-practice",
+                title: "DSE 題型練習",
+                file: "practice.html",
+                desc: "按課題及難度練習原創 DSE 題型，並按評分準則檢討答案",
+                type: "tool",
+                syllabusRef: "Paper 1 / Paper 2",
+                tags: ["DSE", "題庫", "評分準則", "練習"]
+            },
             {
                 id: "tool-sql-simulator",
                 title: "SQL 互動學習平台",
@@ -133,12 +144,12 @@ const courseData = [
             },
             {
                 id: "tool-pki-lab",
-                title: "PKI 加密與數位簽署實驗室",
+                title: "PKI 加密與數碼簽署實驗室",
                 file: "pki_animation.html",
-                desc: "以互動情境理解公開密碼匙加密及數位簽署",
+                desc: "以互動情境理解公開密碼匙加密及數碼簽署",
                 type: "tool",
-                syllabusRef: "Core C",
-                tags: ["PKI", "加密", "數位簽署", "網絡保安"]
+                syllabusRef: "C(d) · 網上保安",
+                tags: ["PKI", "加密", "數碼簽署", "網絡保安"]
             }
         ]
     }

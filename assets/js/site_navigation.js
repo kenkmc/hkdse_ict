@@ -1,38 +1,63 @@
-(function initialiseSharedNavigation() {
+(function initialisePlatformShell() {
     "use strict";
 
     const platform = window.HKDSE_ICT;
-    if (!platform) return;
+    if (!platform || document.querySelector(".platform-shell-nav")) return;
 
     const currentItem = platform.getItemByPath(window.location.pathname);
+    const currentSection = currentItem
+        ? platform.sections.find(section => section.id === currentItem.sectionId)
+        : null;
+
+    document.body.classList.add("platform-page");
+
     if (currentItem) {
         document.body.dataset.contentId = currentItem.id;
         document.body.dataset.contentType = currentItem.type;
         document.body.dataset.syllabusRef = currentItem.syllabusRef;
+        document.title = `${currentItem.title.replace(/^[ivx]+\.\s*/i, "")} | ${platform.config.siteName}`;
     }
 
-    // 保留各課頁原有的導覽設計，只在缺少首頁連結的獨立頁面補上共用入口。
-    const existingHomeLink = document.querySelector('a[href="index.html"], a[href="./"], a[href="/"]');
-    if (existingHomeLink) return;
+    const nav = document.createElement("nav");
+    nav.className = "platform-shell-nav";
+    nav.setAttribute("aria-label", "全站導覽");
 
-    const homeLink = document.createElement("a");
-    homeLink.href = "index.html";
-    homeLink.textContent = "← 返回課程目錄";
-    homeLink.setAttribute("aria-label", "返回 ICT 學習資源網課程目錄");
-    Object.assign(homeLink.style, {
-        position: "fixed",
-        right: "1rem",
-        bottom: "1rem",
-        zIndex: "9999",
-        padding: "0.65rem 0.9rem",
-        borderRadius: "9999px",
-        background: "#312e81",
-        color: "#fff",
-        fontFamily: "system-ui, sans-serif",
-        fontSize: "0.875rem",
-        fontWeight: "700",
-        textDecoration: "none",
-        boxShadow: "0 8px 24px rgb(15 23 42 / 0.25)"
-    });
-    document.body.appendChild(homeLink);
+    const practiceAction = currentItem?.id === "tool-dse-practice"
+        ? ""
+        : '<a class="platform-action platform-action-primary" href="practice.html">DSE 練習</a>';
+
+    nav.innerHTML = `
+        <a class="platform-brand" href="index.html" aria-label="返回 ICT 學習資源網首頁">
+            <span class="platform-brand-mark" aria-hidden="true">ICT</span>
+            <span class="platform-brand-copy">
+                <strong>${platform.config.siteName}</strong>
+                <span>HKDSE Interactive Learning</span>
+            </span>
+        </a>
+        <div class="platform-context">
+            <small>${currentSection?.sectionTitle || platform.config.tagline}</small>
+            <strong>${currentItem?.title || "課程與工具目錄"}</strong>
+        </div>
+        <div class="platform-actions">
+            ${practiceAction}
+            <button class="platform-action platform-action-random" type="button" data-platform-random>隨機學習</button>
+            <a class="platform-action" href="index.html">課程目錄</a>
+        </div>
+    `;
+
+    nav.querySelector("[data-platform-random]")?.addEventListener("click", platform.randomStudy);
+    document.body.prepend(nav);
+
+    let footer = document.querySelector("body > footer");
+    const shouldAppendFooter = !footer;
+    if (!footer) footer = document.createElement("footer");
+    footer.className = "platform-footer";
+    footer.innerHTML = `
+        <p>原創 HKDSE ICT 學習資源；並非教育局或考評局官方網站。</p>
+        <p class="platform-footer-links">
+            課程依據：<a href="${platform.config.curriculumUrl}" target="_blank" rel="noopener">2021 課程及評估指引</a>
+            · <a href="${platform.config.assessmentUrl}" target="_blank" rel="noopener">HKDSE 評核大綱</a>
+        </p>
+    `;
+    if (shouldAppendFooter) document.body.appendChild(footer);
 })();

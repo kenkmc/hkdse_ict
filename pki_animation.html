@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/css/platform.css">
     <title>PKI 多場景互動教學</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -11,7 +12,7 @@
         body {
             font-family: 'Noto Sans TC', sans-serif;
             background-color: #f1f5f9;
-            touch-action: none; 
+            touch-action: pan-y;
         }
 
         .canvas-container {
@@ -26,6 +27,7 @@
             cursor: grab;
             transition: all 0.2s;
             user-select: none;
+            touch-action: none;
         }
 
         .draggable-key:active { cursor: grabbing; transform: scale(1.1); }
@@ -78,47 +80,50 @@
 <body class="p-4">
     <div class="max-w-6xl mx-auto">
         <header class="mb-6 text-center">
-            <h1 class="text-2xl font-bold text-slate-800">PKI 互動實戰：加密與簽署</h1>
+            <h1 class="text-2xl font-bold text-slate-800">PKI 互動實戰：加密與數碼簽署</h1>
             
             <!-- 場景切換器 -->
             <div class="flex justify-center gap-2 mt-4">
                 <button id="btn-conf" onclick="switchScenario('confidentiality')" class="scenario-btn active px-4 py-2 rounded-full text-sm font-bold bg-white text-slate-600 transition-all border">🔐 傳輸加密 (保密性)</button>
-                <button id="btn-auth" onclick="switchScenario('authentication')" class="scenario-btn px-4 py-2 rounded-full text-sm font-bold bg-white text-slate-600 transition-all border">✍️ 數位簽署 (驗證性)</button>
+                <button id="btn-auth" onclick="switchScenario('authentication')" class="scenario-btn px-4 py-2 rounded-full text-sm font-bold bg-white text-slate-600 transition-all border">✍️ 數碼簽署 (來源與完整性)</button>
             </div>
+            <p class="platform-syllabus-note text-left max-w-3xl mx-auto">
+                <strong>概念模型：</strong>實際數碼簽署通常先計算文件摘要（hash），再以簽署者的私人密碼匙處理摘要。此動畫簡化步驟，重點展示公開／私人密碼匙的角色；數碼簽署提供來源鑑定與完整性檢查，不會令內容保密。
+            </p>
         </header>
 
         <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
-            <!-- 側邊欄：金鑰庫 -->
+            <!-- 側邊欄：密碼匙工具箱 -->
             <div class="xl:col-span-1 space-y-4">
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="font-bold text-slate-700 mb-3 text-sm flex items-center gap-2">📦 角色金鑰庫</h3>
+                    <h3 class="font-bold text-slate-700 mb-3 text-sm flex items-center gap-2">📦 密碼匙工具箱</h3>
                     
                     <div class="space-y-3">
                         <!-- Alice -->
                         <div class="p-2 border border-red-100 rounded-lg bg-red-50/30">
-                            <div class="text-[10px] font-bold text-red-500 mb-2">ALICE 的金鑰</div>
+                            <div class="text-[10px] font-bold text-red-500 mb-2">ALICE 持有的密碼匙</div>
                             <div class="flex gap-2">
-                                <div id="key-alice-priv" draggable="true" class="draggable-key text-2xl p-2 bg-red-100 rounded border border-red-200" data-key="alice-priv" title="Alice 的私鑰">🗝️</div>
-                                <div id="key-bob-pub-alice" draggable="true" class="draggable-key text-2xl p-2 bg-white rounded border border-blue-200 text-blue-400" data-key="bob-pub" title="Bob 的公鑰">🔑</div>
+                                <div id="key-alice-priv" draggable="true" class="draggable-key text-2xl p-2 bg-red-100 rounded border border-red-200" data-key="alice-priv" title="Alice 的私人密碼匙">🗝️</div>
+                                <div id="key-bob-pub-alice" draggable="true" class="draggable-key text-2xl p-2 bg-white rounded border border-blue-200 text-blue-400" data-key="bob-pub" title="Bob 的公開密碼匙">🔑</div>
                             </div>
                         </div>
 
                         <!-- Bob -->
                         <div class="p-2 border border-blue-100 rounded-lg bg-blue-50/30">
-                            <div class="text-[10px] font-bold text-blue-500 mb-2">BOB 的金鑰</div>
+                            <div class="text-[10px] font-bold text-blue-500 mb-2">BOB 持有的密碼匙</div>
                             <div class="flex gap-2">
-                                <div id="key-bob-priv" draggable="true" class="draggable-key text-2xl p-2 bg-blue-100 rounded border border-blue-200" data-key="bob-priv" title="Bob 的私鑰">🗝️</div>
-                                <div id="key-alice-pub-bob" draggable="true" class="draggable-key text-2xl p-2 bg-white rounded border border-red-200 text-red-400" data-key="alice-pub" title="Alice 的公鑰">🔑</div>
+                                <div id="key-bob-priv" draggable="true" class="draggable-key text-2xl p-2 bg-blue-100 rounded border border-blue-200" data-key="bob-priv" title="Bob 的私人密碼匙">🗝️</div>
+                                <div id="key-alice-pub-bob" draggable="true" class="draggable-key text-2xl p-2 bg-white rounded border border-red-200 text-red-400" data-key="alice-pub" title="Alice 的公開密碼匙">🔑</div>
                             </div>
                         </div>
 
                         <!-- Eve -->
                         <div class="p-2 border border-slate-200 rounded-lg bg-slate-100">
-                            <div class="text-[10px] font-bold text-slate-600 mb-2">EVE (駭客) 的工具</div>
+                            <div class="text-[10px] font-bold text-slate-600 mb-2">EVE（攻擊者）的工具</div>
                             <div class="flex gap-2">
-                                <div id="key-eve-priv" draggable="true" class="draggable-key text-2xl p-2 bg-slate-800 rounded border border-slate-900" data-key="eve-priv" title="Eve 的私鑰">🗝️</div>
-                                <div id="key-alice-pub-eve" draggable="true" class="draggable-key text-2xl p-2 bg-white rounded border border-red-200 text-red-400 opacity-60" data-key="alice-pub" title="盜取的 Alice 公鑰">🔑</div>
-                                <div id="key-bob-pub-eve" draggable="true" class="draggable-key text-2xl p-2 bg-white rounded border border-blue-200 text-blue-400 opacity-60" data-key="bob-pub" title="盜取的 Bob 公鑰">🔑</div>
+                                <div id="key-eve-priv" draggable="true" class="draggable-key text-2xl p-2 bg-slate-800 rounded border border-slate-900" data-key="eve-priv" title="Eve 的私人密碼匙">🗝️</div>
+                                <div id="key-alice-pub-eve" draggable="true" class="draggable-key text-2xl p-2 bg-white rounded border border-red-200 text-red-400 opacity-60" data-key="alice-pub" title="公開取得的 Alice 公開密碼匙">🔑</div>
+                                <div id="key-bob-pub-eve" draggable="true" class="draggable-key text-2xl p-2 bg-white rounded border border-blue-200 text-blue-400 opacity-60" data-key="bob-pub" title="公開取得的 Bob 公開密碼匙">🔑</div>
                             </div>
                         </div>
                     </div>
@@ -166,7 +171,7 @@
                     <!-- 引導層 -->
                     <div id="guide-box" class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg shadow-sm transition-all duration-300">
                         <h4 id="guide-title" class="font-bold text-blue-800 mb-1">場景：傳輸加密</h4>
-                        <p id="guide-text" class="text-blue-700 text-sm">請將 <b>Bob 的公鑰 (藍色🔑)</b> 拖到郵件上來加密內容。</p>
+                        <p id="guide-text" class="text-blue-700 text-sm">請將 <b>Bob 的公開密碼匙 (藍色🔑)</b> 拖到郵件上來加密內容。</p>
                         <div class="flex gap-2 mt-3">
                             <button id="send-btn" class="hidden bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold hover:bg-blue-700 transition-all">發送 ➔</button>
                             <button id="continue-btn" class="hidden bg-slate-600 text-white px-4 py-1 rounded-full text-xs font-bold hover:bg-slate-700 transition-all">數據繼續傳送 ➔</button>
@@ -185,7 +190,7 @@
         let isProcessed = false;
         const msg = "秘密：明天下午三點開會。";
         const encryptedMsg = "0xAF882D...[密文內容]";
-        const signedMsg = "秘密：明天下午三點開會。\n[簽章: 0x92E1...]";
+        const signedMsg = "秘密：明天下午三點開會。\n[數碼簽署摘要: 0x92E1...]";
 
         function switchScenario(type) {
             currentScenario = type;
@@ -214,9 +219,9 @@
             document.getElementById('eve-avatar').classList.add('opacity-30', 'grayscale');
             
             if (currentScenario === 'confidentiality') {
-                updateGuide("場景：傳輸加密", "目標：確保只有 Bob 能看見內容。請將 <b>Bob 的公鑰 (藍色🔑)</b> 拖到郵件上進行加密。");
+                updateGuide("場景：傳輸加密", "目標：確保只有 Bob 能看見內容。請將 <b>Bob 的公開密碼匙 (藍色🔑)</b> 拖到郵件上進行加密。");
             } else {
-                updateGuide("場景：數位簽署", "目標：證明信件是由 Alice 親筆撰寫。請將 <b>Alice 的私鑰 (紅色🗝️)</b> 拖到郵件上進行簽署。");
+                updateGuide("場景：數碼簽署", "目標：確認文件由持有 Alice 私人密碼匙的人簽署，而且內容未被更改。請將 <b>Alice 的私人密碼匙 (紅色🗝️)</b> 拖到郵件上進行簽署。");
             }
         }
 
@@ -250,14 +255,14 @@
                     if (key === 'bob-pub') {
                         processStep("🔒", "已加密", encryptedMsg, "#f87171", "加密完成！請點擊下方按鈕發送封包。");
                     } else {
-                        showToast("加密失敗！Alice 應該使用對方的公鑰來「上鎖」。", "red");
+                        showToast("加密失敗！Alice 應使用 Bob 的公開密碼匙來『上鎖』。", "red");
                         shake(dropTarget);
                     }
                 } else {
                     if (key === 'alice-priv') {
                         processStep("✍️", "已簽署", signedMsg, "#60a5fa", "簽署完成！請點擊發送，將帶有簽名的郵件送出。");
                     } else {
-                        showToast("簽署失敗！只有 Alice 自己的私鑰才能產生獨一無二的簽名。", "red");
+                        showToast("簽署失敗！應使用 Alice 自己的私人密碼匙產生有效簽署。", "red");
                         shake(dropTarget);
                     }
                 }
@@ -265,28 +270,30 @@
                 // Eve 攔截階段
                 const eveAvatar = document.getElementById('eve-avatar');
                 if (key === 'eve-priv') {
-                    showToast("Eve 嘗試用自己的私鑰解密... 失敗！密文與她的金鑰不匹配。", "red");
+                    showToast("Eve 嘗試用自己的私人密碼匙解密……失敗！密文並非以她的公開密碼匙加密。", "red");
                     shake(eveAvatar);
                     updateDataDisplay("[ERROR] 無法解密：密鑰不正確", "#ef4444");
                     setTimeout(() => updateDataDisplay(currentScenario === 'confidentiality' ? encryptedMsg : signedMsg, currentScenario === 'confidentiality' ? "#f87171" : "#60a5fa"), 1200);
                 } else if (key === 'alice-pub' || key === 'bob-pub') {
-                    showToast("Eve 嘗試用公鑰破解... 沒用！公鑰只能用來「加密」，不能解開別人的鎖。", "orange");
+                    showToast(currentScenario === 'confidentiality'
+                        ? "公開密碼匙可以公開取得，但不能解開以 Bob 公開密碼匙加密的內容。"
+                        : "Alice 的公開密碼匙可以驗證簽署，但不能產生 Alice 的有效簽署或暗中修改文件。", "orange");
                     shake(eveAvatar);
                 }
             } else if (step === 3) {
                 // Bob 階段
                 if (currentScenario === 'confidentiality') {
                     if (key === 'bob-priv') {
-                        finish("📖", "已還原", msg, "#10b981", "Bob 使用自己的私鑰順利解開密文！");
+                        finish("📖", "已還原", msg, "#10b981", "Bob 使用自己的私人密碼匙順利解開密文！");
                     } else {
-                        showToast("解密失敗！世界上只有 Bob 的私鑰能解開這封信。", "red");
+                        showToast("解密失敗！只有 Bob 的私人密碼匙能解開這封信。", "red");
                         shake(dropTarget);
                     }
                 } else {
                     if (key === 'alice-pub') {
-                        finish("✅", "已驗證", msg, "#10b981", "驗證成功！Bob 使用 Alice 的公鑰確認了這封信確實來自 Alice。");
+                        finish("✅", "已驗證", msg, "#10b981", "驗證成功！Bob 使用 Alice 的公開密碼匙確認簽署有效，而且文件內容未被更改。");
                     } else {
-                        showToast("驗證失敗！需使用寄件人 Alice 的公鑰來比對簽章。", "red");
+                        showToast("驗證失敗！需使用 Alice 的公開密碼匙來驗證簽署。", "red");
                         shake(dropTarget);
                     }
                 }
@@ -316,7 +323,7 @@
             setTimeout(() => {
                 eveAvatar.classList.remove('opacity-30', 'grayscale');
                 packet.classList.add('eve-intercept-active');
-                updateGuide("⚠️ 數據被攔截！", "封包目前在駭客 Eve 手中。試著將 <b>Eve 的金鑰 (黑色工具區)</b> 拖到封包上進行破解。看看拿到了公鑰和私鑰的她能否成功？");
+                updateGuide("⚠️ 數據被攔截！", "封包目前在攻擊者 Eve 手中。試用她自己的私人密碼匙或公開取得的密碼匙，觀察哪些操作可以成功。");
                 document.getElementById('continue-btn').classList.remove('hidden');
             }, 700);
         };
@@ -332,9 +339,9 @@
             
             setTimeout(() => {
                 if (currentScenario === 'confidentiality') {
-                    updateGuide("Bob 已收到密文", "數據已安全送達。請將 <b>Bob 的私鑰 (藍色🗝️)</b> 拖到封包上解鎖內容。");
+                    updateGuide("Bob 已收到密文", "數據已送達。請將 <b>Bob 的私人密碼匙 (藍色🗝️)</b> 拖到封包上解密內容。");
                 } else {
-                    updateGuide("Bob 已收到簽署件", "數據已送達。請將 <b>Alice 的公鑰 (紅色🔑)</b> 拖到封包上來驗證寄件人身份。");
+                    updateGuide("Bob 已收到簽署文件", "數據已送達。請將 <b>Alice 的公開密碼匙 (紅色🔑)</b> 拖到封包上驗證簽署及文件完整性。");
                 }
             }, 700);
         };
@@ -346,7 +353,7 @@
             document.getElementById('sim-data').style.color = color;
             document.getElementById('status-badge').innerText = "";
             updateGuide("實驗成功！", guide + "<br><br><b>小結：</b>" + 
-                (currentScenario === 'confidentiality' ? "即使駭客攔截並擁有多把公鑰，沒有正確的『私鑰』依然無法窺探隱私。" : "數位簽章證明了身份。駭客無法偽造 Alice 的私鑰，因此也無法偽造她的身份。"));
+                (currentScenario === 'confidentiality' ? "即使攻擊者攔截密文並取得公開密碼匙，沒有 Bob 的私人密碼匙仍無法解密內容。" : "有效的數碼簽署顯示文件由持有 Alice 私人密碼匙的人簽署，並可偵測簽署後的內容改動。"));
         }
 
         function updateDataDisplay(text, color) {
