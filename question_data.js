@@ -196,6 +196,108 @@ const questionData = [
         explanation: "主關鍵碼必須唯一；簡單 SELECT 查詢要依次處理輸出欄、來源表及篩選條件。"
     },
     {
+        id: "q-b-a-memory-001",
+        topicId: "chb-1",
+        syllabusRef: "B(a)",
+        difficulty: "foundation",
+        marks: 1,
+        type: "mcq",
+        question: "電腦關機後，以下哪項的內容通常會消失？",
+        options: [
+            { value: "A", label: "RAM" },
+            { value: "B", label: "ROM" },
+            { value: "C", label: "SSD" },
+            { value: "D", label: "光碟" }
+        ],
+        answer: "A",
+        markingScheme: [{ marks: 1, criterion: "指出一般 RAM 是揮發性記憶體。" }],
+        explanation: "一般 RAM 需要持續供電才能保存內容；ROM、SSD 和光碟均屬非揮發性。"
+    },
+    {
+        id: "q-b-a-cycle-001",
+        topicId: "chb-1",
+        syllabusRef: "B(a)",
+        difficulty: "standard",
+        marks: 4,
+        type: "short-answer",
+        question: "某程式正在單一處理器上運行。依次指出擷取—解碼—執行周期的三個階段，並說明控制單元和算術邏輯單元各自的一項作用。",
+        answer: "處理器先從主記憶體擷取指令，然後由控制單元解碼指令，最後執行指令。控制單元解釋指令並發出控制訊號協調部件；算術邏輯單元進行所需的算術或邏輯運算。",
+        markingScheme: [
+            { marks: 1, criterion: "按正確次序寫出擷取、解碼、執行。", anyOf: ["擷取", "解碼", "執行", "fetch", "decode", "execute"] },
+            { marks: 1, criterion: "指出擷取是從主記憶體取得指令。", anyOf: ["主記憶體", "記憶體", "RAM", "取得指令", "讀取指令"] },
+            { marks: 1, criterion: "控制單元解碼／解釋指令並發出控制訊號。", anyOf: ["控制單元", "解碼", "控制訊號", "協調"] },
+            { marks: 1, criterion: "算術邏輯單元進行算術或邏輯運算。", anyOf: ["算術邏輯單元", "ALU", "算術", "邏輯運算"] }
+        ],
+        explanation: "完整答案要同時交代三個階段的次序及兩個 CPU 部件的不同角色。"
+    },
+    {
+        id: "q-b-a-device-001",
+        topicId: "chb-1",
+        syllabusRef: "B(a)",
+        difficulty: "standard",
+        marks: 3,
+        type: "short-answer",
+        question: "自然保護區需要在無人值守的山坡自動收集溫度，每分鐘傳送一次讀數。建議一種合適的輸入裝置，並說明兩項選擇理由。",
+        answer: "使用溫度感應器。感應器可把環境溫度自動轉成數據輸入，毋須人手量度；亦可按固定時間連續收集讀數，減少抄錄錯誤。",
+        markingScheme: [
+            { marks: 1, criterion: "建議溫度感應器。", anyOf: ["溫度感應器", "溫度傳感器", "temperature sensor"] },
+            { marks: 1, criterion: "可自動感測／輸入環境溫度，毋須人手。", anyOf: ["自動", "感測", "無人", "毋須人手", "不用人手"] },
+            { marks: 1, criterion: "可連續／定時收集，或減少人手抄錄錯誤。", anyOf: ["連續", "定時", "每分鐘", "抄錄錯誤", "準確"] }
+        ],
+        explanation: "輸入裝置題須把裝置特性連結到所收集的數據類型和工作環境。"
+    },
+    {
+        id: "q-b-b-driver-001",
+        topicId: "chb-2",
+        syllabusRef: "B(b)",
+        difficulty: "foundation",
+        marks: 1,
+        type: "mcq",
+        question: "安裝新打印機時，驅動程式的主要作用是甚麼？",
+        options: [
+            { value: "A", label: "替使用者撰寫文件" },
+            { value: "B", label: "讓操作系統與指定打印機溝通及控制它" },
+            { value: "C", label: "永久增加打印機的紙張容量" },
+            { value: "D", label: "把所有檔案上載到互聯網" }
+        ],
+        answer: "B",
+        markingScheme: [{ marks: 1, criterion: "指出驅動程式讓操作系統與指定硬件溝通／控制硬件。" }],
+        explanation: "驅動程式把操作系統的要求轉化成指定硬件可理解的控制方式。"
+    },
+    {
+        id: "q-b-b-mode-002",
+        topicId: "chb-2",
+        syllabusRef: "B(b)",
+        difficulty: "standard",
+        marks: 4,
+        type: "short-answer",
+        question: "防毒軟件有兩種掃描：模式 X 在程式開啟前立即檢查該檔案；模式 Y 每晚 2 時把當日新增的檔案一次掃描。分別指出 X 和 Y 的操作模式，並各以一項情境資料解釋。",
+        answer: "X 是實時處理，因為它在程式開啟事件發生時必須立即檢查和回應。Y 是批次處理，因為檔案先累積，然後在預定時間一次處理。",
+        markingScheme: [
+            { marks: 1, criterion: "指出 X 是實時處理。", anyOf: ["X 是實時", "X為實時", "real-time", "real time"] },
+            { marks: 1, criterion: "解釋 X 在程式開啟時須立即檢查／回應。", anyOf: ["立即", "即時", "開啟前", "事件", "回應"] },
+            { marks: 1, criterion: "指出 Y 是批次處理。", anyOf: ["Y 是批次", "Y為批次", "batch"] },
+            { marks: 1, criterion: "解釋 Y 把工作累積至預定時間才一次處理。", anyOf: ["累積", "預定", "排程", "每晚", "一次處理"] }
+        ],
+        explanation: "實時處理的關鍵是規定時限內回應事件；批次處理的關鍵是先累積同類工作再集中處理。"
+    },
+    {
+        id: "q-b-b-mode-003",
+        topicId: "chb-2",
+        syllabusRef: "B(b)",
+        difficulty: "advanced",
+        marks: 3,
+        type: "short-answer",
+        question: "一間公司在一部實體伺服器上同時運行數個彼此隔離的虛擬伺服器。指出所用的操作模式，並說明兩項好處。",
+        answer: "這是虛擬化。它可讓多個獨立虛擬環境共享同一部實體電腦的資源，提高硬件使用率；亦可隔離不同服務，方便測試、管理或復原。",
+        markingScheme: [
+            { marks: 1, criterion: "指出操作模式是虛擬化。", anyOf: ["虛擬化", "virtualisation", "virtualization"] },
+            { marks: 1, criterion: "多個虛擬環境共享實體硬件，提高資源使用率／減少硬件數目。", anyOf: ["共享", "使用率", "硬件數目", "成本", "資源"] },
+            { marks: 1, criterion: "指出隔離服務、方便測試／管理／復原等合理好處。", anyOf: ["隔離", "測試", "管理", "復原", "備份", "獨立"] }
+        ],
+        explanation: "虛擬化把實體資源抽象成多個隔離環境；答案要說明共享資源和隔離帶來的實際效果。"
+    },
+    {
         id: "q-c-a-network-001",
         topicId: "chc-1",
         syllabusRef: "C(a)",

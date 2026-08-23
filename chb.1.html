@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="HKDSE ICT 必修 B(a)：基本機器組織、CPU、機器周期、記憶體、輸入輸出及儲存裝置。">
+    <title>B1 基本機器組織 - ICT 學習資源網</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/platform.css?v=4">
+    <link rel="stylesheet" href="assets/css/learning.css?v=3">
+    <link rel="stylesheet" href="assets/css/system-lesson.css?v=1">
+</head>
+<body>
+    <nav class="sys-lesson-nav" aria-label="本課導覽">
+        <a href="#organisation">系統組織</a>
+        <a href="#processor">CPU 與 GPU</a>
+        <a href="#cycle">機器周期</a>
+        <a href="#memory">記憶與儲存</a>
+        <a href="#devices">裝置選擇</a>
+        <a href="#dse-practice">DSE 練習</a>
+    </nav>
+
+    <main class="sys-page">
+        <section class="sys-hero" aria-labelledby="page-title">
+            <div class="sys-hero-copy">
+                <p class="sys-eyebrow">必修部分 B(a) · Basic Machine Organisation · 14 小時</p>
+                <h1 id="page-title">從輸入到輸出，追蹤電腦內每一步</h1>
+                <p>HKDSE 會要求你辨認硬件，也會把部件放入機器周期和實際使用情境。重點不是背外觀，而是解釋數據如何流動，以及為何某個裝置適合題目需要。</p>
+                <div class="sys-actions">
+                    <a class="sys-button sys-button-primary" href="#cycle">操作機器周期</a>
+                    <a class="sys-button sys-button-secondary" href="#devices">練習裝置選擇</a>
+                </div>
+            </div>
+            <aside class="sys-focus-card" aria-label="本課答題框架">
+                <span>DSE ANSWER FRAME</span>
+                <h2>硬件題三步答</h2>
+                <ol>
+                    <li>指出正確部件或裝置名稱。</li>
+                    <li>寫出它處理甚麼數據或訊號。</li>
+                    <li>把速度、容量或用途連回題目情境。</li>
+                </ol>
+            </aside>
+        </section>
+
+        <section id="organisation" class="sys-section" aria-labelledby="organisation-title">
+            <div class="sys-section-heading">
+                <div><p class="sys-kicker">01 · Functional units</p><h2 id="organisation-title">五類硬件如何合作</h2></div>
+                <span class="sys-tag">課程核心</span>
+            </div>
+            <p class="sys-lead">一個計算工作通常不是由 CPU 單獨完成。原始數據經輸入，指令與數據在記憶體、CPU 和裝置之間傳送，最後以合適形式輸出或長期儲存。</p>
+            <div class="sys-flow-grid" aria-label="輸入、記憶體、處理、儲存和輸出的關係">
+                <article class="sys-flow-card"><b>IN</b><h3>輸入裝置</h3><p>把文字、圖像、聲音或物理量轉成電腦可處理的數據。</p></article>
+                <article class="sys-flow-card"><b>MEM</b><h3>主記憶體</h3><p>暫存正在使用的指令、數據和中間結果。</p></article>
+                <article class="sys-flow-card"><b>CPU</b><h3>處理單元</h3><p>擷取、解碼及執行指令，進行運算並控制其他部件。</p></article>
+                <article class="sys-flow-card"><b>SSD</b><h3>儲存裝置</h3><p>在沒有電源時仍長期保存程式和數據。</p></article>
+                <article class="sys-flow-card"><b>OUT</b><h3>輸出裝置</h3><p>把結果轉成畫面、聲音、打印文件或其他可用形式。</p></article>
+            </div>
+        </section>
+
+        <section id="processor" class="sys-section" aria-labelledby="processor-title">
+            <div class="sys-section-heading">
+                <div><p class="sys-kicker">02 · Processing units</p><h2 id="processor-title">CPU 結構與 GPU 的不同強項</h2></div>
+            </div>
+            <div class="sys-processor-grid">
+                <article class="sys-card">
+                    <p class="sys-label">Control unit</p><h3>控制單元（CU）</h3>
+                    <p>解碼指令，發出控制訊號並協調 CPU、記憶體及輸入輸出裝置的工作。</p>
+                    <span class="sys-keyword">解碼 · 控制 · 協調</span>
+                </article>
+                <article class="sys-card">
+                    <p class="sys-label">Arithmetic logic unit</p><h3>算術邏輯單元（ALU）</h3>
+                    <p>執行加減等算術運算，以及比較、AND、OR、NOT 等邏輯運算。</p>
+                    <span class="sys-keyword">算術 · 比較 · 邏輯</span>
+                </article>
+                <article class="sys-card">
+                    <p class="sys-label">Registers</p><h3>暫存器</h3>
+                    <p>位於 CPU 內的高速小容量儲存位置，暫存地址、指令、數據或中間結果。</p>
+                    <span class="sys-keyword">最接近 CPU · 容量小 · 速度高</span>
+                </article>
+                <article class="sys-card">
+                    <p class="sys-label">Central processing unit</p><h3>CPU</h3>
+                    <p>以少量較強的核心處理通用、順序和控制密集的指令。頻率常以 Hz、MHz 或 GHz 表示每秒周期數。</p>
+                </article>
+                <article class="sys-card">
+                    <p class="sys-label">Graphics processing unit</p><h3>GPU</h3>
+                    <p>以大量較小的處理核心同時處理可分拆的工作，常用於圖像、視像及 AI 矩陣運算。</p>
+                </article>
+                <article class="sys-card">
+                    <p class="sys-label">Performance reminder</p><h3>不要只看 GHz</h3>
+                    <p>頻率較高代表周期較多，但整體效能亦受核心數、架構、快取、記憶體速度和工作類型影響。</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="cycle" class="sys-section" aria-labelledby="cycle-title">
+            <div class="sys-section-heading">
+                <div><p class="sys-kicker">03 · Interactive machine cycle</p><h2 id="cycle-title">逐步追蹤擷取—解碼—執行</h2></div>
+                <span class="sys-tag">可操作</span>
+            </div>
+            <p class="sys-lead">按左方步驟，觀察正在工作的暫存器和匯流排。公開試可只問部件名稱，也可要求說明它們如何互相依賴。</p>
+            <div class="sys-cycle" data-cycle-lab>
+                <div class="sys-cycle-controls" role="tablist" aria-label="機器周期步驟">
+                    <button type="button" role="tab" data-cycle-step="fetchAddress">1A 地址</button>
+                    <button type="button" role="tab" data-cycle-step="fetchInstruction">1B 指令</button>
+                    <button type="button" role="tab" data-cycle-step="decode">2 解碼</button>
+                    <button type="button" role="tab" data-cycle-step="execute">3 執行</button>
+                </div>
+                <div class="sys-cycle-panel" role="tabpanel" tabindex="0">
+                    <div class="sys-machine">
+                        <div class="sys-cpu-box">
+                            <strong>中央處理器 CPU</strong>
+                            <div class="sys-registers">
+                                <div class="sys-register" data-register="pc">PC<br>程序計數器</div>
+                                <div class="sys-register" data-register="mar">MAR<br>地址暫存器</div>
+                                <div class="sys-register" data-register="mdr">MDR<br>數據暫存器</div>
+                                <div class="sys-register" data-register="ir">IR / CIR<br>指令暫存器</div>
+                                <div class="sys-register" data-register="cu">CU<br>控制單元</div>
+                                <div class="sys-register" data-register="alu">ALU<br>算術邏輯</div>
+                                <div class="sys-register" data-register="acc">ACC<br>累加器</div>
+                            </div>
+                        </div>
+                        <div class="sys-memory-box" data-memory-box><strong>主記憶體</strong><p>地址 2048</p><p>LOAD value</p><p>地址 2049</p><p>ADD total</p></div>
+                        <div class="sys-bus-strip" aria-label="匯流排">
+                            <span data-bus="address">地址匯流排</span><span data-bus="data">數據匯流排</span><span data-bus="control">控制匯流排</span>
+                        </div>
+                    </div>
+                    <div class="sys-cycle-explanation">
+                        <h3 data-cycle-title></h3>
+                        <p data-cycle-explanation></p>
+                        <p><strong data-cycle-keyword></strong></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="memory" class="sys-section" aria-labelledby="memory-title">
+            <div class="sys-section-heading">
+                <div><p class="sys-kicker">04 · Memory and storage</p><h2 id="memory-title">不要只比較容量：四個準則一起看</h2></div>
+            </div>
+            <p class="sys-lead">題目常要求比較揮發性、存取方式、數據傳輸率和容量。答案必須以同一準則比較，不能只寫「A 較好」。</p>
+            <div class="sys-memory-grid">
+                <article class="sys-card sys-memory-card" style="--memory-color:#d86519"><p class="sys-label">Cache</p><h3>快取記憶體</h3><p>保存 CPU 預期很快再次使用的指令或數據，減少等待較慢主記憶體的時間。</p><dl><div><dt>揮發性</dt><dd>通常是</dd></div><div><dt>速度</dt><dd>極高</dd></div><div><dt>容量</dt><dd>很小</dd></div></dl></article>
+                <article class="sys-card sys-memory-card" style="--memory-color:#1769aa"><p class="sys-label">RAM</p><h3>隨機存取記憶體</h3><p>保存正在使用的程式、數據和結果；關機後一般會失去內容。</p><dl><div><dt>揮發性</dt><dd>是</dd></div><div><dt>存取</dt><dd>隨機</dd></div><div><dt>用途</dt><dd>工作空間</dd></div></dl></article>
+                <article class="sys-card sys-memory-card" style="--memory-color:#16745a"><p class="sys-label">ROM</p><h3>唯讀記憶體</h3><p>在沒有電源時仍可保存啟動或韌體指令；一般使用時主要讀取內容。</p><dl><div><dt>揮發性</dt><dd>否</dd></div><div><dt>用途</dt><dd>啟動／韌體</dd></div><div><dt>修改</dt><dd>較受限制</dd></div></dl></article>
+                <article class="sys-card sys-memory-card" style="--memory-color:#516579"><p class="sys-label">SSD / flash</p><h3>快閃儲存</h3><p>沒有機械讀寫頭，屬非揮發性隨機存取儲存；便攜裝置亦常使用。</p><dl><div><dt>速度</dt><dd>較磁碟快</dd></div><div><dt>抗震</dt><dd>較佳</dd></div><div><dt>每 GB 成本</dt><dd>通常較高</dd></div></dl></article>
+                <article class="sys-card sys-memory-card" style="--memory-color:#7d5a9f"><p class="sys-label">Magnetic disk</p><h3>磁碟</h3><p>以磁性表面隨機存取資料；通常提供較大容量和較低每 GB 成本。</p><dl><div><dt>速度</dt><dd>較 SSD 慢</dd></div><div><dt>活動部件</dt><dd>有</dd></div><div><dt>適用</dt><dd>大量本機儲存</dd></div></dl></article>
+                <article class="sys-card sys-memory-card" style="--memory-color:#9b4f55"><p class="sys-label">Magnetic tape</p><h3>磁帶</h3><p>按次序存取，尋找指定資料較慢，但適合低成本保存大量備份或封存數據。</p><dl><div><dt>存取</dt><dd>順序</dd></div><div><dt>容量</dt><dd>很大</dd></div><div><dt>適用</dt><dd>離線備份</dd></div></dl></article>
+            </div>
+            <div class="sys-equation"><strong>地址與容量：</strong>若每個地址可儲存一個 word，而地址長度是 <code>n bit</code>，便最多有 <code>2ⁿ</code> 個可辨認位置。word length 決定每個位置能保存多少 bit；兩者共同影響可定址容量。</div>
+        </section>
+
+        <section id="devices" class="sys-section" aria-labelledby="devices-title">
+            <div class="sys-section-heading">
+                <div><p class="sys-kicker">05 · Device selection lab</p><h2 id="devices-title">從情境選擇輸入輸出裝置</h2></div>
+                <span class="sys-tag">點選情境</span>
+            </div>
+            <p class="sys-lead">技術細節不是重點。你要辨認數據類型、使用環境及工作量，再選擇合適裝置並提出兩個直接相關的理由。</p>
+            <div class="sys-device-lab" data-device-lab>
+                <div class="sys-scenario-list" role="tablist" aria-label="裝置選擇情境">
+                    <button type="button" role="tab" data-device-scenario="temperature">無人溫室每分鐘量度溫度</button>
+                    <button type="button" role="tab" data-device-scenario="omr">批改大量選擇題答題紙</button>
+                    <button type="button" role="tab" data-device-scenario="barcode">收銀時讀取貨品編號</button>
+                    <button type="button" role="tab" data-device-scenario="display">車站向乘客顯示到站時間</button>
+                </div>
+                <div class="sys-scenario-panel" role="tabpanel" tabindex="0">
+                    <p class="sys-label">Suggested device</p><h3 data-device-title></h3><p data-device-summary></p>
+                    <div class="sys-reason-grid"><div data-device-reason><strong></strong><span></span></div><div data-device-reason><strong></strong><span></span></div></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="dse-practice" class="sys-section" aria-labelledby="practice-title">
+            <div class="sys-section-heading">
+                <div><p class="sys-kicker">06 · Original DSE-style practice</p><h2 id="practice-title">智能溫室電腦系統：7 分</h2></div>
+                <span class="sys-marks">7 分</span>
+            </div>
+            <div class="sys-original-note"><strong>原創練習</strong><span>按課程範圍和公開評核常見指令詞編寫，並非歷屆試題或官方擬題。</span></div>
+            <div class="sys-case">智能溫室每分鐘量度溫度。電腦會處理讀數、在屏幕顯示趨勢，並把全年的記錄保存作分析。</div>
+            <ol class="sys-question-list">
+                <li data-exam-question>
+                    <div class="sys-question-row"><p><span>(a)</span> 建議一種合適的輸入裝置，並解釋它如何減少人手工作。</p><b>[2 分]</b></div>
+                    <textarea rows="3" aria-label="第 a 題答案" placeholder="裝置（1）＋情境理由（1）……"></textarea>
+                    <button type="button" class="sys-reveal" aria-expanded="false">查看評分準則</button>
+                    <div class="sys-marking" hidden><p><strong>溫度感應器</strong>（1）；可自動、定時把物理溫度轉成輸入數據，毋須人手量度或抄錄（1）。</p></div>
+                </li>
+                <li data-exam-question>
+                    <div class="sys-question-row"><p><span>(b)</span> 指出 CPU 中負責解碼指令和進行比較運算的部件。</p><b>[2 分]</b></div>
+                    <textarea rows="2" aria-label="第 b 題答案" placeholder="解碼：……；比較：……"></textarea>
+                    <button type="button" class="sys-reveal" aria-expanded="false">查看評分準則</button>
+                    <div class="sys-marking" hidden><p>解碼指令：<strong>控制單元（CU）</strong>（1）；比較運算：<strong>算術邏輯單元（ALU）</strong>（1）。</p></div>
+                </li>
+                <li data-exam-question>
+                    <div class="sys-question-row"><p><span>(c)</span> 解釋 RAM 與 SSD 在這個系統中的不同用途，並指出哪一種屬揮發性。</p><b>[3 分]</b></div>
+                    <textarea rows="4" aria-label="第 c 題答案" placeholder="用相同準則比較兩者……"></textarea>
+                    <button type="button" class="sys-reveal" aria-expanded="false">查看評分準則</button>
+                    <div class="sys-marking" hidden><ul><li>RAM 暫存正在執行的程式、讀數或中間結果（1）。</li><li>SSD 在關機後仍長期保存全年記錄（1）。</li><li>RAM 屬揮發性；SSD 屬非揮發性（1）。</li></ul></div>
+                </li>
+            </ol>
+            <button type="button" class="sys-button sys-button-primary sys-reveal-all" data-reveal-all>顯示全部評分準則</button>
+        </section>
+
+        <section class="sys-section sys-summary" aria-labelledby="summary-title">
+            <div><p class="sys-kicker">Before you leave</p><h2 id="summary-title">三句答題自檢</h2><a class="sys-next-link" href="chb.2.html">下一課：系統軟件與操作模式 →</a></div>
+            <ol><li><span>1</span>我有沒有寫出部件的完整功能，而不只寫名稱？</li><li><span>2</span>機器周期的步驟和數據方向是否正確？</li><li><span>3</span>裝置選擇理由是否連結數據類型和使用情境？</li></ol>
+        </section>
+    </main>
+
+    <script src="course_data.js"></script>
+    <script src="assets/js/site_navigation.js?v=4"></script>
+    <script src="question_data.js?v=4"></script>
+    <script src="learning_data.js?v=4"></script>
+    <script src="assets/js/system-lessons.js?v=1"></script>
+    <script src="assets/js/lesson_companion.js?v=3"></script>
+</body>
+</html>

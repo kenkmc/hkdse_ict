@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="HKDSE ICT 必修 B(b)：操作系統、實用程式、驅動程式、批次、實時、並行、分布式處理及虛擬化。">
+    <title>B2 系統軟件 - ICT 學習資源網</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/platform.css?v=4">
+    <link rel="stylesheet" href="assets/css/learning.css?v=3">
+    <link rel="stylesheet" href="assets/css/system-lesson.css?v=1">
+</head>
+<body>
+    <nav class="sys-lesson-nav" aria-label="本課導覽">
+        <a href="#software">軟件層次</a>
+        <a href="#operating-system">操作系統</a>
+        <a href="#utilities">實用與驅動程式</a>
+        <a href="#modes">操作模式</a>
+        <a href="#dse-practice">DSE 練習</a>
+    </nav>
+
+    <main class="sys-page">
+        <section class="sys-hero" aria-labelledby="page-title">
+            <div class="sys-hero-copy">
+                <p class="sys-eyebrow">必修部分 B(b) · System Software · 6 小時</p>
+                <h1 id="page-title">軟件如何管理硬件，也決定工作如何處理</h1>
+                <p>這課最容易失分的是把名詞混在一起：操作系統、實用程式、驅動程式各有不同角色；batch、real-time、parallel、distributed 和 virtualisation 則要靠情境關鍵字判斷。</p>
+                <div class="sys-actions">
+                    <a class="sys-button sys-button-primary" href="#modes">比較五種操作模式</a>
+                    <a class="sys-button sys-button-secondary" href="#dse-practice">挑戰 9 分情境題</a>
+                </div>
+            </div>
+            <aside class="sys-focus-card" aria-label="本課答題框架">
+                <span>DSE ANSWER FRAME</span>
+                <h2>模式題不是猜速度</h2>
+                <ol>
+                    <li>圈出排程、立即、多核心或多部電腦等線索。</li>
+                    <li>指出操作模式的完整名稱。</li>
+                    <li>引用題目資料解釋為何符合定義。</li>
+                </ol>
+            </aside>
+        </section>
+
+        <section id="software" class="sys-section" aria-labelledby="software-title">
+            <div class="sys-section-heading">
+                <div><p class="sys-kicker">01 · Software relationship</p><h2 id="software-title">由使用者到硬件的四個層次</h2></div>
+                <span class="sys-tag">關係題</span>
+            </div>
+            <p class="sys-lead">使用者通常透過應用軟件完成工作；應用再要求系統軟件提供檔案、記憶體或裝置服務，系統軟件最終管理硬件。</p>
+            <div class="sys-layer-stack" aria-label="使用者、應用軟件、系統軟件和硬件的層次關係">
+                <div class="sys-layer sys-layer-user"><strong>使用者</strong><span>提出工作要求，例如編輯文件或打印</span></div>
+                <div class="sys-layer sys-layer-app"><strong>應用軟件</strong><span>處理特定使用者工作，例如文書處理、瀏覽器</span></div>
+                <div class="sys-layer sys-layer-system"><strong>系統軟件</strong><span>操作系統、實用程式、驅動程式</span></div>
+                <div class="sys-layer sys-layer-hardware"><strong>硬件</strong><span>CPU、記憶體、儲存及輸入輸出裝置</span></div>
+            </div>
+            <div class="sys-software-grid">
+                <article class="sys-card"><p class="sys-label">System software</p><h3>系統軟件</h3><p>管理及支援整個電腦系統，提供應用程式使用硬件和共用資源的基礎。</p><span class="sys-keyword">管理系統 · 提供平台</span></article>
+                <article class="sys-card"><p class="sys-label">Application software</p><h3>應用軟件</h3><p>協助使用者完成特定工作，例如製作試算表、繪圖、通訊或瀏覽網頁。</p><span class="sys-keyword">完成特定使用者工作</span></article>
+                <article class="sys-card"><p class="sys-label">Exam contrast</p><h3>完整比較句</h3><p>作業系統管理記憶體和打印機等資源；文書處理器則使用這些服務，讓使用者建立及打印文件。</p><span class="sys-keyword">功能 + 例子 + 關係</span></article>
+            </div>
+        </section>
+
+        <section id="operating-system" class="sys-section" aria-labelledby="os-title">
+            <div class="sys-section-heading">
+                <div><p class="sys-kicker">02 · Operating system</p><h2 id="os-title">操作系統的六項基本功能</h2></div>
+            </div>
+            <p class="sys-lead">不同操作系統的介面和應用場景可不同，但答案應集中它們如何分配資源、保護資料及支援程式運行。</p>
+            <div class="sys-processor-grid">
+                <article class="sys-card"><p class="sys-label">Processor</p><h3>處理器管理</h3><p>排程程序，分配 CPU 時間，讓多個工作看似同時運行。</p></article>
+                <article class="sys-card"><p class="sys-label">Memory</p><h3>記憶體管理</h3><p>分配和回收 RAM，避免不同程序不當存取彼此的記憶空間。</p></article>
+                <article class="sys-card"><p class="sys-label">File</p><h3>檔案管理</h3><p>建立資料夾、命名、儲存、搜尋、複製及設定檔案存取權限。</p></article>
+                <article class="sys-card"><p class="sys-label">Device</p><h3>裝置管理</h3><p>透過驅動程式控制打印機、顯示卡等周邊裝置並協調輸入輸出。</p></article>
+                <article class="sys-card"><p class="sys-label">Interface</p><h3>使用者介面</h3><p>提供 GUI 或命令列，讓使用者輸入指令並查看系統回應。</p></article>
+                <article class="sys-card"><p class="sys-label">Security</p><h3>保安與存取控制</h3><p>管理帳戶、身分驗證、權限和系統紀錄，限制未獲授權的存取。</p></article>
+            </div>
+        </section>
+
+        <section id="utilities" class="sys-section" aria-labelledby="utilities-title">
+            <div class="sys-section-heading">
+                <div><p class="sys-kicker">03 · Utilities and drivers</p><h2 id="utilities-title">維護系統，還是控制指定硬件？</h2></div>
+            </div>
+            <div class="sys-utility-grid">
+                <article class="sys-card"><p class="sys-label">Data compressor</p><h3>數據壓縮程式</h3><p>減少檔案所需儲存空間，亦可縮短在相同傳輸率下的傳送時間；是否有損須視方法而定。</p></article>
+                <article class="sys-card"><p class="sys-label">Virus checker</p><h3>病毒檢查程式</h3><p>掃描檔案和活動，比對惡意程式特徵或可疑行為，並隔離、封鎖或移除威脅。</p></article>
+                <article class="sys-card"><p class="sys-label">File manager</p><h3>檔案管理程式</h3><p>協助建立資料夾、搜尋、複製、移動、重新命名及刪除檔案。</p></article>
+                <article class="sys-card"><p class="sys-label">Defragmenter</p><h3>磁碟重組程式</h3><p>重新排列磁碟上分散的檔案區塊，減少機械讀寫頭移動；一般不應用來重組 SSD。</p></article>
+                <article class="sys-card"><p class="sys-label">System monitor</p><h3>系統監察程式</h3><p>顯示 CPU、記憶體、儲存及網絡資源用量，協助找出效能問題。</p></article>
+                <article class="sys-card"><p class="sys-label">Device driver</p><h3>驅動程式</h3><p>讓操作系統與指定硬件溝通，把通用要求轉成裝置可理解的控制方式。</p><span class="sys-keyword">OS ↔ 指定硬件</span></article>
+            </div>
+            <div class="sys-classifier" data-classifier data-correct="driver" data-explanation="打印工作由應用送往操作系統，再由打印機驅動程式轉成該型號可理解的命令。">
+                <h3>即時判斷</h3><p>新打印機連接後，電腦能偵測裝置但無法正確打印。最應先安裝或更新哪一類程式？</p>
+                <div class="sys-choice-row"><button type="button" data-classifier-answer="compressor">數據壓縮程式</button><button type="button" data-classifier-answer="driver">打印機驅動程式</button><button type="button" data-classifier-answer="spreadsheet">試算表</button></div>
+                <p class="sys-feedback" data-classifier-feedback aria-live="polite">選擇答案後會顯示解釋。</p>
+            </div>
+        </section>
+
+        <section id="modes" class="sys-section" aria-labelledby="modes-title">
+            <div class="sys-section-heading">
+                <div><p class="sys-kicker">04 · Interactive operation modes</p><h2 id="modes-title">五種操作模式：看線索，不只看結果</h2></div>
+                <span class="sys-tag">可操作</span>
+            </div>
+            <p class="sys-lead">按模式比較定義、題目關鍵字和典型情境。實際系統可能同時使用多種技術；公開試應按題目強調的特徵作答。</p>
+            <div class="sys-mode-lab" data-mode-lab>
+                <div class="sys-mode-tabs" role="tablist" aria-label="五種操作模式">
+                    <button type="button" role="tab" data-mode="batch">批次處理</button>
+                    <button type="button" role="tab" data-mode="realtime">實時處理</button>
+                    <button type="button" role="tab" data-mode="parallel">並行處理</button>
+                    <button type="button" role="tab" data-mode="distributed">分布式處理</button>
+                    <button type="button" role="tab" data-mode="virtualisation">虛擬化</button>
+                </div>
+                <div class="sys-mode-panel" role="tabpanel" tabindex="0">
+                    <p class="sys-label">Mode profile</p><h3 data-mode-title></h3>
+                    <p class="sys-mode-definition" data-mode-definition></p>
+                    <div class="sys-mode-signals" data-mode-signals></div>
+                    <div class="sys-mode-example" data-mode-example></div>
+                    <p class="sys-contrast"><strong>不要混淆：</strong><span data-mode-contrast></span></p>
+                </div>
+            </div>
+            <div class="sys-classifier" data-classifier data-correct="realtime" data-explanation="閘門必須在感應到障礙物時於規定時間內立即停止，重點是時限內回應事件。">
+                <h3>DSE 關鍵字判斷</h3><p>停車場閘門的感應器偵測到車輛仍在閘下時，系統必須立即停止閘臂。這最符合哪一種模式？</p>
+                <div class="sys-choice-row"><button type="button" data-classifier-answer="batch">批次處理</button><button type="button" data-classifier-answer="realtime">實時處理</button><button type="button" data-classifier-answer="distributed">分布式處理</button><button type="button" data-classifier-answer="virtualisation">虛擬化</button></div>
+                <p class="sys-feedback" data-classifier-feedback aria-live="polite">選擇答案後會顯示解釋。</p>
+            </div>
+        </section>
+
+        <section id="dse-practice" class="sys-section" aria-labelledby="practice-title">
+            <div class="sys-section-heading">
+                <div><p class="sys-kicker">05 · Original DSE-style practice</p><h2 id="practice-title">校園伺服器與防毒系統：9 分</h2></div>
+                <span class="sys-marks">9 分</span>
+            </div>
+            <div class="sys-original-note"><strong>原創練習</strong><span>按課程範圍及公開評核的情境式問法編寫，並非歷屆試題或官方擬題。</span></div>
+            <div class="sys-case">學校把網頁、測試及檔案服務放在同一部實體伺服器的三個獨立環境。防毒軟件會在檔案開啟前檢查，也會在每晚 2 時一次掃描當日新增的所有檔案。</div>
+            <ol class="sys-question-list">
+                <li data-exam-question>
+                    <div class="sys-question-row"><p><span>(a)</span> 指出讓三個獨立環境共用一部實體伺服器的操作模式，並說明一項好處。</p><b>[2 分]</b></div>
+                    <textarea rows="3" aria-label="第 a 題答案" placeholder="模式（1）＋直接好處（1）……"></textarea>
+                    <button type="button" class="sys-reveal" aria-expanded="false">查看評分準則</button>
+                    <div class="sys-marking" hidden><p><strong>虛擬化</strong>（1）；多個隔離環境可共享同一部實體伺服器，提高硬件資源使用率／減少實體設備成本／方便獨立測試及復原（任何一項合理好處，1）。</p></div>
+                </li>
+                <li data-exam-question>
+                    <div class="sys-question-row"><p><span>(b)</span> 分別指出「檔案開啟前檢查」和「每晚一次掃描」的操作模式，並各以題目資料解釋。</p><b>[4 分]</b></div>
+                    <textarea rows="5" aria-label="第 b 題答案" placeholder="每個模式：名稱（1）＋情境解釋（1）……"></textarea>
+                    <button type="button" class="sys-reveal" aria-expanded="false">查看評分準則</button>
+                    <div class="sys-marking" hidden><ul><li>檔案開啟前檢查：<strong>實時處理</strong>（1），因系統須在程式執行事件發生時立即回應並封鎖威脅（1）。</li><li>每晚一次掃描：<strong>批次處理</strong>（1），因檔案先累積，再在預定時間集中處理（1）。</li></ul><p class="sys-marker-note">只用「一個／多個檔案」比較不能完整解釋；評分重點是事件時限和累積／排程。</p></div>
+                </li>
+                <li data-exam-question>
+                    <div class="sys-question-row"><p><span>(c)</span> 說明打印機驅動程式的主要功能，並指出使用正確版本的一項需要。</p><b>[2 分]</b></div>
+                    <textarea rows="3" aria-label="第 c 題答案" placeholder="功能（1）＋版本需要（1）……"></textarea>
+                    <button type="button" class="sys-reveal" aria-expanded="false">查看評分準則</button>
+                    <div class="sys-marking" hidden><ul><li>讓操作系統與指定打印機溝通／控制它（1）。</li><li>正確版本可支援該硬件型號或目前操作系統，避免不相容和錯誤（1）。</li></ul></div>
+                </li>
+                <li data-exam-question>
+                    <div class="sys-question-row"><p><span>(d)</span> 指出一種可查看 CPU 和 RAM 使用量的實用程式。</p><b>[1 分]</b></div>
+                    <textarea rows="2" aria-label="第 d 題答案" placeholder="程式類別：……"></textarea>
+                    <button type="button" class="sys-reveal" aria-expanded="false">查看評分準則</button>
+                    <div class="sys-marking" hidden><p><strong>系統監察程式</strong>（system monitoring software）（1）。</p></div>
+                </li>
+            </ol>
+            <button type="button" class="sys-button sys-button-primary sys-reveal-all" data-reveal-all>顯示全部評分準則</button>
+        </section>
+
+        <section class="sys-section sys-summary" aria-labelledby="summary-title">
+            <div><p class="sys-kicker">Before you leave</p><h2 id="summary-title">三句答題自檢</h2><a class="sys-next-link" href="chc.1.html">下一部分：建網及互聯網基本知識 →</a></div>
+            <ol><li><span>1</span>我有沒有分清系統軟件和應用軟件？</li><li><span>2</span>驅動程式答案有沒有寫出操作系統和指定硬件？</li><li><span>3</span>操作模式的解釋有沒有引用題目中的時間或資源線索？</li></ol>
+        </section>
+    </main>
+
+    <script src="course_data.js"></script>
+    <script src="assets/js/site_navigation.js?v=4"></script>
+    <script src="question_data.js?v=4"></script>
+    <script src="learning_data.js?v=4"></script>
+    <script src="assets/js/system-lessons.js?v=1"></script>
+    <script src="assets/js/lesson_companion.js?v=3"></script>
+</body>
+</html>

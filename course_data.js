@@ -80,6 +80,34 @@ const courseData = [
         ]
     },
     {
+        id: "core-b",
+        sectionTitle: "必修部分 B - 電腦系統基礎",
+        sectionCode: "Core B",
+        kind: "course",
+        color: "bg-amber-50 text-amber-800",
+        icon: "microchip",
+        items: [
+            {
+                id: "chb-1",
+                title: "i. 基本機器組織",
+                file: "chb.1.html",
+                desc: "硬件功能、CPU、機器周期、記憶體、輸入輸出及儲存裝置",
+                type: "lesson",
+                syllabusRef: "B(a)",
+                tags: ["CPU", "GPU", "機器周期", "RAM", "ROM", "記憶體", "輸入輸出", "儲存裝置"]
+            },
+            {
+                id: "chb-2",
+                title: "ii. 系統軟件",
+                file: "chb.2.html",
+                desc: "操作系統、實用程式、驅動程式及五種操作模式",
+                type: "lesson",
+                syllabusRef: "B(b)",
+                tags: ["操作系統", "實用程式", "驅動程式", "批次處理", "實時處理", "虛擬化"]
+            }
+        ]
+    },
+    {
         id: "core-c",
         sectionTitle: "必修部分 C - 互聯網及其應用",
         sectionCode: "Core C",
