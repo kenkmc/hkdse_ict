@@ -793,6 +793,133 @@ const questionData = [
         ], explanation: "水印和簽署功能不同；列出來源亦不一定取代取得授權，兩項做法應同時考慮。"
     },
     {
+        id: "q-ea-rel-001", topicId: "ea-1", syllabusRef: "Elective A(a)", difficulty: "foundation", marks: 1, type: "mcq",
+        question: "一個表有 StudentID 和不重複的 Email，兩者都能唯一識別學生。在選定主鍵前，兩者均屬於甚麼？",
+        options: [{ value: "A", label: "候選鍵" }, { value: "B", label: "外鍵" }, { value: "C", label: "交易" }, { value: "D", label: "重複欄位" }], answer: "A",
+        markingScheme: [{ marks: 1, criterion: "能唯一識別記錄的最小欄位組合是候選鍵。" }], explanation: "表可有多個候選鍵，再選其中一個作主鍵。"
+    },
+    {
+        id: "q-ea-rel-002", topicId: "ea-1", syllabusRef: "Elective A(a)", difficulty: "standard", marks: 5, type: "short-answer",
+        question: "數據庫有 CLASS(ClassID, ClassName) 和 STUDENT(StudentID, Name, ClassID)。指出兩個主鍵和一個外鍵，並分別說明實體完整性及參照完整性如何限制 STUDENT 的數據。",
+        answer: "CLASS 的主鍵是 ClassID；STUDENT 的主鍵是 StudentID；STUDENT.ClassID 是外鍵，參照 CLASS.ClassID。實體完整性要求 StudentID 不可為空且每筆記錄唯一；參照完整性要求非空的 STUDENT.ClassID 必須在 CLASS 中存在。",
+        markingScheme: [{ marks: 1, criterion: "CLASS.ClassID 是主鍵。", anyOf: ["CLASS.ClassID", "CLASS 的 ClassID", "CLASS主鍵"] }, { marks: 1, criterion: "STUDENT.StudentID 是主鍵。", anyOf: ["STUDENT.StudentID", "STUDENT 的 StudentID", "STUDENT主鍵"] }, { marks: 1, criterion: "STUDENT.ClassID 是參照 CLASS.ClassID 的外鍵。", anyOf: ["STUDENT.ClassID", "外鍵", "參照 CLASS"] }, { marks: 1, criterion: "實體完整性：主鍵不可為空且唯一。", anyOf: ["不可為空", "不能空", "唯一", "實體完整性"] }, { marks: 1, criterion: "參照完整性：外鍵值必須在父表存在或為允許的空值。", anyOf: ["必須存在", "CLASS 中存在", "父表", "參照完整性"] }],
+        explanation: "回答完整性時要寫出受限制的欄位和不合法值，而不是只背定義。"
+    },
+    {
+        id: "q-ea-rel-003", topicId: "ea-1", syllabusRef: "Elective A(a)", difficulty: "standard", marks: 3, type: "short-answer",
+        question: "網上付款同時扣減存貨和新增訂單。新增訂單失敗後系統執行 rollback。說明 rollback 的目的，並指出為 ProductID 建立 index 的一項效益及一項成本。",
+        answer: "Rollback 撤銷同一交易中已完成的扣庫存變更，使數據庫返回一致狀態。ProductID index 可加快搜尋／連接，但會佔用額外儲存空間，而且新增或更新時要維護索引。",
+        markingScheme: [{ marks: 1, criterion: "撤銷未完整交易並回復一致狀態。", anyOf: ["撤銷", "還原", "一致", "rollback"] }, { marks: 1, criterion: "索引加快搜尋／排序／連接。", anyOf: ["加快", "搜尋", "查詢", "連接"] }, { marks: 1, criterion: "索引佔空間或增加寫入／維護成本。", anyOf: ["空間", "儲存", "維護", "更新", "新增"] }], explanation: "索引不是免費加速：讀取通常變快，但儲存和寫入成本增加。"
+    },
+    {
+        id: "q-ea-sql-concept-001", topicId: "ea-2", syllabusRef: "Elective A(b)", difficulty: "foundation", marks: 1, type: "mcq",
+        question: "要篩選 GROUP BY 後平均分高於 70 的班別，應使用哪個子句？",
+        options: [{ value: "A", label: "HAVING" }, { value: "B", label: "ALTER" }, { value: "C", label: "DROP" }, { value: "D", label: "VALUES" }], answer: "A",
+        markingScheme: [{ marks: 1, criterion: "HAVING 用於篩選群組聚合結果。" }], explanation: "WHERE 在分組前篩選記錄；HAVING 在分組後篩選群組。"
+    },
+    {
+        id: "q-ea-sql-002", topicId: "ea-2", syllabusRef: "Elective A(b)", difficulty: "standard", marks: 5, type: "sql",
+        question: "有 STUDENT(SID, SName, ClassID) 和 CLASS(ClassID, ClassName)。寫出 SQL，顯示所有班名為 '5A' 的學生姓名，按姓名升序排列。",
+        answer: "SELECT S.SName FROM STUDENT S INNER JOIN CLASS C ON S.ClassID = C.ClassID WHERE C.ClassName = '5A' ORDER BY S.SName ASC;",
+        markingScheme: [{ marks: 1, criterion: "SELECT SName。", anyOf: ["SELECTS.SNAME", "SELECTSNAME"] }, { marks: 1, criterion: "FROM STUDENT 並使用 CLASS。", anyOf: ["FROMSTUDENT", "JOINCLASS"] }, { marks: 1, criterion: "以 ClassID 正確連接兩表。", anyOf: ["S.CLASSID=C.CLASSID", "STUDENT.CLASSID=CLASS.CLASSID"] }, { marks: 1, criterion: "篩選 ClassName='5A'。", anyOf: ["CLASSNAME='5A'", "CLASSNAME=\"5A\""] }, { marks: 1, criterion: "按 SName 升序排列。", anyOf: ["ORDERBYS.SNAME", "ORDERBYSNAME", "ASC"] }], explanation: "先以 ClassID 連接學生和班別，再按班名篩選及排序。"
+    },
+    {
+        id: "q-ea-sql-003", topicId: "ea-2", syllabusRef: "Elective A(b)", difficulty: "advanced", marks: 4, type: "sql",
+        question: "有 RESULT(SID, Score)。寫出 SQL，把所有低於全表平均分的記錄 Score 增加 5。只需一層子查詢。",
+        answer: "UPDATE RESULT SET Score = Score + 5 WHERE Score < (SELECT AVG(Score) FROM RESULT);",
+        markingScheme: [{ marks: 1, criterion: "UPDATE RESULT。", anyOf: ["UPDATERESULT"] }, { marks: 1, criterion: "SET Score = Score + 5。", anyOf: ["SETSCORE=SCORE+5"] }, { marks: 1, criterion: "以 WHERE Score < 子查詢結果篩選。", anyOf: ["WHERESCORE<", "SCORE<("] }, { marks: 1, criterion: "子查詢正確計算 RESULT 的 AVG(Score)。", anyOf: ["SELECTAVG(SCORE)FROMRESULT"] }], explanation: "子查詢先取得單一平均值，外層 UPDATE 只修改低於該值的記錄。"
+    },
+    {
+        id: "q-ea-design-001", topicId: "ea-3", syllabusRef: "Elective A(c)", difficulty: "foundation", marks: 1, type: "mcq",
+        question: "把 M:N 關係轉成關聯表時，最常見做法是甚麼？",
+        options: [{ value: "A", label: "加入橋接表，把關係拆成兩個 1:M" }, { value: "B", label: "刪除其中一個實體" }, { value: "C", label: "把所有資料放進一個文字欄" }, { value: "D", label: "取消所有主鍵" }], answer: "A",
+        markingScheme: [{ marks: 1, criterion: "以橋接表解拆多對多關係。" }], explanation: "橋接表通常以兩邊外鍵組成複合主鍵，亦可保存關係本身的屬性。"
+    },
+    {
+        id: "q-ea-design-002", topicId: "ea-3", syllabusRef: "Elective A(c)", difficulty: "standard", marks: 5, type: "short-answer",
+        question: "學生可選修多個課程，每個課程亦有多名學生；系統還要保存每次選修的 EnrolDate。說明 ER 關係和解拆方法，並列出三個關聯表的主鍵及外鍵。",
+        answer: "STUDENT 與 COURSE 是 M:N。加入 ENROLMENT，把關係解成 STUDENT 1:M ENROLMENT 和 COURSE 1:M ENROLMENT。STUDENT(StudentID PK)、COURSE(CourseID PK)、ENROLMENT(StudentID PK/FK, CourseID PK/FK, EnrolDate)，其中兩個外鍵組成複合主鍵。",
+        markingScheme: [{ marks: 1, criterion: "指出 STUDENT 與 COURSE 是 M:N。", anyOf: ["M:N", "多對多"] }, { marks: 1, criterion: "加入 ENROLMENT／橋接實體。", anyOf: ["ENROLMENT", "橋接", "選修表"] }, { marks: 1, criterion: "把關係拆成兩個 1:M。", anyOf: ["1:M", "一對多"] }, { marks: 1, criterion: "正確列出 STUDENT、COURSE 主鍵。", anyOf: ["StudentID", "CourseID", "主鍵"] }, { marks: 1, criterion: "ENROLMENT 以兩外鍵作複合主鍵並保存 EnrolDate。", anyOf: ["複合主鍵", "PK/FK", "EnrolDate", "兩個外鍵"] }], explanation: "EnrolDate 屬於學生與課程之間的選修關係，因此放在橋接表。"
+    },
+    {
+        id: "q-ea-design-003", topicId: "ea-3", syllabusRef: "Elective A(c)", difficulty: "advanced", marks: 6, type: "short-answer",
+        question: "表 ORDER(OrderID, OrderDate, CustomerID, CustomerName, ProductID, ProductName, Qty) 以 (OrderID, ProductID) 為複合主鍵。指出一項冗餘問題，並把它正規化至 3NF，列出新表及鍵。",
+        answer: "同一顧客／產品名稱在多張訂單重複，容易產生更新異常。可分為 CUSTOMER(CustomerID PK, CustomerName)、PRODUCT(ProductID PK, ProductName)、ORDERS(OrderID PK, OrderDate, CustomerID FK)、ORDER_LINE(OrderID PK/FK, ProductID PK/FK, Qty)。顧客資料只依賴 CustomerID，產品資料只依賴 ProductID，非鍵屬性依賴其表的鍵。",
+        markingScheme: [{ marks: 1, criterion: "指出名稱重複或更新／新增／刪除異常。", anyOf: ["重複", "冗餘", "更新異常", "刪除異常", "新增異常"] }, { marks: 1, criterion: "建立 CUSTOMER 並以 CustomerID 為主鍵。", anyOf: ["CUSTOMER", "CustomerID PK", "CustomerID主鍵"] }, { marks: 1, criterion: "建立 PRODUCT 並以 ProductID 為主鍵。", anyOf: ["PRODUCT", "ProductID PK", "ProductID主鍵"] }, { marks: 1, criterion: "建立 ORDERS，含 CustomerID 外鍵。", anyOf: ["ORDERS", "OrderID", "CustomerID FK", "CustomerID外鍵"] }, { marks: 1, criterion: "建立 ORDER_LINE，以 OrderID、ProductID 作複合鍵。", anyOf: ["ORDER_LINE", "複合", "OrderID", "ProductID"] }, { marks: 1, criterion: "說明移除 partial／transitive dependency 或非鍵只依賴鍵。", anyOf: ["部分依賴", "傳遞依賴", "非鍵", "依賴主鍵", "3NF"] }], explanation: "先把依賴顧客和產品識別碼的描述資料分開，再保留訂單表和訂單明細橋接表。"
+    },
+    {
+        id: "q-eb-network-001", topicId: "eb-1", syllabusRef: "Elective B(a)", difficulty: "foundation", marks: 1, type: "mcq",
+        question: "哪類伺服器主要為新加入網絡的裝置自動配發 IP 位址？",
+        options: [{ value: "A", label: "DHCP server" }, { value: "B", label: "Web server" }, { value: "C", label: "File server" }, { value: "D", label: "Database server" }], answer: "A",
+        markingScheme: [{ marks: 1, criterion: "DHCP 自動租用 IP 位址及網絡參數。" }], explanation: "DNS 負責名稱解析；DHCP 負責位址和相關設定。"
+    },
+    {
+        id: "q-eb-network-002", topicId: "eb-1", syllabusRef: "Elective B(a)", difficulty: "standard", marks: 5, type: "short-answer",
+        question: "瀏覽器把登入表單送到 HTTPS 網站。說明 client、server、request、response 和 TCP port 在這次通訊中的角色，並解釋為何使用 POST 仍需要 HTTPS。",
+        answer: "瀏覽器是 client，向 web server 發出包含表單資料的 HTTP POST request；server 接收和處理後回傳 response。TCP port 用來把連線交給正確的網絡服務，例如 HTTPS 常用 443。POST 只把資料放在請求內容而不是 URL，並不自動加密，所以仍需 HTTPS 保護傳輸。",
+        markingScheme: [{ marks: 1, criterion: "瀏覽器是 client、網站程式是 server。", anyOf: ["瀏覽器", "client", "server", "伺服器"] }, { marks: 1, criterion: "client 發出 POST request。", anyOf: ["POST", "request", "請求"] }, { marks: 1, criterion: "server 處理並回傳 response。", anyOf: ["response", "回應", "處理"] }, { marks: 1, criterion: "port 把連線交給指定服務／HTTPS 常用 443。", anyOf: ["port", "連接埠", "443", "服務"] }, { marks: 1, criterion: "POST 不等於加密，HTTPS 才保護傳輸。", anyOf: ["不會加密", "不是加密", "HTTPS", "保護傳輸"] }], explanation: "GET／POST 是請求方法；HTTPS 是安全傳輸機制，不能混為一談。"
+    },
+    {
+        id: "q-eb-network-003", topicId: "eb-1", syllabusRef: "Elective B(a)", difficulty: "standard", marks: 4, type: "short-answer",
+        question: "展覽攤位有共用資料夾。學生只可閱讀宣傳檔，設計員可新增及修改檔案，只有管理員可執行部署腳本。分配 read、write、execute 權限，並說明最小權限的一項好處。",
+        answer: "學生：read；設計員：read、write；管理員：按工作需要擁有 read、write、execute。最小權限只給完成工作所需權限，可減少誤刪、惡意修改或執行未授權程式的風險。",
+        markingScheme: [{ marks: 1, criterion: "學生只有 read。", anyOf: ["學生", "read", "只讀"] }, { marks: 1, criterion: "設計員有 read、write。", anyOf: ["設計員", "read", "write", "讀寫"] }, { marks: 1, criterion: "管理員才有 execute。", anyOf: ["管理員", "execute", "執行"] }, { marks: 1, criterion: "說明最小權限減少未授權操作／事故。", anyOf: ["最小權限", "未授權", "誤刪", "風險", "攻擊"] }], explanation: "權限要按角色和工作配對，而不是讓所有登入者都有完整控制。"
+    },
+    {
+        id: "q-eb-web-001", topicId: "eb-2", syllabusRef: "Elective B(b)", difficulty: "foundation", marks: 1, type: "mcq",
+        question: "為何伺服器必須再次驗證已由 JavaScript 檢查的表單輸入？",
+        options: [{ value: "A", label: "客戶端驗證可被停用或繞過" }, { value: "B", label: "CSS 不能設定顏色" }, { value: "C", label: "POST 一定會刪除資料" }, { value: "D", label: "伺服器看不到任何請求" }], answer: "A",
+        markingScheme: [{ marks: 1, criterion: "客戶端程式不可信，伺服器須重新驗證。" }], explanation: "使用者可修改或直接建立請求，不能以瀏覽器檢查作唯一防線。"
+    },
+    {
+        id: "q-eb-web-002", topicId: "eb-2", syllabusRef: "Elective B(b)", difficulty: "standard", marks: 6, type: "short-answer",
+        question: "網頁讓學生輸入 0–100 的分數，再把有效資料加入 RESULTS 表。按次序說明 HTML、CSS、client-side script、HTTP POST、server-side script 和 database 的作用。",
+        answer: "HTML 建立有標籤的表單欄位；CSS 提供一致和清楚的呈現；客戶端腳本即時檢查範圍並提示；瀏覽器以 POST request 送出資料；伺服器端腳本不信任客戶端而再次驗證及處理；驗證成功後才以安全查詢新增至 RESULTS，最後回傳成功或錯誤 response。",
+        markingScheme: [{ marks: 1, criterion: "HTML 建立表單結構和欄位。", anyOf: ["HTML", "表單", "欄位"] }, { marks: 1, criterion: "CSS 提供一致呈現。", anyOf: ["CSS", "一致", "樣式"] }, { marks: 1, criterion: "客戶端腳本即時檢查／提示。", anyOf: ["client", "JavaScript", "即時", "範圍"] }, { marks: 1, criterion: "以 HTTP POST request 送出。", anyOf: ["POST", "request", "請求"] }, { marks: 1, criterion: "伺服器端再次驗證和處理。", anyOf: ["server", "伺服器端", "再次驗證"] }, { marks: 1, criterion: "有效資料才寫入 database 並回傳 response。", anyOf: ["database", "數據庫", "RESULTS", "response", "回應"] }], explanation: "高分流程答案要清楚區分瀏覽器顯示、客戶端程式、網絡請求、伺服器處理和數據庫。"
+    },
+    {
+        id: "q-eb-web-003", topicId: "eb-2", syllabusRef: "Elective B(b)", difficulty: "advanced", marks: 4, type: "short-answer",
+        question: "網站以 cookie 保存登入狀態。指出 cookie 的兩項合適安全設定／做法，並解釋為何不應在 cookie 保存明文密碼。",
+        answer: "可設定 Secure 令 cookie 只經 HTTPS 傳送、HttpOnly 減少客戶端腳本讀取、SameSite 減低跨站請求風險，並設合理期限。明文密碼若被裝置使用者、惡意程式或截取者讀取便會直接洩漏帳戶憑證；應只保存不可猜測的短期 session identifier。",
+        markingScheme: [{ marks: 2, criterion: "兩項合理做法：Secure、HttpOnly、SameSite、合理期限或只保存 session ID。", anyOf: ["Secure", "HttpOnly", "SameSite", "期限", "session", "HTTPS"] }, { marks: 1, criterion: "指出明文密碼一旦被讀取便直接洩漏憑證。", anyOf: ["明文", "洩漏", "讀取", "密碼"] }, { marks: 1, criterion: "建議保存短期／不可猜測 session identifier 而非密碼。", anyOf: ["session", "識別碼", "短期", "不可猜"] }], explanation: "Cookie 可保存狀態，但內容和屬性必須按風險設計；它不是安全保險箱。"
+    },
+    {
+        id: "q-ec-program-001", topicId: "ec-1", syllabusRef: "Elective C(a)", difficulty: "foundation", marks: 1, type: "mcq",
+        question: "列印工作按加入先後次序處理，最合適使用哪種數據結構？",
+        options: [{ value: "A", label: "Queue" }, { value: "B", label: "Stack" }, { value: "C", label: "只有 Boolean" }, { value: "D", label: "無序常數" }], answer: "A",
+        markingScheme: [{ marks: 1, criterion: "Queue 以 FIFO 處理先加入的工作。" }], explanation: "打印佇列是典型 FIFO；stack 則是 LIFO。"
+    },
+    {
+        id: "q-ec-program-002", topicId: "ec-1", syllabusRef: "Elective C(a)", difficulty: "standard", marks: 5, type: "short-answer",
+        question: "系統要在 1024 個已排序學生編號中重複搜尋。比較 linear search 和 binary search 的步驟，建議較合適算法並說明一項限制。",
+        answer: "Linear search 由首項逐一比較，最差可能檢查 1024 項；binary search 比較中間項並每次排除一半，約十次比較便可縮至一項。資料已排序且重複搜尋，binary search 較合適。限制是必須維持排序，插入後可能需要重新排序或調整。",
+        markingScheme: [{ marks: 1, criterion: "Linear search 逐項比較。", anyOf: ["逐一", "逐項", "linear"] }, { marks: 1, criterion: "最差可比較 1024 項。", anyOf: ["1024", "所有項"] }, { marks: 1, criterion: "Binary search 每次把範圍減半。", anyOf: ["減半", "一半", "binary"] }, { marks: 1, criterion: "建議 binary search，因資料已排序／重複搜尋。", anyOf: ["binary search", "二分", "已排序", "重複搜尋"] }, { marks: 1, criterion: "限制：必須排序或維持排序有成本。", anyOf: ["必須排序", "維持排序", "重新排序", "限制"] }], explanation: "算法建議要把資料特徵、操作次數和前置條件連起來。"
+    },
+    {
+        id: "q-ec-program-003", topicId: "ec-1", syllabusRef: "Elective C(a)", difficulty: "advanced", marks: 5, type: "short-answer",
+        question: "Stack 最初由底至頂為 [A, B]。依次執行 push(C)、pop()、push(D)、push(E)、pop()。寫出兩次 pop 的值和最終 stack，並說明 underflow 何時發生。",
+        answer: "push(C) 後頂為 C，第一次 pop 得 C，剩 [A,B]；再 push D、E，第二次 pop 得 E，最終 [A,B,D]。在空 stack 上執行 pop／讀取頂端時發生 underflow。",
+        markingScheme: [{ marks: 1, criterion: "第一次 pop 得 C。", anyOf: ["C"] }, { marks: 1, criterion: "第二次 pop 得 E。", anyOf: ["E"] }, { marks: 2, criterion: "最終由底至頂為 A、B、D。", anyOf: ["A,B,D", "[A,B,D]", "A B D"] }, { marks: 1, criterion: "空 stack 上 pop／peek 造成 underflow。", anyOf: ["空", "pop", "underflow", "頂端"] }], explanation: "Stack 只在頂端 push／pop，最後加入的 E 先被移除。"
+    },
+    {
+        id: "q-ec-device-001", topicId: "ec-2", syllabusRef: "Elective C(b)", difficulty: "foundation", marks: 1, type: "mcq",
+        question: "程式在光線讀數低於 20 時執行開燈 handler。數值 20 主要是甚麼？",
+        options: [{ value: "A", label: "事件觸發閾值" }, { value: "B", label: "資料庫外鍵" }, { value: "C", label: "HTML 元素" }, { value: "D", label: "軟件授權" }], answer: "A",
+        markingScheme: [{ marks: 1, criterion: "感應器值越過閾值便觸發事件處理。" }], explanation: "事件可由按鍵或感應器狀態觸發。"
+    },
+    {
+        id: "q-ec-device-002", topicId: "ec-2", syllabusRef: "Elective C(b)", difficulty: "standard", marks: 5, type: "short-answer",
+        question: "溫室控制器讀取溫度感應器；高於 30°C 開風扇，低於 28°C 關風扇。以 input、event／condition、processing、output 及 hysteresis 解釋方案。",
+        answer: "Input 是溫度感應器讀數。讀數高於 30 或低於 28 觸發相應條件／事件；handler 比較閾值並更新風扇狀態；output 是馬達控制訊號。使用兩個不同開關閾值形成 hysteresis，可避免溫度在 30 附近波動時風扇頻繁開關。",
+        markingScheme: [{ marks: 1, criterion: "Input 是溫度感應器讀數。", anyOf: ["溫度", "感應器", "input"] }, { marks: 1, criterion: "高於 30／低於 28 是觸發條件。", anyOf: ["30", "28", "觸發", "condition", "event"] }, { marks: 1, criterion: "處理是比較閾值及更新狀態。", anyOf: ["比較", "閾值", "狀態", "processing"] }, { marks: 1, criterion: "Output 是風扇／馬達控制訊號。", anyOf: ["風扇", "馬達", "output", "控制訊號"] }, { marks: 1, criterion: "兩閾值避免臨界值附近頻繁開關。", anyOf: ["hysteresis", "頻繁", "波動", "兩個閾值"] }], explanation: "兩個閾值保留中間狀態，可處理感應器噪聲和環境波動。"
+    },
+    {
+        id: "q-ec-device-003", topicId: "ec-2", syllabusRef: "Elective C(b)", difficulty: "advanced", marks: 4, type: "short-answer",
+        question: "自動門偶爾收到異常距離讀數而突然開啟。提出兩項程式措施處理讀數，並指出感應器失效時的一項安全預設。",
+        answer: "可拒絕有效範圍外讀數、要求連續多次符合才觸發、使用短期平均／去抖動，或設定最短狀態時間。感應器失效時應進入經風險評估的安全狀態，例如停止自動關門、發出警報並要求人工控制。",
+        markingScheme: [{ marks: 2, criterion: "兩項不同讀數處理，例如範圍檢查、連續確認、平均或去抖動。", anyOf: ["範圍", "連續", "多次", "平均", "去抖", "最短時間"] }, { marks: 1, criterion: "指出偵測感應器失效／超時。", anyOf: ["失效", "超時", "沒有讀數", "異常"] }, { marks: 1, criterion: "合理安全預設，如停止關門、警報或人工控制。", anyOf: ["停止", "警報", "人工", "安全狀態"] }], explanation: "實體裝置程式要處理噪聲、異常和故障，不能把單次讀數當作絕對真實。"
+    },
+    {
         id: "q-ea-sql-001",
         topicId: "tool-sql-simulator",
         syllabusRef: "Elective A",

@@ -438,6 +438,83 @@ const learningData = {
             quickCheck: { question: "哪項最準確描述 open source software？", options: ["只可免費試用 30 日", "按授權提供源代碼，容許使用者在條款下查看、修改或分發", "一定沒有版權", "只可由原作者閱讀程式碼"], answerIndex: 1, explanation: "開放源碼軟件仍受版權及授權條款約束，但授權會提供源代碼及相應使用權。" },
             examTip: "授權題要分開回答價格、源代碼和准許行為；不要把『免費』、『可修改』和『沒有版權』混為一談。"
         },
+        "ea-1": {
+            objectives: ["辨認實體、屬性、關係、domain、index 及不同種類的鍵", "以實體、參照及 domain 完整性檢查數據", "建立合理的關聯表並解釋 rollback 的目的"],
+            scopeNote: "本課依 Elective A(a) 涵蓋關聯數據庫基本概念、簡單關聯數據庫及 rollback；SQL 操作與設計方法分別在 A(b)、A(c) 處理。",
+            featuredQuestionId: "q-ea-rel-002",
+            concepts: [{ icon: "▦", label: "實體與屬性", detail: "實體是要保存資料的對象，屬性描述該對象；domain 限制屬性的有效值。" }, { icon: "PK", label: "鍵", detail: "候選鍵可唯一識別記錄；選定一個作主鍵，外鍵則連結另一表的鍵。" }, { icon: "✓", label: "完整性", detail: "實體、參照及 domain 完整性分別保護識別、關係和有效值。" }, { icon: "↶", label: "Rollback", detail: "交易失敗時撤銷未完成變更，把數據庫還原至一致狀態。" }],
+            misconceptions: [{ claim: "每個表只可以有一個候選鍵。", correction: "一個表可有多個候選鍵，但只選其中一個作主鍵。" }, { claim: "外鍵每個值都必須不同。", correction: "外鍵可以重複；它通常用來表示多筆記錄指向同一筆父表記錄。" }],
+            quickCheck: { question: "STUDENT 表的 StudentID 可唯一識別每名學生，而 Email 亦不重複。兩者在選定主鍵前都屬於甚麼？", options: ["候選鍵", "外鍵", "索引一定不是鍵", "交易"], answerIndex: 0, explanation: "任何能唯一識別記錄的最小屬性組合均可成為候選鍵，再從中選一個作主鍵。" },
+            examTip: "鍵與完整性題要寫明『哪一個表、哪一個欄位、限制甚麼不合法數據』。"
+        },
+        "ea-2": {
+            objectives: ["使用 SQL 建立／修改表並新增、更新及刪除數據", "以運算子、函數、排序和分組從最多三表擷取資料", "正確使用各類 JOIN、一層子查詢及 view"],
+            scopeNote: "本課依 Elective A(b) 涵蓋最多三表的維護與查詢、運算式、aggregate／string functions、equi／natural／outer join 及一層子查詢。",
+            featuredQuestionId: "q-ea-sql-002",
+            concepts: [{ icon: "DDL", label: "表結構", detail: "CREATE、ALTER、DROP 等語句處理表的定義和結構。" }, { icon: "DML", label: "數據維護", detail: "INSERT、UPDATE、DELETE 改變記錄；WHERE 遺漏可影響多筆資料。" }, { icon: "JOIN", label: "多表查詢", detail: "按相關鍵連接表，選擇 join 類型決定是否保留沒有配對的記錄。" }, { icon: "Σ", label: "分析", detail: "aggregate、GROUP BY、HAVING 和子查詢把問題分層處理。" }],
+            misconceptions: [{ claim: "WHERE 和 HAVING 可以在所有情況互換。", correction: "WHERE 在分組前篩選記錄；HAVING 在 GROUP BY 後篩選群組。" }, { claim: "LEFT JOIN 只顯示兩表都有配對的記錄。", correction: "LEFT JOIN 保留左表所有記錄，右表沒有配對時相應欄位為空值。" }],
+            quickCheck: { question: "要找出平均分高於 70 的班別，哪個子句用來篩選計算後的群組？", options: ["HAVING", "WHERE", "ORDER BY", "ALTER TABLE"], answerIndex: 0, explanation: "平均分是群組聚合結果，因此以 HAVING 篩選。" },
+            examTip: "SQL 題先逐段圈出輸出欄、來源表、連接條件、記錄條件、分組條件和排序，再組成語句。"
+        },
+        "ea-3": {
+            objectives: ["由情境建立只含二元關係的 ER 圖並處理 1:1、1:M、M:N", "把 ER 圖轉成關聯表並把 M:N 拆成兩個 1:M", "以 1NF、2NF、3NF 減少冗餘並說明反正規化及存取權"],
+            scopeNote: "本課依 Elective A(c) 涵蓋簡單 ER 圖、M:N resolution、正規化至 3NF、反正規化、ER-to-table 及以 access rights 保護私隱。",
+            featuredQuestionId: "q-ea-design-002",
+            concepts: [{ icon: "ER", label: "ER 模型", detail: "先辨認實體、鍵屬性和二元關係，再標示基數及 mandatory／optional participation。" }, { icon: "M:N", label: "解拆多對多", detail: "建立橋接實體，把 M:N 關係改成兩個 1:M，並保存兩邊外鍵。" }, { icon: "3NF", label: "正規化", detail: "逐步移除 repeating group、partial dependency 和 transitive dependency。" }, { icon: "ACL", label: "存取權", detail: "按職責授予讀、寫或修改權，減少不必要的個人資料存取。" }],
+            misconceptions: [{ claim: "表越多，數據庫一定越好。", correction: "設計要減少異常和冗餘，同時符合查詢需要；過度拆分也會增加複雜度。" }, { claim: "正規化完成後永遠不能反正規化。", correction: "在有理據的效能需要下可反正規化，但要接受冗餘和一致性管理成本。" }],
+            quickCheck: { question: "ENROLMENT(StudentID, CourseID, Grade) 最適合用來解拆哪類關係？", options: ["學生與課程的多對多關係", "學生與姓名的一對一關係", "主鍵與 domain", "一次 rollback"], answerIndex: 0, explanation: "橋接表保存兩邊外鍵和關係本身的屬性 Grade，把 M:N 解成兩個 1:M。" },
+            examTip: "正規化題每一步都要指出依賴關係和新表的主鍵／外鍵，不要只寫最後表名。"
+        },
+        "eb-1": {
+            objectives: ["解釋 request／response、TCP port 及客戶端與伺服器角色", "配對 DHCP、domain controller、file／proxy／web／database server 和 gateway", "設計簡單有線／無線網絡、分享資源並設定 read／write／execute 權限"],
+            scopeNote: "本課依 Elective B(a) 涵蓋客戶端—伺服器通訊、HTTP GET／POST、TCP port、常用伺服器、簡單網絡實作、資源分享及檔案權限。",
+            featuredQuestionId: "q-eb-network-002",
+            concepts: [{ icon: "→", label: "Request", detail: "客戶端向指定伺服器和服務連接埠發出請求；伺服器處理後回應。" }, { icon: "GET", label: "GET／POST", detail: "GET 常把查詢參數放入 URL；POST 把提交資料放在請求內容，兩者都不等於自動加密。" }, { icon: "Srv", label: "伺服器角色", detail: "不同伺服器集中提供位址、身分、檔案、代理、網頁或數據庫服務。" }, { icon: "rwx", label: "權限", detail: "read、write、execute 要按使用者工作需要分配，遵守最小權限。" }],
+            misconceptions: [{ claim: "POST 比 GET 安全，所以不需要 HTTPS。", correction: "POST 只改變資料放置方式；傳輸保密仍需要 HTTPS 等加密連線。" }, { claim: "DHCP 伺服器把域名轉成 IP 位址。", correction: "DHCP 配發網絡設定；DNS 才把域名解析成 IP 位址。" }],
+            quickCheck: { question: "新連接的電腦自動取得 IP 位址、預設閘道和 DNS 設定，主要由哪類伺服器提供？", options: ["DHCP server", "Web server", "File server", "Database server"], answerIndex: 0, explanation: "DHCP 自動租用 IP 位址及相關網絡參數。" },
+            examTip: "網絡服務題先寫服務名稱，再以『誰向誰發出甚麼請求／取得甚麼資源』解釋。"
+        },
+        "eb-2": {
+            objectives: ["以 HTML 和 CSS 建立一致的網頁介面並說明發布方法", "分辨客戶端和伺服器端腳本的執行位置與工作", "建立表單驗證、單表查詢／更新、cookies 及簡單整合式網頁應用"],
+            scopeNote: "本課依 Elective B(b) 涵蓋 HTML／CSS、網頁發布、client／server-side scripting、輸入處理與驗證、單一數據表存取、cookies 及簡單網頁應用整合。",
+            featuredQuestionId: "q-eb-web-002",
+            concepts: [{ icon: "HTML", label: "結構", detail: "HTML 表達標題、段落、表單和內容語意；CSS 統一呈現。" }, { icon: "JS", label: "客戶端", detail: "在瀏覽器提供即時介面和初步驗證，但不能成為唯一安全防線。" }, { icon: "PHP", label: "伺服器端", detail: "接收請求、再次驗證、執行商業規則和安全地讀寫數據庫。" }, { icon: "Cookie", label: "狀態", detail: "cookies 可在請求之間保存識別或偏好；不應存放明文密碼和敏感資料。" }],
+            misconceptions: [{ claim: "有 JavaScript 驗證後，伺服器不必再驗證。", correction: "客戶端程式可被繞過；伺服器必須重新驗證所有不可信輸入。" }, { claim: "Cookie 是伺服器上的數據庫表。", correction: "Cookie 由瀏覽器保存並隨合適請求傳送；伺服器可另用資料庫保存正式記錄。" }],
+            quickCheck: { question: "使用者停用 JavaScript 後仍要阻止非法分數寫入數據庫。最重要的措施是甚麼？", options: ["伺服器端再次驗證", "只更改 CSS 顏色", "把密碼放入 Cookie", "刪除 POST"] , answerIndex: 0, explanation: "客戶端驗證改善使用體驗；只有伺服器端驗證能處理被修改或直接送出的請求。" },
+            examTip: "網頁流程題逐步寫 browser → request → server validation／processing → database → response。"
+        },
+        "ec-1": {
+            objectives: ["選擇並追蹤 linear／binary search、bubble／insertion／selection sort 和 merge", "使用巢狀迴圈、sub-program、參數、局部／全域變數及良好程式風格", "以陣列實作 linked list、stack、queue，操作文字檔並使用進階除錯方法"],
+            scopeNote: "本課依 Elective C(a) 涵蓋指定搜尋／排序／合併算法、巢狀迴圈、線性鏈結串列／堆疊／佇列、文字檔、參數傳遞、結構化程式及數值與一般程式錯誤。",
+            featuredQuestionId: "q-ec-program-002",
+            concepts: [{ icon: "⌕", label: "搜尋排序", detail: "按資料是否排序、規模、穩定性和操作成本選擇算法，而不是只背名稱。" }, { icon: "LIFO", label: "Stack", detail: "最後加入的項目最先移除；push／pop 只在頂端進行。" }, { icon: "FIFO", label: "Queue", detail: "最先加入的項目最先移除；enqueue 在尾，dequeue 在首。" }, { icon: "🐞", label: "除錯", detail: "使用 stub、flag、breakpoint、trace 和測試數據定位錯誤，包括 overflow／underflow。" }],
+            misconceptions: [{ claim: "Binary search 可直接用於任何未排序列表。", correction: "Binary search 依賴有序資料；未排序時必須先排序或改用其他搜尋。" }, { claim: "Stack 和 queue 只是兩個不同名稱的陣列。", correction: "兩者可用陣列實作，但允許加入和移除的位置不同，形成 LIFO 與 FIFO 行為。" }],
+            quickCheck: { question: "打印工作的先到先處理最適合使用哪種結構？", options: ["Queue", "Stack", "只有 Boolean", "Binary tree（本課必須）"], answerIndex: 0, explanation: "打印佇列按 FIFO 處理；較早 enqueue 的工作較早 dequeue。" },
+            examTip: "算法比較題要同時交代前置條件、步驟數趨勢和資料結構；追蹤時標示索引及每次交換。"
+        },
+        "ec-2": {
+            objectives: ["使用擴充模組或函式庫讀取感應器及控制輸出裝置", "以使用者操作或感應器閾值觸發事件處理程序", "把輸入、處理、輸出、邊界安全和失效狀況整合成實體裝置方案"],
+            scopeNote: "本課依 Elective C(b) 涵蓋感應器、馬達等實體裝置、擴充函式庫及 event-driven programs；不要求擴充模組或事件處理器的內部實作細節。",
+            featuredQuestionId: "q-ec-device-002",
+            concepts: [{ icon: "◉", label: "Sensor", detail: "光線、加速度等感應器把環境狀態轉成程式可讀數值。" }, { icon: "◇", label: "Event", detail: "按鍵或數值越過閾值時觸發 handler，主程式不必不斷執行同一動作。" }, { icon: "⚙", label: "Actuator", detail: "馬達、顯示器或聲音裝置把程式輸出轉成物理效果。" }, { icon: "!", label: "安全狀態", detail: "設定有效範圍、去抖動、超時和失效預設，避免錯誤讀數造成危險動作。" }],
+            misconceptions: [{ claim: "事件驅動程式的步驟一定按固定次序發生。", correction: "事件由使用者或環境觸發，次序和時間未必可預測。" }, { claim: "感應器每次讀數都完全準確。", correction: "讀數可受噪聲、校準和環境影響，方案應考慮範圍、平均、閾值和異常處理。" }],
+            quickCheck: { question: "當光線讀數低於 20 時自動開燈，『低於 20』在事件方案中主要是甚麼？", options: ["觸發條件／閾值", "資料庫主鍵", "HTML 標籤", "排序結果"], answerIndex: 0, explanation: "感應器數值越過指定閾值時觸發開燈處理程序。" },
+            examTip: "實體裝置題使用 sensor input → condition／event → processing → actuator output，再補充錯誤讀數與安全狀態。"
+        },
+        "tool-mock-exam": {
+            objectives: ["在限時和不即時顯示答案的情況完成原創題組", "練習卷一必修或卷二任選兩個選修單元的作答安排", "交卷後按課題及評分點檢討"],
+            concepts: [{ icon: "⏱", label: "限時", detail: "倒數只用於當次訓練，不保存瀏覽或學生資料。" }, { icon: "1", label: "Paper 1", detail: "從必修部分抽取選擇題及短答／結構題。" }, { icon: "2", label: "Paper 2", detail: "選取兩個選修單元組成練習題組。" }, { icon: "✓", label: "交卷檢討", detail: "完成前不顯示答案；交卷後逐題查看參考答案及評分準則。" }],
+            misconceptions: [{ claim: "迷你模擬卷的分數可直接換算正式等級。", correction: "題量和難度未經正式等級設定，只能用作診斷與練習。" }],
+            quickCheck: { question: "模擬考途中遇到不肯定的題目，較合適做法是甚麼？", options: ["先標記並按時間安排繼續", "立即查看答案", "退出並重開直至抽到熟悉題目", "只做選擇題"], answerIndex: 0, explanation: "先控制時間並完成可取得的分數，最後才返回較困難題目。" },
+            examTip: "第一次以準確為先，第二次才比較用時；交卷後按評分點重寫失分答案。"
+        },
+        "tool-sba-prep": {
+            objectives: ["把問題、使用者需要和成功準則轉成可驗證規格", "用設計和實作證據說明方案決定", "建立測試計劃並以結果、限制和改善作評估"],
+            concepts: [{ icon: "D", label: "Design", detail: "用需求、數據、介面和算法設計說明方案如何符合問題。" }, { icon: "I", label: "Implementation", detail: "保留版本和自己完成工作的證據，解釋關鍵技術決定。" }, { icon: "T", label: "Testing", detail: "測試正常、邊界、異常及主要功能，記錄預期與實際結果。" }, { icon: "E", label: "Evaluation", detail: "按原定準則判斷成效，引用測試證據並提出具體改善。" }],
+            misconceptions: [{ claim: "SBA 報告越長便一定越高分。", correction: "重點是證據是否直接回應要求、設計決定和評估準則，而不是頁數。" }],
+            quickCheck: { question: "哪項最能支持『輸入驗證有效』的評估？", options: ["正常、邊界及異常測試的預期與實際結果", "只放首頁截圖", "寫『程式很好用』", "複製網上說明"], answerIndex: 0, explanation: "可重現的測試數據和結果能直接證明驗證規則是否正確。" },
+            examTip: "只使用一般框架準備技能；實際受監管題目必須按教師指示在課堂完成並保留真實工作證據。"
+        },
         "tool-dse-practice": {
             objectives: ["按課題和難度選擇題目", "提交後逐點閱讀評分準則", "把錯誤連回相關課程及互動工具"],
             concepts: [

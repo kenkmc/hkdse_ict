@@ -9,7 +9,12 @@
 - 必修 C「互聯網及其應用」：建網與協定、互聯網服務、基礎網頁編寫，以及網上威脅與保安。
 - 必修 D「運算思維與程式編寫」：問題分析、算法設計、程式開發，以及測試與除錯。
 - 必修 E「資訊及通訊科技的社會影響」：科技創新、健康與道德議題，以及知識產權。
+- 選修 A「數據庫」：關聯數據庫概念、SQL、ER 圖、正規化至 3NF、反正規化及存取權。
+- 選修 B「網頁開發」：客戶端—伺服器、網絡服務與實施、HTML／CSS、表單驗證、cookie 及單表數據操作。
+- 選修 C「程式編寫」：搜尋與排序、數據結構、文字檔、測試除錯、感應器、事件處理及實體裝置應用。
 - DSE 題型練習：中央題庫、課題／難度篩選、自動評分、評分準則和解釋。
+- 限時模擬試：Paper 1 核心迷你卷、Paper 2 任選兩個選修單元、交卷後課題分析；作答只留在目前頁面。
+- SBA 準備室：通用證據清單、設計與實施骨架、測試表產生器及以證據為本的評估提示。
 - SQL 互動學習平台：瀏覽器內執行 SQLite、檢視資料表、關係及 ER 圖。
 - Python／偽代碼／流程圖工具：雙向轉換、語法檢查及程式執行。
 - PKI 實驗室：公開／私人密碼匙加密及數碼簽署概念模型。
@@ -32,16 +37,23 @@
 - `assets/css/internet-lesson.css`：必修 C(b)–C(d) 的搜尋、串流、網頁設計及保安互動樣式。
 - `assets/css/algorithm-lesson.css`：必修 D 的 IPO、追蹤表、列表執行和邊界測試互動樣式。
 - `assets/css/society-lesson.css`：必修 E 的科技比較、人體工學、軟件授權及社會議題互動樣式。
+- `assets/css/elective-lesson.css`：選修 A、B、C 的數據庫、網絡服務、網頁流程、演算法及裝置模擬共用樣式。
+- `assets/css/mock.css`、`assets/css/sba.css`：限時模擬試及 SBA 準備室的專用版面。
 - `assets/js/site_navigation.js`：共用全站導覽、頁面識別及課程來源頁尾。
 - `assets/js/lesson_companion.js`：學習助手的展開、概念探索、即時檢查及頁內 DSE 題型互動。
 - `assets/js/system-lessons.js`：機器周期、裝置選擇、操作模式判斷及嵌入式題目互動。
 - `assets/js/internet-lessons.js`：搜尋組合、串流緩衝、HTML 結構、受眾設計及威脅配對互動。
 - `assets/js/algorithm-lessons.js`：IPO 分析、算法追蹤、列表執行、邊界值及錯誤分類互動。
 - `assets/js/society-lessons.js`：科技創新比較、AI 數據流程、人體工學檢查、公平使用情境及軟件授權互動。
+- `assets/js/elective-lessons.js`：關鍵碼／完整性、伺服器角色、正規化、網頁流程、演算法及溫控裝置互動。
 - `assets/js/catalog.js`：首頁目錄及搜尋。
 - `assets/js/question_engine.js`：題目篩選、作答、評分及回饋流程。
+- `assets/js/mock_exam.js`：不保存作答的限時組卷、交卷評分及課題分析。
+- `assets/js/sba.js`：只在目前頁面運作的 SBA 證據清單及測試表產生器。
 
 內容的永久 `id` 會供下一階段的學習進度記錄使用。即使標題或檔名改變，也不應重用或隨意修改既有 ID。
+
+目前版本沒有學生登入、雲端資料庫、瀏覽紀錄或持久進度追蹤。練習、模擬試和 SBA 工具的輸入不會在重新載入後保留。
 
 ## 新增課程或工具
 

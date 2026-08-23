@@ -246,6 +246,43 @@ const courseData = [
         ]
     },
     {
+        id: "elective-a",
+        sectionTitle: "選修部分 A - 數據庫",
+        sectionCode: "Paper 2A",
+        kind: "course",
+        color: "bg-emerald-50 text-emerald-700",
+        icon: "database",
+        items: [
+            { id: "ea-1", title: "i. 關聯數據庫概念", file: "ea.1.html", desc: "實體、屬性、關係、鍵、完整性、索引及 rollback", type: "lesson", syllabusRef: "Elective A(a)", tags: ["關聯數據庫", "主鍵", "外鍵", "候選鍵", "完整性", "rollback"] },
+            { id: "ea-2", title: "ii. SQL", file: "ea.2.html", desc: "建表、增刪改、篩選、函數、連接、子查詢及檢視表", type: "lesson", syllabusRef: "Elective A(b)", tags: ["SQL", "JOIN", "subquery", "view", "aggregate", "DML", "DDL"] },
+            { id: "ea-3", title: "iii. 數據庫設計方法", file: "ea.3.html", desc: "ER 圖、關係轉換、數據冗餘、正規化至 3NF、反正規化及存取權", type: "lesson", syllabusRef: "Elective A(c)", tags: ["ERD", "1NF", "2NF", "3NF", "正規化", "反正規化", "存取權"] }
+        ]
+    },
+    {
+        id: "elective-b",
+        sectionTitle: "選修部分 B - 網頁應用程式開發",
+        sectionCode: "Paper 2B",
+        kind: "course",
+        color: "bg-sky-50 text-sky-700",
+        icon: "panel-top",
+        items: [
+            { id: "eb-1", title: "i. 網絡服務及實作", file: "eb.1.html", desc: "客戶端—伺服器、HTTP GET／POST、連接埠、常用伺服器及資源權限", type: "lesson", syllabusRef: "Elective B(a)", tags: ["client-server", "HTTP", "GET", "POST", "port", "DHCP", "proxy", "file server"] },
+            { id: "eb-2", title: "ii. 網頁程式編寫及應用", file: "eb.2.html", desc: "HTML／CSS、發布、客戶端與伺服器端腳本、表單驗證、cookies 及數據庫", type: "lesson", syllabusRef: "Elective B(b)", tags: ["JavaScript", "PHP", "HTML", "CSS", "form", "validation", "cookies", "web app"] }
+        ]
+    },
+    {
+        id: "elective-c",
+        sectionTitle: "選修部分 C - 算法與程式編寫",
+        sectionCode: "Paper 2C",
+        kind: "course",
+        color: "bg-fuchsia-50 text-fuchsia-700",
+        icon: "braces",
+        items: [
+            { id: "ec-1", title: "i. 程式編寫", file: "ec.1.html", desc: "搜尋、排序、合併、巢狀迴圈、鏈結串列、堆疊、佇列、檔案及除錯", type: "lesson", syllabusRef: "Elective C(a)", tags: ["search", "sort", "merge", "stack", "queue", "linked list", "file handling", "debugging"] },
+            { id: "ec-2", title: "ii. 程式在真實情境的應用", file: "ec.2.html", desc: "感應器、馬達、擴充模組、事件處理及實體裝置程式", type: "lesson", syllabusRef: "Elective C(b)", tags: ["sensor", "motor", "event-driven", "physical device", "accelerometer"] }
+        ]
+    },
+    {
         id: "learning-tools",
         sectionTitle: "互動學習工具",
         sectionCode: "Tools",
@@ -253,6 +290,24 @@ const courseData = [
         color: "bg-violet-50 text-violet-700",
         icon: "wrench",
         items: [
+            {
+                id: "tool-mock-exam",
+                title: "DSE 模擬考訓練",
+                file: "mock.html",
+                desc: "無登入、無追蹤的限時卷一／卷二原創題組，完成後才顯示評分與課題分析",
+                type: "tool",
+                syllabusRef: "Paper 1 / Paper 2",
+                tags: ["模擬考", "計時", "Paper 1", "Paper 2", "原創題目"]
+            },
+            {
+                id: "tool-sba-prep",
+                title: "SBA 準備工作室",
+                file: "sba.html",
+                desc: "一般性的設計、實作、測試及評估框架；不代答受監管校本評核",
+                type: "tool",
+                syllabusRef: "SBA",
+                tags: ["SBA", "Design", "Implementation", "Testing", "Evaluation"]
+            },
             {
                 id: "tool-dse-practice",
                 title: "DSE 題型練習",

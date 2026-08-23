@@ -189,6 +189,10 @@
         button.textContent = open ? "收起評分準則" : "查看評分準則";
     };
 
+    document.querySelectorAll("[data-exam-question] textarea:not([aria-label])").forEach((textarea, index) => {
+        textarea.setAttribute("aria-label", `第 ${index + 1} 題答案`);
+    });
+
     document.querySelectorAll("[data-exam-question]").forEach(question => {
         question.querySelector(".sys-reveal")?.addEventListener("click", event => {
             setQuestionVisibility(question, event.currentTarget.getAttribute("aria-expanded") !== "true");
