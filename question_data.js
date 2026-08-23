@@ -700,6 +700,99 @@ const questionData = [
         ], explanation: "方案比較要使用相同輸入規模和準則；除了速度，也可討論記憶體、前置條件和可維護性。"
     },
     {
+        id: "q-e-a-tech-001",
+        topicId: "che-1", syllabusRef: "E(a)", difficulty: "foundation", marks: 1, type: "mcq",
+        question: "博物館應用程式透過手機相機顯示真實展品，並在畫面疊加互動標籤。這主要使用哪項科技？",
+        options: [{ value: "A", label: "擴增實境（AR）" }, { value: "B", label: "虛擬實境（VR）" }, { value: "C", label: "3D 打印" }, { value: "D", label: "批次處理" }], answer: "A",
+        markingScheme: [{ marks: 1, criterion: "真實景象上疊加數碼內容，屬擴增實境。" }], explanation: "AR 保留真實環境並疊加數碼資料；VR 通常以虛擬環境取代主要視野。"
+    },
+    {
+        id: "q-e-a-innovation-002",
+        topicId: "che-1", syllabusRef: "E(a)", difficulty: "standard", marks: 5, type: "short-answer",
+        question: "回收中心以大量已標註物件相片訓練系統，讓鏡頭自動把新物件分成紙張、金屬和塑膠。指出這項人工智能工作的基本過程，並說明一項效益及兩項可能令分類不可靠或不公平的數據問題。",
+        answer: "系統從已標註相片學習不同物料的特徵／模式，再把新影像的特徵與所學模式比較並作分類。自動分類可提高處理速度或一致性。若訓練相片數量不足、類別比例不平衡、標註錯誤，或拍攝環境與實際鏡頭不同，輸出便可能不準確或偏向某類物件。",
+        markingScheme: [
+            { marks: 1, criterion: "從已標註訓練數據找出特徵／模式。", anyOf: ["已標註", "訓練數據", "特徵", "模式", "學習"] },
+            { marks: 1, criterion: "把新輸入與所學模式比較／分類。", anyOf: ["新影像", "新物件", "比較", "分類", "預測"] },
+            { marks: 1, criterion: "效益：速度、一致性、處理量或減少重複人工作業。", anyOf: ["速度", "一致", "處理量", "自動", "人手"] },
+            { marks: 2, criterion: "兩項不同數據問題，例如不足、不平衡、錯誤標註、欠代表性或環境差異。", anyOf: ["不足", "不平衡", "標註錯誤", "偏差", "欠代表", "拍攝環境", "光線", "角度"] }
+        ], explanation: "模式辨認的高分答案要交代訓練資料、特徵／模式和新輸入，並把可靠性問題連回數據品質與代表性。"
+    },
+    {
+        id: "q-e-a-immersive-003",
+        topicId: "che-1", syllabusRef: "E(a)", difficulty: "standard", marks: 4, type: "short-answer",
+        question: "醫院要（i）製作少量度身訂造的骨骼模型供醫生準備手術，及（ii）讓學生在不進入手術室下沉浸式練習手術步驟。分別建議一項合適科技，並各解釋一項特點如何符合需要。",
+        answer: "（i）3D 打印：按病人的數碼三維模型逐層加入材料，可小量製作形狀不同的實體模型。（ii）虛擬實境：以電腦產生的沉浸環境模擬手術室，學生可安全重複練習而不影響真實病人。",
+        markingScheme: [
+            { marks: 1, criterion: "為度身訂造實體模型建議 3D 打印。", anyOf: ["3D 打印", "3D打印", "三維打印"] },
+            { marks: 1, criterion: "解釋按數碼模型逐層製作／適合小量訂造。", anyOf: ["逐層", "數碼模型", "度身", "訂造", "小量"] },
+            { marks: 1, criterion: "為沉浸式練習建議虛擬實境。", anyOf: ["虛擬實境", "VR"] },
+            { marks: 1, criterion: "解釋沉浸模擬可安全／重複練習。", anyOf: ["沉浸", "模擬", "安全", "重複", "不影響病人"] }
+        ], explanation: "選擇科技後必須使用題目需要的特點作解釋；只寫 3D printing 和 VR 通常只足以取得指出分。"
+    },
+    {
+        id: "q-e-b-health-001",
+        topicId: "che-2", syllabusRef: "E(b)", difficulty: "foundation", marks: 1, type: "mcq",
+        question: "哪項安排最能減低長時間使用滑鼠引致手腕重複性勞損的風險？",
+        options: [{ value: "A", label: "手腕保持自然位置，交替工作並定時休息" }, { value: "B", label: "把屏幕亮度調至最高" }, { value: "C", label: "使用較大的喇叭" }, { value: "D", label: "關閉防火牆" }], answer: "A",
+        markingScheme: [{ marks: 1, criterion: "自然手腕姿勢及休息能針對重複動作與持續受力。" }], explanation: "人體工學措施要對應風險來源；屏幕亮度不會減少手腕重複動作。"
+    },
+    {
+        id: "q-e-b-ergonomics-002",
+        topicId: "che-2", syllabusRef: "E(b)", difficulty: "standard", marks: 5, type: "short-answer",
+        question: "一名職員每天使用桌面電腦六小時。屏幕放在側面並高於視線，椅子沒有背部承托，窗戶在屏幕後造成反光。建議三項改善，並說明每項如何減低一項健康風險。",
+        answer: "把屏幕移至正前方並讓頂部約在眼睛水平，可減少扭頸／抬頭造成的頸肩不適；使用可調校並支撐腰背的椅子，讓雙腳穩定承托，可改善姿勢和減少背痛；調整屏幕或使用窗簾／合適照明消除反光，可減低眼睛疲勞。亦應定時休息、伸展和轉換工作。",
+        markingScheme: [
+            { marks: 2, criterion: "改善屏幕位置並連結頸肩／姿勢風險。", anyOf: ["正前方", "視線", "眼睛水平", "頸", "肩", "抬頭", "扭"] },
+            { marks: 2, criterion: "使用合適椅背／調校高度並連結腰背或姿勢風險。", anyOf: ["椅背", "承托", "腰", "背", "調校", "雙腳", "姿勢"] },
+            { marks: 1, criterion: "減少反光／調整照明並連結眼睛疲勞；或定時休息並說明作用。", anyOf: ["反光", "窗簾", "照明", "眼睛", "疲勞", "休息", "伸展"] }
+        ], explanation: "建議必須具體且與相應風險建立因果關係；同一項泛泛建議不能重複取得多個分點。"
+    },
+    {
+        id: "q-e-b-equity-003",
+        topicId: "che-2", syllabusRef: "E(b)", difficulty: "advanced", marks: 4, type: "short-answer",
+        question: "政府把一項重要公共服務改為只可使用流動應用程式辦理。指出兩類可能受到不利影響的使用者，並為每類提出一項能改善公平使用的措施。",
+        answer: "例如沒有智能手機／穩定網絡的低收入或偏遠地區居民，可保留電話、櫃位服務或提供公共設備；視障人士可提供支援屏幕閱讀器、文字替代和鍵盤操作的無障礙介面；數碼技能不足的長者可獲面對面協助或簡化一致的介面。",
+        markingScheme: [
+            { marks: 1, criterion: "第一類合理受影響使用者。", anyOf: ["低收入", "偏遠", "沒有智能手機", "沒有網絡", "長者", "視障", "殘疾"] },
+            { marks: 1, criterion: "對應第一類的可行措施。", anyOf: ["櫃位", "電話", "公共設備", "資助", "培訓", "無障礙", "屏幕閱讀器"] },
+            { marks: 1, criterion: "第二類不同的合理受影響使用者。", anyOf: ["低收入", "偏遠", "長者", "視障", "聽障", "殘疾", "語言"] },
+            { marks: 1, criterion: "對應第二類的可行措施。", anyOf: ["櫃位", "電話", "協助", "培訓", "簡化", "無障礙", "文字替代", "鍵盤"] }
+        ], explanation: "公平使用題要把障礙和措施配對，而不是只列出『數碼鴻溝』或『提供協助』。"
+    },
+    {
+        id: "q-e-c-licence-001",
+        topicId: "che-3", syllabusRef: "E(c)", difficulty: "foundation", marks: 1, type: "mcq",
+        question: "以下哪項最能分辨 open source software 和 freeware？",
+        options: [{ value: "A", label: "開放源碼軟件按授權提供源代碼；免費軟件不一定提供源代碼" }, { value: "B", label: "兩者都一定沒有版權" }, { value: "C", label: "免費軟件一定容許修改和分發" }, { value: "D", label: "開放源碼軟件只可試用 30 日" }], answer: "A",
+        markingScheme: [{ marks: 1, criterion: "以源代碼及授權權利分辨兩者。" }], explanation: "Freeware 主要表示可免費使用；open source 是否免費以外，更重要是源代碼和授權准許的使用、修改及分發。"
+    },
+    {
+        id: "q-e-c-licence-002",
+        topicId: "che-3", syllabusRef: "E(c)", difficulty: "standard", marks: 5, type: "short-answer",
+        question: "學校準備安裝一款免費下載的文字處理軟件。說明為何『免費下載』不代表可隨意安裝在全校電腦，並提出閱讀授權／使用條款時應檢查的四項內容。",
+        answer: "免費價格不等於放棄版權或授權限制。學校應檢查是否准許教育／機構用途、可安裝的裝置或使用者數目、可否修改／複製／分發、是否只屬試用或部分功能需付費，以及會否收集文件內容或其他個人資料、顯示廣告或限制服務。",
+        markingScheme: [
+            { marks: 1, criterion: "說明免費不等於沒有版權／沒有授權限制。", anyOf: ["版權", "授權", "限制", "條款", "免費不等於"] },
+            { marks: 1, criterion: "檢查是否准許教育、學校、機構或商業用途。", anyOf: ["教育", "學校", "機構", "商業", "個人用途"] },
+            { marks: 1, criterion: "檢查裝置／使用者／安裝數量限制。", anyOf: ["裝置", "電腦數目", "安裝數量", "使用者", "帳戶"] },
+            { marks: 1, criterion: "檢查修改、複製、分發、期限或付費功能限制。", anyOf: ["修改", "複製", "分發", "試用", "期限", "付費", "功能"] },
+            { marks: 1, criterion: "檢查個人資料／文件內容收集、廣告或其他私隱風險。", anyOf: ["個人資料", "文件內容", "收集數據", "私隱", "廣告"] }
+        ], explanation: "公開評核常把軟件類型放進安裝情境；答案要以實際條款和風險解釋，而不是假設『免費』代表完全自由。"
+    },
+    {
+        id: "q-e-c-protection-003",
+        topicId: "che-3", syllabusRef: "E(c)", difficulty: "standard", marks: 4, type: "short-answer",
+        question: "攝影師把相片放到網站展示。說明數碼水印和數碼簽署各可提供的一項保障，並指出使用網上相片時應採取的兩項合適做法。",
+        answer: "數碼水印在相片嵌入擁有者或追蹤標記，協助顯示版權／辨認未授權副本；數碼簽署可驗證來源和相片自簽署後是否被修改。使用者應查閱並遵守授權／取得版權持有人許可，以及承認作者和列出資料來源；必要時使用獲准的素材版本。",
+        markingScheme: [
+            { marks: 1, criterion: "水印顯示擁有者／版權或追蹤未授權副本。", anyOf: ["水印", "擁有者", "版權", "追蹤", "未授權"] },
+            { marks: 1, criterion: "數碼簽署驗證來源及／或完整性。", anyOf: ["數碼簽署", "來源", "身分", "完整性", "修改"] },
+            { marks: 1, criterion: "查閱授權／取得許可／只使用獲准素材。", anyOf: ["授權", "許可", "批准", "獲准", "條款"] },
+            { marks: 1, criterion: "承認作者並列出資料來源。", anyOf: ["作者", "承認", "資料來源", "引用", "出處"] }
+        ], explanation: "水印和簽署功能不同；列出來源亦不一定取代取得授權，兩項做法應同時考慮。"
+    },
+    {
         id: "q-ea-sql-001",
         topicId: "tool-sql-simulator",
         syllabusRef: "Elective A",

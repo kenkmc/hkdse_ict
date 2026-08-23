@@ -209,6 +209,43 @@ const courseData = [
         ]
     },
     {
+        id: "core-e",
+        sectionTitle: "必修部分 E - 資訊及通訊科技的社會影響",
+        sectionCode: "Core E",
+        kind: "course",
+        color: "bg-rose-50 text-rose-700",
+        icon: "scale",
+        items: [
+            {
+                id: "che-1",
+                title: "i. 科技創新",
+                file: "che.1.html",
+                desc: "人工智能與數據科學、模式辨認、3D 打印、擴增實境及虛擬實境",
+                type: "lesson",
+                syllabusRef: "E(a)",
+                tags: ["人工智能", "數據科學", "模式辨認", "3D 打印", "AR", "VR"]
+            },
+            {
+                id: "che-2",
+                title: "ii. 健康與道德議題",
+                file: "che.2.html",
+                desc: "健康風險、人體工學、數碼鴻溝、無障礙使用、資訊自由及道德考慮",
+                type: "lesson",
+                syllabusRef: "E(b)",
+                tags: ["RSI", "人體工學", "數碼鴻溝", "無障礙", "資訊自由", "資訊道德"]
+            },
+            {
+                id: "che-3",
+                title: "iii. 知識產權",
+                file: "che.3.html",
+                desc: "版權、軟件授權、侵權與盜版、數碼水印及數碼簽署",
+                type: "lesson",
+                syllabusRef: "E(c)",
+                tags: ["知識產權", "版權", "freeware", "shareware", "open source", "盜版", "數碼水印"]
+            }
+        ]
+    },
+    {
         id: "learning-tools",
         sectionTitle: "互動學習工具",
         sectionCode: "Tools",
