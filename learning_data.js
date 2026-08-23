@@ -5,7 +5,7 @@
  * 詳細教學內容仍保留在各 HTML 頁面，題型練習則由 question_data.js 管理。
  */
 const learningData = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     pages: {
         "cha-1": {
             objectives: [
@@ -601,6 +601,99 @@ const learningData = {
         }
     }
 };
+
+const lessonVisualAssets = {
+    coreA: {
+        src: "assets/images/lesson-visuals/core-a-data-information.webp",
+        alt: "由條碼、鍵盤和感應器輸入數據，經電腦處理後形成圖表、數據表及支援決策的資訊",
+        width: 1672,
+        height: 941
+    },
+    representation: {
+        src: "assets/images/lesson-visuals/core-a-data-representation.webp",
+        alt: "二進制數據分別表示像素與色彩、字符、聲音取樣及視像畫面",
+        width: 1672,
+        height: 941
+    },
+    coreB: {
+        src: "assets/images/lesson-visuals/core-b-computer-system.webp",
+        alt: "打開的桌面電腦機箱，以及 CPU、暫存器、主記憶體和儲存裝置之間的關係",
+        width: 1672,
+        height: 941
+    },
+    coreC: {
+        src: "assets/images/lesson-visuals/core-c-internet-security.webp",
+        alt: "電腦和手機經無線接達點、路由器及互聯網連接多種伺服器，防火牆阻擋惡意請求",
+        width: 1672,
+        height: 941
+    },
+    coreD: {
+        src: "assets/images/lesson-visuals/core-d-program-development.webp",
+        alt: "現實問題經分析、流程圖、程式編寫、追蹤測試及除錯成為可用程式",
+        width: 1672,
+        height: 941
+    },
+    coreE: {
+        src: "assets/images/lesson-visuals/core-e-responsible-ict.webp",
+        alt: "學生使用擴增實境、3D 打印及人工智能，並注意人體工學、私隱同意和知識產權",
+        width: 1672,
+        height: 941
+    },
+    electiveA: {
+        src: "assets/images/lesson-visuals/elective-a-database-design.webp",
+        alt: "重複資料拆分成以鍵連接的關聯表，再按條件產生查詢結果",
+        width: 1672,
+        height: 941
+    },
+    electiveB: {
+        src: "assets/images/lesson-visuals/elective-b-web-application.webp",
+        alt: "瀏覽器表單經安全請求傳送到網頁伺服器，驗證後讀寫數據庫並回傳結果",
+        width: 1672,
+        height: 941
+    },
+    electiveC: {
+        src: "assets/images/lesson-visuals/elective-c-algorithms-devices.webp",
+        alt: "排序與二分搜尋、堆疊與佇列、鏈結資料，以及感應器控制風扇和馬達",
+        width: 1672,
+        height: 941
+    }
+};
+
+const lessonVisualAssignments = {
+    "cha-1": { asset: "coreA", title: "從數據到決策", caption: "沿箭嘴辨認輸入、處理、輸出和儲存；最後的圖表只有在能回答問題時才成為有用資訊。", points: ["原始輸入", "分類與計算", "資訊支援決策"] },
+    "cha-2": { asset: "coreA", title: "數據進入系統前後都要受控", caption: "收集階段要用 validation 和 verification 控制質素；儲存後仍要以欄位結構、存取權和備份維持可靠性。", points: ["收集與核對", "結構化儲存", "可靠輸出"] },
+    "cha-3": { asset: "representation", title: "同一串 bit，可以表示不同媒體", caption: "先辨認媒體類型，再把解像度、色彩深度、取樣率或畫面數量連到檔案大小及品質。", points: ["像素與色彩", "聲音取樣", "視像壓縮"] },
+    "cha-4": { asset: "coreA", title: "試算表把記錄轉成趨勢", caption: "公式先處理每列數據，圖表再把比較和趨勢顯示出來；留意複製公式時哪些參照需要固定。", points: ["輸入記錄", "公式處理", "圖表比較"] },
+    "cha-5": { asset: "coreA", title: "數據表支援檢索和決策", caption: "不要只看數據庫圓柱圖示；要追問每個欄位保存甚麼、如何識別記錄，以及查詢如何產生所需資訊。", points: ["欄位與記錄", "鍵與關係", "查詢結果"] },
+    "chb-1": { asset: "coreB", title: "由機箱看到 CPU 與記憶體", caption: "分清主機板上的 CPU、RAM 和儲存裝置，再追蹤指令位址及內容在暫存器與主記憶體之間的流動。", points: ["CPU 與主機板", "RAM 與儲存", "機器周期"] },
+    "chb-2": { asset: "coreB", title: "軟件如何控制硬件資源", caption: "操作系統和 device driver 令程式能使用處理器、記憶體、儲存和周邊設備；不同處理模式則決定工作何時執行。", points: ["硬件資源", "系統軟件", "處理模式"] },
+    "chc-1": { asset: "coreC", title: "由裝置接入網絡，再連到服務", caption: "先辨認 NIC、接達點、switch、router 和 modem 的位置，再判斷它們連接同一網絡還是不同網絡。", points: ["有線與無線接入", "LAN 內轉送", "連接不同網絡"] },
+    "chc-2": { asset: "coreC", title: "一次網頁請求經過多個協定", caption: "域名先解析成 IP，傳輸層建立連線，封包再經路由到伺服器；答案要把協定和任務逐一配對。", points: ["名稱解析", "可靠傳輸", "Request／response"] },
+    "chc-3": { asset: "coreC", title: "互聯網服務背後仍是請求與伺服器", caption: "搜尋、串流、雲端和通訊服務的介面不同，但都要考慮伺服器角色、頻寬、延遲及資料可信性。", points: ["客戶端請求", "雲端服務", "資訊可信性"] },
+    "chc-4": { asset: "electiveB", title: "網頁由介面連到後端處理", caption: "HTML 表達結構，CSS 控制呈現；表單資料若送到伺服器，仍要驗證並安全地處理。", points: ["語意結構", "一致呈現", "表單與回應"] },
+    "chc-5": { asset: "coreC", title: "保安是多層控制", caption: "加密保護傳輸，認證確認身分，防火牆及更新阻擋或減少攻擊；備份則處理資料受損後的復原。", points: ["認證與加密", "阻擋威脅", "備份復原"] },
+    "chd-1": { asset: "coreD", title: "先理解問題，再決定寫甚麼", caption: "把現實情境分成必要輸入、處理和輸出，忽略無關細節，再把大問題拆成可測試的子問題。", points: ["問題與使用者", "分解與抽象", "IPO 規格"] },
+    "chd-2": { asset: "coreD", title: "算法把想法變成可追蹤步驟", caption: "利用流程圖或偽代碼表達 sequence、selection 和 iteration；每條分支及迴圈都要有清楚條件。", points: ["流程圖符號", "三種控制結構", "逐步追蹤"] },
+    "chd-3": { asset: "coreD", title: "由算法走到可執行程式", caption: "變數、輸入輸出、條件和迴圈要逐一對應算法；程式能執行不代表邏輯必定正確。", points: ["變數與資料", "條件與迴圈", "程式輸出"] },
+    "chd-4": { asset: "coreD", title: "測試用證據找出錯誤", caption: "先寫 expected result，再用正常、邊界和不合法數據執行；利用 trace 或 debugger 找出結果不同的第一步。", points: ["測試計劃", "邊界與異常", "定位及修正"] },
+    "che-1": { asset: "coreE", title: "新科技仍要由問題和限制出發", caption: "AR、3D 打印和人工智能各有合適用途；評估時同時考慮所需數據、硬件、準確度和人類監督。", points: ["AR／VR", "3D 打印", "AI 與人類監督"] },
+    "che-2": { asset: "coreE", title: "有效率不等於負責任", caption: "使用 ICT 時要同時處理人體工學、數碼鴻溝、個人資料、演算法偏差及不同持份者的影響。", points: ["健康與姿勢", "私隱同意", "公平與共融"] },
+    "che-3": { asset: "coreE", title: "數碼作品仍受權利和授權約束", caption: "先確認作品擁有者和軟件授權，再判斷可否複製、修改或分發；保留來源和使用條款證據。", points: ["作品與版權", "軟件授權", "標示來源"] },
+    "ea-1": { asset: "electiveA", title: "關聯表靠鍵維持連接", caption: "主鍵唯一識別記錄，外鍵連到另一表；完整性規則阻止不存在、重複或超出 domain 的數值。", points: ["主鍵與候選鍵", "外鍵關係", "完整性"] },
+    "ea-2": { asset: "electiveA", title: "SQL 由表及關係產生結果", caption: "先找出需要的欄、表和連接條件，再處理篩選、分組和 aggregate；放大鏡代表查詢只選出所需記錄。", points: ["SELECT 欄位", "JOIN 關係", "篩選與分組"] },
+    "ea-3": { asset: "electiveA", title: "由重複大表走到 3NF", caption: "按 functional dependency 拆表，為每個表選鍵，再用外鍵保留關係；M:N 則需要橋接表。", points: ["辨認依賴", "拆表與鍵", "橋接關係"] },
+    "eb-1": { asset: "electiveB", title: "網絡服務各有清楚職責", caption: "客戶端可同時使用位址配置、登入、檔案、代理、網頁和數據庫服務；答案要寫清楚誰向誰請求甚麼。", points: ["Client／server", "服務與連接埠", "權限與回應"] },
+    "eb-2": { asset: "electiveB", title: "完整網頁應用是往返流程", caption: "瀏覽器先提供介面和初步檢查，伺服器再驗證並讀寫數據庫，最後把結果回傳；安全決定不能只留在 client。", points: ["HTML／CSS／JS", "Server validation", "Database response"] },
+    "ec-1": { asset: "electiveC", title: "演算法和資料結構要配合問題", caption: "排序及搜尋按資料狀態選擇；stack、queue 和 linked list 則以不同加入、移除及連接規則保存項目。", points: ["搜尋與排序", "LIFO／FIFO", "鏈結結構"] },
+    "ec-2": { asset: "electiveC", title: "程式讀取環境，再安全地控制裝置", caption: "sensor 提供輸入，event handler 判斷閾值，actuator 產生動作；異常讀數、超時和頻繁切換都要處理。", points: ["Sensor input", "Event／threshold", "Actuator 與安全狀態"] }
+};
+
+Object.entries(lessonVisualAssignments).forEach(([pageId, assignment]) => {
+    const page = learningData.pages[pageId];
+    const asset = lessonVisualAssets[assignment.asset];
+    if (!page || !asset) return;
+    page.visual = { ...asset, title: assignment.title, caption: assignment.caption, points: assignment.points };
+});
 
 function freezeLearningData(value) {
     if (!value || typeof value !== "object" || Object.isFrozen(value)) return value;

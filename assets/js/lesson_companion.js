@@ -73,6 +73,20 @@
         </div>
     ` : "";
 
+    const lessonVisual = page.visual ? `
+        <figure class="lesson-visual">
+            <div class="lesson-visual-media">
+                <img src="${escapeHTML(page.visual.src)}" alt="${escapeHTML(page.visual.alt)}" width="${Number(page.visual.width) || 1672}" height="${Number(page.visual.height) || 941}" loading="lazy" decoding="async">
+            </div>
+            <figcaption>
+                <p class="lesson-check-label">圖像導讀</p>
+                <h3>${escapeHTML(page.visual.title)}</h3>
+                <p>${escapeHTML(page.visual.caption)}</p>
+                <div class="lesson-visual-points">${page.visual.points.map(point => `<span>${escapeHTML(point)}</span>`).join("")}</div>
+            </figcaption>
+        </figure>
+    ` : "";
+
     section.innerHTML = `
         <div class="lesson-companion-heading">
             <div>
@@ -82,6 +96,7 @@
             <button class="lesson-companion-toggle" type="button" aria-expanded="${expandedByDefault}" aria-controls="lesson-companion-content">${expandedByDefault ? "收起" : "展開學習重點"}</button>
         </div>
         <div id="lesson-companion-content" class="lesson-companion-content"${expandedByDefault ? "" : " hidden"}>
+            ${lessonVisual}
             <div class="lesson-objectives">
                 <h3>完成本頁後，你應能夠</h3>
                 <ul>${page.objectives.map(objective => `<li>${objective}</li>`).join("")}</ul>

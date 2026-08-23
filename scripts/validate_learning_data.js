@@ -14,6 +14,8 @@ const platform = browser.HKDSE_ICT;
 const learning = browser.HKDSE_ICT_LEARNING;
 const questions = browser.HKDSE_ICT_QUESTIONS || [];
 const errors = [];
+let lessonCount = 0;
+let lessonVisualCount = 0;
 
 if (!learning?.pages) {
     errors.push("learning_data.js 沒有公開有效的學習提示資料。");
@@ -37,6 +39,7 @@ if (!learning?.pages) {
         if (!page.examTip) errors.push(`${id} 缺少 DSE 提示。`);
 
         if (catalogById.get(id)?.type === "lesson") {
+            lessonCount += 1;
             if (!page.scopeNote) errors.push(`${id} 缺少課程界線提示。`);
             if (!page.featuredQuestionId && !page.embeddedExamPractice) {
                 errors.push(`${id} 缺少頁內 DSE 題型或嵌入式練習標記。`);
@@ -45,6 +48,25 @@ if (!learning?.pages) {
                 const featured = questionById.get(page.featuredQuestionId);
                 if (!featured) errors.push(`${id} 引用不存在的精選題目：${page.featuredQuestionId}`);
                 if (featured && featured.topicId !== id) errors.push(`${id} 的精選題目屬於其他課題：${featured.topicId}`);
+            }
+
+            const visual = page.visual;
+            if (!visual) {
+                errors.push(`${id} 缺少圖像導讀。`);
+            } else {
+                lessonVisualCount += 1;
+                if (!visual.src || !fs.existsSync(path.join(root, visual.src))) {
+                    errors.push(`${id} 的圖像檔不存在：${visual.src || "（未填寫）"}`);
+                }
+                if (!visual.alt || !visual.title || !visual.caption) {
+                    errors.push(`${id} 的圖像替代文字、標題或說明不完整。`);
+                }
+                if (!Array.isArray(visual.points) || visual.points.length < 3) {
+                    errors.push(`${id} 的圖像導讀至少需要三個觀察重點。`);
+                }
+                if (!Number.isInteger(visual.width) || visual.width <= 0 || !Number.isInteger(visual.height) || visual.height <= 0) {
+                    errors.push(`${id} 的圖像尺寸資料無效。`);
+                }
             }
         }
 
@@ -61,5 +83,5 @@ if (errors.length) {
     errors.forEach(error => console.error(`- ${error}`));
     process.exitCode = 1;
 } else {
-    console.log(`學習提示驗證通過：${Object.keys(learning.pages).length} 個頁面均有目標、概念圖、常見誤解及快速檢查；所有課程頁亦有課程界線及 DSE 題型。`);
+    console.log(`學習提示驗證通過：${Object.keys(learning.pages).length} 個頁面均有目標、概念圖、常見誤解及快速檢查；${lessonVisualCount}/${lessonCount} 個課程頁亦有圖像導讀、課程界線及 DSE 題型。`);
 }
