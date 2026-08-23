@@ -319,6 +319,74 @@ const learningData = {
             },
             examTip: "保安建議題要使用『威脅 → 措施 → 如何減低風險』句式；只列出防火牆、VPN 等名稱通常不足以取得解釋分。"
         },
+        "chd-1": {
+            objectives: ["界定問題目標和範圍並辨認輸入、處理及輸出", "把複雜問題分解成較小而可管理的子問題", "辨認相似問題的模式並保留解題所需的關鍵資料"],
+            scopeNote: "本課依 D(a) 集中問題定義、IPO、分解、模式辨認及抽象化；具體算法表示與控制結構會在 D(b) 處理。",
+            featuredQuestionId: "q-d-a-analysis-002",
+            concepts: [
+                { icon: "◎", label: "定義", detail: "寫清楚目標、使用者、限制和成功條件，避免解決錯誤或過大的問題。" },
+                { icon: "IPO", label: "分析", detail: "辨認所需輸入、處理規則和輸出，建立問題與方案之間的清楚界線。" },
+                { icon: "▦", label: "分解", detail: "把複雜工作拆成輸入、計算、驗證、儲存和輸出等較小子問題。" },
+                { icon: "⌁", label: "模式與抽象", detail: "找出可重用的共同方法，忽略不影響解答的細節，只保留必要特徵。" }
+            ],
+            misconceptions: [
+                { claim: "分解就是把程式每一行分開。", correction: "分解在設計前把問題拆成有清晰責任的子問題，並不等於把現有程式逐行切開。" },
+                { claim: "抽象化代表把所有細節刪除。", correction: "抽象化只忽略與目前目標無關的細節，必須保留解題所需的資料和規則。" }
+            ],
+            quickCheck: { question: "計算 BMI 的問題中，哪組最合適作輸入？", options: ["姓名和班別", "身高和體重", "BMI 和健康分類", "打印機和顯示器"], answerIndex: 1, explanation: "BMI 的計算需要身高和體重；BMI 值和分類是處理後的輸出。" },
+            examTip: "分析題先逐項寫出 input、process、output；處理要用動詞和規則，例如『以體重除以身高平方』。"
+        },
+        "chd-2": {
+            objectives: ["以偽代碼或流程圖表示順序、選擇和迭代算法", "選擇合適數據類型、字串及一維陣列並運用 Boolean 邏輯", "以追蹤表檢查變數值、找出邏輯錯誤並解釋模組化好處"],
+            scopeNote: "本課依 D(b) 涵蓋 dry run、偽代碼／流程圖、介面、簡單數據類型、字串、一維陣列、Boolean、控制結構、追蹤表和模組化；不要求巢狀迴圈。",
+            featuredQuestionId: "q-d-b-trace-002",
+            concepts: [
+                { icon: "→", label: "順序", detail: "步驟按指定次序執行；次序改變可令結果不同。" },
+                { icon: "◇", label: "選擇", detail: "binary 或 multi-way selection 按條件結果選擇一條執行路徑。" },
+                { icon: "↻", label: "迭代", detail: "按次數或條件重複步驟；要確保終止條件可達成。" },
+                { icon: "▤", label: "追蹤與模組", detail: "追蹤表記錄每步狀態；模組把複雜方案分成可理解、測試和重用的部分。" }
+            ],
+            misconceptions: [
+                { claim: "流程圖和偽代碼會被電腦直接執行。", correction: "兩者主要用來表示和溝通算法；需轉成程式語言才由電腦執行。" },
+                { claim: "追蹤表只需寫最終答案。", correction: "追蹤表應在指定語句每次執行後更新相關變數和條件，顯示過程。" }
+            ],
+            quickCheck: { question: "要保存 30 名學生的分數並以索引逐一處理，最合適使用甚麼？", options: ["一個 Boolean", "一個 character", "一維陣列／列表", "只用常數"], answerIndex: 2, explanation: "一維陣列／列表可用同一名稱和索引保存多個同類數值。" },
+            examTip: "dry run 時按執行次序逐行更新追蹤表；不要以心算跳到答案，尤其要記錄迴圈索引和條件真假。"
+        },
+        "chd-3": {
+            objectives: ["正確使用變數、常數、運算子、表達式及輸入輸出", "以順序、選擇及非巢狀迭代建立程式方案", "對字串及一維列表進行搜尋、計數、最大／最小和次序檢查"],
+            scopeNote: "本課依 D(c) 集中變數、常數、簡單列表、運算子、輸入輸出及基本控制結構；公開試指定語言及語法以最新考評資料為準。",
+            featuredQuestionId: "q-d-c-list-002",
+            concepts: [
+                { icon: "x", label: "變數與常數", detail: "變數保存會改變的值；常數代表運行期間不應改變的命名資料。" },
+                { icon: "+−", label: "運算與表達式", detail: "算術、關係和 Boolean 運算把值組合成新值或條件結果。" },
+                { icon: "◇↻", label: "控制流程", detail: "if／else 作選擇，for／while 作迭代；順序決定狀態何時更新。" },
+                { icon: "[ ]", label: "字串與列表", detail: "以索引存取元素，配合迴圈搜尋、計數、比較或擷取。" }
+            ],
+            misconceptions: [
+                { claim: "= 在所有情況都表示數學相等。", correction: "在多數程式語言中 = 用於賦值，而相等比較使用另一運算子；應按指定語言規則判斷。" },
+                { claim: "while 迴圈至少會執行一次。", correction: "一般 while 先檢查條件；若開始時已為 false，迴圈本體可一次也不執行。" }
+            ],
+            quickCheck: { question: "要判斷 age 介乎 12 至 18（包括端點），概念上應使用哪個 Boolean 關係？", options: ["age ≥ 12 AND age ≤ 18", "age ≥ 12 OR age ≤ 18", "NOT age", "age + 12"], answerIndex: 0, explanation: "兩個限制必須同時成立，所以使用 AND。" },
+            examTip: "程式題先列出變數用途和初值，再處理控制結構；計數、總和、最大值等累積變數的初值尤其重要。"
+        },
+        "chd-4": {
+            objectives: ["按驗證規則設計正常、邊界、異常及無效測試數據", "分辨語法、邏輯及執行時錯誤並提出修正", "比較解決同一問題的方案步驟和資源使用"],
+            scopeNote: "本課依 D(d) 涵蓋測試數據、邊界情況、三類程式錯誤、除錯及方案比較；測試不能證明程式在所有輸入下絕對沒有錯誤。",
+            featuredQuestionId: "q-d-d-test-002",
+            concepts: [
+                { icon: "✓", label: "正常數據", detail: "符合所有規則而且不在邊界的典型輸入，用來檢查一般功能。" },
+                { icon: "| |", label: "邊界數據", detail: "選擇剛好在、剛低於和剛高於限制的值，找出 < 與 ≤ 等錯誤。" },
+                { icon: "!", label: "異常／無效", detail: "不符合類型、格式或範圍的輸入，用來檢查驗證和錯誤處理。" },
+                { icon: "🐞", label: "除錯", detail: "根據錯誤訊息、追蹤表和最小測試案例定位原因，修正後再執行回歸測試。" }
+            ],
+            misconceptions: [
+                { claim: "程式可以執行，就代表沒有錯誤。", correction: "語法正確的程式仍可能有邏輯錯誤，或只在特定輸入發生執行時錯誤。" },
+                { claim: "測試一個正常數據便足夠。", correction: "還要覆蓋邊界、異常和不同分支；一個測試不能證明所有情況正確。" }
+            ],
+            quickCheck: { question: "有效年齡範圍是 12 至 18（包括端點）。以下哪組最適合測試下邊界？", options: ["12, 13, 14", "11, 12, 13", "0, 50, 100", "只測 15"], answerIndex: 1, explanation: "11、12、13 分別是剛低於、等於和剛高於下邊界。" },
+            examTip: "邊界測試要寫出具體數值及預期結果；指出錯誤類型後，還要解釋發生時機或不正確輸出。"
+        },
         "tool-dse-practice": {
             objectives: ["按課題和難度選擇題目", "提交後逐點閱讀評分準則", "把錯誤連回相關課程及互動工具"],
             concepts: [

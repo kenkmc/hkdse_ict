@@ -163,6 +163,52 @@ const courseData = [
         ]
     },
     {
+        id: "core-d",
+        sectionTitle: "必修部分 D - 運算思維與程式編寫",
+        sectionCode: "Core D",
+        kind: "course",
+        color: "bg-violet-50 text-violet-700",
+        icon: "code-2",
+        items: [
+            {
+                id: "chd-1",
+                title: "i. 問題定義及分析",
+                file: "chd.1.html",
+                desc: "問題範圍、輸入處理輸出、分解、模式辨認及抽象化",
+                type: "lesson",
+                syllabusRef: "D(a)",
+                tags: ["運算思維", "問題定義", "IPO", "分解", "模式辨認", "抽象化"]
+            },
+            {
+                id: "chd-2",
+                title: "ii. 算法設計",
+                file: "chd.2.html",
+                desc: "偽代碼、流程圖、數據類型、控制結構、陣列、追蹤表及模組化",
+                type: "lesson",
+                syllabusRef: "D(b)",
+                tags: ["算法", "偽代碼", "流程圖", "追蹤表", "數據類型", "陣列", "模組化"]
+            },
+            {
+                id: "chd-3",
+                title: "iii. 程式開發",
+                file: "chd.3.html",
+                desc: "變數、常數、運算子、輸入輸出、選擇、迭代、字串及一維列表",
+                type: "lesson",
+                syllabusRef: "D(c)",
+                tags: ["程式開發", "變數", "運算子", "if", "for", "while", "string", "list"]
+            },
+            {
+                id: "chd-4",
+                title: "iv. 程式測試及除錯",
+                file: "chd.4.html",
+                desc: "正常、邊界及異常數據、語法／邏輯／執行錯誤、除錯與方案比較",
+                type: "lesson",
+                syllabusRef: "D(d)",
+                tags: ["測試數據", "邊界值", "語法錯誤", "邏輯錯誤", "執行錯誤", "除錯"]
+            }
+        ]
+    },
+    {
         id: "learning-tools",
         sectionTitle: "互動學習工具",
         sectionCode: "Tools",

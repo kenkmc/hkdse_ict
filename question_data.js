@@ -580,6 +580,126 @@ const questionData = [
         explanation: "數碼簽署用來檢查來源及完整性，不會自動把文件內容保密。"
     },
     {
+        id: "q-d-a-ipo-001",
+        topicId: "chd-1", syllabusRef: "D(a)", difficulty: "foundation", marks: 1, type: "mcq",
+        question: "程式輸入五個分數，計算平均值並顯示『Pass／Fail』。以下哪項屬於處理（process）？",
+        options: [{ value: "A", label: "五個分數" }, { value: "B", label: "計算平均值並與及格線比較" }, { value: "C", label: "顯示 Pass／Fail" }, { value: "D", label: "鍵盤" }], answer: "B",
+        markingScheme: [{ marks: 1, criterion: "指出計算及比較規則屬處理。" }], explanation: "分數是輸入，計算和比較是處理，Pass／Fail 是輸出。"
+    },
+    {
+        id: "q-d-a-analysis-002",
+        topicId: "chd-1", syllabusRef: "D(a)", difficulty: "standard", marks: 4, type: "short-answer",
+        question: "學校要建立程式，輸入學生身高（m）和體重（kg），計算 BMI，並顯示 BMI 值和健康分類。分別指出輸入、兩項處理及輸出。",
+        answer: "輸入是身高和體重。處理包括以體重除以身高平方計算 BMI，以及按指定範圍把 BMI 分類。輸出是 BMI 值和健康分類。",
+        markingScheme: [
+            { marks: 1, criterion: "輸入：身高和體重。", anyOf: ["身高", "體重"] },
+            { marks: 1, criterion: "處理：BMI = 體重 ÷ 身高²。", anyOf: ["體重", "身高平方", "BMI", "除"] },
+            { marks: 1, criterion: "處理：按範圍／條件判斷健康分類。", anyOf: ["範圍", "條件", "分類", "比較"] },
+            { marks: 1, criterion: "輸出：BMI 值和健康分類。", anyOf: ["BMI 值", "BMI值", "健康分類"] }
+        ], explanation: "IPO 分析要把輸入資料、計算／判斷規則及結果分開。"
+    },
+    {
+        id: "q-d-a-decompose-001",
+        topicId: "chd-1", syllabusRef: "D(a)", difficulty: "standard", marks: 3, type: "short-answer",
+        question: "把『網上活動報名系統』分解成三個合理子問題，並說明分解的一項好處。",
+        answer: "可分為收集及驗證報名資料、檢查名額／重複報名、儲存記錄及發送確認等子問題。分解令各部分責任清楚，可獨立設計、測試、修改或重用。",
+        markingScheme: [
+            { marks: 2, criterion: "提出最少兩個合理而職責不同的子問題。", anyOf: ["輸入", "驗證", "名額", "重複", "儲存", "確認", "電郵"] },
+            { marks: 1, criterion: "說明較易理解／獨立開發、測試、修改或重用。", anyOf: ["理解", "測試", "修改", "重用", "分工", "獨立"] }
+        ], explanation: "子問題應各有清晰輸入和責任，而不是任意把同一步驟切成幾句。"
+    },
+    {
+        id: "q-d-b-type-001",
+        topicId: "chd-2", syllabusRef: "D(b)", difficulty: "foundation", marks: 1, type: "mcq",
+        question: "要保存『學生是否已繳交功課』，最合適的簡單數據類型是甚麼？",
+        options: [{ value: "A", label: "Boolean" }, { value: "B", label: "Real" }, { value: "C", label: "Character array of 1000 items" }, { value: "D", label: "只可使用 Integer" }], answer: "A",
+        markingScheme: [{ marks: 1, criterion: "已繳／未繳只有兩種狀態，適合 Boolean。" }], explanation: "Boolean 保存 true／false 兩種邏輯狀態。"
+    },
+    {
+        id: "q-d-b-trace-002",
+        topicId: "chd-2", syllabusRef: "D(b)", difficulty: "standard", marks: 4, type: "short-answer",
+        question: "追蹤以下偽代碼，依次寫出每次迭代後 i 和 total 的值，並指出最終輸出。",
+        questionCode: "total ← 0\nfor i from 1 to 4\n    total ← total + i\noutput total",
+        answer: "每次迭代後：(i,total) 為 (1,1)、(2,3)、(3,6)、(4,10)；最終輸出 10。",
+        markingScheme: [
+            { marks: 1, criterion: "i=1 後 total=1。", anyOf: ["1,1", "1，1", "i=1", "total=1"] },
+            { marks: 1, criterion: "i=2 後 total=3。", anyOf: ["2,3", "2，3", "total=3"] },
+            { marks: 1, criterion: "i=3、4 後 total 分別為 6、10。", anyOf: ["3,6", "4,10", "6", "10"] },
+            { marks: 1, criterion: "最終輸出 10。", anyOf: ["輸出 10", "output 10", "最終 10"] }
+        ], explanation: "每次執行 total ← total + i 後才更新 total；追蹤表應顯示累積過程。"
+    },
+    {
+        id: "q-d-b-module-001",
+        topicId: "chd-2", syllabusRef: "D(b)", difficulty: "standard", marks: 2, type: "short-answer",
+        question: "說明把大型算法分成多個模組的兩項好處。",
+        answer: "每個模組責任較小，較容易理解和獨立測試／除錯；通用模組亦可在其他方案重用，修改一項功能時影響範圍較清楚。",
+        markingScheme: [
+            { marks: 1, criterion: "較易理解、獨立測試／除錯或維護。", anyOf: ["理解", "測試", "除錯", "維護", "修改"] },
+            { marks: 1, criterion: "可重用／支援分工，或限制修改影響。", anyOf: ["重用", "重複使用", "分工", "影響", "獨立"] }
+        ], explanation: "模組化的價值在清晰責任、可測試性和重用，而不是令所有程式自動更快。"
+    },
+    {
+        id: "q-d-c-boolean-001",
+        topicId: "chd-3", syllabusRef: "D(c)", difficulty: "foundation", marks: 1, type: "mcq",
+        question: "要判斷 score 介乎 50 至 100（包括端點），哪個條件概念正確？",
+        options: [{ value: "A", label: "score ≥ 50 AND score ≤ 100" }, { value: "B", label: "score ≥ 50 OR score ≤ 100" }, { value: "C", label: "NOT score" }, { value: "D", label: "score + 50" }], answer: "A",
+        markingScheme: [{ marks: 1, criterion: "上下限必須同時成立，因此使用 AND。" }], explanation: "使用 OR 會令幾乎所有數值至少符合其中一項條件。"
+    },
+    {
+        id: "q-d-c-list-002",
+        topicId: "chd-3", syllabusRef: "D(c)", difficulty: "standard", marks: 4, type: "short-answer",
+        question: "列表 score 保存 5 個分數。寫出偽代碼，計算並輸出不少於 50 分的分數數目。",
+        answer: "count ← 0；for i from 1 to 5；若 score[i] >= 50，count ← count + 1；迴圈後 output count。",
+        markingScheme: [
+            { marks: 1, criterion: "把 count 初始化為 0。", anyOf: ["count ← 0", "count=0", "count = 0"] },
+            { marks: 1, criterion: "以迴圈處理 score 的 5 個元素。", anyOf: ["for", "1 to 5", "1 至 5", "score[i]"] },
+            { marks: 1, criterion: "條件 score[i] >= 50 成立時 count 增加 1。", anyOf: [">= 50", "≥ 50", "count + 1", "count←count+1"] },
+            { marks: 1, criterion: "在迴圈完成後輸出 count。", anyOf: ["output count", "輸出 count", "print(count)"] }
+        ], explanation: "計數器只在條件成立時增加，並應在迴圈前初始化、迴圈後輸出。"
+    },
+    {
+        id: "q-d-c-while-001",
+        topicId: "chd-3", syllabusRef: "D(c)", difficulty: "standard", marks: 3, type: "short-answer",
+        question: "以下偽代碼原意是不斷輸入正整數，輸入 0 時停止，但可能永不停止。指出原因並修正。",
+        questionCode: "input n\nwhile n ≠ 0\n    total ← total + n\noutput total",
+        answer: "迴圈內沒有再次輸入／更新 n，所以若首個 n 不等於 0，條件永遠不變。應在 total 更新後、迴圈結束前加入 input n，並在之前把 total 初始化為 0。",
+        markingScheme: [
+            { marks: 1, criterion: "指出 n 在迴圈內沒有更新。", anyOf: ["n 沒有更新", "沒有再次輸入", "n不變", "n 不變"] },
+            { marks: 1, criterion: "在迴圈內加入 input n／更新 n。", anyOf: ["input n", "輸入 n", "再次輸入"] },
+            { marks: 1, criterion: "把 total 在使用前初始化為 0。", anyOf: ["total ← 0", "total=0", "total = 0"] }
+        ], explanation: "while 迴圈必須讓控制條件有機會改變；累積變數亦要有明確初值。"
+    },
+    {
+        id: "q-d-d-error-001",
+        topicId: "chd-4", syllabusRef: "D(d)", difficulty: "foundation", marks: 1, type: "mcq",
+        question: "程式能執行完畢，但把平均值錯算成 total / (n - 1)。這屬哪類錯誤？",
+        options: [{ value: "A", label: "語法錯誤" }, { value: "B", label: "邏輯錯誤" }, { value: "C", label: "硬件輸入裝置" }, { value: "D", label: "數據壓縮" }], answer: "B",
+        markingScheme: [{ marks: 1, criterion: "程式可執行但結果不正確，屬邏輯錯誤。" }], explanation: "語法錯誤通常令程式不能按語言規則開始／繼續執行；錯誤公式屬邏輯問題。"
+    },
+    {
+        id: "q-d-d-test-002",
+        topicId: "chd-4", syllabusRef: "D(d)", difficulty: "standard", marks: 4, type: "short-answer",
+        question: "輸入欄 age 只接受 12 至 18 的整數（包括端點）。提出一個正常值、三個用來測試下邊界的值，並提出一個異常／無效輸入。",
+        answer: "正常值例如 15；下邊界使用 11、12、13，分別測試剛低於、等於和剛高於下限；異常／無效輸入例如文字 abc 或非整數 12.5。",
+        markingScheme: [
+            { marks: 1, criterion: "正常值：12 至 18 之間而非邊界，例如 15。", anyOf: ["15", "14", "16", "17"] },
+            { marks: 1, criterion: "剛低於下限：11。", anyOf: ["11"] },
+            { marks: 1, criterion: "等於和剛高於下限：12、13。", anyOf: ["12", "13"] },
+            { marks: 1, criterion: "異常／無效：非整數或錯誤類型，例如 abc、12.5。", anyOf: ["abc", "文字", "12.5", "小數", "非整數"] }
+        ], explanation: "完整邊界組合是 limit−1、limit、limit+1；異常數據要違反類型或格式等規則。"
+    },
+    {
+        id: "q-d-d-compare-001",
+        topicId: "chd-4", syllabusRef: "D(d)", difficulty: "advanced", marks: 3, type: "short-answer",
+        question: "算法 A 逐一搜尋 1000 個已排序項目；算法 B 每次把搜尋範圍減半。比較兩者的操作步驟和一項資源／使用限制。",
+        answer: "A 最差可能比較所有 1000 個項目；B 每次排除一半範圍，所需比較次數遠少。B 的限制是資料必須保持排序，亦可能需要額外排序成本；A 可直接用於未排序資料。",
+        markingScheme: [
+            { marks: 1, criterion: "指出 A 逐項比較，最差可檢查所有項目。", anyOf: ["逐一", "逐項", "1000", "所有項目", "線性"] },
+            { marks: 1, criterion: "指出 B 每次把範圍減半，步驟／比較次數較少。", anyOf: ["減半", "一半", "較少", "二分"] },
+            { marks: 1, criterion: "指出 B 需要已排序資料／排序成本，而 A 可用於未排序資料。", anyOf: ["已排序", "排序", "未排序", "限制"] }
+        ], explanation: "方案比較要使用相同輸入規模和準則；除了速度，也可討論記憶體、前置條件和可維護性。"
+    },
+    {
         id: "q-ea-sql-001",
         topicId: "tool-sql-simulator",
         syllabusRef: "Elective A",
