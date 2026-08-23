@@ -33,7 +33,7 @@
                 </div>
                 <div>
                     <h2 class="text-2xl font-bold text-slate-800">${section.sectionTitle}</h2>
-                    <p class="text-xs font-medium uppercase tracking-wide text-slate-400">${section.sectionCode}</p>
+                    <p class="text-xs font-medium uppercase tracking-wide text-slate-400">${section.sectionCode}${section.recommendedHours ? ` · 建議 ${section.recommendedHours} 小時 · ${section.selectionNote}` : ""}</p>
                 </div>
             </div>
             <span class="text-sm text-slate-400">${section.items.length} 項內容</span>

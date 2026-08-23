@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="assets/css/platform.css?v=4">
     <link rel="stylesheet" href="assets/css/learning.css?v=1">
     <link rel="stylesheet" href="assets/css/practice.css">
+    <link rel="stylesheet" href="assets/css/question-visuals.css?v=1">
 </head>
 <body class="practice-page">
     <main class="practice-main">
@@ -18,7 +19,7 @@
                 <h1>DSE 題型練習</h1>
                 <p>按課題及難度練習，提交後即時按評分準則檢討。短答題的自動評分只作學習提示，請同時閱讀完整參考答案。</p>
             </div>
-            <span class="practice-badge">原創題目 · 非歷屆試題</span>
+            <a class="practice-badge" href="mistakes.html">錯題簿與重練 →</a>
         </header>
 
         <div class="practice-grid">
@@ -28,6 +29,15 @@
                     <label for="practice-topic">課題</label>
                     <select id="practice-topic">
                         <option value="">全部課題</option>
+                    </select>
+                </div>
+                <div class="practice-field">
+                    <label for="practice-type">題型</label>
+                    <select id="practice-type">
+                        <option value="">全部題型</option>
+                        <option value="mcq">選擇題</option>
+                        <option value="short-answer">短答／結構題</option>
+                        <option value="sql">SQL 實作題</option>
                     </select>
                 </div>
                 <div class="practice-field">
@@ -65,8 +75,11 @@
     </main>
 
     <script src="course_data.js"></script>
-    <script src="question_data.js"></script>
-    <script src="assets/js/question_engine.js?v=2"></script>
+    <script src="question_data.js?v=9"></script>
+    <script src="question_expansion_data.js?v=1"></script>
+    <script src="assets/js/question_visuals.js?v=1"></script>
+    <script src="assets/js/study_records.js?v=1"></script>
+    <script src="assets/js/question_engine.js?v=3"></script>
     <script src="assets/js/site_navigation.js?v=4"></script>
     <script src="learning_data.js?v=1"></script>
     <script src="assets/js/lesson_companion.js?v=1"></script>

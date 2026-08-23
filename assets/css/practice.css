@@ -11,7 +11,8 @@
 .practice-kicker { margin: 0 0 6px; color: #4338ca; font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
 .practice-hero h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.18; }
 .practice-hero p { max-width: 650px; margin: 10px 0 0; color: #64748b; line-height: 1.7; }
-.practice-badge { flex: 0 0 auto; padding: 9px 13px; border: 1px solid #c7d2fe; border-radius: 999px; background: #eef2ff; color: #3730a3; font-size: 12px; font-weight: 800; }
+.practice-badge { flex: 0 0 auto; padding: 9px 13px; border: 1px solid #c7d2fe; border-radius: 999px; background: #eef2ff; color: #3730a3; font-size: 12px; font-weight: 800; text-decoration: none; }
+.question-case-label { display: inline-flex; margin: 0 0 10px; padding: 6px 9px; border-radius: 8px; background: #eef5ff; color: #315a88; font-size: 12px; font-weight: 800; }
 .practice-grid { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 22px; align-items: start; }
 .practice-panel { border: 1px solid #e2e8f0; border-radius: 18px; background: #fff; box-shadow: 0 12px 36px rgb(15 23 42 / .07); }
 .practice-controls { padding: 20px; }
@@ -38,7 +39,7 @@
 .question-option { display: flex; gap: 11px; padding: 13px 14px; border: 1px solid #dbe3ee; border-radius: 12px; cursor: pointer; line-height: 1.5; }
 .question-option:hover { border-color: #818cf8; background: #f8faff; }
 .question-option input { margin-top: 4px; }
-.question-answer { width: 100%; min-height: 118px; resize: vertical; padding: 13px 14px; border: 1px solid #cbd5e1; border-radius: 12px; font: 14px/1.65 "Noto Sans TC", system-ui, sans-serif; }
+.question-answer { box-sizing: border-box; width: 100%; min-height: 118px; resize: vertical; padding: 13px 14px; border: 1px solid #cbd5e1; border-radius: 12px; font: 14px/1.65 "Noto Sans TC", system-ui, sans-serif; }
 .question-answer-code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
 .question-actions { display: flex; justify-content: space-between; gap: 12px; margin-top: 20px; }
 .question-feedback { margin-top: 24px; padding: 18px; border-radius: 14px; background: #f8fafc; }

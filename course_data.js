@@ -4,12 +4,12 @@
  * 新增、修改或移除可瀏覽內容時，只需更新此檔案。首頁、隨機學習、
  * 共用導覽及目錄驗證都會讀取同一份資料。
  *
- * `id` 是內容的永久識別碼。日後題目引擎及學習進度會以此欄位連結，
+ * `id` 是內容的永久識別碼。題目引擎、本機錯題重練及日後的完整學習進度會以此欄位連結，
  * 因此即使標題或檔名改變，也不應重用或隨意更改既有 id。
  */
 
 const siteConfig = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     siteName: "ICT 學習資源網",
     tagline: "高中資訊及通訊科技科",
     canonicalUrl: "https://kenkmc.github.io/hkdse_ict/",
@@ -19,7 +19,8 @@ const siteConfig = {
     assessmentUrl: "https://www.hkeaa.edu.hk/DocLibrary/HKDSE/Subject_Information/ict/2027hkdse-e-ict.pdf",
     features: {
         questionEngine: true,
-        progressTracking: false
+        progressTracking: true,
+        progressStorage: "local-only"
     }
 };
 
@@ -249,6 +250,8 @@ const courseData = [
         id: "elective-a",
         sectionTitle: "選修部分 A - 數據庫",
         sectionCode: "Paper 2A",
+        recommendedHours: 38,
+        selectionNote: "三選二",
         kind: "course",
         color: "bg-emerald-50 text-emerald-700",
         icon: "database",
@@ -262,6 +265,8 @@ const courseData = [
         id: "elective-b",
         sectionTitle: "選修部分 B - 網頁應用程式開發",
         sectionCode: "Paper 2B",
+        recommendedHours: 38,
+        selectionNote: "三選二",
         kind: "course",
         color: "bg-sky-50 text-sky-700",
         icon: "panel-top",
@@ -274,6 +279,8 @@ const courseData = [
         id: "elective-c",
         sectionTitle: "選修部分 C - 算法與程式編寫",
         sectionCode: "Paper 2C",
+        recommendedHours: 38,
+        selectionNote: "三選二",
         kind: "course",
         color: "bg-fuchsia-50 text-fuchsia-700",
         icon: "braces",
@@ -294,10 +301,28 @@ const courseData = [
                 id: "tool-mock-exam",
                 title: "DSE 模擬考訓練",
                 file: "mock.html",
-                desc: "無登入、無追蹤的限時卷一／卷二原創題組，完成後才顯示評分與課題分析",
+                desc: "3 份卷一及每個選修 2 組卷二原創模擬：正式分部、限時、標記、列印及課題分析",
                 type: "tool",
                 syllabusRef: "Paper 1 / Paper 2",
-                tags: ["模擬考", "計時", "Paper 1", "Paper 2", "原創題目"]
+                tags: ["模擬考", "計時", "Paper 1", "Paper 2", "標記", "列印", "原創題目"]
+            },
+            {
+                id: "tool-mistake-book",
+                title: "錯題簿與弱項重練",
+                file: "mistakes.html",
+                desc: "在目前瀏覽器記錄錯題、遺漏評分點、第一次／最近得分及 1、3、7、14 日重練",
+                type: "tool",
+                syllabusRef: "Paper 1 / Paper 2",
+                tags: ["錯題簿", "弱項", "重練", "spaced practice", "本機儲存"]
+            },
+            {
+                id: "tool-past-paper-index",
+                title: "歷屆問法與官方來源索引",
+                file: "past-paper-index.html",
+                desc: "按年份、課題及問法整理官方來源連結，不複製歷屆試題或評分參考",
+                type: "tool",
+                syllabusRef: "Past paper metadata",
+                tags: ["歷屆試題", "問法索引", "年份", "課題", "官方來源", "版權"]
             },
             {
                 id: "tool-sba-prep",
@@ -312,10 +337,10 @@ const courseData = [
                 id: "tool-dse-practice",
                 title: "DSE 題型練習",
                 file: "practice.html",
-                desc: "按課題及難度練習原創 DSE 題型，並按評分準則檢討答案",
+                desc: "463 題原創題庫，包含圖像、數據回應及相連分題，並按評分準則檢討答案",
                 type: "tool",
                 syllabusRef: "Paper 1 / Paper 2",
-                tags: ["DSE", "題庫", "評分準則", "練習"]
+                tags: ["DSE", "題庫", "評分準則", "圖像題", "資料回應", "練習"]
             },
             {
                 id: "tool-sql-simulator",

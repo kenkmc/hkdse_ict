@@ -502,11 +502,25 @@ const learningData = {
             examTip: "實體裝置題使用 sensor input → condition／event → processing → actuator output，再補充錯誤讀數與安全狀態。"
         },
         "tool-mock-exam": {
-            objectives: ["在限時和不即時顯示答案的情況完成原創題組", "練習卷一必修或卷二任選兩個選修單元的作答安排", "交卷後按課題及評分點檢討"],
-            concepts: [{ icon: "⏱", label: "限時", detail: "倒數只用於當次訓練，不保存瀏覽或學生資料。" }, { icon: "1", label: "Paper 1", detail: "從必修部分抽取選擇題及短答／結構題。" }, { icon: "2", label: "Paper 2", detail: "選取兩個選修單元組成練習題組。" }, { icon: "✓", label: "交卷檢討", detail: "完成前不顯示答案；交卷後逐題查看參考答案及評分準則。" }],
-            misconceptions: [{ claim: "迷你模擬卷的分數可直接換算正式等級。", correction: "題量和難度未經正式等級設定，只能用作診斷與練習。" }],
+            objectives: ["在正式限時和完成前不顯示答案的情況完成原創題組", "練習卷一甲乙分部或卷二任選兩個選修單元的作答安排", "使用標記、未答導覽、答題紙及交卷後課題分析"],
+            concepts: [{ icon: "⏱", label: "正式限時", detail: "卷一 2 小時；卷二 1 小時 30 分鐘，時間到會自動交卷。" }, { icon: "1", label: "Paper 1", detail: "甲部 40 分選擇題、乙部 60 分短答／結構題，共有三套穩定組卷。" }, { icon: "2", label: "Paper 2", detail: "從 A、B、C 選取兩個 38 小時選修單元，每個選修有兩套題組。" }, { icon: "✓", label: "交卷檢討", detail: "交卷後按正式成績比重換算，並按課題列出失分和遺漏評分點。" }],
+            misconceptions: [{ claim: "本站模擬卷的分數可直接換算正式等級。", correction: "題目是自行編寫，未經考評局等級設定，只能用作診斷與時間管理練習。" }],
             quickCheck: { question: "模擬考途中遇到不肯定的題目，較合適做法是甚麼？", options: ["先標記並按時間安排繼續", "立即查看答案", "退出並重開直至抽到熟悉題目", "只做選擇題"], answerIndex: 0, explanation: "先控制時間並完成可取得的分數，最後才返回較困難題目。" },
             examTip: "第一次以準確為先，第二次才比較用時；交卷後按評分點重寫失分答案。"
+        },
+        "tool-mistake-book": {
+            objectives: ["找出錯題所屬課題、錯誤類型及遺漏評分點", "比較第一次與最近一次得分", "按 1、3、7、14 日節奏完成弱項重練"],
+            concepts: [{ icon: "!", label: "錯誤記錄", detail: "只有未取得滿分的題目才加入錯題簿，資料只存在目前瀏覽器。" }, { icon: "•", label: "評分點", detail: "短答題逐點顯示遺漏內容，讓重溫有明確目標。" }, { icon: "↻", label: "間隔重練", detail: "答對後依次延長至 3、7、14 日；再次失分會回到較短間隔。" }, { icon: "⌂", label: "課題重溫", detail: "每項記錄可返回所屬課程頁或直接重做原題。" }],
+            misconceptions: [{ claim: "錯題簿會把學生資料上載到網站管理員。", correction: "目前版本只用瀏覽器 localStorage；清除網站資料或轉用裝置後不會自動同步。" }],
+            quickCheck: { question: "短答題失分後，哪項記錄最有助下一次改善？", options: ["遺漏的具體評分點", "只記錄總分", "只保存作答日期", "只保存題目顏色"], answerIndex: 0, explanation: "具體評分點能指出答案欠缺的概念或因果關係。" },
+            examTip: "重做前先遮住答案，用一句話重述每個遺漏評分點，再完整作答。"
+        },
+        "tool-past-paper-index": {
+            objectives: ["按年份、課題及問法查找考評局公開示例", "辨認指出、描述、解釋、比較、追蹤和評估等動詞要求", "在不複製歷屆原題的情況建立操卷索引"],
+            concepts: [{ icon: "年", label: "年份", detail: "連到考評局公開考生表現示例及出版資料。" }, { icon: "題", label: "課題", detail: "把公開示例映射到現行課程內容；舊制卷二會清楚標示。" }, { icon: "問", label: "問法", detail: "摘要題目動詞和所需證據，不重製原題。" }, { icon: "©", label: "版權", detail: "歷屆題目和評卷參考受保護，使用及複製須依考評局授權。" }],
+            misconceptions: [{ claim: "網上找到的歷屆試題可以直接大量複製到題庫。", correction: "公開可搜尋不代表可重製；本站只保存元資料、官方連結及自行編寫的練習題。" }],
+            quickCheck: { question: "題目要求『解釋』時，答案通常要包含甚麼？", options: ["原因、機制或因果關係", "只有一個名詞", "只抄題目", "只寫個人喜好"], answerIndex: 0, explanation: "解釋題要交代如何或為何，而不是只列出答案名稱。" },
+            examTip: "先圈起命令詞，再估計每分需要一個可獨立辨認的答案點。"
         },
         "tool-sba-prep": {
             objectives: ["把問題、使用者需要和成功準則轉成可驗證規格", "用設計和實作證據說明方案決定", "建立測試計劃並以結果、限制和改善作評估"],

@@ -3,9 +3,12 @@
 
     const platform = window.HKDSE_ICT;
     const questionBank = window.HKDSE_ICT_QUESTIONS;
+    const studyRecords = window.HKDSEStudyRecords;
+    const visualRenderer = window.HKDSEQuestionVisuals;
     if (!platform || !Array.isArray(questionBank)) return;
 
     const topicSelect = document.getElementById("practice-topic");
+    const typeSelect = document.getElementById("practice-type");
     const difficultySelect = document.getElementById("practice-difficulty");
     const startButton = document.getElementById("practice-start");
     const questionPanel = document.getElementById("practice-question");
@@ -52,8 +55,9 @@
     function getFilteredQuestions() {
         return questionBank.filter(question => {
             const topicMatches = !topicSelect.value || question.topicId === topicSelect.value;
+            const typeMatches = !typeSelect.value || question.type === typeSelect.value;
             const difficultyMatches = !difficultySelect.value || question.difficulty === difficultySelect.value;
-            return topicMatches && difficultyMatches;
+            return topicMatches && typeMatches && difficultyMatches;
         });
     }
 
@@ -104,15 +108,26 @@
 
         const title = document.createElement("h2");
         title.className = "question-title";
-        title.textContent = question.question;
+        title.textContent = `${question.partLabel ? `${question.partLabel} ` : ""}${question.question}`;
 
-        questionPanel.append(meta, title);
+        questionPanel.append(meta);
+        if (question.caseTitle) {
+            const caseLabel = document.createElement("p");
+            caseLabel.className = "question-case-label";
+            caseLabel.textContent = `相連情境：${question.caseTitle}`;
+            questionPanel.appendChild(caseLabel);
+        }
+        questionPanel.append(title);
 
         if (question.questionCode) {
             const code = document.createElement("pre");
             code.className = "question-code";
             code.textContent = question.questionCode;
             questionPanel.appendChild(code);
+        }
+
+        if (question.visual && visualRenderer) {
+            questionPanel.appendChild(visualRenderer.render(question.visual));
         }
 
         questionPanel.appendChild(createAnswerInput(question));
@@ -136,16 +151,18 @@
     }
 
     function calculateMarks(question, response) {
+        if (studyRecords) return studyRecords.grade(question, response);
         const normalisedResponse = normalise(response);
         const accepted = [question.answer, ...(question.acceptedAnswers || [])].map(normalise);
-        if (accepted.includes(normalisedResponse)) return question.marks;
-        if (question.type === "mcq" || !normalisedResponse) return 0;
+        if (accepted.includes(normalisedResponse)) return { awarded: question.marks, missedCriteria: [] };
+        if (question.type === "mcq" || !normalisedResponse) return { awarded: 0, missedCriteria: question.markingScheme.map(point => point.criterion) };
 
-        return Math.min(question.marks, question.markingScheme.reduce((score, point) => {
+        const awarded = Math.min(question.marks, question.markingScheme.reduce((score, point) => {
             if (!point.anyOf) return score;
             const matched = point.anyOf.some(keyword => normalisedResponse.includes(normalise(keyword)));
             return score + (matched ? point.marks : 0);
         }, 0));
+        return { awarded, missedCriteria: question.markingScheme.filter(point => !point.anyOf?.some(keyword => normalisedResponse.includes(normalise(keyword)))).map(point => point.criterion) };
     }
 
     function submitAnswer() {
@@ -158,9 +175,11 @@
         }
 
         answered = true;
-        const awarded = calculateMarks(question, response);
+        const grade = calculateMarks(question, response);
+        const awarded = grade.awarded;
         earnedMarks += awarded;
         possibleMarks += question.marks;
+        studyRecords?.recordAttempt(question, response, awarded, grade.missedCriteria);
         sessionScore.textContent = `${earnedMarks} / ${possibleMarks}`;
 
         questionPanel.querySelectorAll("input, textarea, button").forEach(control => {
@@ -185,6 +204,7 @@
             <ol class="marking-scheme">
                 ${question.markingScheme.map(point => `<li>${point.criterion}（${point.marks} 分）</li>`).join("")}
             </ol>
+            ${awarded < question.marks ? '<p><a href="mistakes.html">已加入本機錯題簿，查看重練安排 →</a></p>' : ''}
         `;
 
         const actions = document.createElement("div");
@@ -220,7 +240,10 @@
     }
 
     function startSession() {
-        sessionQuestions = getFilteredQuestions();
+        const requestedQuestion = new URLSearchParams(window.location.search).get("question");
+        sessionQuestions = requestedQuestion
+            ? questionBank.filter(question => question.id === requestedQuestion)
+            : getFilteredQuestions();
         if (!sessionQuestions.length) {
             questionPanel.innerHTML = '<div class="practice-empty"><div><div class="practice-empty-icon">0</div><h2>沒有符合條件的題目</h2><p>請選擇其他課題或難度。</p></div></div>';
             return;
@@ -233,12 +256,23 @@
     }
 
     populateTopics();
-    const requestedTopic = new URLSearchParams(window.location.search).get("topic");
+    const params = new URLSearchParams(window.location.search);
+    const requestedTopic = params.get("topic");
     if (requestedTopic && [...topicSelect.options].some(option => option.value === requestedTopic)) {
         topicSelect.value = requestedTopic;
     }
+    const requestedType = params.get("type");
+    if (requestedType && [...typeSelect.options].some(option => option.value === requestedType)) {
+        typeSelect.value = requestedType;
+    }
+    const requestedDifficulty = params.get("difficulty");
+    if (requestedDifficulty && [...difficultySelect.options].some(option => option.value === requestedDifficulty)) {
+        difficultySelect.value = requestedDifficulty;
+    }
     updateAvailableCount();
     topicSelect.addEventListener("change", updateAvailableCount);
+    typeSelect.addEventListener("change", updateAvailableCount);
     difficultySelect.addEventListener("change", updateAvailableCount);
     startButton.addEventListener("click", startSession);
+    if (params.get("question")) startSession();
 })();
