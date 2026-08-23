@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="HKDSE ICT 必修 C(b)：搜尋策略、資訊可信性、多媒體格式、互聯網服務、串流、IoT 及雲端服務。">
+    <title>C3 互聯網服務及應用 - ICT 學習資源網</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/platform.css?v=4">
+    <link rel="stylesheet" href="assets/css/learning.css?v=3">
+    <link rel="stylesheet" href="assets/css/system-lesson.css?v=1">
+    <link rel="stylesheet" href="assets/css/internet-lesson.css?v=1">
+</head>
+<body class="internet-page">
+    <nav class="sys-lesson-nav" aria-label="本課導覽">
+        <a href="#search">搜尋策略</a><a href="#sources">來源可信性</a><a href="#media">網頁多媒體</a><a href="#services">互聯網服務</a><a href="#streaming">串流</a><a href="#dse-practice">DSE 練習</a>
+    </nav>
+    <main class="sys-page">
+        <section class="sys-hero" aria-labelledby="page-title">
+            <div class="sys-hero-copy"><p class="sys-eyebrow">必修部分 C(b) · Internet Services and Applications · 5 小時</p><h1 id="page-title">懂得搜尋，更要懂得判斷和應用</h1><p>網上找到答案只是開始。HKDSE 會要求你制定搜尋策略、分析來源可信性，並按情境選擇電郵、檔案傳送、遠端登入、討論區或串流等服務。</p><div class="sys-actions"><a class="sys-button sys-button-primary" href="#search">建立有效查詢</a><a class="sys-button sys-button-secondary" href="#streaming">測試串流緩衝</a></div></div>
+            <aside class="sys-focus-card" aria-label="可信性答題框架"><span>DSE SOURCE CHECK</span><h2>可信性四問</h2><ol><li>誰發布？作者或機構可否核實？</li><li>何時發布或更新？是否仍適用？</li><li>有沒有證據及其他可靠來源印證？</li><li>內容為教育、報道、意見還是推銷？</li></ol></aside>
+        </section>
+
+        <section id="search" class="sys-section" aria-labelledby="search-title">
+            <div class="sys-section-heading"><div><p class="sys-kicker">01 · Interactive search strategy</p><h2 id="search-title">由廣泛主題逐步收窄查詢</h2></div><span class="sys-tag">可操作</span></div>
+            <p class="sys-lead">有效策略不是一次猜中完美關鍵字，而是按搜尋結果增刪具體詞組、情境、來源和排除條件。</p>
+            <div class="int-search-builder" data-query-lab>
+                <div class="int-query-controls" role="group" aria-label="搜尋條件"><button type="button" data-query-part="phrase" aria-pressed="true">完整詞組：「人工智能」</button><button type="button" data-query-part="context" aria-pressed="false">加入情境：中學、學習成效</button><button type="button" data-query-part="source" aria-pressed="false">限制來源：教育機構網站</button><button type="button" data-query-part="exclude" aria-pressed="false">排除：廣告、課程推廣</button></div>
+                <div class="int-query-panel"><p class="sys-label">Search query</p><h3>目前查詢</h3><div class="int-query-box" data-query-output></div><p data-query-detail></p><div class="int-note"><strong>提醒：</strong>搜尋運算符只是收窄結果的工具，不會自動保證內容正確或沒有偏見。</div></div>
+            </div>
+        </section>
+
+        <section id="sources" class="sys-section" aria-labelledby="sources-title">
+            <div class="sys-section-heading"><div><p class="sys-kicker">02 · Source evaluation</p><h2 id="sources-title">同一主題，三個來源的證據強度不同</h2></div></div>
+            <p class="sys-lead">按「分析可信性」查看可取分的判斷。可信性不是只看網址結尾，也不是把所有個人網站一律視為錯誤。</p>
+            <div class="int-source-lab">
+                <article class="int-source-card" data-source-card><p class="sys-label">Source A</p><h3>具名大學研究中心報告</h3><p>三個月前更新，列出作者資格、研究方法、樣本和參考文獻。</p><button type="button" aria-expanded="false">分析可信性</button><div class="int-source-result is-strong" data-source-result hidden><strong>較強：</strong>作者、日期、方法和證據均可核實；仍應檢查研究限制及與其他來源比較。</div></article>
+                <article class="int-source-card" data-source-card><p class="sys-label">Source B</p><h3>匿名「專家」社交帖文</h3><p>沒有日期、資料來源或作者背景，只有「人人都知道」的說法。</p><button type="button" aria-expanded="false">分析可信性</button><div class="int-source-result is-weak" data-source-result hidden><strong>較弱：</strong>權威、時效及證據均不能核實；分享次數不能代替可靠證據。</div></article>
+                <article class="int-source-card" data-source-card><p class="sys-label">Source C</p><h3>產品公司的比較文章</h3><p>資料新而且有測試表，但只比較自家產品，頁面包含購買連結。</p><button type="button" aria-expanded="false">分析可信性</button><div class="int-source-result" data-source-result hidden><strong>需審慎：</strong>資料可能有用，但有商業利益和選擇性比較風險；應核對方法並找獨立來源印證。</div></article>
+            </div>
+        </section>
+
+        <section id="media" class="sys-section" aria-labelledby="media-title">
+            <div class="sys-section-heading"><div><p class="sys-kicker">03 · Web multimedia formats</p><h2 id="media-title">格式選擇要回應內容和網頁需要</h2></div></div>
+            <div class="int-format-grid">
+                <article class="sys-card" data-format="JPG"><h3>照片</h3><p>JPG 以有損壓縮減少相片大小，適合色彩連續的照片；反覆編輯儲存可累積失真。</p></article>
+                <article class="sys-card" data-format="PNG"><h3>圖示／透明背景</h3><p>PNG 支援無損壓縮和透明度，適合界面圖示、標誌及需要清晰邊緣的圖像。</p></article>
+                <article class="sys-card" data-format="SVG"><h3>向量圖形</h3><p>SVG 可按不同尺寸縮放而不失去幾何清晰度，適合簡單圖示和圖表；不適合直接保存一般照片。</p></article>
+                <article class="sys-card" data-format="MP3 / AAC"><h3>聲音</h3><p>常用有損音訊壓縮可大幅減少傳輸量，適合語音及音樂串流；品質受編碼設定影響。</p></article>
+                <article class="sys-card" data-format="MP4"><h3>視像</h3><p>MP4 是常見容器，可配合適當編碼在瀏覽器傳送視像與聲音；實際支援視瀏覽器與編碼而定。</p></article>
+                <article class="sys-card" data-format="PLAYER"><h3>播放支援</h3><p>現代瀏覽器多內置播放器；課程所述 plug-in／player 概念重點是用戶端需要能解碼和播放媒體。</p></article>
+            </div>
+        </section>
+
+        <section id="services" class="sys-section" aria-labelledby="services-title">
+            <div class="sys-section-heading"><div><p class="sys-kicker">04 · Internet services</p><h2 id="services-title">按工作目的配對服務</h2></div></div>
+            <div class="int-service-map">
+                <article><b>✉</b><h3>電郵</h3><p>非同步傳送訊息和附件，可保留通訊紀錄。</p></article><article><b>⇅</b><h3>檔案傳送</h3><p>在本機與遠端主機之間上載或下載檔案。</p></article><article><b>&gt;_</b><h3>遠端登入</h3><p>在另一地點操作遠端電腦或伺服器。</p></article><article><b>●</b><h3>網上聊天</h3><p>參與者通常同步交換短訊、聲音或視像。</p></article><article><b>☷</b><h3>討論區</h3><p>以主題串非同步發布、回覆和保存討論。</p></article>
+            </div>
+            <div class="int-note"><strong>保安連結：</strong>傳送敏感檔案或遠端登入時，要使用加密版本的服務及適當身分認證；「可以傳送」不代表「傳送過程已安全」。</div>
+        </section>
+
+        <section id="streaming" class="sys-section" aria-labelledby="streaming-title">
+            <div class="sys-section-heading"><div><p class="sys-kicker">05 · Streaming simulator</p><h2 id="streaming-title">緩衝如何應付網速波動</h2></div><span class="sys-tag">可操作</span></div>
+            <p class="sys-lead">串流在完整媒體檔案下載前開始播放。按不同網速，觀察緩衝區為何只能應付短暫波動。</p>
+            <div class="int-stream-lab" data-stream-lab>
+                <div class="int-stream-controls" role="tablist" aria-label="網絡狀況"><button type="button" role="tab" data-stream-profile="stable">穩定高速</button><button type="button" role="tab" data-stream-profile="variable">短暫下降</button><button type="button" role="tab" data-stream-profile="slow">持續過慢</button></div>
+                <div class="int-stream-panel" role="tabpanel" tabindex="0"><p class="sys-label">Buffer state</p><h3 data-stream-title></h3><p data-stream-description></p><div class="int-buffer-track" aria-label="串流緩衝量"><span data-buffer-segment></span><span data-buffer-segment></span><span data-buffer-segment></span><span data-buffer-segment></span><span data-buffer-segment></span><span data-buffer-segment></span><span data-buffer-segment></span><span data-buffer-segment></span></div><div class="int-stream-status" data-stream-status></div></div>
+            </div>
+            <div class="int-grid-2" style="margin-top:18px"><article class="sys-card"><h3>互聯網電話／視像會議</h3><p>即時串流聲音和影像；延遲和抖動會直接影響對話流暢度。</p></article><article class="sys-card"><h3>Webcasting／隨選視像</h3><p>向大量觀眾發布直播或預錄媒體；可按網絡狀況調整品質。</p></article></div>
+            <div class="int-note"><strong>社會應用：</strong>IoT 裝置可收集並傳送感應數據，雲端服務可集中儲存、處理及提供應用，支援智能交通、環境監察和遙距服務；同時要考慮私隱、網絡依賴及保安。</div>
+        </section>
+
+        <section id="dse-practice" class="sys-section" aria-labelledby="practice-title">
+            <div class="sys-section-heading"><div><p class="sys-kicker">06 · Original DSE-style practice</p><h2 id="practice-title">網上專題學習：8 分</h2></div><span class="sys-marks">8 分</span></div>
+            <div class="sys-original-note"><strong>原創練習</strong><span>按課程範圍和公開評核常見情境編寫，並非歷屆試題或官方擬題。</span></div><div class="sys-case">學生要製作「香港城市綠化」專題網站，搜尋資料、訪問外地專家並在網頁加入訪問錄影片段。</div>
+            <ol class="sys-question-list">
+                <li data-exam-question><div class="sys-question-row"><p><span>(a)</span> 建議兩種方法改善搜尋結果的相關性。</p><b>[2 分]</b></div><textarea rows="3" aria-label="第 a 題答案"></textarea><button type="button" class="sys-reveal" aria-expanded="false">查看評分準則</button><div class="sys-marking" hidden><p>每項合理方法 1 分，例如使用具體詞組／引號、加入地點和研究面向、限制可靠網站或日期、排除不相關字詞。</p></div></li>
+                <li data-exam-question><div class="sys-question-row"><p><span>(b)</span> 學生找到匿名而沒有日期的網誌。解釋兩項可信性問題。</p><b>[2 分]</b></div><textarea rows="3" aria-label="第 b 題答案"></textarea><button type="button" class="sys-reveal" aria-expanded="false">查看評分準則</button><div class="sys-marking" hidden><ul><li>作者身分／資格不能核實，權威成疑（1）。</li><li>沒有日期，不能判斷內容是否仍然最新和適用（1）。</li></ul></div></li>
+                <li data-exam-question><div class="sys-question-row"><p><span>(c)</span> 建議一種適合與外地專家即時對話的服務，並解釋。</p><b>[2 分]</b></div><textarea rows="3" aria-label="第 c 題答案"></textarea><button type="button" class="sys-reveal" aria-expanded="false">查看評分準則</button><div class="sys-marking" hidden><p><strong>視像會議／網上聊天</strong>（1），可讓不同地點參與者即時、雙向傳送聲音和影像（1）。</p></div></li>
+                <li data-exam-question><div class="sys-question-row"><p><span>(d)</span> 說明串流如何讓訪客在未下載完整影片前開始播放，以及緩衝的作用。</p><b>[2 分]</b></div><textarea rows="3" aria-label="第 d 題答案"></textarea><button type="button" class="sys-reveal" aria-expanded="false">查看評分準則</button><div class="sys-marking" hidden><ul><li>播放器接收部分媒體數據後便一邊下載一邊播放（1）。</li><li>緩衝預先保存一部分數據，以應付短暫網速波動／減少停頓（1）。</li></ul></div></li>
+            </ol><button type="button" class="sys-button sys-button-primary sys-reveal-all" data-reveal-all>顯示全部評分準則</button>
+        </section>
+        <section class="sys-section sys-summary" aria-labelledby="summary-title"><div><p class="sys-kicker">Before you leave</p><h2 id="summary-title">三句答題自檢</h2><a class="sys-next-link" href="chc.4.html">下一課：基礎網頁編寫 →</a></div><ol><li><span>1</span>來源判斷有沒有引用作者、日期、證據或目的？</li><li><span>2</span>服務選擇有沒有回應同步／非同步及工作目的？</li><li><span>3</span>串流答案有沒有分清傳送、播放和緩衝？</li></ol></section>
+    </main>
+    <script src="course_data.js"></script><script src="assets/js/site_navigation.js?v=4"></script><script src="question_data.js?v=5"></script><script src="learning_data.js?v=5"></script><script src="assets/js/system-lessons.js?v=1"></script><script src="assets/js/internet-lessons.js?v=1"></script><script src="assets/js/lesson_companion.js?v=3"></script>
+</body>
+</html>

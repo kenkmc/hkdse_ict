@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="HKDSE ICT 必修 C(d)：惡意程式、網絡威脅、防火牆、WPA、VPN、私隱、加密、認證、授權及電子交易保安。">
+    <title>C5 網上威脅與保安 - ICT 學習資源網</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/platform.css?v=4"><link rel="stylesheet" href="assets/css/learning.css?v=3"><link rel="stylesheet" href="assets/css/system-lesson.css?v=1"><link rel="stylesheet" href="assets/css/internet-lesson.css?v=1">
+</head>
+<body class="internet-page">
+    <nav class="sys-lesson-nav" aria-label="本課導覽"><a href="#goals">保安目標</a><a href="#threats">常見威脅</a><a href="#defences">防護配對</a><a href="#encryption">加密與存取</a><a href="#transactions">電子交易</a><a href="#dse-practice">DSE 練習</a></nav>
+    <main class="sys-page">
+        <section class="sys-hero" aria-labelledby="page-title">
+            <div class="sys-hero-copy"><p class="sys-eyebrow">必修部分 C(d) · Threats and Security on the Internet · 14 小時</p><h1 id="page-title">先判斷風險，再選擇真正對應的防護</h1><p>「安裝防火牆」不是所有保安題的答案。高分答案要辨認威脅如何發生、影響哪項保安目標，再解釋措施如何減低該風險。</p><div class="sys-actions"><a class="sys-button sys-button-primary" href="#defences">配對威脅與防護</a><a class="sys-button sys-button-secondary" href="pki_animation.html">開啟 PKI 實驗室</a></div></div>
+            <aside class="sys-focus-card" aria-label="保安建議答題框架"><span>DSE SECURITY FRAME</span><h2>三段完整解釋</h2><ol><li>威脅：攻擊者如何取得、修改或阻塞資源？</li><li>措施：指出適用的具體保安控制。</li><li>效果：解釋措施如何減低該項風險。</li></ol></aside>
+        </section>
+
+        <section id="goals" class="sys-section" aria-labelledby="goals-title">
+            <div class="sys-section-heading"><div><p class="sys-kicker">01 · Security objectives</p><h2 id="goals-title">保密性、完整性、可用性</h2></div></div>
+            <p class="sys-lead">同一攻擊可影響多項目標。先指出受影響的資料或服務，答案會比只寫「不安全」精確。</p>
+            <div class="int-security-triad">
+                <article><b>C</b><h3>保密性</h3><p>只有獲授權人士可以閱讀資料。截取、間諜軟件和資料外洩會破壞保密性。</p></article><article><b>I</b><h3>完整性</h3><p>資料保持正確、完整而未被未授權修改。入侵和惡意程式可竄改內容。</p></article><article><b>A</b><h3>可用性</h3><p>合法使用者在需要時能取得服務和資料。DoS、勒索軟件或系統故障可令服務中斷。</p></article>
+            </div>
+        </section>
+
+        <section id="threats" class="sys-section" aria-labelledby="threats-title">
+            <div class="sys-section-heading"><div><p class="sys-kicker">02 · Threat profiles</p><h2 id="threats-title">常見威脅：特徵決定分類</h2></div></div>
+            <div class="int-threat-grid">
+                <article class="int-threat-card"><h3>病毒（virus）</h3><p>依附於檔案或程式，通常在宿主執行後複製並感染其他檔案。</p><span>依附宿主 · 感染檔案</span></article>
+                <article class="int-threat-card"><h3>蠕蟲（worm）</h3><p>可經網絡自行複製和散播，不必依附另一個程式才存在。</p><span>自我複製 · 網絡擴散</span></article>
+                <article class="int-threat-card"><h3>木馬（Trojan）</h3><p>偽裝成有用或合法程式，誘使使用者執行後進行惡意活動。</p><span>偽裝 · 社交工程</span></article>
+                <article class="int-threat-card"><h3>間諜軟件</h3><p>秘密監察活動或收集登入資料、瀏覽行為等資訊並外傳。</p><span>監察 · 資料外洩</span></article>
+                <article class="int-threat-card"><h3>勒索軟件</h3><p>加密或封鎖檔案／系統，再要求付款以聲稱恢復存取。</p><span>加密資料 · 勒索</span></article>
+                <article class="int-threat-card"><h3>網絡釣魚</h3><p>以冒充訊息或網站誘騙使用者提交密碼、財務或其他私隱資料。</p><span>冒充 · 誘騙</span></article>
+                <article class="int-threat-card"><h3>動態網頁入侵</h3><p>利用輸入處理或程式漏洞向伺服器提交惡意資料，嘗試存取或修改資源。</p><span>漏洞 · 惡意輸入</span></article>
+                <article class="int-threat-card"><h3>DoS 攻擊</h3><p>以大量請求或其他方式耗盡網絡／伺服器資源，阻止合法使用者取得服務。</p><span>耗盡資源 · 服務中斷</span></article>
+            </div>
+            <div class="int-note"><strong>其他私隱威脅：</strong>竊聽、黑客入侵、垃圾郵件和過度收集個人資料均須按情境分析。匿名可減少公開身分資料，但不能取代加密、認證或合法責任。</div>
+        </section>
+
+        <section id="defences" class="sys-section" aria-labelledby="defences-title">
+            <div class="sys-section-heading"><div><p class="sys-kicker">03 · Threat-to-control lab</p><h2 id="defences-title">每項防護都有適用範圍</h2></div><span class="sys-tag">可操作</span></div>
+            <p class="sys-lead">按威脅查看兩項針對性措施。實際保安通常採用多層防護；防火牆、防毒和 VPN 不能互相完全取代。</p>
+            <div class="int-match-lab" data-risk-lab>
+                <div class="int-risk-tabs" role="tablist" aria-label="選擇保安威脅"><button type="button" role="tab" data-risk="interception">傳輸被截取</button><button type="button" role="tab" data-risk="unauthorised">帳戶被冒認</button><button type="button" role="tab" data-risk="malware">惡意程式</button><button type="button" role="tab" data-risk="dos">拒絕服務</button><button type="button" role="tab" data-risk="wifi">無線網絡風險</button></div>
+                <div class="int-risk-panel" role="tabpanel" tabindex="0"><p class="sys-label">Risk and controls</p><h3 data-risk-title></h3><p data-risk-description></p><div class="int-defense-list" data-defense-list></div></div>
+            </div>
+            <div class="int-grid-2" style="margin-top:18px"><article class="sys-card"><h3>防火牆（firewall）</h3><p>按來源、目的地、服務、連接狀態等規則准許或封鎖網絡流量。它不等同防毒程式，也不能判斷所有網頁內容真偽。</p></article><article class="sys-card"><h3>瀏覽器及更新設定</h3><p>限制危險下載、彈出視窗或不受信任內容，配合系統和程式更新修補已知漏洞；使用者仍須辨認可疑網址及訊息。</p></article></div>
+        </section>
+
+        <section id="encryption" class="sys-section" aria-labelledby="encryption-title">
+            <div class="sys-section-heading"><div><p class="sys-kicker">04 · Encryption and access control</p><h2 id="encryption-title">加密、認證和授權處理不同問題</h2></div></div>
+            <div class="sys-processor-grid">
+                <article class="sys-card"><p class="sys-label">Encryption</p><h3>數據加密</h3><p>以密碼匙把明文轉成密文，減低截取後被閱讀的風險。密碼匙較長通常增加暴力破解所需組合，但實際安全亦受算法、實作和密碼匙保護影響。</p></article>
+                <article class="sys-card"><p class="sys-label">Symmetric key</p><h3>對稱密碼匙</h3><p>加密和解密使用同一條秘密密碼匙，處理速度通常較快；雙方需要安全地共享和保護該秘密。</p></article>
+                <article class="sys-card"><p class="sys-label">Public / private key</p><h3>公開／私人密碼匙</h3><p>使用配對但不同的密碼匙。公開匙可分發，私人匙須保密；可支援密碼匙協商、加密及數碼簽署等用途。</p></article>
+                <article class="sys-card"><p class="sys-label">Authentication</p><h3>認證</h3><p>核實使用者或系統聲稱的身分，例如密碼、保安令牌、智能卡、一次性驗證碼或生物特徵。</p><span class="sys-keyword">你是誰？</span></article>
+                <article class="sys-card"><p class="sys-label">Authorisation</p><h3>授權</h3><p>在身分核實後，按角色和權限決定可以讀取、修改或執行哪些資源。</p><span class="sys-keyword">你可以做甚麼？</span></article>
+                <article class="sys-card"><p class="sys-label">Digital certificate</p><h3>數碼證書</h3><p>把實體身分和公開密碼匙連結，由可信證書頒發機構簽發／驗證，協助接收者檢查公匙屬誰。</p><a class="sys-next-link" href="pki_animation.html">進入 PKI 互動實驗室 →</a></article>
+            </div>
+            <div class="sys-classifier" data-classifier data-correct="authorisation" data-explanation="輸入密碼確認身分是認證；決定已登入教師只可修改自己班別的資料則是授權。"><h3>即時判斷</h3><p>教師登入後，系統只讓他修改自己班別的成績。限制可修改的班別屬於甚麼？</p><div class="sys-choice-row"><button type="button" data-classifier-answer="authentication">認證</button><button type="button" data-classifier-answer="authorisation">授權</button><button type="button" data-classifier-answer="compression">壓縮</button></div><p class="sys-feedback" data-classifier-feedback aria-live="polite">選擇答案後會顯示解釋。</p></div>
+        </section>
+
+        <section id="transactions" class="sys-section" aria-labelledby="transactions-title">
+            <div class="sys-section-heading"><div><p class="sys-kicker">05 · Secured electronic transactions</p><h2 id="transactions-title">電子交易需要多層保障</h2></div></div>
+            <div class="int-grid-4">
+                <article class="sys-card"><h3>TLS／SSL</h3><p>建立受保護傳輸，提供加密和伺服器證書驗證，減低傳輸被竊聽或竄改的風險。</p></article><article class="sys-card"><h3>數碼證書</h3><p>協助把網站或簽署者身分連結到公開密碼匙；使用者亦要檢查網址和證書警告。</p></article><article class="sys-card"><h3>智能卡／令牌</h3><p>提供持有因素，可保存認證憑證或產生驗證資料；遺失時需要撤銷或停用。</p></article><article class="sys-card"><h3>一次性驗證碼</h3><p>每次只在短時間有效，可作第二因素；使用者不應把驗證碼交給來電或釣魚網站。</p></article>
+            </div>
+            <div class="int-note"><strong>HTTPS 界線：</strong>瀏覽器顯示 HTTPS 代表與該證書所識別伺服器之間的傳輸受到保護；不代表商戶一定誠實、商品一定真實，亦不能防止使用者自願把資料輸入釣魚頁。</div>
+        </section>
+
+        <section id="dse-practice" class="sys-section" aria-labelledby="practice-title">
+            <div class="sys-section-heading"><div><p class="sys-kicker">06 · Original DSE-style practice</p><h2 id="practice-title">公共 Wi-Fi 遙距工作：10 分</h2></div><span class="sys-marks">10 分</span></div>
+            <div class="sys-original-note"><strong>原創練習</strong><span>參考公開評核的保安情境與解釋要求編寫，並非歷屆試題或官方擬題。</span></div><div class="sys-case">職員在咖啡店公共 Wi-Fi 遙距登入公司客戶資料庫。公司要求使用 VPN、密碼加一次性驗證碼，並在公司網絡邊界設定防火牆。</div>
+            <ol class="sys-question-list">
+                <li data-exam-question><div class="sys-question-row"><p><span>(a)</span> 說明 VPN 如何減低公共 Wi-Fi 上傳輸被截取的風險。</p><b>[2 分]</b></div><textarea rows="3" aria-label="第 a 題答案"></textarea><button type="button" class="sys-reveal" aria-expanded="false">查看評分準則</button><div class="sys-marking" hidden><ul><li>VPN 在職員裝置和公司網絡之間建立加密通道（1）。</li><li>攻擊者即使截取封包，也難以讀取原本的明文客戶資料／登入內容（1）。</li></ul></div></li>
+                <li data-exam-question><div class="sys-question-row"><p><span>(b)</span> 解釋密碼加一次性驗證碼如何加強認證。</p><b>[2 分]</b></div><textarea rows="3" aria-label="第 b 題答案"></textarea><button type="button" class="sys-reveal" aria-expanded="false">查看評分準則</button><div class="sys-marking" hidden><ul><li>使用兩項不同驗證資料／因素核實使用者身分（1）。</li><li>即使密碼外洩，攻擊者仍缺少短時間有效的一次性驗證碼，較難冒認登入（1）。</li></ul></div></li>
+                <li data-exam-question><div class="sys-question-row"><p><span>(c)</span> 說明防火牆的一項作用，並指出它為何不能取代防毒軟件。</p><b>[3 分]</b></div><textarea rows="4" aria-label="第 c 題答案"></textarea><button type="button" class="sys-reveal" aria-expanded="false">查看評分準則</button><div class="sys-marking" hidden><ul><li>防火牆按規則監察／過濾網絡流量（1），封鎖未獲准的連線或服務（1）。</li><li>防毒軟件主要掃描檔案／程式的惡意程式特徵或行為，功能不同（1）。</li></ul></div></li>
+                <li data-exam-question><div class="sys-question-row"><p><span>(d)</span> 職員收到冒充公司 IT 部門的電郵，要求立即提交密碼和驗證碼。指出威脅，並建議一項預防方法。</p><b>[2 分]</b></div><textarea rows="3" aria-label="第 d 題答案"></textarea><button type="button" class="sys-reveal" aria-expanded="false">查看評分準則</button><div class="sys-marking" hidden><p><strong>網絡釣魚</strong>（1）；例如不要使用郵件內連結，改以已知官方聯絡方法核實要求／檢查網址和寄件者／絕不向他人透露 OTP（1）。</p></div></li>
+                <li data-exam-question><div class="sys-question-row"><p><span>(e)</span> 「只准職員查閱自己負責的客戶」屬認證還是授權？</p><b>[1 分]</b></div><textarea rows="2" aria-label="第 e 題答案"></textarea><button type="button" class="sys-reveal" aria-expanded="false">查看評分準則</button><div class="sys-marking" hidden><p><strong>授權</strong>（1），因為它決定已核實身分的職員可存取哪些客戶資料。</p></div></li>
+            </ol><button type="button" class="sys-button sys-button-primary sys-reveal-all" data-reveal-all>顯示全部評分準則</button>
+        </section>
+        <section class="sys-section sys-summary" aria-labelledby="summary-title"><div><p class="sys-kicker">Before you leave</p><h2 id="summary-title">三句答題自檢</h2><a class="sys-next-link" href="practice.html?topic=chc-5">練習此課題的中央題庫 →</a></div><ol><li><span>1</span>我有沒有先描述威脅如何發生？</li><li><span>2</span>每項措施有沒有直接對應一項風險？</li><li><span>3</span>我有沒有分清加密、認證和授權？</li></ol></section>
+    </main>
+    <script src="course_data.js"></script><script src="assets/js/site_navigation.js?v=4"></script><script src="question_data.js?v=5"></script><script src="learning_data.js?v=5"></script><script src="assets/js/system-lessons.js?v=1"></script><script src="assets/js/internet-lessons.js?v=1"></script><script src="assets/js/lesson_companion.js?v=3"></script>
+</body>
+</html>

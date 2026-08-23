@@ -6,7 +6,7 @@
 
 - 必修 A「資訊處理」：資訊處理簡介、數據組織及數據控制、數據表示、試算表和數據庫。
 - 必修 B「電腦系統基礎」：基本機器組織、CPU 機器周期、記憶及儲存、系統軟件和五種操作模式。
-- 必修 C「互聯網及其應用」：建網基礎及互聯網協定。
+- 必修 C「互聯網及其應用」：建網與協定、互聯網服務、基礎網頁編寫，以及網上威脅與保安。
 - DSE 題型練習：中央題庫、課題／難度篩選、自動評分、評分準則和解釋。
 - SQL 互動學習平台：瀏覽器內執行 SQLite、檢視資料表、關係及 ER 圖。
 - Python／偽代碼／流程圖工具：雙向轉換、語法檢查及程式執行。
@@ -27,9 +27,11 @@
 - `assets/css/learning.css`：共用學習助手及互動概念圖樣式。
 - `assets/css/core-lesson-refresh.css`：必修課題的共用背景、導覽和內容卡片視覺修飾。
 - `assets/css/system-lesson.css`：必修 B 課頁的共用版面、機器周期及操作模式互動樣式。
+- `assets/css/internet-lesson.css`：必修 C(b)–C(d) 的搜尋、串流、網頁設計及保安互動樣式。
 - `assets/js/site_navigation.js`：共用全站導覽、頁面識別及課程來源頁尾。
 - `assets/js/lesson_companion.js`：學習助手的展開、概念探索、即時檢查及頁內 DSE 題型互動。
 - `assets/js/system-lessons.js`：機器周期、裝置選擇、操作模式判斷及嵌入式題目互動。
+- `assets/js/internet-lessons.js`：搜尋組合、串流緩衝、HTML 結構、受眾設計及威脅配對互動。
 - `assets/js/catalog.js`：首頁目錄及搜尋。
 - `assets/js/question_engine.js`：題目篩選、作答、評分及回饋流程。
 

@@ -132,6 +132,33 @@ const courseData = [
                 type: "lesson",
                 syllabusRef: "C(a) · 協定",
                 tags: ["TCP/IP", "IP Address", "DNS", "URL", "網絡協定"]
+            },
+            {
+                id: "chc-3",
+                title: "iii. 互聯網服務及應用",
+                file: "chc.3.html",
+                desc: "搜尋策略、資訊可信性、多媒體格式、互聯網服務及串流技術",
+                type: "lesson",
+                syllabusRef: "C(b)",
+                tags: ["搜尋引擎", "資訊可信性", "串流", "電郵", "遠端登入", "IoT", "雲端服務"]
+            },
+            {
+                id: "chc-4",
+                title: "iv. 基礎網頁編寫",
+                file: "chc.4.html",
+                desc: "HTML 基本結構、跨平台、目標受眾、導覽、版面及網站上載",
+                type: "lesson",
+                syllabusRef: "C(c)",
+                tags: ["HTML", "網頁設計", "超連結", "多媒體", "可用性", "上載網站"]
+            },
+            {
+                id: "chc-5",
+                title: "v. 網上威脅與保安",
+                file: "chc.5.html",
+                desc: "惡意程式、網絡攻擊、私隱、加密、認證、授權及電子交易保安",
+                type: "lesson",
+                syllabusRef: "C(d)",
+                tags: ["病毒", "蠕蟲", "木馬", "勒索軟件", "防火牆", "VPN", "加密", "數碼證書", "網絡保安"]
             }
         ]
     },

@@ -412,6 +412,159 @@ const questionData = [
         explanation: "URL 各部分負責指出協定、主機及資源位置；DNS 只負責名稱解析，不會傳送整個網頁。"
     },
     {
+        id: "q-c-b-stream-001",
+        topicId: "chc-3",
+        syllabusRef: "C(b)",
+        difficulty: "foundation",
+        marks: 1,
+        type: "mcq",
+        question: "關於互聯網串流，以下哪項描述最合適？",
+        options: [
+            { value: "A", label: "必須下載完整媒體檔案後才可播放" },
+            { value: "B", label: "接收部分數據並建立緩衝後可開始播放" },
+            { value: "C", label: "播放後一定不需要網絡連線" },
+            { value: "D", label: "串流會令原始檔案自動變成文字" }
+        ],
+        answer: "B",
+        markingScheme: [{ marks: 1, criterion: "指出串流可在接收部分數據並建立緩衝後開始播放。" }],
+        explanation: "串流讓媒體數據一邊傳送一邊播放；若傳送速度長期低於播放所需速度，仍可能停頓。"
+    },
+    {
+        id: "q-c-b-search-002",
+        topicId: "chc-3",
+        syllabusRef: "C(b)",
+        difficulty: "standard",
+        marks: 4,
+        type: "short-answer",
+        question: "學生搜尋『人工智能對學習的影響』，找到一篇沒有作者、沒有發布日期而且只推銷課程的網誌。指出兩項令來源可信性成疑的資料，並建議兩個改善搜尋／核實的方法。",
+        answer: "可信性問題包括沒有可核實作者或機構、沒有日期，以及內容有明顯商業推廣目的。可改用更具體關鍵字和 site: 等條件搜尋教育或研究機構資料，並以另一個可靠來源交叉核實主要論點和數據。",
+        markingScheme: [
+            { marks: 1, criterion: "指出沒有具名／可核實作者或機構。", anyOf: ["沒有作者", "不知作者", "作者不明", "機構不明", "權威"] },
+            { marks: 1, criterion: "指出沒有日期／內容可能過時，或有明顯商業推廣目的。", anyOf: ["沒有日期", "過時", "商業", "推銷", "偏見", "利益"] },
+            { marks: 1, criterion: "改善查詢，例如使用更具體關鍵字、詞組或網站／日期篩選。", anyOf: ["具體關鍵字", "引號", "詞組", "site:", "篩選", "日期"] },
+            { marks: 1, criterion: "以另一個可靠來源／原始證據交叉核實。", anyOf: ["交叉", "核實", "另一來源", "其他來源", "原始資料", "證據"] }
+        ],
+        explanation: "來源分析應同時評估權威、時效、證據和目的；改善策略亦要說明如何收窄或核實資料。"
+    },
+    {
+        id: "q-c-b-service-001",
+        topicId: "chc-3",
+        syllabusRef: "C(b)",
+        difficulty: "standard",
+        marks: 3,
+        type: "short-answer",
+        question: "學校技術員在家透過互聯網控制校內伺服器，並把修正後的設定檔傳回伺服器。分別指出這兩項工作使用的互聯網服務，並說明一項保安考慮。",
+        answer: "遙距控制伺服器使用遠端登入；傳回設定檔使用檔案傳送服務。連線應採用加密協定／VPN 和強身分認證，避免登入資料或設定被截取及未授權存取。",
+        markingScheme: [
+            { marks: 1, criterion: "控制遠端伺服器：遠端登入。", anyOf: ["遠端登入", "遙距登入", "remote login", "SSH"] },
+            { marks: 1, criterion: "傳回設定檔：檔案傳送。", anyOf: ["檔案傳送", "文件傳送", "file transfer", "SFTP", "FTP"] },
+            { marks: 1, criterion: "合理保安考慮，例如加密連線、VPN 或強身分認證，並連結截取／未授權風險。", anyOf: ["加密", "VPN", "認證", "密碼", "截取", "未授權", "SSH", "SFTP"] }
+        ],
+        explanation: "服務配對要按工作目的；涉及遠端管理時，還要保護認證資料和傳輸內容。"
+    },
+    {
+        id: "q-c-c-html-001",
+        topicId: "chc-4",
+        syllabusRef: "C(c)",
+        difficulty: "foundation",
+        marks: 1,
+        type: "mcq",
+        question: "HTML 在網頁中的主要作用是甚麼？",
+        options: [
+            { value: "A", label: "描述網頁內容的結構和元素" },
+            { value: "B", label: "保證所有資料已經加密" },
+            { value: "C", label: "取代互聯網服務供應商" },
+            { value: "D", label: "自動判斷所有內容是否真確" }
+        ],
+        answer: "A",
+        markingScheme: [{ marks: 1, criterion: "指出 HTML 用來描述網頁內容結構／元素。" }],
+        explanation: "HTML 描述標題、段落、連結、表格和多媒體等結構；CSS 通常控制視覺樣式。"
+    },
+    {
+        id: "q-c-c-design-002",
+        topicId: "chc-4",
+        syllabusRef: "C(c)",
+        difficulty: "standard",
+        marks: 4,
+        type: "short-answer",
+        question: "學校為長者製作健康資訊網站。現時頁面使用 10 px 淺灰文字、只有圖示的導覽按鈕，而且圖片沒有替代文字。建議兩項設計改善，並分別解釋如何回應目標受眾。",
+        answer: "增加字體大小並提高文字與背景的顏色對比，令視力較弱的使用者較易閱讀；為導覽按鈕加入清楚文字標籤，以及為有資訊作用的圖片加入合適 alt 文字，讓受眾和屏幕閱讀器能理解功能／內容。",
+        markingScheme: [
+            { marks: 1, criterion: "建議增加字體大小及／或提高顏色對比。", anyOf: ["增加字體", "放大字體", "字體大小", "提高對比", "高對比", "顏色對比"] },
+            { marks: 1, criterion: "解釋令長者／視力較弱使用者較易閱讀。", anyOf: ["長者", "視力", "易閱讀", "看清", "可讀"] },
+            { marks: 1, criterion: "建議為圖示導覽加入文字標籤，或為圖片加入替代文字。", anyOf: ["文字標籤", "描述性", "替代文字", "alt", "導覽文字"] },
+            { marks: 1, criterion: "解釋可清楚傳達連結／圖片用途，並支援屏幕閱讀器或不熟悉圖示的受眾。", anyOf: ["屏幕閱讀器", "讀屏", "理解", "用途", "不熟悉", "無障礙"] }
+        ],
+        explanation: "每項設計建議都要連結目標受眾的實際需要；只寫『美觀』不能完整解釋可用性。"
+    },
+    {
+        id: "q-c-c-publish-001",
+        topicId: "chc-4",
+        syllabusRef: "C(c)",
+        difficulty: "standard",
+        marks: 3,
+        type: "short-answer",
+        question: "學生的首頁在自己電腦可正常顯示圖片，但上載到 Web 伺服器後圖片消失。提出一個可能原因，並寫出兩項發布前後的檢查。",
+        answer: "可能原因是圖片沒有一同上載，或 HTML 使用了錯誤／只在本機有效的檔案路徑。應確認所有圖片按正確資料夾結構上載並使用相對路徑；再以公開網址在不同瀏覽器／裝置測試圖片、超連結和導覽。",
+        markingScheme: [
+            { marks: 1, criterion: "指出圖片未上載、大小寫不符或檔案／相對路徑錯誤等合理原因。", anyOf: ["未上載", "沒有上載", "路徑", "相對路徑", "大小寫", "檔名"] },
+            { marks: 1, criterion: "核對並上載所有資源，保持正確資料夾結構／相對路徑。", anyOf: ["所有檔案", "所有圖片", "資料夾", "相對路徑", "上載"] },
+            { marks: 1, criterion: "使用公開網址測試圖片、連結／導覽，並可在不同瀏覽器或裝置檢查。", anyOf: ["公開網址", "測試", "連結", "導覽", "瀏覽器", "裝置"] }
+        ],
+        explanation: "本機絕對路徑不會在 Web 伺服器上自動存在；網站發布必須連同資源和正確相對路徑一起測試。"
+    },
+    {
+        id: "q-c-d-threat-001",
+        topicId: "chc-5",
+        syllabusRef: "C(d)",
+        difficulty: "foundation",
+        marks: 1,
+        type: "mcq",
+        question: "某惡意程式偽裝成免費遊戲，誘使用者安裝後開啟後門。它最符合哪一類？",
+        options: [
+            { value: "A", label: "木馬程式" },
+            { value: "B", label: "防火牆" },
+            { value: "C", label: "數碼證書" },
+            { value: "D", label: "數據壓縮程式" }
+        ],
+        answer: "A",
+        markingScheme: [{ marks: 1, criterion: "指出偽裝成合法／吸引程式的惡意程式是木馬。" }],
+        explanation: "木馬以看似有用的軟件欺騙使用者執行；它本身不以自我複製作為必要特徵。"
+    },
+    {
+        id: "q-c-d-access-002",
+        topicId: "chc-5",
+        syllabusRef: "C(d)",
+        difficulty: "standard",
+        marks: 2,
+        type: "short-answer",
+        question: "網上校務系統先要求教師輸入密碼和一次性驗證碼，再只容許班主任修改自己班的成績。分別指出哪一部分屬認證和授權。",
+        answer: "密碼和一次性驗證碼用來確認教師身分，屬認證；限制班主任只可修改自己班的成績，是決定已確認使用者權限，屬授權。",
+        markingScheme: [
+            { marks: 1, criterion: "密碼＋一次性驗證碼確認身分，屬認證。", anyOf: ["認證", "確認身分", "核實身分", "authentication"] },
+            { marks: 1, criterion: "限制可修改的班別／資源屬授權。", anyOf: ["授權", "權限", "自己班", "authorization", "authorisation"] }
+        ],
+        explanation: "認證回答『你是誰』；授權回答『已確認身分後你可以做甚麼』。"
+    },
+    {
+        id: "q-c-d-security-003",
+        topicId: "chc-5",
+        syllabusRef: "C(d)",
+        difficulty: "advanced",
+        marks: 5,
+        type: "short-answer",
+        question: "職員在公共 Wi-Fi 遙距存取公司的客戶資料庫。建議兩項不同的保安措施，分別解釋如何減低傳輸被截取及未授權存取的風險，並說明防火牆在此情境的一項作用。",
+        answer: "使用 VPN 加密職員裝置與公司網絡之間的傳輸，截取者即使取得封包亦難以閱讀內容；使用多因素認證，例如密碼加保安令牌／一次性驗證碼，減低密碼外洩後被冒認登入的風險。防火牆可按來源、目的地、服務或連接狀態規則過濾流量，封鎖未獲准的連線。",
+        markingScheme: [
+            { marks: 1, criterion: "建議使用 VPN／加密連線。", anyOf: ["VPN", "加密", "虛擬私人網絡", "virtual private network"] },
+            { marks: 1, criterion: "解釋截取者取得數據後仍難以讀取明文。", anyOf: ["截取", "密文", "不能閱讀", "難以閱讀", "竊聽", "eavesdrop"] },
+            { marks: 1, criterion: "建議多因素認證，例如密碼加令牌／OTP／生物特徵。", anyOf: ["多因素", "雙重認證", "2FA", "OTP", "一次性", "令牌", "生物"] },
+            { marks: 1, criterion: "解釋第二因素減低密碼外洩後被冒認登入的風險。", anyOf: ["密碼外洩", "冒認", "未授權", "第二因素", "另一因素"] },
+            { marks: 1, criterion: "防火牆按規則過濾網絡流量並封鎖未獲准連線。", anyOf: ["防火牆", "過濾", "流量", "規則", "封鎖", "未獲准"] }
+        ],
+        explanation: "高分保安答案要讓每項措施對應一個風險；VPN 保護傳輸、MFA 加強登入、防火牆控制網絡連線。"
+    },
+    {
         id: "q-c-d-pki-001",
         topicId: "tool-pki-lab",
         syllabusRef: "C(d)",

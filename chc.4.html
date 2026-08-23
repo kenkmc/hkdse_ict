@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="HKDSE ICT 必修 C(c)：HTML 基本結構、跨平台網頁、目標受眾、導覽、多媒體、可用性及發布網站。">
+    <title>C4 基礎網頁編寫 - ICT 學習資源網</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/platform.css?v=4"><link rel="stylesheet" href="assets/css/learning.css?v=3"><link rel="stylesheet" href="assets/css/system-lesson.css?v=1"><link rel="stylesheet" href="assets/css/internet-lesson.css?v=1">
+</head>
+<body class="internet-page">
+    <nav class="sys-lesson-nav" aria-label="本課導覽"><a href="#html">HTML 結構</a><a href="#organisation">內容組織</a><a href="#design">受眾設計</a><a href="#publish">發布網站</a><a href="#dse-practice">DSE 練習</a></nav>
+    <main class="sys-page">
+        <section class="sys-hero" aria-labelledby="page-title">
+            <div class="sys-hero-copy"><p class="sys-eyebrow">必修部分 C(c) · Elementary Web Authoring · 3 小時</p><h1 id="page-title">網頁不是堆放元素，而是為受眾組織資訊</h1><p>課程不要求背誦 HTML 程式碼。你要辨認 HTML 的基本結構，並按目標受眾解釋導覽、連結、表格、多媒體、顏色、背景和字體如何影響可用性。</p><div class="sys-actions"><a class="sys-button sys-button-primary" href="#html">拆解 HTML</a><a class="sys-button sys-button-secondary" href="#design">改良頁面預覽</a></div></div>
+            <aside class="sys-focus-card" aria-label="網頁設計答題框架"><span>DSE DESIGN FRAME</span><h2>每項建議都要有受眾</h2><ol><li>指出要修改的具體元素。</li><li>說明如何修改，而非只寫「改善」。</li><li>解釋對指定受眾或裝置的效果。</li></ol></aside>
+        </section>
+
+        <section id="html" class="sys-section" aria-labelledby="html-title">
+            <div class="sys-section-heading"><div><p class="sys-kicker">01 · Interactive HTML anatomy</p><h2 id="html-title">HTML 描述內容結構</h2></div><span class="sys-tag">毋須背誦代碼</span></div>
+            <p class="sys-lead">點選元素查看功能。HTML 標記讓不同平台的瀏覽器理解內容類型；CSS 一般負責外觀，JavaScript 可提供行為。</p>
+            <div class="int-code-lab" data-code-lab>
+                <div class="int-code-window"><div class="int-window-bar">index.html · 結構示例</div><pre><code>&lt;!doctype html&gt;
+&lt;html lang="zh-Hant"&gt;
+  &lt;head&gt;
+    &lt;title&gt;校園開放日&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    <span data-code-heading>&lt;h1&gt;校園開放日&lt;/h1&gt;</span>
+    <span data-code-paragraph>&lt;p&gt;歡迎家長和學生參觀。&lt;/p&gt;</span>
+    <span data-code-link>&lt;a href=&quot;map.html&quot;&gt;查看交通地圖&lt;/a&gt;</span>
+    <span data-code-image>&lt;img src=&quot;hall.jpg&quot; alt=&quot;學校禮堂入口&quot;&gt;</span>
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre><div class="int-code-controls" role="group" aria-label="選擇 HTML 元素"><button type="button" data-code-tag="heading">標題</button><button type="button" data-code-tag="paragraph">段落</button><button type="button" data-code-tag="link">連結</button><button type="button" data-code-tag="image">圖像</button></div></div>
+                <div class="int-code-explanation"><p class="sys-label">Element role</p><h3 data-code-title></h3><p data-code-detail></p><div class="int-tag-list" data-code-tags></div><div class="int-note"><strong>跨平台重點：</strong>HTML 是公開標準；只要瀏覽器支援相關標準，同一結構可在不同操作系統和裝置呈現。實際外觀仍會受瀏覽器、CSS、字型和屏幕影響。</div></div>
+            </div>
+        </section>
+
+        <section id="organisation" class="sys-section" aria-labelledby="organisation-title">
+            <div class="sys-section-heading"><div><p class="sys-kicker">02 · Information organisation</p><h2 id="organisation-title">先安排資訊，再選擇元素</h2></div></div>
+            <div class="int-grid-4">
+                <article class="sys-card"><p class="sys-label">Navigation</p><h3>導覽與連結</h3><p>主要選單位置和名稱保持一致；連結文字應描述目的地，並讓使用者知道目前位置。</p></article>
+                <article class="sys-card"><p class="sys-label">Table</p><h3>表格</h3><p>適合展示需要按列和欄比較的資料；不應純粹用表格堆砌整個頁面版面。</p></article>
+                <article class="sys-card"><p class="sys-label">Multimedia</p><h3>多媒體</h3><p>圖像、聲音和視像要服務內容目的，並考慮檔案大小、格式支援、字幕和替代資料。</p></article>
+                <article class="sys-card"><p class="sys-label">Frame / embed</p><h3>框架與嵌入</h3><p>課程提及 frame；現代網站較常以 iframe 嵌入指定內容。須避免令導覽、網址和無障礙使用變得混亂。</p></article>
+            </div>
+            <div class="int-note"><strong>資訊層次：</strong>首頁先回答網站目的和主要選項；相關內容分組，以標題、段落和留白建立掃讀路徑，不應把所有資訊放在一個長段落。</div>
+        </section>
+
+        <section id="design" class="sys-section" aria-labelledby="design-title">
+            <div class="sys-section-heading"><div><p class="sys-kicker">03 · Audience design lab</p><h2 id="design-title">為長者健康資訊頁逐項改良</h2></div><span class="sys-tag">即時預覽</span></div>
+            <p class="sys-lead">按控制項比較效果。真正作答時，要把每項修改連結到長者、視力較弱使用者、流動裝置或其他指定受眾。</p>
+            <div class="int-design-lab" data-design-lab>
+                <div class="int-design-controls"><h3>設計檢查</h3><div class="int-toggle"><span>放大主要文字</span><button type="button" data-design-toggle="is-large-text" aria-pressed="false">未啟用</button></div><div class="int-toggle"><span>提高顏色對比</span><button type="button" data-design-toggle="is-high-contrast" aria-pressed="false">未啟用</button></div><div class="int-toggle"><span>為導覽加文字</span><button type="button" data-design-toggle="has-labels" aria-pressed="false">未啟用</button></div><div class="int-toggle"><span>為圖片加替代文字</span><button type="button" data-design-toggle="has-alt" aria-pressed="false">未啟用</button></div></div>
+                <div class="int-preview" data-design-preview><div class="int-preview-head"><strong>健康生活資訊站</strong></div><nav class="int-preview-nav" aria-label="示例網頁導覽"><a href="#">首頁</a><a href="#">運動</a><a href="#">飲食</a><a href="#">聯絡</a></nav><div class="int-preview-body"><h3>每日伸展運動</h3><p>每次使用電腦一段時間後，應離開座位休息、遠望並做適量伸展。</p><div class="int-preview-visual">伸展運動示意圖</div><div class="int-alt-indicator">alt：坐在椅上向上伸展雙手的示意圖</div></div></div>
+            </div>
+            <div class="int-grid-2" style="margin-top:18px"><article class="sys-card"><h3>顏色不能是唯一提示</h3><p>錯誤訊息除紅色外亦應有文字和圖示，照顧色覺差異，也令提示更明確。</p></article><article class="sys-card"><h3>一致不等於單調</h3><p>一致的標題、按鈕和導覽位置可減少學習成本；重點資訊仍可用層次和適量強調突出。</p></article></div>
+        </section>
+
+        <section id="publish" class="sys-section" aria-labelledby="publish-title">
+            <div class="sys-section-heading"><div><p class="sys-kicker">04 · Publish to the Web</p><h2 id="publish-title">由本機檔案到公開網站</h2></div></div>
+            <div class="int-publish-flow">
+                <article><b>01</b><h3>整理檔案</h3><p>使用清楚檔名和資料夾，確保圖片、媒體和頁面以可移植的相對路徑連結。</p></article><article><b>02</b><h3>本機測試</h3><p>檢查 HTML、導覽、表格、多媒體、文字和不同屏幕寬度。</p></article><article><b>03</b><h3>上載伺服器</h3><p>把所有必需檔案傳送至 Web 伺服器正確目錄，並設定首頁和所需權限。</p></article><article><b>04</b><h3>公開測試</h3><p>用公開 URL 測試連結、檔名大小寫、媒體載入和不同瀏覽器／裝置。</p></article>
+            </div>
+            <div class="int-note"><strong>常見失誤：</strong><code>C:\Users\...</code> 或只在作者電腦存在的絕對路徑，上載後不會自動有效。網站資源通常應按伺服器上的資料夾結構使用相對 URL。</div>
+        </section>
+
+        <section id="dse-practice" class="sys-section" aria-labelledby="practice-title">
+            <div class="sys-section-heading"><div><p class="sys-kicker">05 · Original DSE-style practice</p><h2 id="practice-title">長者中心活動網站：7 分</h2></div><span class="sys-marks">7 分</span></div>
+            <div class="sys-original-note"><strong>原創練習</strong><span>按課程範圍和公開評核常見指令詞編寫，並非歷屆試題或官方擬題。</span></div><div class="sys-case">長者中心的活動網站使用淺灰色 10 px 文字、只有圖示的選單，活動相片沒有替代文字，而且「交通資料」連結只顯示「按此」。</div>
+            <ol class="sys-question-list">
+                <li data-exam-question><div class="sys-question-row"><p><span>(a)</span> 建議兩項改善文字和顏色的設計，並解釋對長者的好處。</p><b>[4 分]</b></div><textarea rows="4" aria-label="第 a 題答案"></textarea><button type="button" class="sys-reveal" aria-expanded="false">查看評分準則</button><div class="sys-marking" hidden><ul><li>增加字體大小（1），令長者／視力較弱使用者較易閱讀（1）。</li><li>提高文字與背景的顏色對比（1），令字形較容易分辨（1）。</li></ul></div></li>
+                <li data-exam-question><div class="sys-question-row"><p><span>(b)</span> 說明為選單加文字標籤及為相片加 alt 文字的作用。</p><b>[2 分]</b></div><textarea rows="3" aria-label="第 b 題答案"></textarea><button type="button" class="sys-reveal" aria-expanded="false">查看評分準則</button><div class="sys-marking" hidden><ul><li>文字標籤清楚說明每個圖示選單的目的地／功能（1）。</li><li>alt 文字讓屏幕閱讀器傳達相片的資訊或用途，亦在圖片未載入時提供說明（1）。</li></ul></div></li>
+                <li data-exam-question><div class="sys-question-row"><p><span>(c)</span> 把「按此」改成「查看交通資料」有甚麼好處？</p><b>[1 分]</b></div><textarea rows="2" aria-label="第 c 題答案"></textarea><button type="button" class="sys-reveal" aria-expanded="false">查看評分準則</button><div class="sys-marking" hidden><p>描述性文字讓使用者在開啟連結前知道目的地／掃讀連結時理解用途（1）。</p></div></li>
+            </ol><button type="button" class="sys-button sys-button-primary sys-reveal-all" data-reveal-all>顯示全部評分準則</button>
+        </section>
+        <section class="sys-section sys-summary" aria-labelledby="summary-title"><div><p class="sys-kicker">Before you leave</p><h2 id="summary-title">三句答題自檢</h2><a class="sys-next-link" href="chc.5.html">下一課：網上威脅與保安 →</a></div><ol><li><span>1</span>我有沒有分清 HTML 結構、CSS 外觀和互動行為？</li><li><span>2</span>每項設計建議有沒有連結指定受眾？</li><li><span>3</span>發布前後有沒有測試資源路徑和公開網址？</li></ol></section>
+    </main>
+    <script src="course_data.js"></script><script src="assets/js/site_navigation.js?v=4"></script><script src="question_data.js?v=5"></script><script src="learning_data.js?v=5"></script><script src="assets/js/system-lessons.js?v=1"></script><script src="assets/js/internet-lessons.js?v=1"></script><script src="assets/js/lesson_companion.js?v=3"></script>
+</body>
+</html>
