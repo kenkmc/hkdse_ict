@@ -22,6 +22,7 @@ const siteConfig = {
         layeredLearning: true,
         tieredAssignments: 78,
         multimediaLessons: true,
+        answerUpgradeLab: true,
         progressTracking: true,
         progressStorage: "local-only"
     }
@@ -326,6 +327,15 @@ const courseData = [
                 type: "tool",
                 syllabusRef: "Past paper metadata",
                 tags: ["歷屆試題", "問法索引", "年份", "課題", "官方來源", "版權"]
+            },
+            {
+                id: "tool-answer-lab",
+                title: "考生作答升級實驗室",
+                file: "answer-lab.html",
+                desc: "參考 2025 官方考生表現示例的可見作答模式，以 15 項原創分層任務練習診斷、改寫及獨立作答",
+                type: "tool",
+                syllabusRef: "Paper 1 / Paper 2",
+                tags: ["考生表現示例", "分層練習", "答題技巧", "評分點", "SQL", "算法", "情境題"]
             },
             {
                 id: "tool-sba-prep",

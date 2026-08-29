@@ -16,6 +16,7 @@
 - 正式模擬考模式：3 份兩小時卷一（甲部 40 分、乙部 60 分）及每個選修 2 組卷二題組；具倒數、標記、未答導覽、自動交卷、正式比例換算、課題分析及列印版。
 - 錯題簿與弱項重練：在目前瀏覽器保存錯題、遺漏評分點、錯誤類型、第一次／最近得分，並安排 1、3、7、14 日重練。
 - 歷屆問法索引：以年份、課題、問法及官方來源整理公開考生表現示例，不重製受版權保護的原題或評分準則。
+- 考生作答升級實驗室：比較 2025 年第 1 至第 5 級官方示例的可見作答模式，提供試算表、網絡、SQL、算法及網頁保安共 15 項原創分層診斷／改寫／獨立作答任務。
 - SBA 準備室：通用證據清單、可測需求示例、需求追蹤表、測試表產生器、成效指標及以證據為本的評估提示。
 - SQL 互動學習平台：瀏覽器內執行 SQLite、檢視資料表、關係及 ER 圖。
 - Python／偽代碼／流程圖工具：雙向轉換、語法檢查及程式執行。
@@ -33,7 +34,7 @@
 
 - `course_data.js`：課程、工具、路徑及穩定內容 ID 的唯一資料來源。
 - `question_data.js`、`question_expansion_data.js`：DSE 題型中央題庫；每題以 `topicId` 連結一項課程或工具，大容量題庫另設擴充資料檔以保持基礎題清晰。
-- `past_paper_data.js`：歷屆公開示例的年份、卷別、課題、問法及官方連結元資料，不包含原題或評分準則。
+- `past_paper_data.js`：歷屆公開示例的年份、卷別、課題、問法、2025 各等級作答模式及官方連結元資料；所有練習情境及答案均為原創，不包含官方原題或評分準則。
 - `learning_data.js`：每頁圖像導讀、學習目標、課程界線、概念節點、常見誤解、快速檢查及精選題目連結的中央資料。
 - `assets/images/lesson-visuals/`：供課程頁共用的原創 WebP 教學圖像及生成提示紀錄；真實硬件照片則保留在 `assets/images/network/` 並列明來源及授權。
 - `assets/images/scenario-media/`：分層課業和圖像微課共用的真實情境 WebP 圖片，以及完整生成／編輯提示紀錄。
@@ -45,7 +46,7 @@
 - `assets/css/algorithm-lesson.css`：必修 D 的 IPO、追蹤表、列表執行和邊界測試互動樣式。
 - `assets/css/society-lesson.css`：必修 E 的科技比較、人體工學、軟件授權及社會議題互動樣式。
 - `assets/css/elective-lesson.css`：選修 A、B、C 的數據庫、網絡服務、網頁流程、演算法及裝置模擬共用樣式。
-- `assets/css/mock.css`、`assets/css/mistakes.css`、`assets/css/past-paper-index.css`、`assets/css/sba.css`：模擬考、錯題簿、歷屆索引及 SBA 準備室的專用版面。
+- `assets/css/mock.css`、`assets/css/mistakes.css`、`assets/css/past-paper-index.css`、`assets/css/answer-lab.css`、`assets/css/sba.css`：模擬考、錯題簿、歷屆索引、作答實驗室及 SBA 準備室的專用版面。
 - `assets/css/question-visuals.css`：題庫的網絡、CPU、ER 圖、試算表、流程圖、追蹤表及資料回應圖像元件。
 - `assets/js/site_navigation.js`：共用全站導覽、頁面識別及課程來源頁尾。
 - `assets/js/lesson_companion.js`：學習助手的展開、概念探索、即時檢查及頁內 DSE 題型互動。
@@ -60,6 +61,7 @@
 - `assets/js/mock_exam.js`：穩定組卷、正式分部、限時、標記、交卷評分、課題分析及三種列印模式。
 - `assets/js/study_records.js`、`assets/js/mistakes.js`：本機錯題資料、間隔重練日程及錯題簿介面。
 - `assets/js/past-paper-index.js`：歷屆元資料篩選及問法導覽。
+- `assets/js/answer-lab.js`：等級觀察、五步核對、答案診斷、積木重組及高階自評互動。
 - `assets/js/sba.js`：只在目前頁面運作的 SBA 證據清單、測試表產生器及成效指標。
 
 內容及題目的永久 `id` 供錯題重練和日後完整進度系統使用。即使標題或檔名改變，也不應重用或隨意修改既有 ID。
@@ -87,9 +89,10 @@ node scripts/validate_questions.js
 node scripts/validate_mock_exam.js
 node scripts/validate_study_records.js
 node scripts/validate_learning_data.js
+node scripts/validate_answer_lab.js
 ```
 
-目錄驗證會檢查重複識別碼、實際頁面、未列入目錄的 HTML，以及本機 `href`／`src`。題庫驗證會檢查題型、難度、課題連結、答案、評分準則、圖片檔、文字重複及目標題量；模擬卷驗證會檢查 3 份卷一的 40 + 60 分結構、每個選修的 2 組 25 分題組，以及圖像題和相連情境；錯題驗證會走完 1、3、7、14 日重練狀態；學習提示驗證則確保每個目錄項目都有完整的教學輔助資料，並檢查 26 個課程頁的三級學習、78 項課業、情境圖片、圖像微課、替代文字、尺寸及完成準則。
+目錄驗證會檢查重複識別碼、實際頁面、未列入目錄的 HTML，以及本機 `href`／`src`。題庫驗證會檢查題型、難度、課題連結、答案、評分準則、圖片檔、文字重複及目標題量；模擬卷驗證會檢查 3 份卷一的 40 + 60 分結構、每個選修的 2 組 25 分題組，以及圖像題和相連情境；錯題驗證會走完 1、3、7、14 日重練狀態；學習提示驗證則確保每個目錄項目都有完整的教學輔助資料，並檢查 26 個課程頁的三級學習、78 項課業、情境圖片、圖像微課、替代文字、尺寸及完成準則；作答實驗室驗證會核對 6 份官方來源連結、5 個等級觀察、5 組題材及 15 項分層任務。
 
 ## 技術
 
