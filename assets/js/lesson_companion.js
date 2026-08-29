@@ -14,6 +14,29 @@
     const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, character => ({
         "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
     })[character]);
+    const layerStorageKey = "hkdse-ict-layered-learning-v1";
+    const readLayerProgress = () => {
+        try {
+            const stored = JSON.parse(window.localStorage.getItem(layerStorageKey) || "{}");
+            return stored && typeof stored === "object" ? stored : {};
+        } catch (error) {
+            return {};
+        }
+    };
+    const allLayerProgress = readLayerProgress();
+    const pageLayerProgress = allLayerProgress[item.id] && typeof allLayerProgress[item.id] === "object"
+        ? allLayerProgress[item.id]
+        : { activeLevelId: "foundation", levels: {} };
+    pageLayerProgress.levels ||= {};
+    const saveLayerProgress = () => {
+        try {
+            allLayerProgress[item.id] = pageLayerProgress;
+            window.localStorage.setItem(layerStorageKey, JSON.stringify(allLayerProgress));
+            return true;
+        } catch (error) {
+            return false;
+        }
+    };
     const featuredQuestion = page.featuredQuestionId
         ? questionBank.find(question => question.id === page.featuredQuestionId)
         : null;
@@ -87,6 +110,99 @@
         </figure>
     ` : "";
 
+    const layeredStudy = page.layeredLearning ? (() => {
+        const { scenario, microLesson, levels } = page.layeredLearning;
+        if (!levels.some(level => level.id === pageLayerProgress.activeLevelId)) pageLayerProgress.activeLevelId = levels[0].id;
+        const completeCount = levels.filter(level => pageLayerProgress.levels[level.id]?.completed).length;
+        const tabs = levels.map((level, index) => {
+            const active = level.id === pageLayerProgress.activeLevelId;
+            const complete = Boolean(pageLayerProgress.levels[level.id]?.completed);
+            return `
+                <button class="lesson-layer-tab${active ? " is-active" : ""}${complete ? " is-complete" : ""}" type="button" role="tab" aria-selected="${active}" aria-controls="lesson-layer-panel-${escapeHTML(level.id)}" data-layer-tab="${escapeHTML(level.id)}">
+                    <span>${index + 1}</span>
+                    <b>${escapeHTML(level.label)}</b>
+                    <small>${escapeHTML(level.tag)}</small>
+                </button>
+            `;
+        }).join("");
+        const panels = levels.map(level => {
+            const active = level.id === pageLayerProgress.activeLevelId;
+            const saved = pageLayerProgress.levels[level.id] || {};
+            const checkedCriteria = new Set(Array.isArray(saved.criteria) ? saved.criteria : []);
+            const allChecked = level.criteria.every((criterion, index) => checkedCriteria.has(index));
+            return `
+                <section id="lesson-layer-panel-${escapeHTML(level.id)}" class="lesson-layer-panel" role="tabpanel" data-layer-panel="${escapeHTML(level.id)}"${active ? "" : " hidden"}>
+                    <div class="lesson-layer-brief">
+                        <div class="lesson-layer-meta"><span>${escapeHTML(level.duration)}</span><span>${escapeHTML(level.tag)}</span></div>
+                        <h3>${escapeHTML(level.label)}：${escapeHTML(level.goal)}</h3>
+                        <p><strong>本層課業：</strong>${escapeHTML(level.task)}</p>
+                        <p class="lesson-layer-output"><strong>提交形式：</strong>${escapeHTML(level.output)}</p>
+                        ${level.id === "exam" ? `<a class="lesson-layer-practice" href="practice.html?topic=${encodeURIComponent(item.id)}">開啟本課題題庫 →</a>` : ""}
+                    </div>
+                    <div class="lesson-layer-work">
+                        <p class="lesson-check-label">完成準則</p>
+                        <div class="lesson-layer-criteria">
+                            ${level.criteria.map((criterion, index) => `
+                                <label><input type="checkbox" data-layer-criterion="${index}"${checkedCriteria.has(index) ? " checked" : ""}> <span>${escapeHTML(criterion)}</span></label>
+                            `).join("")}
+                        </div>
+                        <label class="lesson-layer-note">
+                            <span>我的答案／證據筆記</span>
+                            <textarea rows="4" data-layer-note placeholder="先草擬答案；內容只儲存在這個瀏覽器。">${escapeHTML(saved.note || "")}</textarea>
+                        </label>
+                        <div class="lesson-layer-actions">
+                            <button type="button" data-layer-complete${allChecked ? "" : " disabled"}>${saved.completed ? "已完成 ✓" : "標記本層完成"}</button>
+                            <span data-layer-save-status>${saved.note || checkedCriteria.size ? "已儲存在此瀏覽器" : "尚未儲存"}</span>
+                        </div>
+                    </div>
+                </section>
+            `;
+        }).join("");
+        const mediaSteps = microLesson.steps.map((step, index) => `
+            <button type="button" data-media-step="${index}" aria-label="查看畫面 ${index + 1}" aria-pressed="${index === 0}"></button>
+        `).join("");
+        const firstStep = microLesson.steps[0];
+        return `
+            <section class="lesson-layered-study" aria-labelledby="lesson-layered-title">
+                <div class="lesson-layered-heading">
+                    <div>
+                        <p class="lesson-check-label">分層學習與課業</p>
+                        <h3 id="lesson-layered-title">由概念穩固到 DSE 應用</h3>
+                        <p>三層可以按需要選做，不會鎖住內容；完成記錄只存於目前瀏覽器。</p>
+                    </div>
+                    <div class="lesson-layer-progress" aria-label="分層課業進度">
+                        <strong data-layer-progress-text>${completeCount} / ${levels.length}</strong>
+                        <span><i data-layer-progress-bar style="width:${(completeCount / levels.length) * 100}%"></i></span>
+                    </div>
+                </div>
+                <div class="lesson-layer-tabs" role="tablist" aria-label="選擇學習層級">${tabs}</div>
+                ${panels}
+                <section class="lesson-media-lab" aria-labelledby="lesson-media-title">
+                    <figure>
+                        <img src="${escapeHTML(scenario.src)}" alt="${escapeHTML(scenario.alt)}" width="${Number(scenario.width) || 1672}" height="${Number(scenario.height) || 941}" loading="lazy" decoding="async">
+                        <figcaption><strong>${escapeHTML(scenario.title)}</strong>${escapeHTML(scenario.caption)}</figcaption>
+                    </figure>
+                    <div class="lesson-media-player">
+                        <div class="lesson-media-player-heading">
+                            <div><p class="lesson-check-label">圖像微課</p><h3 id="lesson-media-title">${escapeHTML(microLesson.title)}</h3></div>
+                            <span>約 90 秒</span>
+                        </div>
+                        <div class="lesson-media-frame" aria-live="polite">
+                            <span class="lesson-media-icon" aria-hidden="true" data-media-icon>${escapeHTML(firstStep.icon)}</span>
+                            <div><small data-media-kicker>${escapeHTML(firstStep.kicker)}</small><h4 data-media-title>${escapeHTML(firstStep.title)}</h4><p data-media-body>${escapeHTML(firstStep.body)}</p></div>
+                        </div>
+                        <div class="lesson-media-controls">
+                            <button type="button" data-media-prev aria-label="上一個畫面">←</button>
+                            <button type="button" data-media-play aria-pressed="false">播放微課</button>
+                            <button type="button" data-media-next aria-label="下一個畫面">→</button>
+                            <div class="lesson-media-dots">${mediaSteps}</div>
+                        </div>
+                    </div>
+                </section>
+            </section>
+        `;
+    })() : "";
+
     section.innerHTML = `
         <div class="lesson-companion-heading">
             <div>
@@ -97,6 +213,7 @@
         </div>
         <div id="lesson-companion-content" class="lesson-companion-content"${expandedByDefault ? "" : " hidden"}>
             ${lessonVisual}
+            ${layeredStudy}
             <div class="lesson-objectives">
                 <h3>完成本頁後，你應能夠</h3>
                 <ul>${page.objectives.map(objective => `<li>${objective}</li>`).join("")}</ul>
@@ -138,6 +255,112 @@
         toggle.textContent = expanded ? "展開學習重點" : "收起";
         content.hidden = expanded;
     });
+
+    const layeredSection = section.querySelector(".lesson-layered-study");
+    if (layeredSection && page.layeredLearning) {
+        const levels = page.layeredLearning.levels;
+        const updateLayerProgressUI = () => {
+            const completed = levels.filter(level => pageLayerProgress.levels[level.id]?.completed).length;
+            const progressText = layeredSection.querySelector("[data-layer-progress-text]");
+            const progressBar = layeredSection.querySelector("[data-layer-progress-bar]");
+            if (progressText) progressText.textContent = `${completed} / ${levels.length}`;
+            if (progressBar) progressBar.style.width = `${(completed / levels.length) * 100}%`;
+            layeredSection.querySelectorAll("[data-layer-tab]").forEach(tab => {
+                tab.classList.toggle("is-complete", Boolean(pageLayerProgress.levels[tab.dataset.layerTab]?.completed));
+            });
+        };
+        const showLayer = levelId => {
+            pageLayerProgress.activeLevelId = levelId;
+            layeredSection.querySelectorAll("[data-layer-tab]").forEach(tab => {
+                const active = tab.dataset.layerTab === levelId;
+                tab.classList.toggle("is-active", active);
+                tab.setAttribute("aria-selected", String(active));
+            });
+            layeredSection.querySelectorAll("[data-layer-panel]").forEach(panel => {
+                panel.hidden = panel.dataset.layerPanel !== levelId;
+            });
+            saveLayerProgress();
+        };
+        layeredSection.querySelectorAll("[data-layer-tab]").forEach(tab => {
+            tab.addEventListener("click", () => showLayer(tab.dataset.layerTab));
+        });
+        layeredSection.querySelectorAll("[data-layer-panel]").forEach(panel => {
+            const levelId = panel.dataset.layerPanel;
+            const level = levels.find(candidate => candidate.id === levelId);
+            if (!level) return;
+            const state = pageLayerProgress.levels[levelId] ||= { criteria: [], note: "", completed: false };
+            const criteria = [...panel.querySelectorAll("[data-layer-criterion]")];
+            const completeButton = panel.querySelector("[data-layer-complete]");
+            const saveStatus = panel.querySelector("[data-layer-save-status]");
+            const updateCompletionAvailability = () => {
+                const allChecked = criteria.every(input => input.checked);
+                completeButton.disabled = !allChecked;
+                if (!allChecked && state.completed) {
+                    state.completed = false;
+                    completeButton.textContent = "標記本層完成";
+                }
+                updateLayerProgressUI();
+            };
+            criteria.forEach(input => {
+                input.addEventListener("change", () => {
+                    state.criteria = criteria.flatMap((candidate, index) => candidate.checked ? [index] : []);
+                    updateCompletionAvailability();
+                    saveStatus.textContent = saveLayerProgress() ? "已儲存在此瀏覽器" : "瀏覽器未能儲存";
+                });
+            });
+            panel.querySelector("[data-layer-note]").addEventListener("input", event => {
+                state.note = event.currentTarget.value;
+                saveStatus.textContent = saveLayerProgress() ? "已儲存在此瀏覽器" : "瀏覽器未能儲存";
+            });
+            completeButton.addEventListener("click", () => {
+                if (completeButton.disabled) return;
+                state.completed = true;
+                state.completedAt = new Date().toISOString();
+                completeButton.textContent = "已完成 ✓";
+                saveStatus.textContent = saveLayerProgress() ? "完成記錄已儲存" : "瀏覽器未能儲存";
+                updateLayerProgressUI();
+            });
+            updateCompletionAvailability();
+        });
+
+        const mediaSteps = page.layeredLearning.microLesson.steps;
+        let mediaIndex = 0;
+        let mediaTimer = null;
+        const mediaPlay = layeredSection.querySelector("[data-media-play]");
+        const renderMediaStep = index => {
+            mediaIndex = (index + mediaSteps.length) % mediaSteps.length;
+            const step = mediaSteps[mediaIndex];
+            layeredSection.querySelector("[data-media-icon]").textContent = step.icon;
+            layeredSection.querySelector("[data-media-kicker]").textContent = step.kicker;
+            layeredSection.querySelector("[data-media-title]").textContent = step.title;
+            layeredSection.querySelector("[data-media-body]").textContent = step.body;
+            layeredSection.querySelectorAll("[data-media-step]").forEach((dot, dotIndex) => {
+                dot.classList.toggle("is-active", dotIndex === mediaIndex);
+                dot.setAttribute("aria-pressed", String(dotIndex === mediaIndex));
+            });
+        };
+        const stopMedia = () => {
+            if (mediaTimer) window.clearInterval(mediaTimer);
+            mediaTimer = null;
+            mediaPlay.setAttribute("aria-pressed", "false");
+            mediaPlay.textContent = "播放微課";
+            layeredSection.classList.remove("is-playing");
+        };
+        const startMedia = () => {
+            mediaTimer = window.setInterval(() => renderMediaStep(mediaIndex + 1), 4000);
+            mediaPlay.setAttribute("aria-pressed", "true");
+            mediaPlay.textContent = "暫停微課";
+            layeredSection.classList.add("is-playing");
+        };
+        mediaPlay.addEventListener("click", () => mediaTimer ? stopMedia() : startMedia());
+        layeredSection.querySelector("[data-media-prev]").addEventListener("click", () => { stopMedia(); renderMediaStep(mediaIndex - 1); });
+        layeredSection.querySelector("[data-media-next]").addEventListener("click", () => { stopMedia(); renderMediaStep(mediaIndex + 1); });
+        layeredSection.querySelectorAll("[data-media-step]").forEach(dot => {
+            dot.addEventListener("click", () => { stopMedia(); renderMediaStep(Number(dot.dataset.mediaStep)); });
+        });
+        renderMediaStep(0);
+        window.addEventListener("pagehide", stopMedia, { once: true });
+    }
 
     const conceptDetail = section.querySelector(".lesson-concept-detail");
     section.querySelectorAll(".lesson-concept").forEach(button => {

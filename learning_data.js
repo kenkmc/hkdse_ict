@@ -5,7 +5,7 @@
  * 詳細教學內容仍保留在各 HTML 頁面，題型練習則由 question_data.js 管理。
  */
 const learningData = {
-    schemaVersion: 2,
+    schemaVersion: 3,
     pages: {
         "cha-1": {
             objectives: [
@@ -688,11 +688,124 @@ const lessonVisualAssignments = {
     "ec-2": { asset: "electiveC", title: "程式讀取環境，再安全地控制裝置", caption: "sensor 提供輸入，event handler 判斷閾值，actuator 產生動作；異常讀數、超時和頻繁切換都要處理。", points: ["Sensor input", "Event／threshold", "Actuator 與安全狀態"] }
 };
 
+const scenarioMediaAssets = {
+    schoolData: {
+        src: "assets/images/scenario-media/smart-school-data.webp",
+        alt: "學生在圖書館掃描圖書、填寫平板問卷及讀取環境感應器，教師查看不含個人資料的統計圖表",
+        width: 1672,
+        height: 941
+    },
+    computerNetwork: {
+        src: "assets/images/scenario-media/computer-network-lab.webp",
+        alt: "學生在電腦室辨認桌面電腦內部組件，接駁交換器和無線路由器，教師檢查伺服器機櫃",
+        width: 1672,
+        height: 941
+    },
+    softwareWeb: {
+        src: "assets/images/scenario-media/software-web-project.webp",
+        alt: "學生由問題分析及流程圖開始，進行程式編寫、網頁介面預覽，以及正常、邊界和不合法數據測試",
+        width: 1672,
+        height: 941
+    },
+    relationalDatabase: {
+        src: "assets/images/scenario-media/relational-database-project.webp",
+        alt: "學生把重複的活動報名記錄整理成以關係連接的實體卡及數據表，再查看查詢結果圖表",
+        width: 1672,
+        height: 941
+    },
+    smartGreenhouse: {
+        src: "assets/images/scenario-media/smart-greenhouse-iot.webp",
+        alt: "學生在溫室把溫度和土壤濕度感應器接到微控制器，利用程式控制風扇、水泵和警示燈",
+        width: 1672,
+        height: 941
+    }
+};
+
+const layeredLearningAssignments = {
+    "cha-1": { asset: "schoolData", scenarioTitle: "圖書館數據如何成為決策", scenario: "圖書借閱、問卷及環境讀數只是原始數據；只有經過整理、比較和呈現，才可支援延長開放時間或調配資源等決策。", challengeTask: "為學校圖書館設計一個資訊系統 IPO：列出三項輸入、兩個處理步驟、兩項輸出和一個儲存需要，並說明其中一項輸出如何支援決策。", challengeOutput: "一張 IPO 表及 120–160 字理據。", criteria: ["輸入是可收集的原始數據", "處理和輸出有清楚因果關係", "決策用途與情境一致"] },
+    "cha-2": { asset: "schoolData", scenarioTitle: "收集之前，先設計數據控制", scenario: "問卷和感應器資料可能遺漏、超出合理範圍或輸入錯誤；有效性檢驗、驗證及錯誤檢測的目的並不相同。", challengeTask: "為校外活動報名表選擇四個欄位，分別設計合適的 validation 或 verification，寫出檢查規則，並指出仍可能通過檢查的錯誤例子。", challengeOutput: "四列表格：欄位、方法、規則、限制。", criteria: ["正確分辨 validation 和 verification", "規則具體而可執行", "能指出檢查不能保證資料真確"] },
+    "cha-3": { asset: "schoolData", scenarioTitle: "同一活動需要多種數碼媒體", scenario: "活動宣傳可能同時使用圖片、錄音和視像；解像度、色彩深度、取樣參數及壓縮會影響品質和傳送時間。", challengeTask: "為校園直播準備一幅圖片、一段 30 秒立體聲錄音及一段短片。自訂合理參數，列式估算未壓縮大小，再提出一項減少檔案大小的方法及代價。", challengeOutput: "完整算式、單位和一段品質取捨說明。", criteria: ["公式包含所有必要參數", "bit、byte、KB／MB 單位正確", "壓縮方法和品質代價相符"] },
+    "cha-4": { asset: "schoolData", scenarioTitle: "用試算表找出借閱趨勢", scenario: "把借閱記錄輸入工作表後，可用公式計算、排序篩選及圖表比較月份或書籍類別，但公式參照必須正確。", challengeTask: "設計一個 8 列的借閱分析工作表，加入至少兩個函數、一條可向下複製的公式、一個絕對或混合參照，並選擇合適圖表回答一個管理問題。", challengeOutput: "工作表草圖、公式和圖表選擇理據。", criteria: ["公式參照可正確複製", "函數與所求結果相符", "圖表類型能回答指定問題"] },
+    "cha-5": { asset: "schoolData", scenarioTitle: "以數據庫保存可檢索的記錄", scenario: "圖書館需要欄、記錄、主鍵和查詢；表單只是輸入介面，報告則把查詢結果整理成可閱讀格式。", challengeTask: "為校內器材借用設計一個單表數據庫：列出六個欄位及數據類型、選擇主鍵，再寫出兩個單表查詢要求及預期結果。", challengeOutput: "數據字典及兩條自然語言／SQL 查詢。", criteria: ["主鍵唯一、穩定且非空", "數據類型符合欄位內容", "查詢欄位和條件可由單表完成"] },
+    "chb-1": { asset: "computerNetwork", scenarioTitle: "由零件到完整電腦系統", scenario: "處理器、RAM、儲存、輸入輸出裝置及匯流排共同工作；硬件選擇必須按工作需要比較速度、容量和用途。", challengeTask: "學校要購置一台剪片電腦。從 CPU／GPU、RAM、儲存和輸入輸出四方面提出規格，並以相同準則比較至少兩個選擇。", challengeOutput: "四項規格建議及 150 字選擇理據。", criteria: ["每項規格對應剪片需要", "能分辨 RAM 和非揮發性儲存", "比較使用一致而可量度的準則"] },
+    "chb-2": { asset: "computerNetwork", scenarioTitle: "系統軟件協調共用資源", scenario: "操作系統、驅動程式和實用程式讓多個應用使用處理器、記憶體、儲存和周邊裝置；工作性質亦決定處理模式。", challengeTask: "把薪酬計算、網上報名、天氣站分析、影片轉碼和虛擬伺服器分配到合適處理模式，並為每項寫一個決定性情境特徵。", challengeOutput: "五行情境—模式—理據配對表。", criteria: ["模式名稱使用正確", "理據引用時限、工作量或資源特徵", "沒有把 multitasking 當成所有模式的統稱"] },
+    "chc-1": { asset: "computerNetwork", scenarioTitle: "為電腦室選擇正確網絡硬件", scenario: "NIC、接達點、switch、router 和 modem／ONT 位於不同位置，各自負責接入、LAN 內轉送或連接不同網絡。", challengeTask: "為 24 台電腦、10 部平板及一台網絡打印機畫出校園電腦室網絡，標示所需硬件、傳輸媒介、LAN／WAN 邊界及一項可用性措施。", challengeOutput: "有標示的拓撲圖及 120 字設計說明。", criteria: ["硬件角色和連接位置正確", "有線與無線媒介選擇有理據", "能清楚分辨 LAN 和 WAN"] },
+    "chc-2": { asset: "computerNetwork", scenarioTitle: "一次請求會經過多層協定", scenario: "裝置先取得網絡設定，再把域名解析成 IP；資料分段後經路由到伺服器，應用協定才完成登入或下載。", challengeTask: "由學生輸入校網網址開始，畫出六步時序，加入 DNS、IP、TCP、HTTP／HTTPS 及 router，並在每一步說明輸入和輸出。", challengeOutput: "六步時序圖或表格。", criteria: ["協定與任務正確配對", "次序能由名稱解析走到回應", "分清 IP 位址、域名和 URL"] },
+    "chc-3": { asset: "computerNetwork", scenarioTitle: "服務體驗受網絡條件影響", scenario: "搜尋、串流、雲端及通訊服務都由客戶端向伺服器提出請求；頻寬、延遲、緩衝和資料可信性會改變體驗。", challengeTask: "比較直播課堂和下載錄影兩個情境，解釋頻寬、延遲、buffering 及壓縮的影響，並提出兩項改善直播體驗的方法。", challengeOutput: "比較表及兩項附因果說明的建議。", criteria: ["能分辨頻寬和延遲", "改善方法針對題目瓶頸", "同時考慮品質和傳送成本"] },
+    "chc-4": { asset: "softwareWeb", scenarioTitle: "網頁結構、呈現與互動各有責任", scenario: "活動報名頁需要有語意的 HTML、跨頁一致 CSS、清楚表單標籤和不同裝置可用的版面。", challengeTask: "為校園活動設計一個可回應手機的報名頁 wireframe，標示 header、navigation、main、form 和 footer，再寫出三項無障礙或易用性決定。", challengeOutput: "桌面／手機 wireframe 及三項設計理據。", criteria: ["主要 HTML 結構語意正確", "手機版不依賴固定寬度", "表單標籤、焦點或錯誤訊息清楚"] },
+    "chc-5": { asset: "computerNetwork", scenarioTitle: "保安依靠多層而非單一產品", scenario: "身份認證、加密、更新、防火牆、權限和備份分別處理不同風險；控制措施要配合威脅和資產。", challengeTask: "校網發現釣魚電郵、過期系統及未授權登入。為每項風險選擇預防、偵測及復原控制，並說明控制失效時的剩餘風險。", challengeOutput: "三項風險的多層控制矩陣。", criteria: ["控制與威脅有直接關係", "包含技術及使用者措施", "能指出備份不是阻止入侵的措施"] },
+    "chd-1": { asset: "softwareWeb", scenarioTitle: "先把現實問題拆成可處理部分", scenario: "程式開發由使用者需要、限制及 IPO 出發；分解和抽象可把複雜情境變成可測試的子問題。", challengeTask: "分析午膳取餐排隊問題：列出使用者、三項功能要求、兩項限制、IPO，以及至少三個可獨立開發和測試的子問題。", challengeOutput: "一頁問題分析及 IPO 規格。", criteria: ["要求可測量而非空泛", "IPO 之間有資料流關係", "分解後子問題沒有重疊關鍵責任"] },
+    "chd-2": { asset: "softwareWeb", scenarioTitle: "流程圖要能被逐步追蹤", scenario: "Sequence、selection 和 iteration 應由清楚條件連接；dry run 可檢查分支、更新及終止是否符合預期。", challengeTask: "設計一個重複輸入分數直至輸入 -1、拒絕不合法分數並輸出平均值的算法，再用正常、邊界和不合法數據各追蹤一次。", challengeOutput: "流程圖或偽代碼及三張追蹤表。", criteria: ["迴圈終止條件清楚", "不合法數據不會加入計算", "追蹤表顯示每次變數更新"] },
+    "chd-3": { asset: "softwareWeb", scenarioTitle: "程式必須忠實實現算法", scenario: "變數、輸入輸出、條件、迴圈和函數要逐一對應設計；能執行只代表沒有立即停止，並不保證結果正確。", challengeTask: "把本課其中一個算法改寫成 Python，至少使用一個自訂函數、selection 和 iteration，並加入輸入檢查及三組測試輸出。", challengeOutput: "附註解的程式、測試數據及輸出截圖／文字。", criteria: ["程式結構對應算法", "輸入檢查不破壞正常流程", "測試包含正常、邊界和不合法數據"] },
+    "chd-4": { asset: "softwareWeb", scenarioTitle: "測試要在執行前寫預期結果", scenario: "測試計劃先定義正常、邊界和不合法數據及 expected result；trace 和 debugger 再協助找出第一個偏差。", challengeTask: "為活動報名程式設計六個測試個案，最少各有兩個正常、邊界和不合法數據；加入預期結果、實際結果、通過／失敗和修正後重測欄。", challengeOutput: "完整測試表及一段除錯紀錄。", criteria: ["每組數據有具體預期結果", "邊界值正好位於規則前後", "失敗個案能連到修正和重測證據"] },
+    "che-1": { asset: "schoolData", scenarioTitle: "新科技要由用途和限制評估", scenario: "感應器、AR、3D 打印和人工智能可改善學習或管理，但仍要考慮數據品質、硬件成本、準確度和人類監督。", challengeTask: "評估以 AI 分析圖書借閱並推薦書籍的方案：列出兩項效益、三項限制或風險、所需數據，以及一個必須由人決定的環節。", challengeOutput: "持份者評估表及有條件的建議結論。", criteria: ["效益和風險來自同一情境", "包括數據品質或偏差", "結論列明採用條件及人類監督"] },
+    "che-2": { asset: "schoolData", scenarioTitle: "收集得到，不代表應該收集", scenario: "智能校園同時涉及人體工學、私隱同意、數碼鴻溝及演算法公平；便利性不能取代比例原則。", challengeTask: "學校計劃以平板和感應器記錄學習活動。從學生、教師和家長角度分析需要收集、可選擇及不應收集的資料，並提出四項保障。", challengeOutput: "三類數據清單、持份者分析及保障建議。", criteria: ["收集目的和資料項目相稱", "同意和拒絕機制具體", "同時處理私隱、共融或健康影響"] },
+    "che-3": { asset: "schoolData", scenarioTitle: "數碼作品仍有作者和授權", scenario: "網站圖片、程式碼及軟件都有擁有者和使用條款；標示來源不一定等於已取得所需權利。", challengeTask: "為一個校園網站建立素材登記表，包含五項圖片／字款／程式庫，記錄作者、來源、授權、可否修改及署名要求，並替其中一項寫合規署名。", challengeOutput: "五項素材登記表及一個署名示例。", criteria: ["能分辨免費使用和公有領域", "授權條件與使用方式相符", "署名包含來源及授權資料"] },
+    "ea-1": { asset: "relationalDatabase", scenarioTitle: "關聯表以鍵維持一致資料", scenario: "活動報名涉及學生、活動及報名三類實體；主鍵、外鍵、domain 和參照完整性阻止重複或不存在的關係。", challengeTask: "從活動報名情境找出三個實體，為每個實體列出屬性、候選鍵和主鍵，建立關係，並為 entity、domain、referential integrity 各寫一條規則。", challengeOutput: "關係綱要及三類完整性規則。", criteria: ["主鍵和候選鍵選擇合理", "外鍵方向及 cardinality 正確", "三類完整性規則沒有混淆"] },
+    "ea-2": { asset: "relationalDatabase", scenarioTitle: "SQL 把關係轉成可用資訊", scenario: "查詢要先決定所需欄位、來源表、JOIN 條件和篩選，再處理排序、grouping、aggregate 或 subquery。", challengeTask: "為活動報名數據庫寫六個逐步查詢：基本 SELECT、WHERE／ORDER BY、aggregate、GROUP BY／HAVING、JOIN 及 subquery 各一，並寫出每條的預期結果。", challengeOutput: "六條 SQL、用途及結果摘要。", criteria: ["JOIN 條件對應主鍵／外鍵", "WHERE 和 HAVING 使用位置正確", "輸出欄位能回答指定問題"] },
+    "ea-3": { asset: "relationalDatabase", scenarioTitle: "由重複表走到可維護設計", scenario: "把學生、活動及導師資料放在同一大表會造成更新、插入及刪除異常；functional dependency 指引拆表至 3NF。", challengeTask: "把一張含學生、活動、導師和報名資料的非正規化表逐步整理至 1NF、2NF、3NF，標示主鍵、外鍵和 functional dependency，再解釋一項反正規化取捨。", challengeOutput: "三階段關係綱要及 150 字設計解釋。", criteria: ["每次拆表有依賴理據", "最終關係仍能重建原有資料", "反正規化同時說明效能收益和一致性代價"] },
+    "eb-1": { asset: "softwareWeb", scenarioTitle: "網絡服務共同支援校園網站", scenario: "客戶端會使用 DNS、DHCP、登入、檔案、代理、網頁及數據庫服務；每個服務有不同請求、回應和權限。", challengeTask: "為學校內聯網畫出 client、web、database、file、authentication、proxy／firewall 的架構，標示主要請求，並提出最小權限、備份及可用性措施。", challengeOutput: "服務架構圖及三項實施控制。", criteria: ["服務角色和資料流正確", "權限只開放工作所需", "可用性和保安措施能對應風險"] },
+    "eb-2": { asset: "softwareWeb", scenarioTitle: "網頁應用是完整往返流程", scenario: "HTML／CSS 建立介面，client script 提供即時回應，server 必須重新驗證，再以受控方法讀寫數據庫及回傳結果。", challengeTask: "設計一個活動報名 web application：畫出 client—server—database 流程，列出 client 和 server 各自檢查，設計成功及錯誤回應，並說明 cookie 只保存甚麼。", challengeOutput: "流程圖、驗證表及一個介面 wireframe。", criteria: ["敏感驗證不只在 client 執行", "數據庫操作有清楚輸入和結果", "cookie 不保存密碼或不必要個人資料"] },
+    "ec-1": { asset: "smartGreenhouse", scenarioTitle: "算法和資料結構按操作需要選擇", scenario: "排序狀態、資料規模及加入／移除方式會影響 linear／binary search、sorting、stack、queue 或 linked structure 的選擇。", challengeTask: "為圖書搜尋、打印工作、瀏覽返回、成績排序和動態播放清單各選一個演算法或資料結構，寫出核心操作、時間／結構優勢及一項限制。", challengeOutput: "五行情境選擇矩陣。", criteria: ["binary search 只用於已排序資料", "LIFO／FIFO 操作次序正確", "每項選擇同時包含優勢和限制"] },
+    "ec-2": { asset: "smartGreenhouse", scenarioTitle: "程式由環境輸入控制實體輸出", scenario: "感應器提供輸入，事件或閾值觸發程式判斷，actuator 產生動作；異常值、超時及快速切換需要安全處理。", challengeTask: "設計溫室控制器：定義兩個 sensor input、風扇／水泵／警示燈的觸發條件、hysteresis、安全狀態和人工 override，再以四個情境追蹤輸出。", challengeOutput: "狀態／流程圖、偽代碼及四行情境追蹤表。", criteria: ["輸入—處理—輸出關係完整", "hysteresis 能避免頻繁切換", "感應器失效時進入明確安全狀態"] }
+};
+
 Object.entries(lessonVisualAssignments).forEach(([pageId, assignment]) => {
     const page = learningData.pages[pageId];
     const asset = lessonVisualAssets[assignment.asset];
     if (!page || !asset) return;
     page.visual = { ...asset, title: assignment.title, caption: assignment.caption, points: assignment.points };
+});
+
+Object.entries(layeredLearningAssignments).forEach(([pageId, assignment]) => {
+    const page = learningData.pages[pageId];
+    const scenarioAsset = scenarioMediaAssets[assignment.asset];
+    if (!page || !scenarioAsset) return;
+    const conceptNames = page.concepts.slice(0, 3).map(concept => concept.label).join("、");
+    page.layeredLearning = {
+        scenario: { ...scenarioAsset, title: assignment.scenarioTitle, caption: assignment.scenario },
+        microLesson: {
+            title: `90 秒圖像微課：${assignment.scenarioTitle}`,
+            steps: page.concepts.slice(0, 4).map((concept, index) => ({
+                kicker: `畫面 ${index + 1}`,
+                icon: concept.icon,
+                title: concept.label,
+                body: concept.detail
+            }))
+        },
+        levels: [
+            {
+                id: "foundation",
+                label: "基礎層",
+                tag: "先穩固概念",
+                duration: "約 10 分鐘",
+                goal: `能用自己的文字解釋 ${conceptNames}，並辨認一個生活例子。`,
+                task: `觀看圖像微課後，選出三個核心概念，各用一句話解釋，再為其中一個概念寫一個與「${assignment.scenarioTitle}」有關的例子。`,
+                output: "60–100 字概念筆記或三張概念卡。",
+                criteria: ["至少正確解釋兩個核心概念", "例子與本課題直接相關", "沒有把本頁常見誤解寫成結論"]
+            },
+            {
+                id: "exam",
+                label: "應試層",
+                tag: "把概念變成分數",
+                duration: "約 20 分鐘",
+                goal: "按題目指令詞，把知識寫成可逐點給分的 DSE 答案。",
+                task: `先完成本頁 60 秒快速檢查及原創 DSE 題型，再按這項提示修訂答案：${page.examTip}`,
+                output: "一份按分值列點的修訂答案，另寫一句說明自己改了甚麼。",
+                criteria: ["首句直接回應題目指令詞", "每個獨立評分點分開表達", "答案引用情境資料或說明清楚因果"]
+            },
+            {
+                id: "challenge",
+                label: "挑戰層",
+                tag: "整合真實情境",
+                duration: "約 30 分鐘",
+                goal: "把多個本課概念整合到一個設計、分析或評估任務。",
+                task: assignment.challengeTask,
+                output: assignment.challengeOutput,
+                criteria: assignment.criteria
+            }
+        ]
+    };
 });
 
 function freezeLearningData(value) {

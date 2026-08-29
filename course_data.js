@@ -9,7 +9,7 @@
  */
 
 const siteConfig = {
-    schemaVersion: 2,
+    schemaVersion: 3,
     siteName: "ICT 學習資源網",
     tagline: "高中資訊及通訊科技科",
     canonicalUrl: "https://kenkmc.github.io/hkdse_ict/",
@@ -19,6 +19,9 @@ const siteConfig = {
     assessmentUrl: "https://www.hkeaa.edu.hk/DocLibrary/HKDSE/Subject_Information/ict/2027hkdse-e-ict.pdf",
     features: {
         questionEngine: true,
+        layeredLearning: true,
+        tieredAssignments: 78,
+        multimediaLessons: true,
         progressTracking: true,
         progressStorage: "local-only"
     }

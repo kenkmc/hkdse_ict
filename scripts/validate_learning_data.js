@@ -16,6 +16,7 @@ const questions = browser.HKDSE_ICT_QUESTIONS || [];
 const errors = [];
 let lessonCount = 0;
 let lessonVisualCount = 0;
+let layeredLessonCount = 0;
 
 if (!learning?.pages) {
     errors.push("learning_data.js 沒有公開有效的學習提示資料。");
@@ -68,6 +69,49 @@ if (!learning?.pages) {
                     errors.push(`${id} 的圖像尺寸資料無效。`);
                 }
             }
+
+            const layered = page.layeredLearning;
+            if (!layered) {
+                errors.push(`${id} 缺少分層學習及課業。`);
+            } else {
+                layeredLessonCount += 1;
+                const scenario = layered.scenario;
+                if (!scenario?.src || !fs.existsSync(path.join(root, scenario.src))) {
+                    errors.push(`${id} 的情境圖片不存在：${scenario?.src || "（未填寫）"}`);
+                }
+                if (!scenario?.alt || !scenario?.title || !scenario?.caption) {
+                    errors.push(`${id} 的情境圖片替代文字、標題或說明不完整。`);
+                }
+                if (!Number.isInteger(scenario?.width) || scenario.width <= 0 || !Number.isInteger(scenario?.height) || scenario.height <= 0) {
+                    errors.push(`${id} 的情境圖片尺寸資料無效。`);
+                }
+                if (!layered.microLesson?.title || !Array.isArray(layered.microLesson?.steps) || layered.microLesson.steps.length < 3) {
+                    errors.push(`${id} 的圖像微課至少需要三個畫面。`);
+                } else {
+                    layered.microLesson.steps.forEach((step, index) => {
+                        if (!step.kicker || !step.title || !step.body) errors.push(`${id} 的圖像微課畫面 ${index + 1} 不完整。`);
+                    });
+                }
+                const levels = layered.levels;
+                const expectedLevelIds = ["foundation", "exam", "challenge"];
+                if (!Array.isArray(levels) || levels.length !== expectedLevelIds.length) {
+                    errors.push(`${id} 必須提供基礎、應試及挑戰三個學習層。`);
+                } else {
+                    const levelIds = levels.map(level => level.id);
+                    expectedLevelIds.forEach(levelId => {
+                        if (!levelIds.includes(levelId)) errors.push(`${id} 缺少 ${levelId} 學習層。`);
+                    });
+                    if (new Set(levelIds).size !== levelIds.length) errors.push(`${id} 有重複學習層識別碼。`);
+                    levels.forEach(level => {
+                        if (!level.label || !level.tag || !level.duration || !level.goal || !level.task || !level.output) {
+                            errors.push(`${id} 的 ${level.id || "未命名"} 學習層內容不完整。`);
+                        }
+                        if (!Array.isArray(level.criteria) || level.criteria.length < 3) {
+                            errors.push(`${id} 的 ${level.id || "未命名"} 學習層至少需要三項完成準則。`);
+                        }
+                    });
+                }
+            }
         }
 
         const check = page.quickCheck;
@@ -83,5 +127,5 @@ if (errors.length) {
     errors.forEach(error => console.error(`- ${error}`));
     process.exitCode = 1;
 } else {
-    console.log(`學習提示驗證通過：${Object.keys(learning.pages).length} 個頁面均有目標、概念圖、常見誤解及快速檢查；${lessonVisualCount}/${lessonCount} 個課程頁亦有圖像導讀、課程界線及 DSE 題型。`);
+    console.log(`學習提示驗證通過：${Object.keys(learning.pages).length} 個頁面均有目標、概念圖、常見誤解及快速檢查；${lessonVisualCount}/${lessonCount} 個課程頁有圖像導讀，${layeredLessonCount}/${lessonCount} 個課程頁有三級學習、情境課業及圖像微課。`);
 }
