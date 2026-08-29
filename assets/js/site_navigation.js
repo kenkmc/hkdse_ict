@@ -57,10 +57,9 @@
     if (!footer) footer = document.createElement("footer");
     footer.className = "platform-footer";
     footer.innerHTML = `
-        <p>原創 HKDSE ICT 學習資源；並非教育局或考評局官方網站。</p>
+        <p>原創 HKDSE ICT 學習資源；並非官方網站。</p>
         <p class="platform-footer-links">
             課程依據：<a href="${platform.config.curriculumUrl}" target="_blank" rel="noopener">2021 課程及評估指引</a>
-            · <a href="${platform.config.assessmentUrl}" target="_blank" rel="noopener">HKDSE 評核大綱</a>
         </p>
     `;
     if (shouldAppendFooter) document.body.appendChild(footer);

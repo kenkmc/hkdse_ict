@@ -1,105 +1,86 @@
-(function initialisePastPaperIndex() {
+(function initialiseTopicFocus() {
     "use strict";
-    const data = window.HKDSE_ICT_PAST_PAPER_INDEX;
-    if (!data) return;
 
-    const filters = {
-        year: document.querySelector('[data-index-filter="year"]'),
-        topic: document.querySelector('[data-index-filter="topic"]'),
-        ask: document.querySelector('[data-index-filter="ask"]')
+    const platform = window.HKDSE_ICT;
+    const learning = window.HKDSE_ICT_LEARNING;
+    const practice = window.HKDSE_ICT_EXAM_PRACTICE;
+    const commandContainer = document.querySelector("[data-command-words]");
+    const groupContainer = document.querySelector("[data-topic-groups]");
+    if (!platform || !learning?.pages || !practice || !commandContainer || !groupContainer) return;
+
+    const element = (tag, className, text) => {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        if (text !== undefined) node.textContent = text;
+        return node;
     };
-    const list = document.querySelector("[data-index-list]");
-    const empty = document.querySelector("[data-index-empty]");
-    const count = document.querySelector("[data-index-count]");
 
-    function addOptions(select, values) {
-        [...new Set(values)].sort((a, b) => String(b).localeCompare(String(a), "zh-Hant", { numeric: true })).forEach(value => {
-            const option = document.createElement("option");
-            option.value = String(value);
-            option.textContent = String(value);
-            select.appendChild(option);
+    commandContainer.replaceChildren(...practice.commandWords.map(command => {
+        const article = element("article", "past-command-card");
+        article.append(element("h3", "", command.verb), element("p", "", command.demand));
+        return article;
+    }));
+
+    const lessonSections = platform.sections.filter(section => section.kind === "course");
+    let topicCount = 0;
+    const groups = lessonSections.map(section => {
+        const group = element("section", "past-topic-group");
+        const header = element("header", "past-topic-group-head");
+        header.append(element("span", "", section.sectionCode), element("h3", "", section.sectionTitle));
+        group.append(header);
+
+        const cards = element("div", "past-topic-card-grid");
+        section.items.forEach(item => {
+            const focus = learning.pages[item.id]?.dseFocus;
+            if (!focus) return;
+            topicCount += 1;
+            const article = element("article", "past-topic-card");
+            const heading = element("div", "past-topic-card-heading");
+            const title = element("div");
+            title.append(element("small", "", item.syllabusRef), element("h4", "", item.title.replace(/^[ivx]+\.\s*/i, "")));
+            heading.append(title, element("span", "", focus.questionForms[0]));
+            article.append(heading);
+
+            const terms = element("div", "past-topic-terms");
+            focus.keyTerms.forEach(term => terms.append(element("span", "", term)));
+            article.append(terms);
+
+            const columns = element("div", "past-topic-columns");
+            const know = element("div", "past-topic-list");
+            know.append(element("b", "", "核心重點"));
+            const knowList = document.createElement("ul");
+            focus.mustKnow.forEach(point => knowList.append(element("li", "", point)));
+            know.append(knowList);
+            const losses = element("div", "past-topic-list past-topic-losses");
+            losses.append(element("b", "", "常見失分"));
+            const lossList = document.createElement("ul");
+            focus.lossPoints.forEach(point => lossList.append(element("li", "", point)));
+            losses.append(lossList);
+            columns.append(know, losses);
+            article.append(columns);
+
+            const pattern = element("p", "past-answer-pattern");
+            pattern.append(element("strong", "", "建議答題結構："), document.createTextNode(focus.answerPattern));
+            article.append(pattern);
+
+            const forms = element("div", "past-question-forms");
+            focus.questionForms.forEach(form => forms.append(element("span", "", form)));
+            article.append(forms);
+
+            const actions = element("div", "past-topic-actions");
+            const lesson = element("a", "", "重溫課題");
+            lesson.href = item.file;
+            const questions = element("a", "", "做原創題");
+            questions.href = `practice.html?topic=${encodeURIComponent(item.id)}`;
+            actions.append(lesson, questions);
+            article.append(actions);
+            cards.append(article);
         });
-    }
-
-    addOptions(filters.year, data.entries.map(entry => entry.year));
-    addOptions(filters.topic, data.entries.map(entry => entry.topic));
-    addOptions(filters.ask, data.entries.map(entry => entry.askType));
-
-    function render() {
-        const shown = data.entries.filter(entry =>
-            (filters.year.value === "all" || String(entry.year) === filters.year.value) &&
-            (filters.topic.value === "all" || entry.topic === filters.topic.value) &&
-            (filters.ask.value === "all" || entry.askType === filters.ask.value)
-        );
-        list.replaceChildren(...shown.map(entry => {
-            const article = document.createElement("article");
-            article.className = "past-index-card";
-            const year = document.createElement("div");
-            year.className = "past-index-year";
-            year.innerHTML = `<b>${entry.year}</b><span>${entry.paper}</span>`;
-            const details = document.createElement("div");
-            const title = document.createElement("h3");
-            title.textContent = entry.topic;
-            const metadata = document.createElement("div");
-            metadata.className = "past-index-meta";
-            [entry.askType, entry.curriculum].forEach(value => {
-                const tag = document.createElement("span");
-                tag.textContent = value;
-                metadata.appendChild(tag);
-            });
-            const context = document.createElement("p");
-            context.textContent = entry.context;
-            details.append(title, metadata, context);
-            const link = document.createElement("a");
-            link.href = entry.sourceUrl;
-            link.target = "_blank";
-            link.rel = "noopener";
-            link.textContent = "官方示例 ↗";
-            article.append(year, details, link);
-            return article;
-        }));
-        count.textContent = `${shown.length} 項公開示例標記`;
-        empty.hidden = shown.length > 0;
-    }
-
-    Object.values(filters).forEach(select => select.addEventListener("change", render));
-    document.querySelector("[data-index-reset]")?.addEventListener("click", () => {
-        Object.values(filters).forEach(select => { select.value = "all"; });
-        render();
+        group.append(cards);
+        return group;
     });
 
-    const guideContainer = document.querySelector("[data-ask-guides]");
-    guideContainer?.replaceChildren(...data.askGuides.map(guide => {
-        const article = document.createElement("article");
-        article.className = "past-verb-card";
-        const title = document.createElement("h3");
-        title.textContent = guide.verb;
-        const description = document.createElement("p");
-        description.textContent = guide.demand;
-        const link = document.createElement("a");
-        link.href = guide.route;
-        link.textContent = "練習這類問法 →";
-        article.append(title, description, link);
-        return article;
-    }));
-
-    const sourceContainer = document.querySelector("[data-source-pages]");
-    sourceContainer?.replaceChildren(...data.sourcePages.map(source => {
-        const article = document.createElement("article");
-        article.className = "past-source-card";
-        const details = document.createElement("div");
-        const year = document.createElement("b");
-        year.textContent = source.year;
-        const title = document.createElement("p");
-        title.textContent = source.label;
-        details.append(year, title);
-        const link = document.createElement("a");
-        link.href = source.href;
-        link.target = "_blank";
-        link.rel = "noopener";
-        link.textContent = "前往考評局 ↗";
-        article.append(details, link);
-        return article;
-    }));
-    render();
+    groupContainer.replaceChildren(...groups);
+    document.querySelector("[data-topic-count]").textContent = `${topicCount} 個課題`;
+    document.querySelector("[data-topic-total]").textContent = String(topicCount);
 })();

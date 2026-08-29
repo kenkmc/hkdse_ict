@@ -3,56 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <meta name="description" content="按年份、課題及問法查找 HKDSE ICT 官方考生表現示例與原創練習，不重製受版權保護的歷屆試題。">
-    <title>歷屆問法與官方來源索引 - ICT 學習資源網</title>
+    <meta name="description" content="按 HKDSE ICT 課程整理各課題的必用字詞、核心重點、常見失分及答題結構。">
+    <title>DSE 課題答題重點 - ICT 學習資源網</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/platform.css?v=4">
-    <link rel="stylesheet" href="assets/css/learning.css?v=4">
     <link rel="stylesheet" href="assets/css/system-lesson.css?v=1">
-    <link rel="stylesheet" href="assets/css/past-paper-index.css?v=2">
+    <link rel="stylesheet" href="assets/css/past-paper-index.css?v=3">
 </head>
 <body class="past-index-page">
-<nav class="sys-lesson-nav" aria-label="本頁導覽"><a href="answer-lab.html">作答實驗室</a><a href="#index">年份索引</a><a href="#verbs">問法拆解</a><a href="#sources">官方來源</a></nav>
+<nav class="sys-lesson-nav" aria-label="本頁導覽"><a href="#commands">指令詞</a><a href="#topics">各課題重點</a><a href="answer-lab.html">分層作答練習</a></nav>
 <main class="sys-page">
     <section class="sys-hero past-index-hero">
-        <div class="sys-hero-copy"><p class="sys-eyebrow">Past-paper metadata · Copyright-safe</p><h1>歷屆問法與官方來源索引</h1><p>用年份、課題和問法找出需要練習的能力，再前往考評局官方頁面核對公開示例。本頁只保存自行整理的元資料和摘要，不展示原題或官方評分準則。</p><div class="sys-actions"><a class="sys-button sys-button-primary" href="#index">開始查找</a><a class="sys-button sys-button-secondary" href="answer-lab.html">練習作答升級</a><a class="sys-button sys-button-secondary" href="practice.html">做原創題</a></div></div>
-        <aside class="sys-focus-card"><span>使用方法</span><h2>由問法返回能力</h2><ol><li>按年份或課題篩選公開示例</li><li>看清題目動詞所要求的證據</li><li>到官方來源閱讀可公開內容</li><li>回到本站以原創題重練</li></ol></aside>
-    </section>
-
-    <section class="sys-section past-licence-note"><h2>授權界線</h2><p>歷屆試題及評卷參考受版權保護。學校複製或以電子方式保存試題可能需要考評局牌照；本索引因此不大量複製題目，也不重製官方評分準則。若你持有合法試題專輯，請用這裏的課題與問法欄自行補充私人筆記。</p><div class="past-note-actions"><a href="https://www.hkeaa.edu.hk/en/resources/publications/licence/" target="_blank" rel="noopener">學校使用試題牌照</a><a href="https://www.hkeaa.edu.hk/en/resources/publications/qps/" target="_blank" rel="noopener">申請轉載試題</a></div></section>
-
-    <section class="sys-section past-answer-lab-card"><div><p class="sys-kicker">New · 2025 candidate response study</p><h2>由公開答卷轉成分層練習</h2><p>比較第 1 至第 5 級示例的作答完整度後，以全新情境練習找出缺口、重組評分點及獨立作答。涵蓋試算表、網絡、SQL、算法及網頁保安，共 15 項任務。</p></div><a href="answer-lab.html">進入作答升級實驗室 →</a></section>
-
-    <section id="index" class="sys-section">
-        <div class="sys-section-heading"><div><p class="sys-kicker">01 · Searchable metadata</p><h2>年份 × 課題 × 問法</h2></div><span class="sys-tag" data-index-count>0 項公開示例標記</span></div>
-        <div class="past-filters" aria-label="索引篩選">
-            <label>年份<select data-index-filter="year"><option value="all">全部年份</option></select></label>
-            <label>課題<select data-index-filter="topic"><option value="all">全部課題</option></select></label>
-            <label>問法<select data-index-filter="ask"><option value="all">全部問法</option></select></label>
-            <button type="button" data-index-reset>重設</button>
+        <div class="sys-hero-copy">
+            <p class="sys-eyebrow">Topic focus · Precise terminology</p>
+            <h1>DSE 課題答題重點</h1>
+            <p>按課程單元重新整理每課最重要的概念、必用字詞、常見題型和失分位置。學生可由課題卡直接返回教材或開啟相應原創練習。</p>
+            <div class="sys-actions"><a class="sys-button sys-button-primary" href="#topics">查看全部課題</a><a class="sys-button sys-button-secondary" href="answer-lab.html">練習作答結構</a></div>
         </div>
-        <div class="past-index-list" data-index-list></div>
-        <p class="past-index-empty" data-index-empty hidden>沒有符合全部條件的項目，請減少篩選條件。</p>
+        <aside class="sys-focus-card">
+            <span>每個課題都要做到</span>
+            <h2>不只背名詞，要寫成答案</h2>
+            <ol><li>使用準確課程用字</li><li>指出題目中的證據或限制</li><li>交代技術機制或步驟</li><li>把結果連回題目情境</li></ol>
+        </aside>
     </section>
 
-    <section id="verbs" class="sys-section">
-        <div class="sys-section-heading"><div><p class="sys-kicker">02 · Command words</p><h2>先回答題目真正要求</h2></div></div>
-        <div class="past-verb-grid" data-ask-guides></div>
+    <section class="past-summary-grid" aria-label="內容摘要">
+        <article><b data-topic-total>26</b><span>個必修及選修課題</span></article>
+        <article><b>5</b><span>步提交前核對</span></article>
+        <article><b>3</b><span>類資料：用字、重點、失分</span></article>
     </section>
 
-    <section id="sources" class="sys-section">
-        <div class="sys-section-heading"><div><p class="sys-kicker">03 · Official sources</p><h2>按年份前往考評局資料</h2></div><span class="sys-tag">外部連結</span></div>
-        <div class="past-source-grid" data-source-pages></div>
-        <div class="past-transition-note"><strong>課程轉制提醒：</strong>2027 年起的新選修結構為 A、B、C，學生選兩個單元。較早年份的卷二選項名稱與範圍不同，索引只把仍相關的技能映射到新課程，不把舊制卷別當作新制完整模擬。</div>
+    <section id="commands" class="sys-section">
+        <div class="sys-section-heading"><div><p class="sys-kicker">01 · Command words</p><h2>先按指令詞決定答案形式</h2></div><span class="sys-tag">不需年份篩選</span></div>
+        <div class="past-command-grid" data-command-words></div>
+    </section>
+
+    <section id="topics" class="sys-section past-topic-section">
+        <div class="sys-section-heading"><div><p class="sys-kicker">02 · Topic-by-topic focus</p><h2>所有課題的用字與重點</h2></div><span class="sys-tag" data-topic-count>0 個課題</span></div>
+        <p class="sys-lead">每張卡把「要懂甚麼」與「要怎樣寫」放在一起。先讀必用字詞和核心重點，再以答題結構完成原創練習。</p>
+        <div class="past-topic-groups" data-topic-groups></div>
     </section>
 </main>
-<script src="course_data.js?v=3"></script>
+<script src="course_data.js?v=4"></script>
 <script src="assets/js/site_navigation.js?v=4"></script>
-<script src="learning_data.js?v=10"></script>
-<script src="past_paper_data.js?v=2"></script>
-<script src="assets/js/past-paper-index.js?v=1"></script>
-<script src="assets/js/lesson_companion.js?v=4"></script>
+<script src="learning_data.js?v=11"></script>
+<script src="past_paper_data.js?v=3"></script>
+<script src="assets/js/past-paper-index.js?v=3"></script>
 </body>
 </html>

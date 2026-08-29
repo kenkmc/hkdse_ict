@@ -1,5 +1,59 @@
-.past-index-page .past-index-hero{background:radial-gradient(circle at 82% 16%,rgb(125 211 252 / .24),transparent 27%),linear-gradient(135deg,#102a43,#174c65 65%,#236a75)}
-.past-index-page .sys-button-primary{background:#d9f5ef;color:#12483e}.past-licence-note{border-color:#f4d3a3;background:#fffaf2}.past-licence-note h2{margin-top:0;color:#7c4814}.past-licence-note p{color:#6f563e;line-height:1.75}.past-note-actions{display:flex;flex-wrap:wrap;gap:10px}.past-note-actions a{padding:8px 12px;border-radius:9px;background:#fff0d6;color:#7b4512;font-size:13px;font-weight:800;text-decoration:none}.past-filters{display:grid;grid-template-columns:160px 1fr 1fr auto;gap:12px;align-items:end;padding:18px;border-radius:14px;background:#eef6f8}.past-filters label{display:grid;gap:6px;color:#315369;font-size:12px;font-weight:800}.past-filters select{min-width:0;min-height:42px;padding:8px 10px;border:1px solid #bfd0d8;border-radius:9px;background:#fff;font:13px "Noto Sans TC",sans-serif}.past-filters button{min-height:42px;padding:0 16px;border:0;border-radius:9px;background:#1f6071;color:#fff;font-weight:800;cursor:pointer}.past-index-list{display:grid;gap:12px;margin-top:18px}.past-index-card{display:grid;grid-template-columns:100px minmax(0,1fr) auto;gap:18px;align-items:start;padding:18px;border:1px solid #dbe5ea;border-radius:14px;background:#fff}.past-index-year{display:grid;gap:3px;color:#1b5d70;font-weight:800}.past-index-year b{font-size:24px}.past-index-year span{font-size:12px}.past-index-card h3{margin:0 0 7px;color:#202c3b;font-size:17px}.past-index-card p{margin:5px 0;color:#687482;line-height:1.62}.past-index-meta{display:flex;flex-wrap:wrap;gap:7px}.past-index-meta span{padding:5px 8px;border-radius:999px;background:#eef5f7;color:#355d69;font-size:11px;font-weight:800}.past-index-card>a{align-self:center;padding:9px 12px;border-radius:9px;background:#176477;color:#fff;font-size:12px;font-weight:800;text-decoration:none;white-space:nowrap}.past-index-empty{padding:30px;text-align:center;color:#74808a}.past-verb-grid,.past-source-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.past-verb-card,.past-source-card{padding:18px;border:1px solid #dbe4e9;border-radius:14px;background:#fff}.past-verb-card h3,.past-source-card h3{margin:0 0 7px;color:#1d3b4c}.past-verb-card p,.past-source-card p{margin:0;color:#6b7480;line-height:1.65}.past-verb-card a,.past-source-card a{display:inline-flex;margin-top:12px;color:#176477;font-size:13px;font-weight:800;text-decoration:none}.past-source-card{display:flex;align-items:center;justify-content:space-between;gap:16px}.past-source-card b{display:block;color:#1c596a;font-size:25px}.past-transition-note{margin-top:16px;padding:15px;border-radius:11px;background:#eff4ff;color:#405372;line-height:1.7}
-.past-answer-lab-card{display:flex;align-items:center;justify-content:space-between;gap:26px;border-color:#b9d7e1;background:linear-gradient(135deg,#eef8fb,#f8fbff)}.past-answer-lab-card h2{font-size:27px}.past-answer-lab-card p:not(.sys-kicker){max-width:760px;margin:10px 0 0;color:#526879;line-height:1.75}.past-answer-lab-card>a{flex:0 0 auto;padding:12px 16px;border-radius:11px;background:#176477;color:#fff;font-size:13px;font-weight:800;text-decoration:none}
-@media(max-width:800px){.past-answer-lab-card{align-items:flex-start;flex-direction:column}.past-filters{grid-template-columns:1fr 1fr}.past-filters button{grid-column:1/-1}.past-index-card{grid-template-columns:86px 1fr}.past-index-card>a{grid-column:1/-1;text-align:center}.past-verb-grid,.past-source-grid{grid-template-columns:1fr}}
-@media(max-width:520px){.past-filters,.past-index-card{grid-template-columns:1fr}.past-index-card>a{grid-column:auto}.past-index-year{display:flex;align-items:baseline;gap:8px}.past-source-card{align-items:flex-start;flex-direction:column}}
+.past-index-page .past-index-hero {
+    background:
+        radial-gradient(circle at 82% 16%, rgb(125 211 252 / .24), transparent 27%),
+        linear-gradient(135deg, #102a43, #174c65 65%, #236a75);
+}
+
+.past-index-page .sys-button-primary { background: #d9f5ef; color: #12483e; }
+
+.past-summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
+.past-summary-grid article { display: flex; align-items: center; gap: 13px; padding: 18px 20px; border: 1px solid #d7e2e8; border-radius: 16px; background: #fff; box-shadow: 0 10px 25px rgb(24 49 83 / .06); }
+.past-summary-grid b { color: #176477; font-size: 28px; }
+.past-summary-grid span { color: #5d6b78; font-size: 13px; font-weight: 700; }
+
+.past-command-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.past-command-card { padding: 18px; border: 1px solid #d9e3e9; border-radius: 14px; background: #fbfcfd; }
+.past-command-card h3 { margin: 0 0 8px; color: #18566d; font-size: 16px; }
+.past-command-card p { margin: 0; color: #63717e; font-size: 12px; line-height: 1.7; }
+
+.past-topic-section { padding-inline: clamp(18px, 3vw, 34px); }
+.past-topic-groups { display: grid; gap: 26px; }
+.past-topic-group { padding-top: 4px; }
+.past-topic-group + .past-topic-group { padding-top: 27px; border-top: 2px solid #e3eaee; }
+.past-topic-group-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 13px; }
+.past-topic-group-head span { padding: 5px 8px; border-radius: 7px; background: #173e5f; color: #fff; font-size: 11px; font-weight: 900; }
+.past-topic-group-head h3 { margin: 0; color: #203b53; font-size: 21px; }
+.past-topic-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+.past-topic-card { min-width: 0; padding: 19px; border: 1px solid #d9e3e9; border-radius: 16px; background: linear-gradient(180deg, #fff, #fbfcfd); }
+.past-topic-card-heading { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+.past-topic-card-heading small { color: #7a8793; font-size: 10px; font-weight: 800; letter-spacing: .04em; }
+.past-topic-card-heading h4 { margin: 3px 0 0; color: #1d344b; font-size: 18px; }
+.past-topic-card-heading > span { flex: 0 0 auto; max-width: 130px; padding: 5px 8px; border-radius: 999px; background: #e7f3f6; color: #1f6170; font-size: 10px; font-weight: 800; text-align: center; }
+.past-topic-terms, .past-question-forms { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 13px; }
+.past-topic-terms span { padding: 5px 8px; border-radius: 7px; background: #edf2fa; color: #354e72; font-size: 10px; font-weight: 800; }
+.past-topic-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-top: 14px; }
+.past-topic-list { padding: 12px; border-radius: 11px; background: #f3f7f9; }
+.past-topic-list b { color: #24536b; font-size: 11px; }
+.past-topic-list ul { display: grid; gap: 5px; margin: 8px 0 0; padding-left: 18px; color: #53616f; font-size: 11px; line-height: 1.55; }
+.past-topic-losses { background: #fff7ed; }
+.past-topic-losses b { color: #9a4d13; }
+.past-answer-pattern { margin: 13px 0 0; padding: 11px 12px; border-left: 4px solid #27735f; border-radius: 9px; background: #edf8f4; color: #345f54; font-size: 12px; line-height: 1.65; }
+.past-answer-pattern strong { color: #175b49; }
+.past-question-forms span { color: #6a7580; font-size: 10px; font-weight: 800; }
+.past-question-forms span::before { content: "• "; color: #c66c1e; }
+.past-topic-actions { display: flex; gap: 8px; margin-top: 14px; }
+.past-topic-actions a { flex: 1 1 0; padding: 8px 10px; border-radius: 9px; background: #1c6273; color: #fff; font-size: 11px; font-weight: 800; text-align: center; text-decoration: none; }
+.past-topic-actions a:last-child { background: #243f6b; }
+
+@media (max-width: 880px) {
+    .past-command-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .past-topic-card-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 620px) {
+    .past-summary-grid, .past-command-grid, .past-topic-columns { grid-template-columns: 1fr; }
+    .past-summary-grid article { padding: 14px 16px; }
+    .past-topic-card { padding: 16px; }
+    .past-topic-card-heading { flex-direction: column; }
+    .past-topic-card-heading > span { max-width: none; }
+}

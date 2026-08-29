@@ -55,6 +55,24 @@ if (!platform || !Array.isArray(platform.sections)) {
             }
         }
     });
+
+    const sourceExtensions = new Set([".html", ".js", ".css", ".md"]);
+    const sourceFiles = [];
+    const collectSources = directory => {
+        fs.readdirSync(directory, { withFileTypes: true }).forEach(entry => {
+            if (entry.name === ".git") return;
+            const fullPath = path.join(directory, entry.name);
+            if (entry.isDirectory()) collectSources(fullPath);
+            else if (sourceExtensions.has(path.extname(entry.name).toLowerCase())) sourceFiles.push(fullPath);
+        });
+    };
+    collectSources(root);
+    sourceFiles.forEach(file => {
+        const source = fs.readFileSync(file, "utf8");
+        if (/https?:\/\/[^\s"')]*hkeaa\.edu\.hk/i.test(source)) {
+            errors.push(`${path.relative(root, file)} 仍包含不需要的外部評核網站連結。`);
+        }
+    });
 }
 
 if (errors.length) {

@@ -17,6 +17,7 @@ const errors = [];
 let lessonCount = 0;
 let lessonVisualCount = 0;
 let layeredLessonCount = 0;
+let dseFocusCount = 0;
 
 if (!learning?.pages) {
     errors.push("learning_data.js 沒有公開有效的學習提示資料。");
@@ -112,6 +113,18 @@ if (!learning?.pages) {
                     });
                 }
             }
+
+            const focus = page.dseFocus;
+            if (!focus) {
+                errors.push(`${id} 缺少 DSE 用字與答題重點。`);
+            } else {
+                dseFocusCount += 1;
+                if (!Array.isArray(focus.keyTerms) || focus.keyTerms.length < 5) errors.push(`${id} 至少需要五個必用字詞。`);
+                if (!Array.isArray(focus.mustKnow) || focus.mustKnow.length < 3) errors.push(`${id} 至少需要三項核心重點。`);
+                if (!Array.isArray(focus.questionForms) || focus.questionForms.length < 2) errors.push(`${id} 至少需要兩種常見題型。`);
+                if (!focus.answerPattern) errors.push(`${id} 缺少建議答題結構。`);
+                if (!Array.isArray(focus.lossPoints) || focus.lossPoints.length < 3) errors.push(`${id} 至少需要三項常見失分。`);
+            }
         }
 
         const check = page.quickCheck;
@@ -127,5 +140,5 @@ if (errors.length) {
     errors.forEach(error => console.error(`- ${error}`));
     process.exitCode = 1;
 } else {
-    console.log(`學習提示驗證通過：${Object.keys(learning.pages).length} 個頁面均有目標、概念圖、常見誤解及快速檢查；${lessonVisualCount}/${lessonCount} 個課程頁有圖像導讀，${layeredLessonCount}/${lessonCount} 個課程頁有三級學習、情境課業及圖像微課。`);
+    console.log(`學習提示驗證通過：${Object.keys(learning.pages).length} 個頁面均有目標、概念圖、常見誤解及快速檢查；${lessonVisualCount}/${lessonCount} 個課程頁有圖像導讀，${layeredLessonCount}/${lessonCount} 個課程頁有三級學習，${dseFocusCount}/${lessonCount} 個課程頁有專屬 DSE 用字、重點及失分提示。`);
 }

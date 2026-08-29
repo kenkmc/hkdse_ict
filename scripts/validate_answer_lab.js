@@ -10,19 +10,14 @@ vm.runInContext(fs.readFileSync(path.join(root, "course_data.js"), "utf8"), cont
 vm.runInContext(fs.readFileSync(path.join(root, "past_paper_data.js"), "utf8"), context, { filename: "past_paper_data.js" });
 
 const platform = browser.HKDSE_ICT;
-const study = browser.HKDSE_ICT_PAST_PAPER_INDEX?.performanceStudy;
+const study = browser.HKDSE_ICT_EXAM_PRACTICE;
 const errors = [];
 const expectedLayers = ["foundation", "exam", "challenge"];
 
 if (!study) {
-    errors.push("past_paper_data.js 缺少 performanceStudy。 ");
+    errors.push("past_paper_data.js 缺少 EXAM_PRACTICE 資料。");
 } else {
-    if (study.year !== 2025 || !study.officialPage?.includes("hkeaa.edu.hk")) errors.push("官方示例年份或來源頁無效。");
-    if (!Array.isArray(study.sourceFiles) || study.sourceFiles.length !== 6) errors.push("應提供前言及第 1 至第 5 級共 6 個官方 PDF 連結。");
-    study.sourceFiles?.forEach(source => {
-        if (!source.id || !source.label || !/^https:\/\/www\.hkeaa\.edu\.hk\//.test(source.href || "")) errors.push(`官方 PDF 資料不完整：${source.id || "未命名"}`);
-    });
-    if (!Array.isArray(study.observedLevels) || study.observedLevels.length !== 5) errors.push("等級觀察必須包含第 1 至第 5 級。");
+    if (!Array.isArray(study.commandWords) || study.commandWords.length < 6) errors.push("指令詞整理至少需要 6 項。");
     if (!Array.isArray(study.answerFramework) || study.answerFramework.length !== 5) errors.push("作答框架必須包含 5 個核對步驟。");
 
     const ids = new Set();
@@ -60,5 +55,5 @@ if (errors.length) {
     process.exitCode = 1;
 } else {
     const taskCount = study.practiceSets.length * expectedLayers.length;
-    console.log(`作答實驗室驗證通過：${study.observedLevels.length} 個等級觀察、${study.practiceSets.length} 組題材及 ${taskCount} 項分層任務均完整。`);
+    console.log(`作答實驗室驗證通過：${study.commandWords.length} 個指令詞、${study.practiceSets.length} 組題材及 ${taskCount} 項分層任務均完整。`);
 }

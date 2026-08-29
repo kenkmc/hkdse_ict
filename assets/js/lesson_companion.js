@@ -203,6 +203,31 @@
         `;
     })() : "";
 
+    const dseFocus = page.dseFocus ? `
+        <section class="lesson-dse-focus" aria-labelledby="lesson-dse-focus-title">
+            <div class="lesson-dse-focus-heading">
+                <div><p class="lesson-check-label">DSE 用字與重點</p><h3 id="lesson-dse-focus-title">這一課要懂甚麼、怎樣寫</h3></div>
+                <a href="past-paper-index.html#topics">查看全部課題 →</a>
+            </div>
+            <div class="lesson-dse-focus-grid">
+                <div class="lesson-dse-focus-block">
+                    <h4>必用字詞</h4>
+                    <div class="lesson-dse-term-list">${page.dseFocus.keyTerms.map(term => `<span>${escapeHTML(term)}</span>`).join("")}</div>
+                </div>
+                <div class="lesson-dse-focus-block">
+                    <h4>核心重點</h4>
+                    <ul>${page.dseFocus.mustKnow.map(point => `<li>${escapeHTML(point)}</li>`).join("")}</ul>
+                </div>
+                <div class="lesson-dse-focus-block lesson-dse-losses">
+                    <h4>常見失分</h4>
+                    <ul>${page.dseFocus.lossPoints.map(point => `<li>${escapeHTML(point)}</li>`).join("")}</ul>
+                </div>
+            </div>
+            <div class="lesson-dse-answer-pattern"><strong>建議答題結構</strong><span>${escapeHTML(page.dseFocus.answerPattern)}</span></div>
+            <div class="lesson-dse-question-forms"><strong>常見要求：</strong>${page.dseFocus.questionForms.map(form => `<span>${escapeHTML(form)}</span>`).join("")}</div>
+        </section>
+    ` : "";
+
     section.innerHTML = `
         <div class="lesson-companion-heading">
             <div>
@@ -213,6 +238,7 @@
         </div>
         <div id="lesson-companion-content" class="lesson-companion-content"${expandedByDefault ? "" : " hidden"}>
             ${lessonVisual}
+            ${dseFocus}
             ${layeredStudy}
             <div class="lesson-objectives">
                 <h3>完成本頁後，你應能夠</h3>

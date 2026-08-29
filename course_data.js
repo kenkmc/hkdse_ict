@@ -16,7 +16,6 @@ const siteConfig = {
     searchSite: "kenkmc.github.io/hkdse_ict",
     repositoryUrl: "https://github.com/kenkmc/hkdse_ict",
     curriculumUrl: "https://www.edb.gov.hk/attachment/tc/curriculum-development/kla/technology-edu/curriculum-doc/ICT_C%26A%20Guide_c_final.pdf",
-    assessmentUrl: "https://www.hkeaa.edu.hk/DocLibrary/HKDSE/Subject_Information/ict/2027hkdse-e-ict.pdf",
     features: {
         questionEngine: true,
         layeredLearning: true,
@@ -321,21 +320,21 @@ const courseData = [
             },
             {
                 id: "tool-past-paper-index",
-                title: "歷屆問法與官方來源索引",
+                title: "DSE 課題答題重點",
                 file: "past-paper-index.html",
-                desc: "按年份、課題及問法整理官方來源連結，不複製歷屆試題或評分參考",
+                desc: "按全部必修及選修課題整理必用字詞、核心概念、常見題型、答題結構及失分位置",
                 type: "tool",
-                syllabusRef: "Past paper metadata",
-                tags: ["歷屆試題", "問法索引", "年份", "課題", "官方來源", "版權"]
+                syllabusRef: "Paper 1 / Paper 2",
+                tags: ["DSE", "課題重點", "必用字詞", "答題結構", "常見失分", "溫習"]
             },
             {
                 id: "tool-answer-lab",
-                title: "考生作答升級實驗室",
+                title: "DSE 作答升級實驗室",
                 file: "answer-lab.html",
-                desc: "參考 2025 官方考生表現示例的可見作答模式，以 15 項原創分層任務練習診斷、改寫及獨立作答",
+                desc: "以 15 項原創分層任務練習找出答案缺口、重組評分點及獨立作答",
                 type: "tool",
                 syllabusRef: "Paper 1 / Paper 2",
-                tags: ["考生表現示例", "分層練習", "答題技巧", "評分點", "SQL", "算法", "情境題"]
+                tags: ["分層練習", "答題技巧", "評分點", "SQL", "算法", "情境題"]
             },
             {
                 id: "tool-sba-prep",

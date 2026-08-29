@@ -15,24 +15,6 @@
 }
 
 .answer-lab-page .sys-button-primary { background: #fde68a; color: #573306; }
-.answer-scope-note { display: grid; grid-template-columns: minmax(230px, .58fr) minmax(0, 1.45fr) auto; gap: 24px; align-items: center; border-color: #f1d39b; background: #fffaf0; }
-.answer-scope-note h2 { font-size: 24px; }
-.answer-scope-note p { margin: 0; color: #69573e; line-height: 1.8; }
-.answer-scope-note > a { padding: 10px 13px; border-radius: 10px; background: #7a4a12; color: #fff; font-size: 12px; font-weight: 800; text-align: center; text-decoration: none; }
-
-.answer-level-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
-.answer-level-card { position: relative; display: flex; min-width: 0; flex-direction: column; padding: 18px; overflow: hidden; border: 1px solid #dbe4ec; border-radius: 16px; background: linear-gradient(180deg, #fff, #f8fafc); }
-.answer-level-card::before { content: ""; position: absolute; inset: 0 0 auto; height: 5px; background: var(--level-colour); }
-.answer-level-card:nth-child(1) { --level-colour: #b65757; }
-.answer-level-card:nth-child(2) { --level-colour: #d47b35; }
-.answer-level-card:nth-child(3) { --level-colour: #b28b24; }
-.answer-level-card:nth-child(4) { --level-colour: #26806d; }
-.answer-level-card:nth-child(5) { --level-colour: #315fa5; }
-.answer-level-card small { color: #718095; font-size: 11px; font-weight: 800; letter-spacing: .05em; }
-.answer-level-card h3 { margin: 6px 0 10px; color: var(--answer-ink); font-size: 20px; }
-.answer-level-card p { margin: 0 0 12px; color: #617083; font-size: 13px; line-height: 1.65; }
-.answer-level-card .answer-next { margin-top: auto; padding-top: 12px; border-top: 1px solid #e4e9ee; color: #374c68; }
-.answer-level-card a { margin-top: 13px; color: var(--answer-blue); font-size: 12px; font-weight: 800; text-decoration: none; }
 
 .answer-framework { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
 .answer-framework-card { padding: 18px; border: 1px solid #dce4eb; border-radius: 15px; background: #fbfcfd; }
@@ -116,21 +98,13 @@
 .answer-self-check input { margin-top: 3px; accent-color: #245d9a; }
 .answer-route { color: #245d9a; font-size: 12px; font-weight: 800; text-decoration: none; }
 
-.answer-source-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-.answer-source-card { display: flex; align-items: center; justify-content: space-between; gap: 13px; padding: 15px; border: 1px solid #dbe3e9; border-radius: 13px; background: #fbfcfd; }
-.answer-source-card span { color: #31485f; font-size: 13px; font-weight: 800; }
-.answer-source-card a { flex: 0 0 auto; color: #245d9a; font-size: 12px; font-weight: 800; text-decoration: none; }
-
 @media (max-width: 940px) {
-    .answer-level-grid, .answer-framework { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .answer-scope-note { grid-template-columns: 1fr; }
-    .answer-scope-note > a { justify-self: start; }
+    .answer-framework { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .answer-case-grid { grid-template-columns: 1fr; }
-    .answer-source-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 620px) {
-    .answer-level-grid, .answer-framework, .answer-layer-tabs, .answer-option-grid, .answer-block-grid, .answer-self-check, .answer-source-grid { grid-template-columns: 1fr; }
+    .answer-framework, .answer-layer-tabs, .answer-option-grid, .answer-block-grid, .answer-self-check { grid-template-columns: 1fr; }
     .answer-practice-head { grid-template-columns: 1fr; padding: 20px 17px; }
     .answer-practice-meta { justify-content: flex-start; }
     .answer-case-grid, .answer-layer-panel { padding: 18px 16px; }

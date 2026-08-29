@@ -1,7 +1,7 @@
 /**
  * 原創 DSE 題型題庫。
  *
- * 題目並非考評局歷屆試題。`topicId` 必須對應 course_data.js 的永久內容 id，
+ * 題目均為自行編寫。`topicId` 必須對應 course_data.js 的永久內容 id，
  * 讓下一階段的進度追蹤能以同一識別碼計算課題掌握度。
  */
 const questionData = [

@@ -1,15 +1,13 @@
 (function initialiseAnswerLab() {
     "use strict";
 
-    const study = window.HKDSE_ICT_PAST_PAPER_INDEX?.performanceStudy;
+    const study = window.HKDSE_ICT_EXAM_PRACTICE;
     if (!study) return;
 
-    const levelContainer = document.querySelector("[data-observed-levels]");
     const frameworkContainer = document.querySelector("[data-answer-framework]");
-    const sourceContainer = document.querySelector("[data-performance-sources]");
     const setTabs = document.querySelector("[data-practice-set-tabs]");
     const practicePanel = document.querySelector("[data-practice-panel]");
-    if (!levelContainer || !frameworkContainer || !sourceContainer || !setTabs || !practicePanel) return;
+    if (!frameworkContainer || !setTabs || !practicePanel) return;
 
     const state = {
         setId: study.practiceSets[0]?.id,
@@ -26,29 +24,7 @@
         return node;
     }
 
-    function externalLink(label, href) {
-        const link = element("a", "", label);
-        link.href = href;
-        link.target = "_blank";
-        link.rel = "noopener";
-        return link;
-    }
-
     function renderOverview() {
-        levelContainer.replaceChildren(...study.observedLevels.map((item, index) => {
-            const article = element("article", "answer-level-card");
-            article.append(
-                element("small", "", item.level),
-                element("h3", "", item.short),
-                element("p", "", item.signal)
-            );
-            const next = element("p", "answer-next", item.next);
-            article.append(next);
-            const source = study.sourceFiles.find(file => file.id === `level-${index + 1}`);
-            if (source) article.append(externalLink("查看官方示例 PDF ↗", source.href));
-            return article;
-        }));
-
         frameworkContainer.replaceChildren(...study.answerFramework.map((item, index) => {
             const article = element("article", "answer-framework-card");
             article.append(
@@ -56,12 +32,6 @@
                 element("h3", "", item.label),
                 element("p", "", item.prompt)
             );
-            return article;
-        }));
-
-        sourceContainer.replaceChildren(...study.sourceFiles.map(source => {
-            const article = element("article", "answer-source-card");
-            article.append(element("span", "", source.label), externalLink("開啟 PDF ↗", source.href));
             return article;
         }));
     }

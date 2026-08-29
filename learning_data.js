@@ -504,7 +504,7 @@ const learningData = {
         "tool-mock-exam": {
             objectives: ["在正式限時和完成前不顯示答案的情況完成原創題組", "練習卷一甲乙分部或卷二任選兩個選修單元的作答安排", "使用標記、未答導覽、答題紙及交卷後課題分析"],
             concepts: [{ icon: "⏱", label: "正式限時", detail: "卷一 2 小時；卷二 1 小時 30 分鐘，時間到會自動交卷。" }, { icon: "1", label: "Paper 1", detail: "甲部 40 分選擇題、乙部 60 分短答／結構題，共有三套穩定組卷。" }, { icon: "2", label: "Paper 2", detail: "從 A、B、C 選取兩個 38 小時選修單元，每個選修有兩套題組。" }, { icon: "✓", label: "交卷檢討", detail: "交卷後按正式成績比重換算，並按課題列出失分和遺漏評分點。" }],
-            misconceptions: [{ claim: "本站模擬卷的分數可直接換算正式等級。", correction: "題目是自行編寫，未經考評局等級設定，只能用作診斷與時間管理練習。" }],
+            misconceptions: [{ claim: "本站模擬卷的分數可直接換算正式等級。", correction: "題目是自行編寫，未經正式等級設定，只能用作診斷與時間管理練習。" }],
             quickCheck: { question: "模擬考途中遇到不肯定的題目，較合適做法是甚麼？", options: ["先標記並按時間安排繼續", "立即查看答案", "退出並重開直至抽到熟悉題目", "只做選擇題"], answerIndex: 0, explanation: "先控制時間並完成可取得的分數，最後才返回較困難題目。" },
             examTip: "第一次以準確為先，第二次才比較用時；交卷後按評分點重寫失分答案。"
         },
@@ -516,16 +516,16 @@ const learningData = {
             examTip: "重做前先遮住答案，用一句話重述每個遺漏評分點，再完整作答。"
         },
         "tool-past-paper-index": {
-            objectives: ["按年份、課題及問法查找考評局公開示例", "辨認指出、描述、解釋、比較、追蹤和評估等動詞要求", "在不複製歷屆原題的情況建立操卷索引"],
-            concepts: [{ icon: "年", label: "年份", detail: "連到考評局公開考生表現示例及出版資料。" }, { icon: "題", label: "課題", detail: "把公開示例映射到現行課程內容；舊制卷二會清楚標示。" }, { icon: "問", label: "問法", detail: "摘要題目動詞和所需證據，不重製原題。" }, { icon: "©", label: "版權", detail: "歷屆題目和評卷參考受保護，使用及複製須依考評局授權。" }],
-            misconceptions: [{ claim: "網上找到的歷屆試題可以直接大量複製到題庫。", correction: "公開可搜尋不代表可重製；本站只保存元資料、官方連結及自行編寫的練習題。" }],
+            objectives: ["按必修及選修單元掌握全部 26 課的核心重點", "辨認每課必用字詞、常見題型及失分位置", "使用課題專屬答題結構完成原創練習"],
+            concepts: [{ icon: "詞", label: "必用字詞", detail: "使用課程中的準確名詞，避免以『較好』『方便』等籠統字眼代替機制。" }, { icon: "點", label: "核心重點", detail: "每課先整理必須理解的三個關係，再進入細節及題型。" }, { icon: "寫", label: "答題結構", detail: "把情境證據、技術機制和直接結果組成可逐點判讀的答案。" }, { icon: "失", label: "常見失分", detail: "針對單位、條件、欄名、步驟、比較準則及情境連結逐項核對。" }],
+            misconceptions: [{ claim: "只背課題名詞便足以回答解釋題。", correction: "名詞只是答案起點；仍要寫出如何運作，以及為何能處理題目中的需要或風險。" }],
             quickCheck: { question: "題目要求『解釋』時，答案通常要包含甚麼？", options: ["原因、機制或因果關係", "只有一個名詞", "只抄題目", "只寫個人喜好"], answerIndex: 0, explanation: "解釋題要交代如何或為何，而不是只列出答案名稱。" },
             examTip: "先圈起命令詞，再估計每分需要一個可獨立辨認的答案點。"
         },
         "tool-answer-lab": {
-            objectives: ["從不同等級公開示例辨認作答完整度及常見缺口", "以情境證據、技術機制和直接結果組織答案", "完成基礎診斷、應試改寫及高階整合三層原創練習"],
+            objectives: ["辨認不完整公式、SQL、算法及解釋句的缺口", "以情境證據、技術機制和直接結果組織答案", "完成基礎診斷、應試改寫及高階整合三層原創練習"],
             concepts: [{ icon: "眼", label: "診斷", detail: "辨認留白、籠統術語、欠條件公式及不完整 SQL 等可見缺口。" }, { icon: "鏈", label: "因果鏈", detail: "解釋題由題目證據連到技術機制，再寫出對情境的直接結果。" }, { icon: "分", label: "評分點", detail: "按分數和命令詞檢查答案點數量、單位、條件、輸出及步驟。" }, { icon: "改", label: "重寫", detail: "先診斷，再把答案重組；最後在新情境中獨立作答和自評。" }],
-            misconceptions: [{ claim: "只要背熟第 5 級考生的句子，就能應付相同題型。", correction: "公開示例用來觀察答案品質；真正能力是把原理移植到新的數據、欄位、硬件和限制。" }, { claim: "答案越長便越高分。", correction: "每句應回應命令詞或形成可辨認的評分點；無關背景不會取代準確的機制與結果。" }],
+            misconceptions: [{ claim: "背熟一份參考答案便能應付相同題型。", correction: "真正能力是把原理移植到新的數據、欄位、硬件和限制。" }, { claim: "答案越長便越高分。", correction: "每句應回應命令詞或形成可辨認的評分點；無關背景不會取代準確的機制與結果。" }],
             quickCheck: { question: "解釋某硬件適合題目情境時，哪種結構最完整？", options: ["硬件名稱 → 運作機制 → 情境效果", "只寫『較快』", "只抄產品規格", "列出所有認識的硬件"], answerIndex: 0, explanation: "由選擇、機制到情境效果能形成可辨認的因果鏈，也較容易逐點核對。" },
             examTip: "答案完成後逐項問：有沒有回應命令詞、引用情境、寫出機制、交代結果，以及核對分數與單位？"
         },
@@ -757,6 +757,195 @@ const layeredLearningAssignments = {
     "ec-2": { asset: "smartGreenhouse", scenarioTitle: "程式由環境輸入控制實體輸出", scenario: "感應器提供輸入，事件或閾值觸發程式判斷，actuator 產生動作；異常值、超時及快速切換需要安全處理。", challengeTask: "設計溫室控制器：定義兩個 sensor input、風扇／水泵／警示燈的觸發條件、hysteresis、安全狀態和人工 override，再以四個情境追蹤輸出。", challengeOutput: "狀態／流程圖、偽代碼及四行情境追蹤表。", criteria: ["輸入—處理—輸出關係完整", "hysteresis 能避免頻繁切換", "感應器失效時進入明確安全狀態"] }
 };
 
+/**
+ * 每課的 DSE 用字與作答重點。
+ * 內容把常見作答缺口轉成課題專屬提示；不按年份或試卷來源分類。
+ */
+const dseExamFocusAssignments = {
+    "cha-1": {
+        keyTerms: ["原始數據", "資訊", "輸入", "處理", "輸出", "儲存"],
+        mustKnow: ["數據經處理並在情境中產生意義才成為資訊", "資訊系統包括硬件、軟件、數據、程序及使用者", "用 IPO 加儲存描述完整資料流"],
+        questionForms: ["辨認數據／資訊", "描述資訊處理流程", "解釋資訊如何支援決策"],
+        answerPattern: "指出輸入的原始數據 → 寫出處理方法 → 說明輸出資訊及用途。",
+        lossPoints: ["只寫裝置名稱，沒有資料內容", "把未處理數據直接稱為資訊", "列出 IPO 後沒有連回題目用途"]
+    },
+    "cha-2": {
+        keyTerms: ["欄", "記錄", "檔案", "有效性檢驗", "驗證", "校驗位"],
+        mustKnow: ["字符、欄、記錄、檔案及數據庫的層級", "有效性檢驗不能證明輸入與原件相同", "順序存取與直接存取的適用情境"],
+        questionForms: ["選擇檢查方法", "比較驗證與檢驗", "解釋檔案存取方式"],
+        answerPattern: "方法名稱 → 寫出實際規則或比較動作 → 說明可找出哪類錯誤。",
+        lossPoints: ["只寫 range check，沒有範圍", "混淆 validation、verification 和 error detection", "沒有引用題目的欄位或原始文件"]
+    },
+    "cha-3": {
+        keyTerms: ["bit", "byte", "二進制", "十六進制", "解像度", "色彩深度", "取樣頻率"],
+        mustKnow: ["進制轉換及有符號數的表示", "文字編碼與字符集的分別", "圖像、聲音及視像未壓縮大小的計算因素"],
+        questionForms: ["進制轉換", "計算檔案大小", "解釋數碼化參數的影響"],
+        answerPattern: "寫公式 → 代入數值 → 轉換 bit／byte 及容量單位 → 以結果作判斷。",
+        lossPoints: ["漏乘聲道、時間、色彩深度或幀率", "bit 與 byte 沒有除以 8", "只有最後數值，沒有步驟或單位"]
+    },
+    "cha-4": {
+        keyTerms: ["相對參照", "絕對參照", "混合參照", "IF", "COUNTIF", "SUMIF", "AVERAGEIF"],
+        mustKnow: ["由題意辨認輸出、條件範圍及計算範圍", "複製公式時判斷列與欄是否需要鎖定", "按資料與比較目的選擇合適圖表"],
+        questionForms: ["完成／修正公式", "預測複製後參照", "選擇圖表並解釋"],
+        answerPattern: "先圈出輸出與條件 → 選函數 → 填入正確範圍／準則 → 檢查 $ 鎖定位置。",
+        lossPoints: ["使用一般函數但沒有套用條件", "criteria range 與 sum／average range 對調", "公式可執行但沒有符合複製方向"]
+    },
+    "cha-5": {
+        keyTerms: ["數據表", "欄", "記錄", "主鍵", "外鍵", "查詢", "表單", "報表"],
+        mustKnow: ["主鍵唯一識別記錄，外鍵建立數據表關係", "查詢篩選及組合資料，表單處理輸入，報表安排輸出", "數據庫減少重複並支援一致更新"],
+        questionForms: ["辨認數據庫物件", "選擇主鍵／外鍵", "解釋數據庫優點"],
+        answerPattern: "指出物件或鍵 → 說明其功能 → 連回題目中的資料或操作。",
+        lossPoints: ["把欄和記錄對調", "以容易重複的姓名作主鍵", "只寫『方便』而沒有說明查詢、更新或一致性"]
+    },
+    "chb-1": {
+        keyTerms: ["控制器", "算術邏輯單元", "暫存器", "RAM", "ROM", "輸入／輸出裝置", "輔助儲存"],
+        mustKnow: ["提取、解碼、執行、儲存的機器周期", "CPU、主記憶體、輸入輸出及儲存裝置的角色", "容量、速度、揮發性、可攜性及耐用度的比較準則"],
+        questionForms: ["標示硬件結構", "比較裝置", "按情境建議硬件"],
+        answerPattern: "硬件名稱 → 準確功能／特性 → 題目工作如何受惠或受限。",
+        lossPoints: ["只寫『較快／較好』，沒有比較準則", "混淆 RAM、ROM 與輔助儲存", "寫出硬件規格但沒有連回使用情境"]
+    },
+    "chb-2": {
+        keyTerms: ["操作系統", "實用程式", "驅動程式", "批次處理", "實時處理", "互動處理", "多工"],
+        mustKnow: ["操作系統管理處理器、記憶體、檔案、裝置及介面", "驅動程式讓系統控制指定硬件", "以輸入時間、回應期限及工作安排分辨處理模式"],
+        questionForms: ["辨認軟件類別", "判斷處理模式", "解釋操作系統功能"],
+        answerPattern: "引用情境訊號 → 判斷軟件／模式 → 說明其運作及為何符合時限或工作方式。",
+        lossPoints: ["只憑『很快』判斷實時處理", "把應用軟件當成操作系統功能", "混淆多工與多道程式處理"]
+    },
+    "chc-1": {
+        keyTerms: ["LAN", "WAN", "網絡介面卡", "交換器", "路由器", "無線接入點", "傳輸媒介"],
+        mustKnow: ["交換器處理同一 LAN 的幀，路由器連接不同網絡", "按距離、頻寬、干擾、成本及流動性選媒介", "拓撲圖要清楚表示裝置、連線及互聯網邊界"],
+        questionForms: ["辨認網絡硬件", "設計／修正拓撲", "比較有線與無線連線"],
+        answerPattern: "裝置／媒介 → 運作角色或特性 → 在圖中連接位置 → 對情境的效果。",
+        lossPoints: ["把交換器和路由器功能互換", "拓撲只有裝置名稱，沒有正確連線", "比較時兩邊使用不同準則"]
+    },
+    "chc-2": {
+        keyTerms: ["IP 位址", "MAC 位址", "DNS", "URL", "TCP/IP", "HTTP／HTTPS", "SMTP／IMAP"],
+        mustKnow: ["DNS 把域名解析成 IP 位址", "IP 支援跨網絡定址，MAC 用於本地鏈路識別", "協定名稱要連同通訊工作及資料方向理解"],
+        questionForms: ["拆解 URL", "描述存取網站流程", "配對網絡協定"],
+        answerPattern: "使用者動作 → DNS／位址處理 → 建立連線及傳送請求 → 伺服器回應。",
+        lossPoints: ["把 DNS 說成配發 IP 設定", "只列協定縮寫，沒有功能", "混淆網頁、檔案傳送及電郵協定"]
+    },
+    "chc-3": {
+        keyTerms: ["搜尋運算子", "可信性", "相關性", "串流", "緩衝", "雲端服務", "物聯網"],
+        mustKnow: ["以作者、日期、證據、目的及交叉核對評估來源", "串流先接收部分內容並以緩衝減少播放中斷", "按即時性、頻寬、儲存及控制權選擇服務"],
+        questionForms: ["改善搜尋式", "評估網上資訊", "解釋串流／雲端服務"],
+        answerPattern: "指出服務或資料特徵 → 以準則分析 → 說明對使用者的效益、限制或風險。",
+        lossPoints: ["只以網站外觀判斷可信", "把下載與串流說成完全相同", "只列優點，沒有題目限制或風險"]
+    },
+    "chc-4": {
+        keyTerms: ["HTML 元素", "屬性", "超連結", "相對路徑", "導覽", "目標受眾", "跨平台"],
+        mustKnow: ["HTML 表達內容結構，CSS 控制呈現", "連結、圖片及表單要使用正確元素與屬性", "介面決定要連回目標受眾、可讀性、導覽及不同裝置"],
+        questionForms: ["完成 HTML", "判斷頁面輸出", "改善介面並解釋"],
+        answerPattern: "指出元素／設計改動 → 寫出正確語法或做法 → 說明對指定受眾的效果。",
+        lossPoints: ["開始與結束標籤不配對", "路徑或 href／src 用錯", "只寫『美觀』，沒有可讀性或操作理由"]
+    },
+    "chc-5": {
+        keyTerms: ["惡意程式", "社交工程", "防火牆", "加密", "認證", "授權", "數碼簽署", "備份"],
+        mustKnow: ["威脅、漏洞、攻擊方法及控制措施要分清", "加密保密；雜湊支援完整性；數碼簽署支援完整性及身分驗證", "認證確認身分，授權決定可使用的資源"],
+        questionForms: ["辨認威脅", "建議保安措施", "描述加密／簽署程序"],
+        answerPattern: "具體威脅 → 如何造成影響 → 控制措施的機制 → 可降低的風險。",
+        lossPoints: ["只寫『加密／防毒』而沒有機制", "把備份當成阻止感染的方法", "混淆公開／私人密碼匙或認證／授權"]
+    },
+    "chd-1": {
+        keyTerms: ["問題範圍", "輸入", "處理", "輸出", "分解", "模式辨認", "抽象化"],
+        mustKnow: ["先界定目標、限制、使用者及成功準則", "以分解把大問題拆成可處理子問題", "抽象化保留解題所需資料並移除無關細節"],
+        questionForms: ["建立 IPO 表", "分解真實問題", "辨認運算思維方法"],
+        answerPattern: "題目目標／限制 → 所需輸入 → 處理規則 → 可驗證輸出。",
+        lossPoints: ["IPO 只寫裝置而非資料", "處理步驟太籠統，無法轉成算法", "沒有區分問題要求與解決方案"]
+    },
+    "chd-2": {
+        keyTerms: ["順序", "選擇", "迭代", "流程圖", "偽代碼", "追蹤表", "陣列", "子程序"],
+        mustKnow: ["條件必須清楚指出 True／False 分支", "迴圈要有初始化、條件、更新及終止", "追蹤時逐次記錄變數、索引和輸出"],
+        questionForms: ["完成流程圖／偽代碼", "追蹤算法", "找出邏輯或邊界問題"],
+        answerPattern: "列初值 → 逐步判斷條件 → 記錄每次更新 → 寫出終止時的輸出。",
+        lossPoints: ["只寫最後答案，沒有中間值", "迴圈變數沒有更新或邊界差一", "流程圖符號或箭嘴造成不完整路徑"]
+    },
+    "chd-3": {
+        keyTerms: ["變數", "數據類型", "運算子", "selection", "iteration", "字串", "列表", "函數"],
+        mustKnow: ["變數和運算子要配合數據類型", "if／elif／else 及 for／while 的條件與縮排", "列表索引、字串處理及函數參數的資料流"],
+        questionForms: ["預測程式輸出", "完成程式片段", "把算法轉成程式"],
+        answerPattern: "先追蹤輸入與初值 → 檢查條件／迴圈 → 更新變數或列表 → 核對輸出格式。",
+        lossPoints: ["使用未初始化變數", "把賦值和比較運算子混淆", "索引超出範圍或縮排改變程式邏輯"]
+    },
+    "chd-4": {
+        keyTerms: ["正常數據", "邊界數據", "異常數據", "語法錯誤", "邏輯錯誤", "執行錯誤", "追蹤"],
+        mustKnow: ["測試前寫輸入、目的及預期結果", "邊界數據包括界線本身及其相鄰值", "由第一個實際與預期不符的位置定位邏輯錯誤"],
+        questionForms: ["設計測試數據", "分類錯誤", "使用追蹤表除錯"],
+        answerPattern: "測試目的 → 輸入數據 → 預期結果 → 實際結果 → 判斷及修正。",
+        lossPoints: ["把極大數值一律稱為邊界值", "只有輸入，沒有預期結果", "指出錯誤類型但沒有定位或修正"]
+    },
+    "che-1": {
+        keyTerms: ["人工智能", "數據科學", "模式辨認", "訓練數據", "3D 打印", "擴增實境", "虛擬實境"],
+        mustKnow: ["新科技的輸入數據、處理及輸出", "效益要連回速度、準確度、成本或使用者體驗", "限制包括數據品質、偏差、硬件要求及人類監督"],
+        questionForms: ["解釋科技應用", "比較 AR／VR", "評估 AI 方案"],
+        answerPattern: "使用情境 → 技術如何處理資料 → 一項效益 → 一項限制 → 有條件結論。",
+        lossPoints: ["只說『AI 很聰明』，沒有資料或處理", "效益與限制不屬同一情境", "評估題沒有最終判斷或採用條件"]
+    },
+    "che-2": {
+        keyTerms: ["人體工學", "重複性勞損", "數碼鴻溝", "無障礙使用", "私隱", "同意", "資訊自由"],
+        mustKnow: ["健康措施要對應姿勢、顯示器、重複動作或休息問題", "社會影響要辨認不同持份者", "私隱措施要處理目的、最少收集、存取、保留及同意"],
+        questionForms: ["建議健康措施", "分析持份者影響", "評估私隱／道德問題"],
+        answerPattern: "受影響者 → 具體問題及原因 → 對應措施 → 成效與剩餘限制。",
+        lossPoints: ["措施與風險不配對", "只寫個人感受，沒有持份者或證據", "只有單方面好處，沒有公平或私隱代價"]
+    },
+    "che-3": {
+        keyTerms: ["版權", "授權條款", "侵權", "盜版", "freeware", "shareware", "開放源碼", "數碼水印"],
+        mustKnow: ["免費取得不等於沒有版權或可任意修改", "軟件授權決定安裝、複製、修改及分發權利", "數碼水印支援來源追蹤，數碼簽署處理完整性及身分"],
+        questionForms: ["判斷侵權情境", "比較軟件授權", "建議保護作品方法"],
+        answerPattern: "作品／行為 → 適用權利或授權條款 → 是否合規 → 改正方法。",
+        lossPoints: ["把 freeware 當成 public domain", "只寫『標明來源』便視為已獲授權", "混淆數碼水印、加密與數碼簽署"]
+    },
+    "ea-1": {
+        keyTerms: ["實體", "屬性", "元組", "候選鍵", "主鍵", "外鍵", "實體／域／參照完整性"],
+        mustKnow: ["由實體和屬性建立關係綱要", "候選鍵可唯一識別元組，主鍵由候選鍵選出", "外鍵值必須參照存在的主鍵或按規則為空值"],
+        questionForms: ["選擇鍵", "套用完整性規則", "解釋索引／交易／回復"],
+        answerPattern: "指出關係與鍵 → 寫出完整性條件 → 以題目記錄示範合法或不合法操作。",
+        lossPoints: ["選用會重複或改變的欄作主鍵", "外鍵方向寫反", "只背完整性名稱，沒有規則或例子"]
+    },
+    "ea-2": {
+        keyTerms: ["SELECT", "FROM", "WHERE", "ORDER BY", "GROUP BY", "HAVING", "JOIN", "子查詢"],
+        mustKnow: ["由題意拆出輸出欄、來源表、連接、條件及排列", "WHERE 篩選記錄，HAVING 篩選群組", "JOIN 條件通常連接主鍵與外鍵"],
+        questionForms: ["寫出 SQL", "修正查詢", "預測結果表"],
+        answerPattern: "SELECT 輸出 → FROM／JOIN 來源 → WHERE 條件 → GROUP／HAVING → ORDER BY。",
+        lossPoints: ["查詢可執行但輸出欄或條件答非所問", "漏寫 JOIN 條件造成錯配記錄", "聚合欄與 GROUP BY／HAVING 使用不一致"]
+    },
+    "ea-3": {
+        keyTerms: ["ER 圖", "cardinality", "功能依賴", "1NF", "2NF", "3NF", "更新異常", "反正規化"],
+        mustKnow: ["ER 圖清楚標示實體、屬性、鍵及關係數量", "由功能依賴判斷部分依賴及傳遞依賴", "正規化減少重複與異常，反正規化以一致性換取部分效能"],
+        questionForms: ["完成 ER 圖", "逐步正規化", "評估反正規化／存取權"],
+        answerPattern: "找出鍵與依賴 → 指出違反的正規形 → 拆表並保留鍵關係 → 說明消除的異常。",
+        lossPoints: ["只給最終數據表，沒有依賴理據", "拆表後沒有主鍵／外鍵可重建資料", "混淆部分依賴與傳遞依賴"]
+    },
+    "eb-1": {
+        keyTerms: ["客戶端—伺服器", "request／response", "GET／POST", "連接埠", "DHCP", "代理伺服器", "最小權限"],
+        mustKnow: ["客戶端向指定伺服器及服務發出請求", "GET／POST 是傳送方式，不代表是否加密", "伺服器、資源及使用者權限要按工作需要配置"],
+        questionForms: ["描述網絡服務流程", "選擇伺服器角色", "設計權限／服務架構"],
+        answerPattern: "哪個客戶端 → 向哪個服務／連接埠發出甚麼請求 → 伺服器處理 → 回應及權限。",
+        lossPoints: ["只列伺服器名稱，沒有請求與回應", "把 POST 當成自動加密", "給予所有使用者完整權限，沒有最小權限"]
+    },
+    "eb-2": {
+        keyTerms: ["HTML／CSS", "客戶端腳本", "伺服器端腳本", "表單驗證", "cookie", "session", "數據庫"],
+        mustKnow: ["客戶端驗證改善即時回饋，伺服器仍須重新驗證", "伺服器端處理規則及受控讀寫數據庫", "cookie 只保存必要識別或偏好，不存明文密碼"],
+        questionForms: ["完成網頁程式", "描述 client—server 流程", "改善表單及保安"],
+        answerPattern: "使用者輸入 → client 初步檢查 → request → server 驗證／處理 → database → response。",
+        lossPoints: ["把保安完全交給 JavaScript", "沒有說明程式在哪一端執行", "表單改善只有外觀，沒有錯誤提示或伺服器控制"]
+    },
+    "ec-1": {
+        keyTerms: ["linear／binary search", "bubble／insertion／selection sort", "stack", "queue", "linked list", "文字檔", "子程序"],
+        mustKnow: ["binary search 需要已排序資料", "stack 是 LIFO，queue 是 FIFO", "追蹤搜尋、排序及資料結構時要記錄索引和每次操作"],
+        questionForms: ["追蹤算法", "選擇資料結構", "完成／除錯程序"],
+        answerPattern: "寫初始資料與索引 → 逐次比較／加入／移除 → 記錄結構變化 → 寫結果及終止原因。",
+        lossPoints: ["只寫最終列表，沒有每輪變化", "在未排序資料直接使用 binary search", "混淆 stack 的 top 與 queue 的 front／rear"]
+    },
+    "ec-2": {
+        keyTerms: ["感應器", "輸出裝置", "事件", "事件處理程序", "閾值", "hysteresis", "人工 override", "安全狀態"],
+        mustKnow: ["感應器輸入經條件或事件觸發輸出裝置", "事件驅動流程的發生時間及次序未必固定", "異常讀數、超時及失效要有明確安全處理"],
+        questionForms: ["設計裝置程式", "完成事件處理", "評估安全及邊界情況"],
+        answerPattern: "sensor input → threshold／event → processing → actuator output → 異常及 fail-safe。",
+        lossPoints: ["只列硬件，沒有觸發條件", "沒有處理讀數在閾值附近反覆切換", "感應器失效時仍持續危險輸出"]
+    }
+};
+
 Object.entries(lessonVisualAssignments).forEach(([pageId, assignment]) => {
     const page = learningData.pages[pageId];
     const asset = lessonVisualAssets[assignment.asset];
@@ -767,6 +956,7 @@ Object.entries(lessonVisualAssignments).forEach(([pageId, assignment]) => {
 Object.entries(layeredLearningAssignments).forEach(([pageId, assignment]) => {
     const page = learningData.pages[pageId];
     const scenarioAsset = scenarioMediaAssets[assignment.asset];
+    const examFocus = dseExamFocusAssignments[pageId];
     if (!page || !scenarioAsset) return;
     const conceptNames = page.concepts.slice(0, 3).map(concept => concept.label).join("、");
     page.layeredLearning = {
@@ -796,10 +986,10 @@ Object.entries(layeredLearningAssignments).forEach(([pageId, assignment]) => {
                 label: "應試層",
                 tag: "把概念變成分數",
                 duration: "約 20 分鐘",
-                goal: "按題目指令詞，把知識寫成可逐點給分的 DSE 答案。",
-                task: `先完成本頁 60 秒快速檢查及原創 DSE 題型，再按這項提示修訂答案：${page.examTip}`,
-                output: "一份按分值列點的修訂答案，另寫一句說明自己改了甚麼。",
-                criteria: ["首句直接回應題目指令詞", "每個獨立評分點分開表達", "答案引用情境資料或說明清楚因果"]
+                goal: `使用本課必用字詞，按「${examFocus.answerPattern}」把知識寫成可逐點判讀的答案。`,
+                task: `先完成本頁快速檢查及原創題，再核對這三類失分：${examFocus.lossPoints.join("；")}。最後按答題結構重寫一次。`,
+                output: "一份標示題目證據、技術機制及情境結果的修訂答案，另圈出本課必用字詞。",
+                criteria: [`準確使用至少兩個本課字詞：${examFocus.keyTerms.slice(0, 4).join("、")}`, "首句直接回應指令詞及題目對象", "答案包含技術機制、必要步驟或清楚因果"]
             },
             {
                 id: "challenge",
@@ -813,6 +1003,11 @@ Object.entries(layeredLearningAssignments).forEach(([pageId, assignment]) => {
             }
         ]
     };
+});
+
+Object.entries(dseExamFocusAssignments).forEach(([pageId, focus]) => {
+    const page = learningData.pages[pageId];
+    if (page) page.dseFocus = focus;
 });
 
 function freezeLearningData(value) {
