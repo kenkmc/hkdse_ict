@@ -946,6 +946,164 @@ const dseExamFocusAssignments = {
     }
 };
 
+/**
+ * 首批課題互動遊戲。
+ * 活動要求學生先作出選擇、預測或修正，再顯示答案；最佳分數只儲存在目前瀏覽器。
+ */
+const lessonGameAssignments = {
+    "cha-4": {
+        type: "formula-detective",
+        eyebrow: "Spreadsheet formula detective",
+        title: "試算表公式偵探",
+        intro: "逐關修正公式，系統會檢查函數、範圍、準則及絕對參照。每關最多 2 分。",
+        missions: [
+            {
+                title: "第 1 關：條件計數",
+                prompt: "計算 B2:B6 中不少於 50 的分數數目。以下公式錯用了 COUNT，請修正。",
+                headers: ["學生", "分數"],
+                rows: [["Amy", "72"], ["Ben", "48"], ["Chloe", "65"], ["David", "31"], ["Eva", "50"]],
+                faulty: "=COUNT(B2:B6,\">=50\")",
+                answer: "=COUNTIF(B2:B6,\">=50\")",
+                acceptable: ["=COUNTIF(B2:B6,\">=50\")"],
+                hint: "需要使用能同時接收 range 和 criteria 的條件函數。",
+                explanation: "COUNT 只計算數值儲存格；COUNTIF 才會按「>=50」準則計數。"
+            },
+            {
+                title: "第 2 關：複製公式",
+                prompt: "G2 的公式為 =B2*$F$1。把它向下複製到 G3，應輸入甚麼公式？",
+                headers: ["列", "B：數量", "F1：單價", "G：總額"],
+                rows: [["2", "3", "12", "=B2*$F$1"], ["3", "5", "12", "？"]],
+                faulty: "=B3*F2",
+                answer: "=B3*$F$1",
+                acceptable: ["=B3*$F$1"],
+                hint: "數量要跟隨列號改變；單價所在的列與欄都必須鎖定。",
+                explanation: "相對參照 B2 會變成 B3；絕對參照 $F$1 在複製時保持不變。"
+            },
+            {
+                title: "第 3 關：條件平均",
+                prompt: "B2:B6 是班別，C2:C6 是分數。計算 5A 班平均分，修正以下公式。",
+                headers: ["學生", "班別", "分數"],
+                rows: [["Amy", "5A", "72"], ["Ben", "5B", "68"], ["Chloe", "5A", "84"], ["David", "5B", "55"], ["Eva", "5A", "90"]],
+                faulty: "=AVERAGE(B2:B6,\"5A\",C2:C6)",
+                answer: "=AVERAGEIF(B2:B6,\"5A\",C2:C6)",
+                acceptable: ["=AVERAGEIF(B2:B6,\"5A\",C2:C6)"],
+                hint: "criteria range 是班別欄；average range 是分數欄。",
+                explanation: "AVERAGEIF(range, criteria, average_range) 先在班別欄找 5A，再平均相應分數。"
+            }
+        ]
+    },
+    "chc-1": {
+        type: "network-builder",
+        eyebrow: "Build a school LAN",
+        title: "校園網絡建構挑戰",
+        intro: "把四件硬件放到正確位置，再按情境選擇傳輸媒介。可拖放，也可先點硬件再點位置。",
+        scenario: "學校要把互聯網連線分配到有線電腦室及流動平板。每部桌面電腦亦要有連接網絡的介面。",
+        devices: [
+            { id: "router", label: "路由器", image: "assets/images/network/wifi-router.jpg", alt: "具有天線和網絡連接埠的路由器", note: "連接不同網絡並把校內 LAN 接到互聯網。" },
+            { id: "switch", label: "交換器", image: "assets/images/network/network-switch.jpg", alt: "具有多個 Ethernet 連接埠的網絡交換器", note: "在同一 LAN 內連接多部有線裝置。" },
+            { id: "wap", label: "無線接入點", image: "assets/images/network/wireless-access-point.jpg", alt: "安裝在室內的無線接入點", note: "讓無線裝置接入現有 LAN。" },
+            { id: "nic", label: "網絡介面卡", image: "assets/images/network/network-interface-card.jpg", alt: "安裝在電腦內的網絡介面卡", note: "為個別電腦提供網絡連接介面。" }
+        ],
+        slots: [
+            { id: "gateway", label: "互聯網與校內網絡之間", answer: "router", hint: "這裏要連接兩個不同網絡。" },
+            { id: "lan-core", label: "電腦室有線連接中心", answer: "switch", hint: "這裏要連接同一 LAN 內多部電腦。" },
+            { id: "wireless-zone", label: "平板電腦無線覆蓋區", answer: "wap", hint: "這件硬件把無線裝置接到有線 LAN。" },
+            { id: "desktop", label: "每部桌面電腦內部", answer: "nic", hint: "電腦本身需要一個網絡介面。" }
+        ],
+        mediumChallenge: {
+            prompt: "交換器與同一電腦室內的桌面電腦應優先使用哪種媒介？",
+            options: ["UTP 雙絞線", "衛星", "地面微波"],
+            answerIndex: 0,
+            explanation: "UTP 適合建築物內短距離 Ethernet 連線，成本較低而且容易鋪設。"
+        }
+    },
+    "chd-2": {
+        type: "trace-debugger",
+        eyebrow: "Trace before you debug",
+        title: "程式追蹤與除錯偵探",
+        intro: "先預測每次迭代後的 count，再根據追蹤結果找出算法為何漏計。",
+        code: [
+            "scores ← [62, 48, 75, 91]",
+            "count ← 0",
+            "FOR i FROM 0 TO LENGTH(scores) - 2",
+            "    IF scores[i] >= 50 THEN",
+            "        count ← count + 1",
+            "    END IF",
+            "END FOR",
+            "OUTPUT count"
+        ],
+        trace: [
+            { i: "0", value: "62", expectedCount: 1, note: "62 ≥ 50，所以 count 由 0 增至 1。" },
+            { i: "1", value: "48", expectedCount: 1, note: "48 < 50，所以 count 保持 1。" },
+            { i: "2", value: "75", expectedCount: 2, note: "75 ≥ 50，所以 count 由 1 增至 2。" }
+        ],
+        bugPrompt: "輸出為 2，但實際有三個分數不少於 50。錯誤在哪裏？",
+        bugOptions: [
+            "count 應初始化為 1",
+            "迴圈上限 LENGTH(scores) - 2 漏掉最後一項",
+            "比較運算子應由 >= 改成 >"
+        ],
+        bugAnswerIndex: 1,
+        fix: "把迴圈上限改為 LENGTH(scores) - 1，讓索引 0、1、2、3 都被處理。",
+        explanation: "長度為 4 的列表最後索引是 3。原來上限為 2，索引 3 的 91 從未被檢查。"
+    },
+    "ea-2": {
+        type: "sql-missions",
+        eyebrow: "Query missions",
+        title: "SQL 任務模式",
+        intro: "根據資料表和指定輸出完成查詢。系統逐段檢查 SELECT、FROM、條件、連接及排序。",
+        schema: [
+            "STUDENT(StudentID, StudentName, Class)",
+            "RESULT(StudentID, Subject, Mark)"
+        ],
+        tables: [
+            {
+                title: "STUDENT",
+                headers: ["StudentID", "StudentName", "Class"],
+                rows: [["S01", "Amy", "5A"], ["S02", "Ben", "5B"], ["S03", "Chloe", "5A"]]
+            },
+            {
+                title: "RESULT",
+                headers: ["StudentID", "Subject", "Mark"],
+                rows: [["S01", "ICT", "76"], ["S01", "Math", "80"], ["S02", "ICT", "65"], ["S03", "ICT", "90"]]
+            }
+        ],
+        missions: [
+            {
+                title: "第 1 關：篩選與排序",
+                prompt: "顯示 5A 班學生的 StudentName，並按姓名升序排列。",
+                starter: "SELECT StudentName\nFROM STUDENT\nWHERE \nORDER BY ;",
+                canonical: "SELECT StudentName\nFROM STUDENT\nWHERE Class = '5A'\nORDER BY StudentName;",
+                requiredTokens: ["SELECT STUDENTNAME", "FROM STUDENT", "WHERE CLASS = '5A'", "ORDER BY STUDENTNAME"],
+                hints: ["WHERE 要比較 Class 與文字值 '5A'。", "ORDER BY 應使用輸出的姓名欄。"],
+                resultColumns: ["StudentName"],
+                resultRows: [["Amy"], ["Chloe"]],
+                explanation: "WHERE 先保留 5A 記錄，ORDER BY StudentName 再按姓名升序排列。"
+            },
+            {
+                title: "第 2 關：連接兩個數據表",
+                prompt: "顯示 ICT 分數不少於 75 的 StudentName 及 Mark，並按 Mark 由高至低排列。",
+                starter: "SELECT STUDENT.StudentName, RESULT.Mark\nFROM STUDENT\nINNER JOIN RESULT ON \nWHERE \nORDER BY ;",
+                canonical: "SELECT STUDENT.StudentName, RESULT.Mark\nFROM STUDENT\nINNER JOIN RESULT ON STUDENT.StudentID = RESULT.StudentID\nWHERE RESULT.Subject = 'ICT' AND RESULT.Mark >= 75\nORDER BY RESULT.Mark DESC;",
+                requiredTokens: [
+                    "SELECT STUDENT.STUDENTNAME, RESULT.MARK",
+                    "FROM STUDENT",
+                    "INNER JOIN RESULT",
+                    "ON STUDENT.STUDENTID = RESULT.STUDENTID",
+                    "WHERE RESULT.SUBJECT = 'ICT'",
+                    "RESULT.MARK >= 75",
+                    "ORDER BY RESULT.MARK DESC"
+                ],
+                hints: ["JOIN 條件要連接兩表共同的 StudentID。", "WHERE 同時限制 Subject 和 Mark。", "由高至低需要 DESC。"],
+                resultColumns: ["StudentName", "Mark"],
+                resultRows: [["Chloe", "90"], ["Amy", "76"]],
+                explanation: "INNER JOIN 以 StudentID 合併學生與成績；WHERE 篩選科目及分數；DESC 由高至低排列。"
+            }
+        ],
+        simulatorHref: "db_simulator.html"
+    }
+};
+
 Object.entries(lessonVisualAssignments).forEach(([pageId, assignment]) => {
     const page = learningData.pages[pageId];
     const asset = lessonVisualAssets[assignment.asset];
@@ -1008,6 +1166,11 @@ Object.entries(layeredLearningAssignments).forEach(([pageId, assignment]) => {
 Object.entries(dseExamFocusAssignments).forEach(([pageId, focus]) => {
     const page = learningData.pages[pageId];
     if (page) page.dseFocus = focus;
+});
+
+Object.entries(lessonGameAssignments).forEach(([pageId, game]) => {
+    const page = learningData.pages[pageId];
+    if (page) page.game = game;
 });
 
 function freezeLearningData(value) {

@@ -228,6 +228,12 @@
         </section>
     ` : "";
 
+    const lessonGame = page.game ? `
+        <section class="lesson-game" data-lesson-game-root aria-label="${escapeHTML(page.game.title)}">
+            <p class="lesson-game-loading">正在載入互動活動……</p>
+        </section>
+    ` : "";
+
     section.innerHTML = `
         <div class="lesson-companion-heading">
             <div>
@@ -239,6 +245,7 @@
         <div id="lesson-companion-content" class="lesson-companion-content"${expandedByDefault ? "" : " hidden"}>
             ${lessonVisual}
             ${dseFocus}
+            ${lessonGame}
             ${layeredStudy}
             <div class="lesson-objectives">
                 <h3>完成本頁後，你應能夠</h3>
@@ -272,6 +279,22 @@
     `;
 
     nav.insertAdjacentElement("afterend", section);
+
+    if (page.game) {
+        if (!document.querySelector('link[data-lesson-games-style]')) {
+            const gameStyle = document.createElement("link");
+            gameStyle.rel = "stylesheet";
+            gameStyle.href = "assets/css/lesson-games.css?v=1";
+            gameStyle.dataset.lessonGamesStyle = "true";
+            document.head.append(gameStyle);
+        }
+        if (!document.querySelector('script[data-lesson-games-script]')) {
+            const gameScript = document.createElement("script");
+            gameScript.src = "assets/js/lesson_games.js?v=1";
+            gameScript.dataset.lessonGamesScript = "true";
+            document.body.append(gameScript);
+        }
+    }
 
     const content = section.querySelector(".lesson-companion-content");
     const toggle = section.querySelector(".lesson-companion-toggle");

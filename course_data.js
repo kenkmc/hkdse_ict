@@ -21,6 +21,7 @@ const siteConfig = {
         layeredLearning: true,
         tieredAssignments: 78,
         multimediaLessons: true,
+        interactiveLessonGames: 4,
         answerUpgradeLab: true,
         progressTracking: true,
         progressStorage: "local-only"
@@ -67,10 +68,10 @@ const courseData = [
                 id: "cha-4",
                 title: "iv. 數據操縱和分析：試算表",
                 file: "cha.4.html",
-                desc: "公式、函數、儲存格參照、數據分析及圖表",
+                desc: "公式、函數、儲存格參照、數據分析、圖表及公式偵探遊戲",
                 type: "lesson",
                 syllabusRef: "A(d) · 試算表",
-                tags: ["試算表", "Excel", "公式", "函數", "圖表"]
+                tags: ["試算表", "Excel", "公式", "函數", "圖表", "公式偵探"]
             },
             {
                 id: "cha-5",
@@ -123,10 +124,10 @@ const courseData = [
                 id: "chc-1",
                 title: "i. 建網及互聯網基本知識",
                 file: "chc.1.html",
-                desc: "LAN／WAN、網絡服務、硬件實物、通訊鏈路及情境題",
+                desc: "LAN／WAN、網絡服務、硬件實物、通訊鏈路、拓撲建構及情境題",
                 type: "lesson",
                 syllabusRef: "C(a) · 網絡",
-                tags: ["LAN", "WAN", "網絡硬件", "光纖", "無線網絡", "DSE 情境題"]
+                tags: ["LAN", "WAN", "網絡硬件", "光纖", "無線網絡", "拓撲建構", "DSE 情境題"]
             },
             {
                 id: "chc-2",
@@ -187,10 +188,10 @@ const courseData = [
                 id: "chd-2",
                 title: "ii. 算法設計",
                 file: "chd.2.html",
-                desc: "偽代碼、流程圖、數據類型、控制結構、陣列、追蹤表及模組化",
+                desc: "偽代碼、流程圖、數據類型、控制結構、陣列、互動追蹤除錯及模組化",
                 type: "lesson",
                 syllabusRef: "D(b)",
-                tags: ["算法", "偽代碼", "流程圖", "追蹤表", "數據類型", "陣列", "模組化"]
+                tags: ["算法", "偽代碼", "流程圖", "追蹤表", "除錯遊戲", "數據類型", "陣列", "模組化"]
             },
             {
                 id: "chd-3",
@@ -260,7 +261,7 @@ const courseData = [
         icon: "database",
         items: [
             { id: "ea-1", title: "i. 關聯數據庫概念", file: "ea.1.html", desc: "實體、屬性、關係、鍵、完整性、索引及 rollback", type: "lesson", syllabusRef: "Elective A(a)", tags: ["關聯數據庫", "主鍵", "外鍵", "候選鍵", "完整性", "rollback"] },
-            { id: "ea-2", title: "ii. SQL", file: "ea.2.html", desc: "建表、增刪改、篩選、函數、連接、子查詢及檢視表", type: "lesson", syllabusRef: "Elective A(b)", tags: ["SQL", "JOIN", "subquery", "view", "aggregate", "DML", "DDL"] },
+            { id: "ea-2", title: "ii. SQL", file: "ea.2.html", desc: "建表、增刪改、篩選、函數、連接、子查詢、檢視表及 SQL 任務", type: "lesson", syllabusRef: "Elective A(b)", tags: ["SQL", "JOIN", "subquery", "view", "aggregate", "DML", "DDL", "SQL 任務"] },
             { id: "ea-3", title: "iii. 數據庫設計方法", file: "ea.3.html", desc: "ER 圖、關係轉換、數據冗餘、正規化至 3NF、反正規化及存取權", type: "lesson", syllabusRef: "Elective A(c)", tags: ["ERD", "1NF", "2NF", "3NF", "正規化", "反正規化", "存取權"] }
         ]
     },

@@ -25,6 +25,7 @@
 - 共用學習助手：26 個課程頁均提供配合課題的圖像導讀、學習目標、課程界線、互動概念圖、常見誤解、快速檢查，以及由中央題庫載入的原創 DSE 題型與逐分準則。
 - 分層學習及課業：每個課題均提供基礎、應試及挑戰三層內容，共 78 項課業；學生可逐項核對完成準則、保存答案筆記，並以本機進度條查看完成情況。
 - 圖像微課及情境教材：每課利用真實情境圖片和可播放／暫停的概念畫面串連重點；支援鍵盤操作、手動前後切換及 reduced-motion 設定。
+- 課題互動遊戲：首批包括試算表公式偵探、校園網絡建構、程式追蹤除錯及 SQL 任務；學生必須先預測、組裝或修正，才會看到解釋，最佳分數只存於目前瀏覽器。
 
 ## 課程依據
 
@@ -35,11 +36,12 @@
 - `course_data.js`：課程、工具、路徑及穩定內容 ID 的唯一資料來源。
 - `question_data.js`、`question_expansion_data.js`：DSE 題型中央題庫；每題以 `topicId` 連結一項課程或工具，大容量題庫另設擴充資料檔以保持基礎題清晰。
 - `past_paper_data.js`：作答指令詞、五步核對框架及 15 項分層練習的中央資料；不包含外部試題連結。
-- `learning_data.js`：每頁圖像導讀、學習目標、課程界線、概念節點、DSE 用字、答題重點、常見失分、快速檢查及精選題目連結的中央資料。
+- `learning_data.js`：每頁圖像導讀、學習目標、課程界線、概念節點、DSE 用字、答題重點、常見失分、快速檢查、精選題目及課題遊戲的中央資料。
 - `assets/images/lesson-visuals/`：供課程頁共用的原創 WebP 教學圖像及生成提示紀錄；真實硬件照片則保留在 `assets/images/network/` 並列明來源及授權。
 - `assets/images/scenario-media/`：分層課業和圖像微課共用的真實情境 WebP 圖片，以及完整生成／編輯提示紀錄。
 - `assets/css/platform.css`：所有頁面的共用視覺系統。
 - `assets/css/learning.css`：共用學習助手及互動概念圖樣式。
+- `assets/css/lesson-games.css`：公式、網絡、追蹤除錯及 SQL 遊戲的共用響應式及 reduced-motion 樣式。
 - `assets/css/core-lesson-refresh.css`：必修課題的共用背景、導覽和內容卡片視覺修飾。
 - `assets/css/system-lesson.css`：必修 B 課頁的共用版面、機器周期及操作模式互動樣式。
 - `assets/css/internet-lesson.css`：必修 C(b)–C(d) 的搜尋、串流、網頁設計及保安互動樣式。
@@ -50,6 +52,7 @@
 - `assets/css/question-visuals.css`：題庫的網絡、CPU、ER 圖、試算表、流程圖、追蹤表及資料回應圖像元件。
 - `assets/js/site_navigation.js`：共用全站導覽、頁面識別及課程來源頁尾。
 - `assets/js/lesson_companion.js`：學習助手的展開、概念探索、即時檢查及頁內 DSE 題型互動。
+- `assets/js/lesson_games.js`：四款首批課題遊戲的評分、提示、拖放／點選、追蹤、查詢檢查及本機最佳紀錄。
 - `assets/js/system-lessons.js`：機器周期、裝置選擇、操作模式判斷及嵌入式題目互動。
 - `assets/js/internet-lessons.js`：搜尋組合、串流緩衝、HTML 結構、受眾設計及威脅配對互動。
 - `assets/js/algorithm-lessons.js`：IPO 分析、算法追蹤、列表執行、邊界值及錯誤分類互動。
@@ -66,7 +69,7 @@
 
 內容及題目的永久 `id` 供錯題重練和日後完整進度系統使用。即使標題或檔名改變，也不應重用或隨意修改既有 ID。
 
-目前版本沒有學生登入、雲端資料庫或跨裝置同步。錯題資料、分層課業勾選、答案筆記及完成狀態只保存在該瀏覽器的 `localStorage`，不會上載 GitHub Pages；清除網站資料或轉用裝置便不會保留。SBA 表格仍只在目前頁面運作。
+目前版本沒有學生登入、雲端資料庫或跨裝置同步。錯題資料、分層課業勾選、答案筆記、完成狀態及課題遊戲最佳分數只保存在該瀏覽器的 `localStorage`，不會上載 GitHub Pages；清除網站資料或轉用裝置便不會保留。SBA 表格仍只在目前頁面運作。
 
 ## 新增課程或工具
 
@@ -89,10 +92,11 @@ node scripts/validate_questions.js
 node scripts/validate_mock_exam.js
 node scripts/validate_study_records.js
 node scripts/validate_learning_data.js
+node scripts/validate_lesson_games.js
 node scripts/validate_answer_lab.js
 ```
 
-目錄驗證會檢查重複識別碼、實際頁面、未列入目錄的 HTML，以及本機 `href`／`src`。題庫驗證會檢查題型、難度、課題連結、答案、評分準則、圖片檔、文字重複及目標題量；模擬卷驗證會檢查 3 份卷一的 40 + 60 分結構、每個選修的 2 組 25 分題組，以及圖像題和相連情境；錯題驗證會走完 1、3、7、14 日重練狀態；學習提示驗證會檢查 26 個課程頁的三級學習、圖像教材，以及每課專屬的必用字詞、核心重點、常見題型、答題結構和失分提示；作答實驗室驗證會核對指令詞、5 組題材及 15 項分層任務。
+目錄驗證會檢查重複識別碼、實際頁面、未列入目錄的 HTML，以及本機 `href`／`src`。題庫驗證會檢查題型、難度、課題連結、答案、評分準則、圖片檔、文字重複及目標題量；模擬卷驗證會檢查 3 份卷一的 40 + 60 分結構、每個選修的 2 組 25 分題組，以及圖像題和相連情境；錯題驗證會走完 1、3、7、14 日重練狀態；學習提示驗證會檢查 26 個課程頁的三級學習、圖像教材及 DSE 用字／重點；課題遊戲驗證會核對四款活動的掛載、關卡、參考答案、硬件圖片、版本、手機及 reduced-motion 支援；作答實驗室驗證會核對指令詞、5 組題材及 15 項分層任務。
 
 ## 技術
 

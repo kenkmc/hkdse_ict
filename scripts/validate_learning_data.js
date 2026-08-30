@@ -18,6 +18,13 @@ let lessonCount = 0;
 let lessonVisualCount = 0;
 let layeredLessonCount = 0;
 let dseFocusCount = 0;
+let lessonGameCount = 0;
+const expectedGames = new Map([
+    ["cha-4", "formula-detective"],
+    ["chc-1", "network-builder"],
+    ["chd-2", "trace-debugger"],
+    ["ea-2", "sql-missions"]
+]);
 
 if (!learning?.pages) {
     errors.push("learning_data.js 沒有公開有效的學習提示資料。");
@@ -125,6 +132,70 @@ if (!learning?.pages) {
                 if (!focus.answerPattern) errors.push(`${id} 缺少建議答題結構。`);
                 if (!Array.isArray(focus.lossPoints) || focus.lossPoints.length < 3) errors.push(`${id} 至少需要三項常見失分。`);
             }
+
+            const expectedGameType = expectedGames.get(id);
+            if (expectedGameType && page.game?.type !== expectedGameType) {
+                errors.push(`${id} 應提供 ${expectedGameType} 互動遊戲。`);
+            }
+            if (page.game) {
+                lessonGameCount += 1;
+                const game = page.game;
+                if (!expectedGameType) errors.push(`${id} 提供了未列入首批範圍的互動遊戲。`);
+                if (!game.title || !game.intro || !game.eyebrow) errors.push(`${id} 的互動遊戲標題或說明不完整。`);
+                if (game.type === "formula-detective") {
+                    if (!Array.isArray(game.missions) || game.missions.length < 3) errors.push(`${id} 公式偵探至少需要三關。`);
+                    game.missions?.forEach((mission, index) => {
+                        if (!mission.prompt || !mission.faulty || !mission.answer || !mission.hint || !mission.explanation) {
+                            errors.push(`${id} 公式關卡 ${index + 1} 內容不完整。`);
+                        }
+                        if (!Array.isArray(mission.acceptable) || !mission.acceptable.includes(mission.answer)) {
+                            errors.push(`${id} 公式關卡 ${index + 1} 沒有包含標準答案。`);
+                        }
+                    });
+                }
+                if (game.type === "network-builder") {
+                    const deviceIds = new Set(game.devices?.map(device => device.id));
+                    if (!Array.isArray(game.devices) || game.devices.length < 4 || !Array.isArray(game.slots) || game.slots.length < 4) {
+                        errors.push(`${id} 網絡建構遊戲至少需要四件硬件及四個位置。`);
+                    }
+                    game.devices?.forEach(device => {
+                        if (!device.image || !fs.existsSync(path.join(root, device.image))) errors.push(`${id} 網絡硬件圖片不存在：${device.image || "（未填寫）"}`);
+                        if (!device.alt || !device.note) errors.push(`${id} 網絡硬件 ${device.id || "未命名"} 缺少替代文字或功能說明。`);
+                    });
+                    game.slots?.forEach(slot => {
+                        if (!deviceIds.has(slot.answer)) errors.push(`${id} 網絡位置 ${slot.id || "未命名"} 引用不存在的硬件。`);
+                    });
+                    if (!Number.isInteger(game.mediumChallenge?.answerIndex) || game.mediumChallenge.answerIndex < 0 || game.mediumChallenge.answerIndex >= game.mediumChallenge.options?.length) {
+                        errors.push(`${id} 傳輸媒介挑戰答案索引無效。`);
+                    }
+                }
+                if (game.type === "trace-debugger") {
+                    if (!Array.isArray(game.code) || game.code.length < 6 || !Array.isArray(game.trace) || game.trace.length < 3) {
+                        errors.push(`${id} 追蹤除錯遊戲缺少程式或追蹤步驟。`);
+                    }
+                    game.trace?.forEach((step, index) => {
+                        if (step.i === undefined || step.value === undefined || !Number.isInteger(step.expectedCount) || !step.note) {
+                            errors.push(`${id} 追蹤步驟 ${index + 1} 不完整。`);
+                        }
+                    });
+                    if (!Number.isInteger(game.bugAnswerIndex) || game.bugAnswerIndex < 0 || game.bugAnswerIndex >= game.bugOptions?.length || !game.fix) {
+                        errors.push(`${id} 除錯答案或修正方法無效。`);
+                    }
+                }
+                if (game.type === "sql-missions") {
+                    if (!Array.isArray(game.tables) || game.tables.length < 2 || !Array.isArray(game.missions) || game.missions.length < 2) {
+                        errors.push(`${id} SQL 任務至少需要兩個數據表及兩關。`);
+                    }
+                    game.missions?.forEach((mission, index) => {
+                        if (!mission.prompt || !mission.starter || !mission.canonical || !Array.isArray(mission.requiredTokens) || mission.requiredTokens.length < 4) {
+                            errors.push(`${id} SQL 任務 ${index + 1} 查詢資料不完整。`);
+                        }
+                        if (!Array.isArray(mission.resultColumns) || !Array.isArray(mission.resultRows) || !mission.explanation) {
+                            errors.push(`${id} SQL 任務 ${index + 1} 結果或解釋不完整。`);
+                        }
+                    });
+                }
+            }
         }
 
         const check = page.quickCheck;
@@ -140,5 +211,5 @@ if (errors.length) {
     errors.forEach(error => console.error(`- ${error}`));
     process.exitCode = 1;
 } else {
-    console.log(`學習提示驗證通過：${Object.keys(learning.pages).length} 個頁面均有目標、概念圖、常見誤解及快速檢查；${lessonVisualCount}/${lessonCount} 個課程頁有圖像導讀，${layeredLessonCount}/${lessonCount} 個課程頁有三級學習，${dseFocusCount}/${lessonCount} 個課程頁有專屬 DSE 用字、重點及失分提示。`);
+    console.log(`學習提示驗證通過：${Object.keys(learning.pages).length} 個頁面均有目標、概念圖、常見誤解及快速檢查；${lessonVisualCount}/${lessonCount} 個課程頁有圖像導讀，${layeredLessonCount}/${lessonCount} 個課程頁有三級學習，${dseFocusCount}/${lessonCount} 個課程頁有專屬 DSE 用字、重點及失分提示，${lessonGameCount} 個首批互動遊戲資料完整。`);
 }
