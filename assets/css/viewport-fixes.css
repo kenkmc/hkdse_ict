@@ -1,0 +1,291 @@
+:root {
+    --viewport-page-gutter: clamp(11px, 2vw, 24px);
+}
+
+html {
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+body.platform-page {
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: clip;
+}
+
+.platform-page *,
+.platform-page *::before,
+.platform-page *::after {
+    box-sizing: border-box;
+}
+
+.platform-page main,
+.platform-page section,
+.platform-page article,
+.platform-page aside,
+.platform-page header,
+.platform-page footer,
+.platform-page form,
+.platform-page fieldset,
+.platform-page .container,
+.platform-page [class*="grid"],
+.platform-page [class*="flex"] {
+    min-width: 0;
+}
+
+.platform-page img,
+.platform-page video {
+    max-width: 100%;
+    height: auto;
+}
+
+.platform-page svg,
+.platform-page canvas {
+    max-width: 100%;
+}
+
+.platform-page pre,
+.platform-page code,
+.platform-page textarea,
+.platform-page input,
+.platform-page select {
+    max-width: 100%;
+}
+
+.platform-page table {
+    max-width: 100%;
+}
+
+/* 讓舊課頁的寬表格可以完整查看，而不是把整頁撐出畫面。 */
+.platform-page .table-container,
+.platform-page .overflow-x-auto,
+.platform-page .qv-table-wrap,
+.platform-page .sba-test-table-wrap,
+.platform-page .sba-trace-table-wrap,
+.platform-page .lesson-game-table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+}
+
+/* SQL 工具原本在 body、root 和 App 同時使用 100vh，加入全站導覽後底部會被截去。 */
+body[data-content-id="tool-sql-simulator"] {
+    height: 100dvh !important;
+    min-height: 640px;
+    overflow: hidden !important;
+}
+
+body[data-content-id="tool-sql-simulator"] > #root {
+    height: auto !important;
+    min-height: 0 !important;
+    flex: 1 1 0 !important;
+    overflow: hidden;
+}
+
+body[data-content-id="tool-sql-simulator"] > #root > .h-screen {
+    height: 100% !important;
+    min-height: 0;
+}
+
+body[data-content-id="tool-sql-simulator"] .lesson-companion {
+    max-height: 42dvh;
+    overflow-y: auto;
+}
+
+body[data-content-id="tool-sql-simulator"] main > .flex.bg-gray-200 {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+}
+
+body[data-content-id="tool-sql-simulator"] main > .flex.bg-gray-200 > button {
+    flex: 0 0 auto;
+}
+
+/* Python 工具保留大畫布，但所有控制都留在可見視窗並可捲動。 */
+body[data-content-id="tool-python-converter"] {
+    min-width: 0;
+    overflow-x: clip;
+}
+
+body[data-content-id="tool-python-converter"] > .container,
+body[data-content-id="tool-python-converter"] .panel,
+body[data-content-id="tool-python-converter"] #flow-editor-container,
+body[data-content-id="tool-python-converter"] #flow-workspace {
+    min-width: 0;
+    max-width: 100%;
+}
+
+body[data-content-id="tool-python-converter"] #flow-workspace {
+    max-height: min(68dvh, 720px);
+    overflow: auto;
+    overscroll-behavior: contain;
+}
+
+body[data-content-id="tool-python-converter"] #flow-canvas {
+    max-width: none;
+}
+
+body[data-content-id="tool-python-converter"].maximized > .container {
+    width: 100% !important;
+    height: 100dvh !important;
+    min-height: 0;
+    overflow: hidden;
+}
+
+body[data-content-id="tool-python-converter"].maximized .panel {
+    height: 100%;
+    min-height: 0 !important;
+    overflow: hidden;
+}
+
+body[data-content-id="tool-python-converter"].maximized #flow-workspace {
+    height: auto !important;
+    min-height: 0;
+    max-height: none;
+}
+
+/* 模擬考的雙層 sticky 在 1080p 以下會佔去過多垂直空間。 */
+@media (max-height: 1080px) and (min-width: 761px) {
+    .mock-toolbar {
+        top: 8px !important;
+        padding-block: 9px !important;
+    }
+
+    .mock-navigator {
+        top: 88px !important;
+        max-height: calc(100dvh - 104px);
+        overflow-y: auto;
+    }
+
+    .mock-question-card {
+        scroll-margin-top: 92px !important;
+    }
+
+    .practice-main {
+        padding-top: clamp(22px, 3vh, 34px) !important;
+    }
+
+    .canvas-container {
+        min-height: min(600px, calc(100dvh - 260px)) !important;
+    }
+}
+
+@media (max-width: 1000px) {
+    .platform-shell-nav {
+        flex-wrap: wrap;
+        gap: 9px 14px;
+    }
+
+    .platform-context {
+        order: 3;
+        flex-basis: 100%;
+    }
+
+    .platform-context small,
+    .platform-context strong {
+        text-align: left;
+    }
+
+    .sba-test-builder,
+    .sba-metric-box {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .sba-metric-box > :first-child,
+    .sba-metric-box output {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 760px) {
+    body.platform-page {
+        overflow-x: hidden;
+    }
+
+    body[data-content-id="tool-sql-simulator"] {
+        height: auto !important;
+        min-height: 100dvh;
+        overflow-y: auto !important;
+    }
+
+    body[data-content-id="tool-sql-simulator"] > #root {
+        min-height: 720px !important;
+        overflow: visible;
+    }
+
+    body[data-content-id="tool-sql-simulator"] #root header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    body[data-content-id="tool-sql-simulator"] #root header h1 {
+        font-size: 1rem;
+        line-height: 1.35;
+    }
+
+    body[data-content-id="tool-sql-simulator"] #root main {
+        min-height: 620px;
+    }
+
+    body[data-content-id="tool-sql-simulator"] .lesson-companion {
+        max-height: none;
+        overflow: visible;
+    }
+
+    body[data-content-id="tool-python-converter"] .panel {
+        min-height: min(500px, 72dvh) !important;
+        padding: 15px !important;
+    }
+
+    body[data-content-id="tool-python-converter"] #flow-workspace {
+        min-height: 360px !important;
+        max-height: 62dvh;
+    }
+
+    .mock-toolbar {
+        position: static !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .mock-toolbar .mock-submit {
+        grid-column: 1 / -1;
+    }
+
+    .mock-navigator {
+        position: static !important;
+        max-height: none;
+    }
+
+    .sba-test-builder,
+    .sba-metric-box {
+        grid-template-columns: 1fr !important;
+    }
+
+    .sba-metric-box > :first-child,
+    .sba-metric-box output {
+        grid-column: auto;
+    }
+
+    .canvas-container {
+        min-height: 520px !important;
+        padding: 1rem !important;
+    }
+
+    body[data-content-id="tool-pki-lab"] .scenario-btn {
+        flex: 1 1 170px;
+    }
+
+    body[data-content-id="tool-pki-lab"] .scenario-btn:first-child {
+        margin-left: 0;
+    }
+
+    body[data-content-id="tool-pki-lab"] header > .flex {
+        flex-wrap: wrap;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto !important; }
+}

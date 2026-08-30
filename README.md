@@ -22,14 +22,15 @@
 - Python／偽代碼／流程圖工具：雙向轉換、語法檢查及程式執行。
 - PKI 實驗室：公開／私人密碼匙加密及數碼簽署概念模型。
 - 網絡及多媒體互動示範，以及部分章節的即時回饋測驗。
-- 共用學習助手：26 個課程頁均提供配合課題的圖像導讀、學習目標、課程界線、互動概念圖、常見誤解、快速檢查，以及由中央題庫載入的原創 DSE 題型與逐分準則。
+- 共用學習助手：26 個課程頁均提供可摺疊的零基礎起步扶手、字詞朗讀、圖像導讀、學習目標、課程界線、互動概念圖、常見誤解、快速檢查，以及由中央題庫載入的原創 DSE 題型與逐分準則。
 - 分層學習及課業：每個課題均提供基礎、應試及挑戰三層內容，共 78 項課業；學生可逐項核對完成準則、保存答案筆記，並以本機進度條查看完成情況。
 - 圖像微課及情境教材：每課利用真實情境圖片和可播放／暫停的概念畫面串連重點；支援鍵盤操作、手動前後切換及 reduced-motion 設定。
-- 課題互動遊戲：首批包括試算表公式偵探、校園網絡建構、程式追蹤除錯及 SQL 任務；學生必須先預測、組裝或修正，才會看到解釋，最佳分數只存於目前瀏覽器。
+- 課題互動遊戲：包括試算表公式偵探、CPU 機器周期競速、校園網絡建構、三波網絡保衛戰、程式追蹤除錯、SQL 任務及演算法競技場；學生必須先預測、組裝或修正，才會看到解釋，XP 及最佳分數只存於目前瀏覽器。
+- Viewport-safe 版面：首頁及 35 個內容頁共用桌面／手機防溢出規則；特別修正 SQL 全螢幕高度、Python 大畫布、模擬考黏附導覽、SBA 寬表格及 1080px 高桌面操作區。
 
 ## 課程依據
 
-內容範圍以教育局 2021《資訊及通訊科技課程及評估指引（中四至中六）》為基準。本站的題目及教材均為原創內容；正式考核安排以教師提供的當屆資料為準。
+內容範圍以教育局 2021《資訊及通訊科技課程及評估指引（中四至中六）》為基準。本站的題目及教材均為原創內容；正式考核安排以教師提供的當屆資料為準。網站以由零基礎銜接至高階整合及 5** 所需能力為設計方向，但不保證個別公開考試成績。
 
 ## 內容與程式結構
 
@@ -40,8 +41,9 @@
 - `assets/images/lesson-visuals/`：供課程頁共用的原創 WebP 教學圖像及生成提示紀錄；真實硬件照片則保留在 `assets/images/network/` 並列明來源及授權。
 - `assets/images/scenario-media/`：分層課業和圖像微課共用的真實情境 WebP 圖片，以及完整生成／編輯提示紀錄。
 - `assets/css/platform.css`：所有頁面的共用視覺系統。
+- `assets/css/viewport-fixes.css`：全站寬度、視窗高度、大型表格、工具畫布及黏附導覽的防截斷規則。
 - `assets/css/learning.css`：共用學習助手及互動概念圖樣式。
-- `assets/css/lesson-games.css`：公式、網絡、追蹤除錯及 SQL 遊戲的共用響應式及 reduced-motion 樣式。
+- `assets/css/lesson-games.css`：七款課題遊戲的共用 arcade、評分、響應式及 reduced-motion 樣式。
 - `assets/css/core-lesson-refresh.css`：必修課題的共用背景、導覽和內容卡片視覺修飾。
 - `assets/css/system-lesson.css`：必修 B 課頁的共用版面、機器周期及操作模式互動樣式。
 - `assets/css/internet-lesson.css`：必修 C(b)–C(d) 的搜尋、串流、網頁設計及保安互動樣式。
@@ -51,8 +53,8 @@
 - `assets/css/mock.css`、`assets/css/mistakes.css`、`assets/css/past-paper-index.css`、`assets/css/answer-lab.css`、`assets/css/sba.css`：模擬考、錯題簿、課題答題重點、作答實驗室及 SBA 準備室的專用版面。
 - `assets/css/question-visuals.css`：題庫的網絡、CPU、ER 圖、試算表、流程圖、追蹤表及資料回應圖像元件。
 - `assets/js/site_navigation.js`：共用全站導覽、頁面識別及課程來源頁尾。
-- `assets/js/lesson_companion.js`：學習助手的展開、概念探索、即時檢查及頁內 DSE 題型互動。
-- `assets/js/lesson_games.js`：四款首批課題遊戲的評分、提示、拖放／點選、追蹤、查詢檢查及本機最佳紀錄。
+- `assets/js/lesson_companion.js`：學習助手的零基礎五步扶手、字詞朗讀、展開、概念探索、即時檢查及頁內 DSE 題型互動。
+- `assets/js/lesson_games.js`：七款課題遊戲的 XP、提示、生命／健康值、combo、拖放／點選、追蹤、查詢檢查及本機最佳紀錄。
 - `assets/js/system-lessons.js`：機器周期、裝置選擇、操作模式判斷及嵌入式題目互動。
 - `assets/js/internet-lessons.js`：搜尋組合、串流緩衝、HTML 結構、受眾設計及威脅配對互動。
 - `assets/js/algorithm-lessons.js`：IPO 分析、算法追蹤、列表執行、邊界值及錯誤分類互動。
@@ -94,9 +96,10 @@ node scripts/validate_study_records.js
 node scripts/validate_learning_data.js
 node scripts/validate_lesson_games.js
 node scripts/validate_answer_lab.js
+node scripts/validate_viewports.js
 ```
 
-目錄驗證會檢查重複識別碼、實際頁面、未列入目錄的 HTML，以及本機 `href`／`src`。題庫驗證會檢查題型、難度、課題連結、答案、評分準則、圖片檔、文字重複及目標題量；模擬卷驗證會檢查 3 份卷一的 40 + 60 分結構、每個選修的 2 組 25 分題組，以及圖像題和相連情境；錯題驗證會走完 1、3、7、14 日重練狀態；學習提示驗證會檢查 26 個課程頁的三級學習、圖像教材及 DSE 用字／重點；課題遊戲驗證會核對四款活動的掛載、關卡、參考答案、硬件圖片、版本、手機及 reduced-motion 支援；作答實驗室驗證會核對指令詞、5 組題材及 15 項分層任務。
+目錄驗證會檢查重複識別碼、實際頁面、未列入目錄的 HTML，以及本機 `href`／`src`。題庫驗證會檢查題型、難度、課題連結、答案、評分準則、圖片檔、文字重複及目標題量；模擬卷驗證會檢查 3 份卷一的 40 + 60 分結構、每個選修的 2 組 25 分題組，以及圖像題和相連情境；錯題驗證會走完 1、3、7、14 日重練狀態；學習提示驗證會檢查 26 個課程頁的零基礎扶手、三級學習、圖像教材及 DSE 用字／重點；課題遊戲驗證會核對七款活動的掛載、關卡、參考答案、硬件圖片、版本、手機及 reduced-motion 支援；作答實驗室驗證會核對指令詞、5 組題材及 15 項分層任務；視窗版面驗證會檢查首頁和 35 個內容頁的共用修正版本，以及 SQL、Python、模擬考、SBA、大型表格和 1080px 高桌面的已知風險。
 
 ## 技術
 

@@ -21,7 +21,7 @@ const siteConfig = {
         layeredLearning: true,
         tieredAssignments: 78,
         multimediaLessons: true,
-        interactiveLessonGames: 4,
+        interactiveLessonGames: 7,
         answerUpgradeLab: true,
         progressTracking: true,
         progressStorage: "local-only"
@@ -96,10 +96,10 @@ const courseData = [
                 id: "chb-1",
                 title: "i. 基本機器組織",
                 file: "chb.1.html",
-                desc: "硬件功能、CPU、機器周期、記憶體、輸入輸出及儲存裝置",
+                desc: "硬件功能、CPU、機器周期競速、記憶體、輸入輸出及儲存裝置",
                 type: "lesson",
                 syllabusRef: "B(a)",
-                tags: ["CPU", "GPU", "機器周期", "RAM", "ROM", "記憶體", "輸入輸出", "儲存裝置"]
+                tags: ["CPU", "GPU", "機器周期", "CPU 競速", "RAM", "ROM", "記憶體", "輸入輸出", "儲存裝置"]
             },
             {
                 id: "chb-2",
@@ -160,10 +160,10 @@ const courseData = [
                 id: "chc-5",
                 title: "v. 網上威脅與保安",
                 file: "chc.5.html",
-                desc: "惡意程式、網絡攻擊、私隱、加密、認證、授權及電子交易保安",
+                desc: "惡意程式、網絡攻擊、私隱、加密、認證、授權及校園網絡保衛戰",
                 type: "lesson",
                 syllabusRef: "C(d)",
-                tags: ["病毒", "蠕蟲", "木馬", "勒索軟件", "防火牆", "VPN", "加密", "數碼證書", "網絡保安"]
+                tags: ["病毒", "蠕蟲", "木馬", "勒索軟件", "防火牆", "VPN", "加密", "數碼證書", "網絡保衛戰"]
             }
         ]
     },
@@ -289,7 +289,7 @@ const courseData = [
         color: "bg-fuchsia-50 text-fuchsia-700",
         icon: "braces",
         items: [
-            { id: "ec-1", title: "i. 程式編寫", file: "ec.1.html", desc: "搜尋、排序、合併、巢狀迴圈、鏈結串列、堆疊、佇列、檔案及除錯", type: "lesson", syllabusRef: "Elective C(a)", tags: ["search", "sort", "merge", "stack", "queue", "linked list", "file handling", "debugging"] },
+            { id: "ec-1", title: "i. 程式編寫", file: "ec.1.html", desc: "搜尋、排序、合併、巢狀迴圈、鏈結串列、堆疊、佇列及演算法競技場", type: "lesson", syllabusRef: "Elective C(a)", tags: ["search", "sort", "merge", "stack", "queue", "linked list", "algorithm arena", "debugging"] },
             { id: "ec-2", title: "ii. 程式在真實情境的應用", file: "ec.2.html", desc: "感應器、馬達、擴充模組、事件處理及實體裝置程式", type: "lesson", syllabusRef: "Elective C(b)", tags: ["sensor", "motor", "event-driven", "physical device", "accelerometer"] }
         ]
     },

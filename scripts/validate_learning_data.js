@@ -21,9 +21,12 @@ let dseFocusCount = 0;
 let lessonGameCount = 0;
 const expectedGames = new Map([
     ["cha-4", "formula-detective"],
+    ["chb-1", "cpu-cycle-race"],
     ["chc-1", "network-builder"],
+    ["chc-5", "cyber-defense"],
     ["chd-2", "trace-debugger"],
-    ["ea-2", "sql-missions"]
+    ["ea-2", "sql-missions"],
+    ["ec-1", "algorithm-arena"]
 ]);
 
 if (!learning?.pages) {
@@ -140,7 +143,7 @@ if (!learning?.pages) {
             if (page.game) {
                 lessonGameCount += 1;
                 const game = page.game;
-                if (!expectedGameType) errors.push(`${id} 提供了未列入首批範圍的互動遊戲。`);
+                if (!expectedGameType) errors.push(`${id} 提供了未列入驗證範圍的互動遊戲。`);
                 if (!game.title || !game.intro || !game.eyebrow) errors.push(`${id} 的互動遊戲標題或說明不完整。`);
                 if (game.type === "formula-detective") {
                     if (!Array.isArray(game.missions) || game.missions.length < 3) errors.push(`${id} 公式偵探至少需要三關。`);
@@ -195,6 +198,31 @@ if (!learning?.pages) {
                         }
                     });
                 }
+                if (game.type === "cpu-cycle-race" || game.type === "algorithm-arena") {
+                    if (!Array.isArray(game.rounds) || game.rounds.length < 4) errors.push(`${id} 競技遊戲至少需要四個回合。`);
+                    game.rounds?.forEach((round, index) => {
+                        if (!round.title || !round.prompt || !round.explanation || !Array.isArray(round.options) || round.options.length < 3) {
+                            errors.push(`${id} 競技回合 ${index + 1} 內容不完整。`);
+                        }
+                        if (!Number.isInteger(round.answerIndex) || round.answerIndex < 0 || round.answerIndex >= round.options?.length) {
+                            errors.push(`${id} 競技回合 ${index + 1} 的答案索引無效。`);
+                        }
+                    });
+                    if (game.type === "cpu-cycle-race" && (!Array.isArray(game.route) || game.route.length < 6)) {
+                        errors.push(`${id} CPU 競速缺少完整資料路線。`);
+                    }
+                }
+                if (game.type === "cyber-defense") {
+                    if (!Array.isArray(game.waves) || game.waves.length < 3) errors.push(`${id} 網絡保衛戰至少需要三波攻擊。`);
+                    game.waves?.forEach((wave, index) => {
+                        if (!wave.name || !wave.threat || !wave.impact || !wave.explanation || !Array.isArray(wave.options) || wave.options.length < 3) {
+                            errors.push(`${id} 攻擊波 ${index + 1} 內容不完整。`);
+                        }
+                        if (!Number.isInteger(wave.answerIndex) || wave.answerIndex < 0 || wave.answerIndex >= wave.options?.length) {
+                            errors.push(`${id} 攻擊波 ${index + 1} 的答案索引無效。`);
+                        }
+                    });
+                }
             }
         }
 
@@ -206,10 +234,20 @@ if (!learning?.pages) {
     });
 }
 
+const companionSource = fs.readFileSync(path.join(root, "assets/js/lesson_companion.js"), "utf8");
+["hkdse-ict-zero-start-v1", "data-zero-step", "speechSynthesis", "完全未學過？由這裏開始"].forEach(marker => {
+    if (!companionSource.includes(marker)) errors.push(`零基礎起步扶手缺少標記：${marker}`);
+});
+platform?.getItems().filter(item => item.type === "lesson").forEach(item => {
+    const html = fs.readFileSync(path.join(root, item.file), "utf8");
+    if (!html.includes("learning_data.js?v=13")) errors.push(`${item.file} 未載入最新學習資料。`);
+    if (!html.includes("lesson_companion.js?v=7")) errors.push(`${item.file} 未載入最新學習助手。`);
+});
+
 if (errors.length) {
     console.error(`學習提示驗證失敗（${errors.length} 項）：`);
     errors.forEach(error => console.error(`- ${error}`));
     process.exitCode = 1;
 } else {
-    console.log(`學習提示驗證通過：${Object.keys(learning.pages).length} 個頁面均有目標、概念圖、常見誤解及快速檢查；${lessonVisualCount}/${lessonCount} 個課程頁有圖像導讀，${layeredLessonCount}/${lessonCount} 個課程頁有三級學習，${dseFocusCount}/${lessonCount} 個課程頁有專屬 DSE 用字、重點及失分提示，${lessonGameCount} 個首批互動遊戲資料完整。`);
+    console.log(`學習提示驗證通過：${Object.keys(learning.pages).length} 個頁面均有目標、概念圖、常見誤解及快速檢查；${lessonVisualCount}/${lessonCount} 個課程頁有圖像導讀、零基礎起步扶手及三級學習，${dseFocusCount}/${lessonCount} 個課程頁有專屬 DSE 用字、重點及失分提示，${lessonGameCount} 個互動遊戲資料完整。`);
 }

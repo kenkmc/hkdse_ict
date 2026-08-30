@@ -15,6 +15,7 @@
         "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
     })[character]);
     const layerStorageKey = "hkdse-ict-layered-learning-v1";
+    const zeroStartStorageKey = "hkdse-ict-zero-start-v1";
     const readLayerProgress = () => {
         try {
             const stored = JSON.parse(window.localStorage.getItem(layerStorageKey) || "{}");
@@ -40,6 +41,16 @@
     const featuredQuestion = page.featuredQuestionId
         ? questionBank.find(question => question.id === page.featuredQuestionId)
         : null;
+    const readZeroStartProgress = () => {
+        try {
+            const stored = JSON.parse(window.localStorage.getItem(zeroStartStorageKey) || "{}");
+            return stored && typeof stored === "object" ? stored : {};
+        } catch (error) {
+            return {};
+        }
+    };
+    const zeroStartProgress = readZeroStartProgress();
+    const pageZeroStart = new Set(Array.isArray(zeroStartProgress[item.id]) ? zeroStartProgress[item.id] : []);
 
     const section = document.createElement("section");
     section.className = "lesson-companion";
@@ -228,6 +239,46 @@
         </section>
     ` : "";
 
+    const zeroStart = item.type === "lesson" ? (() => {
+        const starterConcepts = page.concepts.slice(0, 3);
+        const starterTerms = (page.dseFocus?.keyTerms || starterConcepts.map(concept => concept.label)).slice(0, 5);
+        const steps = [
+            { title: "先認字詞", body: `讀出 ${starterTerms.slice(0, 3).join("、")}，暫時不用背長答案。`, target: ".lesson-zero-terms" },
+            { title: "看一幅圖", body: "只找出圖中三個重點，然後用自己的說話描述一次。", target: ".lesson-visual" },
+            { title: "理解第一個概念", body: `先掌握「${starterConcepts[0]?.label || "核心概念"}」，再逐個打開其餘概念。`, target: ".lesson-concept-explorer" },
+            { title: "做 60 秒檢查", body: "先作答才看解釋；答錯並不扣分，重點是找出誤解。", target: ".lesson-quick-check" },
+            { title: "完成基礎層課業", body: "寫三句概念筆記並勾選完成準則，才進入應試層。", target: "[data-layer-tab='foundation']" }
+        ];
+        return `
+            <details class="lesson-zero-start" data-zero-start${pageZeroStart.size === steps.length ? "" : " open"}>
+                <summary>
+                    <span aria-hidden="true">🌱</span>
+                    <span><small>完全未學過？由這裏開始</small><strong>零基礎起步：先識字詞，再做第一題</strong></span>
+                    <b data-zero-progress>${pageZeroStart.size} / ${steps.length}</b>
+                </summary>
+                <div class="lesson-zero-body">
+                    <p>每次只做一小步。這不是全站學習路徑，而是本課的起步扶手；已熟悉內容可直接跳到分層課業。</p>
+                    <div class="lesson-zero-terms" aria-label="本課起步字詞">
+                        <div><span>本課先認識</span>${starterTerms.map(term => `<b>${escapeHTML(term)}</b>`).join("")}</div>
+                        <button type="button" data-zero-speak>讀出字詞</button>
+                    </div>
+                    <div class="lesson-zero-concepts">
+                        ${starterConcepts.map((concept, index) => `<article><span>${index + 1}</span><div><strong>${escapeHTML(concept.label)}</strong><p>${escapeHTML(concept.detail)}</p></div></article>`).join("")}
+                    </div>
+                    <ol class="lesson-zero-steps">
+                        ${steps.map((step, index) => `
+                            <li class="${pageZeroStart.has(index) ? "is-complete" : ""}">
+                                <label><input type="checkbox" data-zero-step="${index}"${pageZeroStart.has(index) ? " checked" : ""}> <span><strong>${index + 1}. ${escapeHTML(step.title)}</strong><small>${escapeHTML(step.body)}</small></span></label>
+                                <button type="button" data-zero-jump="${escapeHTML(step.target)}">前往</button>
+                            </li>
+                        `).join("")}
+                    </ol>
+                    <p class="lesson-zero-next" data-zero-next>${pageZeroStart.size === steps.length ? "起步步驟已完成，可以進入應試層。" : `下一步：${steps.find((step, index) => !pageZeroStart.has(index))?.title || steps[0].title}`}</p>
+                </div>
+            </details>
+        `;
+    })() : "";
+
     const lessonGame = page.game ? `
         <section class="lesson-game" data-lesson-game-root aria-label="${escapeHTML(page.game.title)}">
             <p class="lesson-game-loading">正在載入互動活動……</p>
@@ -243,6 +294,7 @@
             <button class="lesson-companion-toggle" type="button" aria-expanded="${expandedByDefault}" aria-controls="lesson-companion-content">${expandedByDefault ? "收起" : "展開學習重點"}</button>
         </div>
         <div id="lesson-companion-content" class="lesson-companion-content"${expandedByDefault ? "" : " hidden"}>
+            ${zeroStart}
             ${lessonVisual}
             ${dseFocus}
             ${lessonGame}
@@ -280,17 +332,59 @@
 
     nav.insertAdjacentElement("afterend", section);
 
+    const zeroRoot = section.querySelector("[data-zero-start]");
+    if (zeroRoot) {
+        const zeroSteps = Array.from(zeroRoot.querySelectorAll("[data-zero-step]"));
+        const progressNode = zeroRoot.querySelector("[data-zero-progress]");
+        const nextNode = zeroRoot.querySelector("[data-zero-next]");
+        const stepTitles = ["先認字詞", "看一幅圖", "理解第一個概念", "做 60 秒檢查", "完成基礎層課業"];
+        const saveZeroStart = () => {
+            try {
+                zeroStartProgress[item.id] = Array.from(pageZeroStart).sort((a, b) => a - b);
+                window.localStorage.setItem(zeroStartStorageKey, JSON.stringify(zeroStartProgress));
+            } catch (error) {
+                // 起步扶手仍可使用；只是不會在私隱模式下保留記錄。
+            }
+            progressNode.textContent = `${pageZeroStart.size} / ${zeroSteps.length}`;
+            const nextIndex = stepTitles.findIndex((title, index) => !pageZeroStart.has(index));
+            nextNode.textContent = nextIndex === -1 ? "起步步驟已完成，可以進入應試層。" : `下一步：${stepTitles[nextIndex]}`;
+        };
+        zeroSteps.forEach(input => input.addEventListener("change", () => {
+            const index = Number(input.dataset.zeroStep);
+            if (input.checked) pageZeroStart.add(index);
+            else pageZeroStart.delete(index);
+            input.closest("li")?.classList.toggle("is-complete", input.checked);
+            saveZeroStart();
+        }));
+        zeroRoot.querySelectorAll("[data-zero-jump]").forEach(button => button.addEventListener("click", () => {
+            const target = section.querySelector(button.dataset.zeroJump);
+            if (target?.matches("[data-layer-tab]")) target.click();
+            target?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+        }));
+        zeroRoot.querySelector("[data-zero-speak]")?.addEventListener("click", event => {
+            if (!("speechSynthesis" in window)) {
+                event.currentTarget.textContent = "此瀏覽器不支援朗讀";
+                return;
+            }
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance((page.dseFocus?.keyTerms || page.concepts.map(concept => concept.label)).slice(0, 5).join("，"));
+            utterance.lang = "zh-HK";
+            utterance.rate = 0.82;
+            window.speechSynthesis.speak(utterance);
+        });
+    }
+
     if (page.game) {
         if (!document.querySelector('link[data-lesson-games-style]')) {
             const gameStyle = document.createElement("link");
             gameStyle.rel = "stylesheet";
-            gameStyle.href = "assets/css/lesson-games.css?v=1";
+            gameStyle.href = "assets/css/lesson-games.css?v=2";
             gameStyle.dataset.lessonGamesStyle = "true";
             document.head.append(gameStyle);
         }
         if (!document.querySelector('script[data-lesson-games-script]')) {
             const gameScript = document.createElement("script");
-            gameScript.src = "assets/js/lesson_games.js?v=1";
+            gameScript.src = "assets/js/lesson_games.js?v=2";
             gameScript.dataset.lessonGamesScript = "true";
             document.body.append(gameScript);
         }

@@ -1101,6 +1101,127 @@ const lessonGameAssignments = {
             }
         ],
         simulatorHref: "db_simulator.html"
+    },
+    "chb-1": {
+        type: "cpu-cycle-race",
+        eyebrow: "CPU machine-cycle race",
+        title: "CPU 機器周期競速場",
+        intro: "駕駛資料封包完成提取、解碼及執行。答對才能通過閘門；第一次答對每關 2 XP。",
+        route: ["PC", "MAR", "記憶體", "MDR", "CIR", "控制器", "ALU"],
+        rounds: [
+            {
+                title: "閘門 1 · 指令地址",
+                prompt: "新周期開始。哪個暫存器保存下一條指令的地址？",
+                options: ["Program Counter (PC)", "Memory Data Register (MDR)", "Accumulator (ACC)"],
+                answerIndex: 0,
+                explanation: "PC 保存下一條要提取的指令地址，地址會送到 MAR，再經地址匯流排到主記憶體。"
+            },
+            {
+                title: "閘門 2 · 讀入指令",
+                prompt: "主記憶體送回指令內容時，資料會先進入哪個暫存器？",
+                options: ["MAR", "MDR", "PC"],
+                answerIndex: 1,
+                explanation: "MDR 暫存由記憶體讀入或準備寫回記憶體的資料／指令；其後指令送到 CIR。"
+            },
+            {
+                title: "閘門 3 · 解碼",
+                prompt: "CIR 已保存目前指令。哪個部件解釋操作碼並發出控制訊號？",
+                options: ["控制器 (CU)", "ALU", "輔助儲存裝置"],
+                answerIndex: 0,
+                explanation: "控制器解碼指令並協調資料流；ALU 主要執行算術及邏輯運算。"
+            },
+            {
+                title: "Boss 關 · 執行",
+                prompt: "指令要求比較兩個分數。最適合由哪個部件完成？",
+                options: ["ALU", "ROM", "輸入裝置"],
+                answerIndex: 0,
+                explanation: "大小比較屬邏輯運算，由 ALU 執行。完成後結果可存入暫存器或寫回記憶體。"
+            }
+        ]
+    },
+    "chc-5": {
+        type: "cyber-defense",
+        eyebrow: "Cyber defence waves",
+        title: "校園網絡保衛戰",
+        intro: "三波攻擊會逐步逼近。按攻擊方法選擇能直接降低風險的控制，守住系統健康值。",
+        waves: [
+            {
+                name: "第 1 波 · 偽冒登入頁",
+                threat: "職員收到仿冒雲端硬碟的電郵，連結要求重新輸入帳戶密碼。",
+                options: [
+                    "核實寄件者和網址、由書籤進入網站，並啟用多因素認證",
+                    "增加電腦的 RAM 容量",
+                    "每天把顯示器關閉一次"
+                ],
+                answerIndex: 0,
+                explanation: "這是 phishing／社交工程。核實來源可避免提交密碼；MFA 可降低單一密碼外洩後被登入的風險。",
+                impact: "帳戶被接管及資料外洩"
+            },
+            {
+                name: "第 2 波 · 勒索軟件",
+                threat: "一部未更新的電腦開啟惡意附件，校內共用檔案開始被加密。",
+                options: [
+                    "只把備份存於同一個共用磁碟",
+                    "隔離感染電腦、修補系統，並由離線／不可改寫備份復原",
+                    "把所有使用者提升為系統管理員"
+                ],
+                answerIndex: 1,
+                explanation: "隔離可減少橫向擴散；更新修補漏洞；離線或不可改寫備份不會與共用檔案一起被加密。",
+                impact: "檔案不可用及服務中斷"
+            },
+            {
+                name: "Boss 波 · 公共 Wi-Fi",
+                threat: "學生在未受信任的公共 Wi-Fi 登入學校平台，瀏覽器顯示證書警告。",
+                options: [
+                    "忽略警告，因為 HTTPS 一定安全",
+                    "繼續登入，但把密碼縮短方便重試",
+                    "停止登入、核對證書及網址；需要時改用受信任網絡或 VPN"
+                ],
+                answerIndex: 2,
+                explanation: "證書警告可能表示不能確認伺服器身分或連線被攔截。先停止傳送敏感資料，再核對身分及使用受信任通道。",
+                impact: "登入資料被攔截或連到冒充網站"
+            }
+        ]
+    },
+    "ec-1": {
+        type: "algorithm-arena",
+        eyebrow: "Algorithm arena",
+        title: "演算法競技場",
+        intro: "在搜尋及資料結構擂台逐回合預測結果。連續答對會累積 combo，但答錯後仍可按提示再試。",
+        rounds: [
+            {
+                title: "Round 1 · Binary search",
+                prompt: "已排序列表 [4, 9, 15, 21, 28, 34, 40]，以 binary search 尋找 28。第一次比較哪個值？",
+                visual: ["4", "9", "15", "21", "28", "34", "40"],
+                options: ["4", "21", "28"],
+                answerIndex: 1,
+                explanation: "7 個項目的中間索引是 3，因此先比較 21；28 較大，下一步只保留右半部。"
+            },
+            {
+                title: "Round 2 · Linear search",
+                prompt: "未排序列表 [18, 6, 31, 12, 25]，linear search 尋找 12，需要多少次比較？",
+                visual: ["18", "6", "31", "12", "25"],
+                options: ["2 次", "3 次", "4 次"],
+                answerIndex: 2,
+                explanation: "Linear search 由第一項逐一比較：18、6、31、12，所以第 4 次才找到。"
+            },
+            {
+                title: "Round 3 · Stack combo",
+                prompt: "空 stack 依次 PUSH A、PUSH B、PUSH C、POP。哪個項目被移除？",
+                visual: ["A", "B", "C"],
+                options: ["A", "B", "C"],
+                answerIndex: 2,
+                explanation: "Stack 採用 LIFO；最後加入的 C 位於頂部，因此最先被 POP。"
+            },
+            {
+                title: "Boss Round · Queue",
+                prompt: "空 queue 依次 ENQUEUE Amy、Ben、Chloe，再 DEQUEUE 一次。誰會先離開？",
+                visual: ["Amy", "Ben", "Chloe"],
+                options: ["Amy", "Ben", "Chloe"],
+                answerIndex: 0,
+                explanation: "Queue 採用 FIFO；Amy 最先加入，所以最先離開。"
+            }
+        ]
     }
 };
 

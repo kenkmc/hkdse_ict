@@ -4,6 +4,14 @@
     const platform = window.HKDSE_ICT;
     if (!platform || document.querySelector(".platform-shell-nav")) return;
 
+    if (!document.querySelector('link[data-viewport-fixes]')) {
+        const viewportStyle = document.createElement("link");
+        viewportStyle.rel = "stylesheet";
+        viewportStyle.href = "assets/css/viewport-fixes.css?v=1";
+        viewportStyle.dataset.viewportFixes = "true";
+        document.head.append(viewportStyle);
+    }
+
     const currentItem = platform.getItemByPath(window.location.pathname);
     const currentSection = currentItem
         ? platform.sections.find(section => section.id === currentItem.sectionId)

@@ -29,7 +29,10 @@
         "formula-detective": game.missions?.length * 2,
         "network-builder": game.slots?.length + 1,
         "trace-debugger": game.trace?.length + 1,
-        "sql-missions": game.missions?.length * 2
+        "sql-missions": game.missions?.length * 2,
+        "cpu-cycle-race": game.rounds?.length * 2,
+        "cyber-defense": game.waves?.length * 2,
+        "algorithm-arena": game.rounds?.length * 2
     };
     const total = Number(totalByType[game.type]) || 0;
 
@@ -480,11 +483,229 @@
         render();
     };
 
+    const renderCPUCycleRace = () => {
+        const state = {
+            index: 0,
+            attempts: game.rounds.map(() => 0),
+            earned: game.rounds.map(() => null),
+            feedback: "",
+            lastChoice: -1
+        };
+        const score = () => state.earned.reduce((sum, value) => sum + (Number(value) || 0), 0);
+        const render = () => {
+            const round = game.rounds[state.index];
+            const completed = state.earned[state.index] !== null;
+            stage.innerHTML = `
+                <div class="lesson-cpu-dashboard">
+                    <div class="lesson-cpu-route" aria-label="CPU 資料路線">
+                        ${game.route.map((stop, index) => `<span class="${index <= state.index + 2 ? "is-reached" : ""}${index === Math.min(state.index + 2, game.route.length - 1) ? " is-current" : ""}"><b>${escapeHTML(stop)}</b><i aria-hidden="true">${index === Math.min(state.index + 2, game.route.length - 1) ? "⚡" : index <= state.index + 2 ? "✓" : "·"}</i></span>`).join("")}
+                    </div>
+                    <div class="lesson-arcade-status"><span>閘門 <b>${state.index + 1} / ${game.rounds.length}</b></span><span>能量 <b>${Math.max(1, 4 - state.attempts[state.index])} ⚡</b></span></div>
+                </div>
+                <section class="lesson-arcade-challenge">
+                    <p class="lesson-game-kicker">${escapeHTML(round.title)}</p>
+                    <h4>${escapeHTML(round.prompt)}</h4>
+                    <div class="lesson-game-options lesson-arcade-options">
+                        ${round.options.map((option, index) => {
+                            const className = completed && index === round.answerIndex ? "is-correct" : (!completed && state.lastChoice === index ? "is-incorrect" : "");
+                            return `<button type="button" data-cpu-choice="${index}" class="${className}"${completed ? " disabled" : ""}>${escapeHTML(option)}</button>`;
+                        }).join("")}
+                    </div>
+                    <p class="lesson-game-feedback ${completed ? "is-success" : state.feedback ? "is-warning" : ""}" aria-live="polite">${escapeHTML(state.feedback || "選擇後，資料封包才會通過下一個閘門。")}</p>
+                    ${completed ? `<div class="lesson-game-explanation"><p>${escapeHTML(round.explanation)}</p></div>` : ""}
+                    ${completed ? `<div class="lesson-game-actions">${state.index === game.rounds.length - 1 ? `<button type="button" class="is-primary" disabled>已完成 ✓</button>` : `<button type="button" class="is-primary" data-cpu-next>衝向下一關 →</button>`}</div>` : ""}
+                </section>
+                ${state.earned.every(value => value !== null) && state.index === game.rounds.length - 1 ? `<div class="lesson-arcade-victory"><span aria-hidden="true">🏁</span><div><strong>機器周期通關！</strong><p>你已把 PC、MAR、MDR、CIR、控制器及 ALU 放回正確資料流程。</p></div></div>` : ""}
+            `;
+            updateScore(score());
+            stage.querySelectorAll("[data-cpu-choice]").forEach(button => button.addEventListener("click", () => {
+                const choice = Number(button.dataset.cpuChoice);
+                state.attempts[state.index] += 1;
+                state.lastChoice = choice;
+                if (choice === round.answerIndex) {
+                    state.earned[state.index] = state.attempts[state.index] === 1 ? 2 : 1;
+                    state.feedback = `閘門開啟！取得 ${state.earned[state.index]} XP。`;
+                } else {
+                    state.feedback = "閘門未開。先判斷這一步處理的是地址、資料、解碼還是運算，再試一次。";
+                }
+                render();
+            }));
+            stage.querySelector("[data-cpu-next]")?.addEventListener("click", () => {
+                if (state.index < game.rounds.length - 1) {
+                    state.index += 1;
+                    state.feedback = "";
+                    state.lastChoice = -1;
+                    render();
+                }
+            });
+        };
+        resetCurrentGame = () => {
+            state.index = 0;
+            state.attempts.fill(0);
+            state.earned.fill(null);
+            state.feedback = "";
+            state.lastChoice = -1;
+            render();
+        };
+        render();
+    };
+
+    const renderCyberDefense = () => {
+        const state = {
+            index: 0,
+            health: 100,
+            attempts: game.waves.map(() => 0),
+            earned: game.waves.map(() => null),
+            feedback: "",
+            lastChoice: -1,
+            penalised: new Set()
+        };
+        const score = () => state.earned.reduce((sum, value) => sum + (Number(value) || 0), 0);
+        const render = () => {
+            const wave = game.waves[state.index];
+            const completed = state.earned[state.index] !== null;
+            const healthClass = state.health >= 70 ? "is-healthy" : state.health >= 40 ? "is-warning" : "is-danger";
+            stage.innerHTML = `
+                <div class="lesson-defense-skyline" aria-hidden="true"><span>🏫</span><i>🖥️</i><i>📡</i><i>🗄️</i><b class="${completed ? "is-blocked" : ""}">${state.index === game.waves.length - 1 ? "👾" : "⚠️"}</b></div>
+                <div class="lesson-defense-hud">
+                    <span>攻擊波 <b>${state.index + 1} / ${game.waves.length}</b></span>
+                    <span>系統健康 <b>${state.health}%</b></span>
+                    <div class="lesson-defense-health ${healthClass}"><i style="width:${state.health}%"></i></div>
+                </div>
+                <section class="lesson-arcade-challenge">
+                    <p class="lesson-game-kicker">${escapeHTML(wave.name)}</p>
+                    <h4>${escapeHTML(wave.threat)}</h4>
+                    <p class="lesson-defense-impact"><strong>可能影響：</strong>${escapeHTML(wave.impact)}</p>
+                    <div class="lesson-game-options lesson-defense-options">
+                        ${wave.options.map((option, index) => {
+                            const className = completed && index === wave.answerIndex ? "is-correct" : (!completed && state.lastChoice === index ? "is-incorrect" : "");
+                            return `<button type="button" data-defense-choice="${index}" class="${className}"${completed ? " disabled" : ""}>${escapeHTML(option)}</button>`;
+                        }).join("")}
+                    </div>
+                    <p class="lesson-game-feedback ${completed ? "is-success" : state.feedback ? "is-warning" : ""}" aria-live="polite">${escapeHTML(state.feedback || "選擇一項能直接處理這個威脅的保安控制。")}</p>
+                    ${completed ? `<div class="lesson-game-explanation"><p>${escapeHTML(wave.explanation)}</p></div><div class="lesson-game-actions">${state.index === game.waves.length - 1 ? `<button type="button" class="is-primary" disabled>保衛戰完成 ✓</button>` : `<button type="button" class="is-primary" data-defense-next>迎戰下一波 →</button>`}</div>` : ""}
+                </section>
+                ${state.earned.every(value => value !== null) && state.index === game.waves.length - 1 ? `<div class="lesson-arcade-victory"><span aria-hidden="true">🛡️</span><div><strong>校園系統守住了！</strong><p>剩餘健康值 ${state.health}%。記住：措施要寫出機制，不能只列「防毒／加密／備份」。</p></div></div>` : ""}
+            `;
+            updateScore(score());
+            stage.querySelectorAll("[data-defense-choice]").forEach(button => button.addEventListener("click", () => {
+                const choice = Number(button.dataset.defenseChoice);
+                state.attempts[state.index] += 1;
+                state.lastChoice = choice;
+                if (choice === wave.answerIndex) {
+                    state.earned[state.index] = state.attempts[state.index] === 1 ? 2 : 1;
+                    state.feedback = `防禦成功，取得 ${state.earned[state.index]} XP。`;
+                } else {
+                    if (!state.penalised.has(state.index)) {
+                        state.health = Math.max(40, state.health - 15);
+                        state.penalised.add(state.index);
+                    }
+                    state.feedback = "控制未能直接處理目前攻擊。先找出攻擊途徑，再選能阻止、偵測或復原的措施。";
+                }
+                render();
+            }));
+            stage.querySelector("[data-defense-next]")?.addEventListener("click", () => {
+                if (state.index < game.waves.length - 1) {
+                    state.index += 1;
+                    state.feedback = "";
+                    state.lastChoice = -1;
+                    render();
+                }
+            });
+        };
+        resetCurrentGame = () => {
+            state.index = 0;
+            state.health = 100;
+            state.attempts.fill(0);
+            state.earned.fill(null);
+            state.feedback = "";
+            state.lastChoice = -1;
+            state.penalised = new Set();
+            render();
+        };
+        render();
+    };
+
+    const renderAlgorithmArena = () => {
+        const state = {
+            index: 0,
+            combo: 0,
+            bestCombo: 0,
+            attempts: game.rounds.map(() => 0),
+            earned: game.rounds.map(() => null),
+            feedback: "",
+            lastChoice: -1
+        };
+        const score = () => state.earned.reduce((sum, value) => sum + (Number(value) || 0), 0);
+        const render = () => {
+            const round = game.rounds[state.index];
+            const completed = state.earned[state.index] !== null;
+            stage.innerHTML = `
+                <div class="lesson-arena-header">
+                    <div><span>ROUND</span><b>${state.index + 1}</b><small>/ ${game.rounds.length}</small></div>
+                    <div class="lesson-arena-combo"><span>COMBO</span><b>×${state.combo}</b><small>最佳 ×${state.bestCombo}</small></div>
+                </div>
+                <section class="lesson-arcade-challenge">
+                    <p class="lesson-game-kicker">${escapeHTML(round.title)}</p>
+                    <h4>${escapeHTML(round.prompt)}</h4>
+                    <div class="lesson-arena-array" aria-label="題目資料">${round.visual.map((value, index) => `<span style="--bar:${35 + ((index * 17) % 56)}%"><i></i><b>${escapeHTML(value)}</b></span>`).join("")}</div>
+                    <div class="lesson-game-options lesson-arcade-options">
+                        ${round.options.map((option, index) => {
+                            const className = completed && index === round.answerIndex ? "is-correct" : (!completed && state.lastChoice === index ? "is-incorrect" : "");
+                            return `<button type="button" data-arena-choice="${index}" class="${className}"${completed ? " disabled" : ""}>${escapeHTML(option)}</button>`;
+                        }).join("")}
+                    </div>
+                    <p class="lesson-game-feedback ${completed ? "is-success" : state.feedback ? "is-warning" : ""}" aria-live="polite">${escapeHTML(state.feedback || "先在腦中逐步執行操作，再選答案。")}</p>
+                    ${completed ? `<div class="lesson-game-explanation"><p>${escapeHTML(round.explanation)}</p></div><div class="lesson-game-actions">${state.index === game.rounds.length - 1 ? `<button type="button" class="is-primary" disabled>擂台完成 ✓</button>` : `<button type="button" class="is-primary" data-arena-next>下一回合 →</button>`}</div>` : ""}
+                </section>
+                ${state.earned.every(value => value !== null) && state.index === game.rounds.length - 1 ? `<div class="lesson-arcade-victory"><span aria-hidden="true">🏆</span><div><strong>演算法擂台完成！</strong><p>你已分辨 binary／linear search，以及 stack 的 LIFO 和 queue 的 FIFO。</p></div></div>` : ""}
+            `;
+            updateScore(score());
+            stage.querySelectorAll("[data-arena-choice]").forEach(button => button.addEventListener("click", () => {
+                const choice = Number(button.dataset.arenaChoice);
+                state.attempts[state.index] += 1;
+                state.lastChoice = choice;
+                if (choice === round.answerIndex) {
+                    state.earned[state.index] = state.attempts[state.index] === 1 ? 2 : 1;
+                    state.combo += 1;
+                    state.bestCombo = Math.max(state.bestCombo, state.combo);
+                    state.feedback = `判斷正確，combo ×${state.combo}，取得 ${state.earned[state.index]} XP。`;
+                } else {
+                    state.combo = 0;
+                    state.feedback = "Combo 中斷，但可以立即再試。把每一步寫出或用手指逐項追蹤。";
+                }
+                render();
+            }));
+            stage.querySelector("[data-arena-next]")?.addEventListener("click", () => {
+                if (state.index < game.rounds.length - 1) {
+                    state.index += 1;
+                    state.feedback = "";
+                    state.lastChoice = -1;
+                    render();
+                }
+            });
+        };
+        resetCurrentGame = () => {
+            state.index = 0;
+            state.combo = 0;
+            state.bestCombo = 0;
+            state.attempts.fill(0);
+            state.earned.fill(null);
+            state.feedback = "";
+            state.lastChoice = -1;
+            render();
+        };
+        render();
+    };
+
     const renderers = {
         "formula-detective": renderFormulaDetective,
         "network-builder": renderNetworkBuilder,
         "trace-debugger": renderTraceDebugger,
-        "sql-missions": renderSQLMissions
+        "sql-missions": renderSQLMissions,
+        "cpu-cycle-race": renderCPUCycleRace,
+        "cyber-defense": renderCyberDefense,
+        "algorithm-arena": renderAlgorithmArena
     };
     const renderer = renderers[game.type];
     if (!renderer) {

@@ -13,9 +13,12 @@ const learning = browser.HKDSE_ICT_LEARNING;
 const errors = [];
 const expected = new Map([
     ["cha-4", { type: "formula-detective", file: "cha.4.html" }],
+    ["chb-1", { type: "cpu-cycle-race", file: "chb.1.html" }],
     ["chc-1", { type: "network-builder", file: "chc.1.html" }],
+    ["chc-5", { type: "cyber-defense", file: "chc.5.html" }],
     ["chd-2", { type: "trace-debugger", file: "chd.2.html" }],
-    ["ea-2", { type: "sql-missions", file: "ea.2.html" }]
+    ["ea-2", { type: "sql-missions", file: "ea.2.html" }],
+    ["ec-1", { type: "algorithm-arena", file: "ec.1.html" }]
 ]);
 
 const normaliseFormula = value => String(value || "")
@@ -39,8 +42,8 @@ expected.forEach((definition, id) => {
     }
     if (game.type !== definition.type) errors.push(`${id} 遊戲類型應為 ${definition.type}。`);
     const html = fs.readFileSync(path.join(root, definition.file), "utf8");
-    if (!html.includes("learning_data.js?v=12")) errors.push(`${definition.file} 未載入最新 learning_data.js。`);
-    if (!html.includes("lesson_companion.js?v=6")) errors.push(`${definition.file} 未載入最新 lesson_companion.js。`);
+    if (!html.includes("learning_data.js?v=13")) errors.push(`${definition.file} 未載入最新 learning_data.js。`);
+    if (!html.includes("lesson_companion.js?v=7")) errors.push(`${definition.file} 未載入最新 lesson_companion.js。`);
 
     if (game.type === "formula-detective") {
         game.missions.forEach((mission, index) => {
@@ -74,6 +77,22 @@ expected.forEach((definition, id) => {
             if (missing.length) errors.push(`${id} SQL 任務 ${index + 1} 的參考查詢未通過自身檢查：${missing.join("、")}`);
         });
     }
+
+    if (game.type === "cpu-cycle-race" || game.type === "algorithm-arena") {
+        game.rounds.forEach((round, index) => {
+            if (!Number.isInteger(round.answerIndex) || round.answerIndex < 0 || round.answerIndex >= round.options.length) {
+                errors.push(`${id} 競技回合 ${index + 1} 的答案索引無效。`);
+            }
+        });
+    }
+
+    if (game.type === "cyber-defense") {
+        game.waves.forEach((wave, index) => {
+            if (!Number.isInteger(wave.answerIndex) || wave.answerIndex < 0 || wave.answerIndex >= wave.options.length) {
+                errors.push(`${id} 攻擊波 ${index + 1} 的答案索引無效。`);
+            }
+        });
+    }
 });
 
 const companion = fs.readFileSync(path.join(root, "assets/js/lesson_companion.js"), "utf8");
@@ -81,8 +100,8 @@ const gameScript = fs.readFileSync(path.join(root, "assets/js/lesson_games.js"),
 const gameStyle = fs.readFileSync(path.join(root, "assets/css/lesson-games.css"), "utf8");
 [
     ["data-lesson-game-root", "學習助手缺少遊戲掛載點。"],
-    ["lesson-games.css?v=1", "學習助手沒有載入遊戲樣式。"],
-    ["lesson_games.js?v=1", "學習助手沒有載入遊戲程式。"]
+    ["lesson-games.css?v=2", "學習助手沒有載入遊戲樣式。"],
+    ["lesson_games.js?v=2", "學習助手沒有載入遊戲程式。"]
 ].forEach(([needle, message]) => {
     if (!companion.includes(needle)) errors.push(message);
 });
@@ -98,5 +117,5 @@ if (errors.length) {
     errors.forEach(error => console.error(`- ${error}`));
     process.exitCode = 1;
 } else {
-    console.log("課題遊戲驗證通過：公式、網絡、追蹤除錯及 SQL 共 4 款活動已接入課題頁，參考答案可通過各自檢查，手機及 reduced-motion 樣式齊備。");
+    console.log("課題遊戲驗證通過：公式、CPU、網絡建構、網絡保衛、追蹤除錯、SQL 及演算法共 7 款活動已接入課題頁，答案索引及參考答案有效，手機及 reduced-motion 樣式齊備。");
 }
