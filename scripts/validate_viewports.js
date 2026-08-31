@@ -18,7 +18,7 @@ uniquePages.forEach(file => {
     if (!/<meta\s+name=["']viewport["'][^>]*width=device-width/i.test(html)) {
         errors.push(`${file} 缺少裝置寬度 viewport 設定。`);
     }
-    if (!html.includes("assets/js/site_navigation.js?v=5") && !html.includes("assets/css/viewport-fixes.css?v=1")) {
+    if (!html.includes("assets/js/site_navigation.js?v=6") && !html.includes("assets/css/viewport-fixes.css?v=1")) {
         errors.push(`${file} 未載入包含 viewport-safe 修正的最新全站導覽。`);
     }
     if (/style=["'][^"']*min-width\s*:\s*(?:[7-9]\d\d|\d{4,})px/i.test(html) && !/overflow-x-(?:auto|scroll)|overflow-x\s*:\s*auto/i.test(html)) {

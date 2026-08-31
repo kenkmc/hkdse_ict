@@ -4,6 +4,7 @@
     const platform = window.HKDSE_ICT;
     const questionBank = window.HKDSE_ICT_QUESTIONS;
     const studyRecords = window.HKDSEStudyRecords;
+    const progress = window.HKDSEProgress;
     const visualRenderer = window.HKDSEQuestionVisuals;
     if (!platform || !Array.isArray(questionBank)) return;
 
@@ -180,6 +181,7 @@
         earnedMarks += awarded;
         possibleMarks += question.marks;
         studyRecords?.recordAttempt(question, response, awarded, grade.missedCriteria);
+        progress?.recordQuestionAttempt(question, response, awarded, { source: "practice" });
         sessionScore.textContent = `${earnedMarks} / ${possibleMarks}`;
 
         questionPanel.querySelectorAll("input, textarea, button").forEach(control => {

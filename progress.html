@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="description" content="HKDSE ICT 我的學習：在目前瀏覽器整理課堂瀏覽、練習表現、弱項、重練及模擬考紀錄。">
+    <title>我的學習 - ICT 學習資源網</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/platform.css?v=4">
+    <link rel="stylesheet" href="assets/css/learning.css?v=6">
+    <link rel="stylesheet" href="assets/css/progress.css?v=1">
+</head>
+<body class="progress-page">
+    <main class="progress-main">
+        <header class="progress-hero">
+            <div>
+                <p class="progress-kicker">My learning · Local progress</p>
+                <h1>我的學習</h1>
+                <p>把課堂瀏覽、練習、課業、遊戲及模擬考整理成下一步行動。所有資料只保存在目前瀏覽器，不會上載至 GitHub 或伺服器。</p>
+            </div>
+            <span class="progress-local-badge">只存於這個瀏覽器</span>
+        </header>
+
+        <section class="progress-summary" aria-label="學習摘要">
+            <article><span>已瀏覽課題</span><b id="progress-lessons">0</b><small>共 26 個課題</small></article>
+            <article><span>練習作答</span><b id="progress-attempts">0</b><small>每次作答均計算</small></article>
+            <article><span>累積得分率</span><b id="progress-accuracy">—</b><small>不是公開試等級預測</small></article>
+            <article><span>今日重練</span><b id="progress-due">0</b><small>來自錯題簿</small></article>
+        </section>
+
+        <section class="progress-next-grid">
+            <article class="progress-next-card progress-continue">
+                <p class="progress-kicker">Continue</p>
+                <h2>從上次位置繼續</h2>
+                <div id="progress-continue"></div>
+            </article>
+            <article class="progress-next-card progress-review">
+                <p class="progress-kicker">Review today</p>
+                <h2>今天先處理甚麼？</h2>
+                <div id="progress-review"></div>
+            </article>
+            <article class="progress-next-card progress-weak">
+                <p class="progress-kicker">Weakness</p>
+                <h2>目前較弱課題</h2>
+                <div id="progress-weak"></div>
+            </article>
+        </section>
+
+        <section class="progress-section" aria-labelledby="topic-progress-title">
+            <div class="progress-section-heading">
+                <div><p class="progress-kicker">Topic evidence</p><h2 id="topic-progress-title">按課題檢視練習證據</h2></div>
+                <p>得分率只反映你在本站已作答的題目；題量太少時不應當成能力判定。</p>
+            </div>
+            <div id="progress-topic-grid" class="progress-topic-grid"></div>
+        </section>
+
+        <section class="progress-section" aria-labelledby="mock-history-title">
+            <div class="progress-section-heading">
+                <div><p class="progress-kicker">Mock history</p><h2 id="mock-history-title">模擬考紀錄</h2></div>
+                <a class="progress-button" href="mock.html">開始模擬考</a>
+            </div>
+            <div id="progress-mock-history" class="progress-mock-history"></div>
+        </section>
+
+        <section class="progress-section progress-data" aria-labelledby="progress-data-title">
+            <div>
+                <p class="progress-kicker">Privacy and backup</p>
+                <h2 id="progress-data-title">管理本機學習紀錄</h2>
+                <p>轉換裝置或清除瀏覽器資料前，可先匯出 JSON 備份。匯入會取代目前裝置內的本站學習紀錄。</p>
+                <output id="progress-data-status" aria-live="polite"></output>
+            </div>
+            <div class="progress-data-actions">
+                <button id="progress-export" type="button">匯出備份</button>
+                <label class="progress-import">匯入備份<input id="progress-import" type="file" accept="application/json,.json"></label>
+                <button id="progress-clear" class="is-danger" type="button">清除全部本機紀錄</button>
+            </div>
+        </section>
+
+        <p class="progress-disclaimer"><strong>重要：</strong>此頁提供自我檢討證據，不會預測 HKDSE 等級。未登入的 GitHub Pages 無法把資料跨裝置同步；清除網站資料、使用另一瀏覽器或私隱模式會看不到原有紀錄。</p>
+    </main>
+    <script src="course_data.js?v=7"></script><script src="assets/js/progress_store.js?v=1"></script>
+    
+    <script src="assets/js/site_navigation.js?v=6"></script>
+    <script src="learning_data.js?v=14"></script>
+    <script src="assets/js/progress_dashboard.js?v=1"></script>
+</body>
+</html>

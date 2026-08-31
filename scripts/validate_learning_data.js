@@ -240,8 +240,8 @@ const companionSource = fs.readFileSync(path.join(root, "assets/js/lesson_compan
 });
 platform?.getItems().filter(item => item.type === "lesson").forEach(item => {
     const html = fs.readFileSync(path.join(root, item.file), "utf8");
-    if (!html.includes("learning_data.js?v=13")) errors.push(`${item.file} 未載入最新學習資料。`);
-    if (!html.includes("lesson_companion.js?v=7")) errors.push(`${item.file} 未載入最新學習助手。`);
+    if (!html.includes("learning_data.js?v=14")) errors.push(`${item.file} 未載入最新學習資料。`);
+    if (!html.includes("lesson_companion.js?v=8")) errors.push(`${item.file} 未載入最新學習助手。`);
 });
 
 if (errors.length) {

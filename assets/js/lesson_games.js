@@ -4,6 +4,7 @@
     const root = document.querySelector("[data-lesson-game-root]");
     const platform = window.HKDSE_ICT;
     const learning = window.HKDSE_ICT_LEARNING;
+    const progress = window.HKDSEProgress;
     const item = platform?.getItemByPath(window.location.pathname);
     const game = item ? learning?.pages?.[item.id]?.game : null;
     if (!root || !item || !game) return;
@@ -64,10 +65,21 @@
     const updateScore = score => {
         currentScore = Math.max(0, Math.min(Number(score) || 0, total));
         scoreNode.textContent = `${currentScore} / ${total}`;
+        let shouldSave = false;
         if (currentScore > (Number(record.best) || 0)) {
             record.best = currentScore;
             record.total = total;
             record.updatedAt = new Date().toISOString();
+            shouldSave = true;
+            progress?.recordEvent("game-score", { topicId: item.id, source: "lesson-game", score: currentScore, maxScore: total, metadata: { gameType: game.type, title: game.title } });
+        }
+        if (total > 0 && currentScore === total && !record.completed) {
+            record.completed = true;
+            record.completedAt = new Date().toISOString();
+            shouldSave = true;
+            progress?.recordEvent("game-complete", { topicId: item.id, source: "lesson-game", score: currentScore, maxScore: total, metadata: { gameType: game.type, title: game.title } });
+        }
+        if (shouldSave) {
             records[item.id] = record;
             try {
                 window.localStorage.setItem(storageKey, JSON.stringify(records));

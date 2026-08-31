@@ -4,7 +4,7 @@
  * 新增、修改或移除可瀏覽內容時，只需更新此檔案。首頁、隨機學習、
  * 共用導覽及目錄驗證都會讀取同一份資料。
  *
- * `id` 是內容的永久識別碼。題目引擎、本機錯題重練及日後的完整學習進度會以此欄位連結，
+ * `id` 是內容的永久識別碼。題目引擎、本機錯題重練及「我的學習」進度會以此欄位連結，
  * 因此即使標題或檔名改變，也不應重用或隨意更改既有 id。
  */
 
@@ -301,6 +301,15 @@ const courseData = [
         color: "bg-violet-50 text-violet-700",
         icon: "wrench",
         items: [
+            {
+                id: "tool-my-learning",
+                title: "我的學習",
+                file: "progress.html",
+                desc: "在目前瀏覽器整理課堂瀏覽、練習得分率、今日重練、弱項及模擬考紀錄",
+                type: "tool",
+                syllabusRef: "Learning progress",
+                tags: ["學習進度", "繼續學習", "弱項", "模擬考紀錄", "本機儲存", "備份"]
+            },
             {
                 id: "tool-mock-exam",
                 title: "DSE 模擬考訓練",

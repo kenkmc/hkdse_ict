@@ -4,6 +4,7 @@
     const platform = window.HKDSE_ICT;
     const learning = window.HKDSE_ICT_LEARNING;
     const questionBank = window.HKDSE_ICT_QUESTIONS || [];
+    const progress = window.HKDSEProgress;
     if (!platform || !learning?.pages) return;
 
     const item = platform.getItemByPath(window.location.pathname);
@@ -285,6 +286,45 @@
         </section>
     ` : "";
 
+    const objectivesPanel = `
+        <div class="lesson-objectives">
+            <h3>完成本頁後，你應能夠</h3>
+            <ul>${page.objectives.map(objective => `<li>${objective}</li>`).join("")}</ul>
+            ${scopeNote}
+        </div>
+    `;
+    const conceptPanel = `
+        <div class="lesson-concept-explorer">
+            <div class="lesson-section-heading">
+                <div><span>互動概念圖</span><h3>點選節點查看關係</h3></div>
+                ${practiceLink}
+            </div>
+            <div class="lesson-concept-track" role="group" aria-label="本頁概念節點">${concepts}</div>
+            <p class="lesson-concept-detail" aria-live="polite"><strong>${page.concepts[0].label}：</strong>${page.concepts[0].detail}</p>
+        </div>
+    `;
+    const mistakesPanel = `<div class="lesson-mistakes"><h3>常見誤解</h3>${misconceptions}<p class="lesson-exam-tip"><strong>DSE 提示：</strong>${page.examTip}</p></div>`;
+    const quickCheckPanel = `<div class="lesson-quick-check"><p class="lesson-check-label">60 秒快速檢查</p><h3>${page.quickCheck.question}</h3><div class="lesson-check-options">${quickOptions}</div><p class="lesson-check-feedback" aria-live="polite">選擇答案後會顯示解釋。</p></div>`;
+    const focusSteps = ["起步", "理解", "互動", "課業", "應試"];
+    const savedFocus = item.type === "lesson" ? (progress?.getFocusState(item.id) || { step: 0, mode: "focus" }) : null;
+    const activeFocusStep = Math.max(0, Math.min(4, Number(savedFocus?.step) || 0));
+    const focusMode = savedFocus?.mode === "all" ? "all" : "focus";
+    const focusPanel = (step, content) => `<section class="lesson-focus-panel" data-focus-panel="${step}"${focusMode === "focus" && step !== activeFocusStep ? " hidden" : ""}>${content}</section>`;
+    const lessonBody = item.type === "lesson" ? `
+        <nav class="lesson-focus-nav" aria-label="本課五步學習">
+            <div class="lesson-focus-tabs">${focusSteps.map((label, index) => `<button type="button" data-focus-step="${index}" aria-current="${index === activeFocusStep ? "step" : "false"}"><span>${index + 1}</span>${label}</button>`).join("")}</div>
+            <button class="lesson-focus-all" type="button" data-focus-all aria-pressed="${focusMode === "all"}">${focusMode === "all" ? "返回分步模式" : "一次顯示全部"}</button>
+        </nav>
+        <div class="lesson-focus-panels" data-focus-mode="${focusMode}">
+            ${focusPanel(0, `${zeroStart}${lessonVisual || ""}`)}
+            ${focusPanel(1, `${dseFocus}${objectivesPanel}${conceptPanel}${mistakesPanel}`)}
+            ${focusPanel(2, `${lessonGame}${quickCheckPanel}`)}
+            ${focusPanel(3, layeredStudy)}
+            ${focusPanel(4, featuredPractice || `<div class="lesson-featured-practice"><h3>完成本課 DSE 練習</h3><p>前往題庫，選擇本課課題並由基礎難度開始。</p>${practiceLink}</div>`)}
+            <div class="lesson-focus-controls"><button type="button" data-focus-prev>← 上一步</button><span data-focus-label>第 ${activeFocusStep + 1} 步／5 · ${focusSteps[activeFocusStep]}</span><button type="button" data-focus-next>下一步 →</button></div>
+        </div>
+    ` : `${zeroStart}${lessonVisual}${dseFocus}${lessonGame}${layeredStudy}${objectivesPanel}${conceptPanel}${mistakesPanel}${quickCheckPanel}${featuredPractice}`;
+
     section.innerHTML = `
         <div class="lesson-companion-heading">
             <div>
@@ -294,43 +334,47 @@
             <button class="lesson-companion-toggle" type="button" aria-expanded="${expandedByDefault}" aria-controls="lesson-companion-content">${expandedByDefault ? "收起" : "展開學習重點"}</button>
         </div>
         <div id="lesson-companion-content" class="lesson-companion-content"${expandedByDefault ? "" : " hidden"}>
-            ${zeroStart}
-            ${lessonVisual}
-            ${dseFocus}
-            ${lessonGame}
-            ${layeredStudy}
-            <div class="lesson-objectives">
-                <h3>完成本頁後，你應能夠</h3>
-                <ul>${page.objectives.map(objective => `<li>${objective}</li>`).join("")}</ul>
-                ${scopeNote}
-            </div>
-            <div class="lesson-concept-explorer">
-                <div class="lesson-section-heading">
-                    <div>
-                        <span>互動概念圖</span>
-                        <h3>點選節點查看關係</h3>
-                    </div>
-                    ${practiceLink}
-                </div>
-                <div class="lesson-concept-track" role="group" aria-label="本頁概念節點">${concepts}</div>
-                <p class="lesson-concept-detail" aria-live="polite"><strong>${page.concepts[0].label}：</strong>${page.concepts[0].detail}</p>
-            </div>
-            <div class="lesson-mistakes">
-                <h3>常見誤解</h3>
-                ${misconceptions}
-                <p class="lesson-exam-tip"><strong>DSE 提示：</strong>${page.examTip}</p>
-            </div>
-            <div class="lesson-quick-check">
-                <p class="lesson-check-label">60 秒快速檢查</p>
-                <h3>${page.quickCheck.question}</h3>
-                <div class="lesson-check-options">${quickOptions}</div>
-                <p class="lesson-check-feedback" aria-live="polite">選擇答案後會顯示解釋。</p>
-            </div>
-            ${featuredPractice}
+            ${lessonBody}
         </div>
     `;
 
     nav.insertAdjacentElement("afterend", section);
+
+    let setFocusStep = () => {};
+    const focusRoot = section.querySelector(".lesson-focus-panels");
+    if (focusRoot) {
+        let currentStep = activeFocusStep;
+        let currentMode = focusMode;
+        const renderFocus = () => {
+            focusRoot.dataset.focusMode = currentMode;
+            focusRoot.querySelectorAll("[data-focus-panel]").forEach(panel => {
+                panel.hidden = currentMode === "focus" && Number(panel.dataset.focusPanel) !== currentStep;
+            });
+            section.querySelectorAll("[data-focus-step]").forEach(button => {
+                button.setAttribute("aria-current", Number(button.dataset.focusStep) === currentStep ? "step" : "false");
+            });
+            const allButton = section.querySelector("[data-focus-all]");
+            allButton.setAttribute("aria-pressed", String(currentMode === "all"));
+            allButton.textContent = currentMode === "all" ? "返回分步模式" : "一次顯示全部";
+            section.querySelector("[data-focus-label]").textContent = currentMode === "all" ? "正在顯示全部 5 步" : `第 ${currentStep + 1} 步／5 · ${focusSteps[currentStep]}`;
+            section.querySelector("[data-focus-prev]").disabled = currentMode === "focus" && currentStep === 0;
+            section.querySelector("[data-focus-next]").disabled = currentMode === "focus" && currentStep === focusSteps.length - 1;
+            progress?.setFocusState(item.id, { step: currentStep, mode: currentMode });
+        };
+        setFocusStep = (step, mode = "focus") => {
+            currentStep = Math.max(0, Math.min(focusSteps.length - 1, Number(step) || 0));
+            currentMode = mode;
+            renderFocus();
+        };
+        section.querySelectorAll("[data-focus-step]").forEach(button => button.addEventListener("click", () => setFocusStep(button.dataset.focusStep)));
+        section.querySelector("[data-focus-all]").addEventListener("click", () => {
+            currentMode = currentMode === "all" ? "focus" : "all";
+            renderFocus();
+        });
+        section.querySelector("[data-focus-prev]").addEventListener("click", () => setFocusStep(currentStep - 1));
+        section.querySelector("[data-focus-next]").addEventListener("click", () => setFocusStep(currentStep + 1));
+        renderFocus();
+    }
 
     const zeroRoot = section.querySelector("[data-zero-start]");
     if (zeroRoot) {
@@ -355,9 +399,12 @@
             else pageZeroStart.delete(index);
             input.closest("li")?.classList.toggle("is-complete", input.checked);
             saveZeroStart();
+            if (input.checked) progress?.recordEvent("zero-step-complete", { topicId: item.id, source: "lesson", score: 1, maxScore: 1, metadata: { step: index } });
         }));
         zeroRoot.querySelectorAll("[data-zero-jump]").forEach(button => button.addEventListener("click", () => {
             const target = section.querySelector(button.dataset.zeroJump);
+            const targetPanel = target?.closest("[data-focus-panel]");
+            if (targetPanel) setFocusStep(targetPanel.dataset.focusPanel);
             if (target?.matches("[data-layer-tab]")) target.click();
             target?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
         }));
@@ -378,13 +425,13 @@
         if (!document.querySelector('link[data-lesson-games-style]')) {
             const gameStyle = document.createElement("link");
             gameStyle.rel = "stylesheet";
-            gameStyle.href = "assets/css/lesson-games.css?v=2";
+            gameStyle.href = "assets/css/lesson-games.css?v=3";
             gameStyle.dataset.lessonGamesStyle = "true";
             document.head.append(gameStyle);
         }
         if (!document.querySelector('script[data-lesson-games-script]')) {
             const gameScript = document.createElement("script");
-            gameScript.src = "assets/js/lesson_games.js?v=2";
+            gameScript.src = "assets/js/lesson_games.js?v=3";
             gameScript.dataset.lessonGamesScript = "true";
             document.body.append(gameScript);
         }
@@ -457,11 +504,13 @@
             });
             completeButton.addEventListener("click", () => {
                 if (completeButton.disabled) return;
+                const wasCompleted = state.completed;
                 state.completed = true;
                 state.completedAt = new Date().toISOString();
                 completeButton.textContent = "已完成 ✓";
                 saveStatus.textContent = saveLayerProgress() ? "完成記錄已儲存" : "瀏覽器未能儲存";
                 updateLayerProgressUI();
+                if (!wasCompleted) progress?.recordEvent("lesson-layer-complete", { topicId: item.id, source: "lesson-assignment", score: 1, maxScore: 1, difficulty: levelId, metadata: { levelId } });
             });
             updateCompletionAvailability();
         });
@@ -532,6 +581,7 @@
             if (!correct) button.classList.add("is-incorrect");
             feedback.className = `lesson-check-feedback ${correct ? "is-correct" : "is-incorrect"}`;
             feedback.textContent = `${correct ? "答對。" : "未正確。"}${page.quickCheck.explanation}`;
+            progress?.recordEvent("quick-check", { topicId: item.id, source: "lesson", score: correct ? 1 : 0, maxScore: 1, difficulty: "foundation", metadata: { selectedIndex, answerIndex: page.quickCheck.answerIndex } });
         });
     });
 
@@ -561,6 +611,7 @@
                     option.classList.add("is-incorrect");
                 }
             });
+            if (willOpen) progress?.recordEvent("featured-practice-reviewed", { topicId: item.id, source: "lesson", score: 0, maxScore: 0, difficulty: featuredQuestion.difficulty, metadata: { questionId: featuredQuestion.id, questionType: featuredQuestion.type } });
         });
     }
 })();

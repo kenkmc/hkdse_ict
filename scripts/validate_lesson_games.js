@@ -42,8 +42,8 @@ expected.forEach((definition, id) => {
     }
     if (game.type !== definition.type) errors.push(`${id} 遊戲類型應為 ${definition.type}。`);
     const html = fs.readFileSync(path.join(root, definition.file), "utf8");
-    if (!html.includes("learning_data.js?v=13")) errors.push(`${definition.file} 未載入最新 learning_data.js。`);
-    if (!html.includes("lesson_companion.js?v=7")) errors.push(`${definition.file} 未載入最新 lesson_companion.js。`);
+    if (!html.includes("learning_data.js?v=14")) errors.push(`${definition.file} 未載入最新 learning_data.js。`);
+    if (!html.includes("lesson_companion.js?v=8")) errors.push(`${definition.file} 未載入最新 lesson_companion.js。`);
 
     if (game.type === "formula-detective") {
         game.missions.forEach((mission, index) => {
@@ -100,8 +100,8 @@ const gameScript = fs.readFileSync(path.join(root, "assets/js/lesson_games.js"),
 const gameStyle = fs.readFileSync(path.join(root, "assets/css/lesson-games.css"), "utf8");
 [
     ["data-lesson-game-root", "學習助手缺少遊戲掛載點。"],
-    ["lesson-games.css?v=2", "學習助手沒有載入遊戲樣式。"],
-    ["lesson_games.js?v=2", "學習助手沒有載入遊戲程式。"]
+    ["lesson-games.css?v=3", "學習助手沒有載入遊戲樣式。"],
+    ["lesson_games.js?v=3", "學習助手沒有載入遊戲程式。"]
 ].forEach(([needle, message]) => {
     if (!companion.includes(needle)) errors.push(message);
 });

@@ -39,7 +39,9 @@
                     </div>
                 </div>
 
-                <form action="https://www.google.com/search" method="get" target="_blank"
+                <div class="flex w-full flex-col gap-2 sm:flex-row md:w-auto">
+                    <a href="progress.html" class="inline-flex items-center justify-center gap-2 rounded-lg border border-indigo-400 bg-indigo-700 px-4 py-2 text-sm font-bold text-white transition hover:bg-indigo-600"><i data-lucide="bar-chart-3" class="h-4 w-4"></i>我的學習</a>
+                    <form action="https://www.google.com/search" method="get" target="_blank"
                       class="flex w-full overflow-hidden rounded-lg border border-indigo-600 bg-indigo-800 transition focus-within:ring-2 focus-within:ring-white md:w-auto">
                     <input id="site-search-scope" type="hidden" name="sitesearch" value="">
                     <label for="google-search" class="sr-only">Google 內容搜尋</label>
@@ -48,7 +50,8 @@
                     <button type="submit" aria-label="搜尋" class="bg-indigo-900 px-4 py-2 text-indigo-100 transition hover:bg-indigo-950">
                         <i data-lucide="search" class="h-5 w-5"></i>
                     </button>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </header>
@@ -69,6 +72,8 @@
             </div>
         </section>
 
+        <section id="home-progress" class="mx-auto mb-10 max-w-6xl" aria-labelledby="home-progress-title"></section>
+
         <div id="course-container" class="mx-auto max-w-6xl space-y-12" aria-live="polite"></div>
 
         <div id="no-results" class="hidden py-12 text-center">
@@ -87,7 +92,8 @@
         </div>
     </footer>
 
-    <script src="course_data.js?v=6"></script>
-    <script src="assets/js/catalog.js"></script>
+    <script src="course_data.js?v=7"></script><script src="assets/js/progress_store.js?v=1"></script>
+
+    <script src="assets/js/catalog.js?v=2"></script>
 </body>
 </html>

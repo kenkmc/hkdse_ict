@@ -2,6 +2,7 @@
     "use strict";
 
     const study = window.HKDSE_ICT_EXAM_PRACTICE;
+    const progress = window.HKDSEProgress;
     if (!study) return;
 
     const frameworkContainer = document.querySelector("[data-answer-framework]");
@@ -165,7 +166,13 @@
         } else {
             feedback.textContent = `已選 ${current.selected.size} 項；按題目要求選取最關鍵的缺口。`;
         }
-        check.addEventListener("click", () => { current.checked = true; renderPractice(); });
+        check.addEventListener("click", () => {
+            current.checked = true;
+            const correct = new Set(layer.correctIds);
+            const exact = current.selected.size === correct.size && [...current.selected].every(id => correct.has(id));
+            progress?.recordEvent("answer-lab-attempt", { topicId: pack.topicId, source: "answer-lab", score: exact ? 1 : 0, maxScore: 1, difficulty: "foundation", metadata: { practiceSetId: pack.id, layer: "foundation" } });
+            renderPractice();
+        });
         actions.append(check, feedback);
         container.append(actions);
     }
@@ -199,7 +206,12 @@
         const actions = element("div", "answer-action-row");
         const check = element("button", "answer-check-button", "檢查結構");
         check.type = "button";
-        check.addEventListener("click", () => { current.checked = true; renderPractice(); });
+        check.addEventListener("click", () => {
+            current.checked = true;
+            const exact = current.sequence.length === layer.targetIds.length && current.sequence.every((id, index) => id === layer.targetIds[index]);
+            progress?.recordEvent("answer-lab-attempt", { topicId: pack.topicId, source: "answer-lab", score: exact ? 1 : 0, maxScore: 1, difficulty: "standard", metadata: { practiceSetId: pack.id, layer: "exam" } });
+            renderPractice();
+        });
         const clear = element("button", "answer-clear-button", "清除重組");
         clear.type = "button";
         clear.addEventListener("click", () => { current.sequence = []; current.checked = false; renderPractice(); });
@@ -263,6 +275,7 @@
         reveal.addEventListener("click", () => {
             current.text = textarea.value;
             current.revealed = true;
+            progress?.recordEvent("answer-lab-attempt", { topicId: pack.topicId, source: "answer-lab", score: current.checks.size, maxScore: layer.checklist.length, difficulty: "advanced", metadata: { practiceSetId: pack.id, layer: "challenge", answered: Boolean(current.text.trim()) } });
             renderPractice();
         });
         const feedback = element("p", "answer-feedback");
