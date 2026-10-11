@@ -44,6 +44,12 @@ if (state.mockAttempts.length !== 1 || state.mockAttempts[0].percentage !== 55) 
 if (summary.visitedLessons !== 1) errors.push("工具頁被錯誤計入已瀏覽課題。");
 if (summary.questionAttempts !== 2 || summary.accuracy !== 50) errors.push("練習次數或累積得分率計算錯誤。");
 if (summary.dueReviews !== 1 || summary.completedLayers !== 1) errors.push("舊有錯題或分層課業記錄未能納入摘要。");
+const syncSnapshot = progress.getSyncSnapshot();
+if (syncSnapshot.format !== "hkdse-ict-school-sync" || syncSnapshot.schemaVersion !== 2 || syncSnapshot.summary.questionAttempts !== 2) errors.push("校園同步摘要格式或練習數據不正確。");
+if (!Array.isArray(syncSnapshot.topics) || !syncSnapshot.topics.some(topic => topic.topicId === question.topicId)) errors.push("校園同步摘要缺少逐課題表現。");
+if (!Array.isArray(syncSnapshot.recentMocks) || syncSnapshot.recentMocks[0]?.percentage !== 55) errors.push("校園同步摘要缺少最近模擬考紀錄。");
+if (!Array.isArray(syncSnapshot.sessions) || !syncSnapshot.sessions.length) errors.push("校園同步摘要缺少登入時段。");
+if (!Array.isArray(syncSnapshot.exerciseAttempts) || syncSnapshot.exerciseAttempts.length !== 2) errors.push("校園同步摘要缺少練習活動紀錄。");
 
 const backup = progress.exportData();
 progress.clear();
@@ -55,12 +61,12 @@ const items = browser.HKDSE_ICT.getItems();
 const progressItem = items.find(item => item.id === "tool-my-learning");
 if (!progressItem || progressItem.file !== "progress.html") errors.push("中央目錄缺少「我的學習」頁面。");
 const progressHtml = fs.readFileSync(path.join(root, "progress.html"), "utf8");
-if (!progressHtml.includes("progress_dashboard.js") || !progressHtml.includes("只存於這個瀏覽器")) errors.push("進度頁缺少儀表板或本機私隱提示。");
+if (!progressHtml.includes("progress_dashboard.js") || !progressHtml.includes("school-sync-panel")) errors.push("進度頁缺少儀表板或校園同步面板。");
 
 items.forEach(item => {
     const html = fs.readFileSync(path.join(root, item.file), "utf8");
     const courseIndex = html.indexOf("course_data.js?v=7");
-    const progressIndex = html.indexOf("assets/js/progress_store.js?v=1");
+    const progressIndex = html.indexOf("assets/js/progress_store.js?v=2");
     if (progressIndex < 0) errors.push(`${item.file} 未載入統一進度記錄。`);
     if (courseIndex >= 0 && progressIndex < courseIndex) errors.push(`${item.file} 在中央目錄之前載入進度記錄。`);
     ["question_engine.js", "mock_exam.js", "site_navigation.js", "lesson_companion.js"].forEach(script => {

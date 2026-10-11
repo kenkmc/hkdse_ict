@@ -2,9 +2,12 @@
     "use strict";
 
     const storageKey = "hkdse-ict-progress-v1";
-    const schemaVersion = 1;
+    const schemaVersion = 2;
     const maxEvents = 2000;
     const maxMockAttempts = 50;
+    const maxSessions = 250;
+    const maxPageActivity = 2000;
+    const sessionStorageKey = "hkdse-ict-learning-session-v1";
     const legacyKeys = [
         "hkdse-ict-study-records-v1",
         "hkdse-ict-layered-learning-v1",
@@ -21,6 +24,8 @@
         visits: {},
         focus: {},
         mockAttempts: [],
+        sessions: {},
+        pageActivity: {},
         updatedAt: isoNow()
     });
     const plainObject = value => value && typeof value === "object" && !Array.isArray(value);
@@ -48,6 +53,8 @@
             visits: plainObject(state.visits) ? state.visits : {},
             focus: plainObject(state.focus) ? state.focus : {},
             mockAttempts: Array.isArray(state.mockAttempts) ? state.mockAttempts.slice(-maxMockAttempts) : [],
+            sessions: plainObject(state.sessions) ? Object.fromEntries(Object.entries(state.sessions).slice(-maxSessions)) : {},
+            pageActivity: plainObject(state.pageActivity) ? Object.fromEntries(Object.entries(state.pageActivity).slice(-maxPageActivity)) : {},
             updatedAt: safeText(state.updatedAt || isoNow(), 40)
         };
     };
@@ -71,8 +78,10 @@
     }
     function recordEvent(type, payload = {}) {
         const state = read();
+        const session = ensureSession(state);
         const event = {
             id: makeId("event"),
+            sessionId: session.sessionId,
             type: safeText(type, 50),
             topicId: safeText(payload.topicId, 80),
             source: safeText(payload.source || "site", 60),
@@ -87,6 +96,89 @@
         state.events = state.events.slice(-maxEvents);
         write(state);
         return event;
+    }
+
+    function ensureSession(existingState) {
+        const state = existingState || read();
+        let sessionId = "";
+        try {
+            sessionId = safeText(window.sessionStorage.getItem(sessionStorageKey), 100);
+        } catch (error) {
+            sessionId = "";
+        }
+        if (!sessionId) {
+            sessionId = makeId("session");
+            try {
+                window.sessionStorage.setItem(sessionStorageKey, sessionId);
+            } catch (error) {
+                // Session tracking continues in memory when sessionStorage is unavailable.
+            }
+        }
+        const current = plainObject(state.sessions[sessionId]) ? state.sessions[sessionId] : {};
+        const session = {
+            sessionId,
+            startedAt: safeText(current.startedAt || isoNow(), 40),
+            lastActiveAt: safeText(current.lastActiveAt || isoNow(), 40),
+            activeSeconds: Math.max(0, Math.round(safeNumber(current.activeSeconds))),
+            pageCount: Math.max(0, Math.round(safeNumber(current.pageCount)))
+        };
+        state.sessions[sessionId] = session;
+        return session;
+    }
+
+    function startPageActivity(pageId) {
+        const safePageId = safeText(pageId, 100);
+        if (!safePageId) return null;
+        window.HKDSEProgress?.stopPageActivity?.();
+        const state = read();
+        const session = ensureSession(state);
+        const activityKey = `${session.sessionId}|${safePageId}`;
+        const current = plainObject(state.pageActivity[activityKey]) ? state.pageActivity[activityKey] : {};
+        const page = {
+            activityKey,
+            sessionId: session.sessionId,
+            pageId: safePageId,
+            firstOpenedAt: safeText(current.firstOpenedAt || isoNow(), 40),
+            lastActiveAt: safeText(current.lastActiveAt || isoNow(), 40),
+            activeSeconds: Math.max(0, Math.round(safeNumber(current.activeSeconds))),
+            viewCount: Math.max(0, Math.round(safeNumber(current.viewCount))) + 1
+        };
+        if (!current.viewCount) session.pageCount += 1;
+        state.pageActivity[activityKey] = page;
+        write(state);
+
+        let lastTick = Date.now();
+        let lastInteraction = Date.now();
+        let stopped = false;
+        const markInteraction = () => { lastInteraction = Date.now(); };
+        const flush = () => {
+            if (stopped) return;
+            const now = Date.now();
+            const elapsed = Math.min(15, Math.max(0, Math.round((now - lastTick) / 1000)));
+            lastTick = now;
+            if (document.visibilityState !== "visible" || now - lastInteraction > 120000 || elapsed <= 0) return;
+            const next = read();
+            const nextSession = ensureSession(next);
+            const nextPage = plainObject(next.pageActivity[activityKey]) ? next.pageActivity[activityKey] : page;
+            nextPage.activeSeconds = Math.max(0, Math.round(safeNumber(nextPage.activeSeconds))) + elapsed;
+            nextPage.lastActiveAt = isoNow();
+            nextSession.activeSeconds = Math.max(0, Math.round(safeNumber(nextSession.activeSeconds))) + elapsed;
+            nextSession.lastActiveAt = nextPage.lastActiveAt;
+            next.pageActivity[activityKey] = nextPage;
+            write(next, false);
+        };
+        const timer = window.setInterval(flush, 15000);
+        ["pointerdown", "keydown", "scroll", "touchstart"].forEach(type => window.addEventListener(type, markInteraction, { passive: true }));
+        const stop = () => {
+            if (stopped) return;
+            flush();
+            stopped = true;
+            window.clearInterval(timer);
+            ["pointerdown", "keydown", "scroll", "touchstart"].forEach(type => window.removeEventListener(type, markInteraction));
+        };
+        window.addEventListener("pagehide", stop, { once: true });
+        window.HKDSEProgress.stopPageActivity = stop;
+        return page;
     }
     function recordVisit(topicId) {
         if (!topicId) return null;
@@ -221,6 +313,82 @@
             mockAttempts: state.mockAttempts.length
         };
     }
+    function getSyncSnapshot() {
+        const state = read();
+        const summary = getSummary();
+        const lessonIds = new Set((window.HKDSE_ICT?.getItems?.() || [])
+            .filter(item => item.type === "lesson")
+            .map(item => item.id));
+        const activityTimes = [
+            ...Object.entries(state.visits)
+                .filter(([topicId]) => !lessonIds.size || lessonIds.has(topicId))
+                .map(([, visit]) => visit?.lastVisitedAt),
+            ...state.events.map(event => event?.createdAt),
+            ...state.mockAttempts.map(attempt => attempt?.completedAt)
+        ].filter(Boolean).map(value => new Date(value).getTime()).filter(Number.isFinite);
+        const weakest = summary.weakestTopic;
+        return {
+            format: "hkdse-ict-school-sync",
+            schemaVersion,
+            lastActivityAt: activityTimes.length ? new Date(Math.max(...activityTimes)).toISOString() : "",
+            summary: {
+                visitedLessons: summary.visitedLessons,
+                questionAttempts: summary.questionAttempts,
+                accuracy: summary.accuracy,
+                dueReviews: summary.dueReviews,
+                completedLayers: summary.completedLayers,
+                completedGames: summary.completedGames,
+                latestTopicId: summary.latestTopicId,
+                weakestTopicId: weakest?.topicId || "",
+                weakestTopicPercentage: weakest?.percentage || 0,
+                mockAttempts: summary.mockAttempts
+            },
+            topics: topicStats(state).map(topic => ({
+                topicId: safeText(topic.topicId, 80),
+                attempts: Math.max(0, safeNumber(topic.attempts)),
+                score: Math.max(0, safeNumber(topic.score)),
+                maxScore: Math.max(0, safeNumber(topic.maxScore)),
+                correct: Math.max(0, safeNumber(topic.correct)),
+                percentage: Math.max(0, Math.min(100, safeNumber(topic.percentage)))
+            })),
+            recentMocks: state.mockAttempts.slice(-10).map(attempt => ({
+                mode: safeText(attempt.mode, 30),
+                paperLabel: safeText(attempt.paperLabel, 100),
+                score: Math.max(0, safeNumber(attempt.score)),
+                maxScore: Math.max(0, safeNumber(attempt.maxScore)),
+                percentage: Math.max(0, Math.min(100, safeNumber(attempt.percentage))),
+                unanswered: Math.max(0, safeNumber(attempt.unanswered)),
+                timedOut: Boolean(attempt.timedOut),
+                completedAt: safeText(attempt.completedAt, 40)
+            })),
+            sessions: Object.values(state.sessions).slice(-maxSessions).map(session => ({
+                sessionId: safeText(session.sessionId, 100),
+                startedAt: safeText(session.startedAt, 40),
+                lastActiveAt: safeText(session.lastActiveAt, 40),
+                activeSeconds: Math.max(0, Math.round(safeNumber(session.activeSeconds))),
+                pageCount: Math.max(0, Math.round(safeNumber(session.pageCount)))
+            })),
+            pageActivity: Object.values(state.pageActivity).slice(-maxPageActivity).map(page => ({
+                activityKey: safeText(page.activityKey, 220),
+                sessionId: safeText(page.sessionId, 100),
+                pageId: safeText(page.pageId, 100),
+                firstOpenedAt: safeText(page.firstOpenedAt, 40),
+                lastActiveAt: safeText(page.lastActiveAt, 40),
+                activeSeconds: Math.max(0, Math.round(safeNumber(page.activeSeconds))),
+                viewCount: Math.max(0, Math.round(safeNumber(page.viewCount)))
+            })),
+            exerciseAttempts: state.events.slice(-maxEvents).map(event => ({
+                attemptId: safeText(event.id, 100),
+                sessionId: safeText(event.sessionId, 100),
+                activityType: safeText(event.type, 50),
+                exerciseId: safeText(event.metadata?.questionId || event.metadata?.practiceSetId || event.metadata?.levelId || event.metadata?.gameType || event.id, 100),
+                topicId: safeText(event.topicId, 80),
+                score: Math.max(0, safeNumber(event.score)),
+                maxScore: Math.max(0, safeNumber(event.maxScore)),
+                attemptedAt: safeText(event.createdAt, 40)
+            }))
+        };
+    }
     function exportData() {
         return {
             format: "hkdse-ict-progress-backup",
@@ -248,6 +416,7 @@
     function clear() {
         try {
             window.localStorage.removeItem(storageKey);
+            window.sessionStorage.removeItem(sessionStorageKey);
             dispatchChange();
         } catch (error) {
             // The in-memory page can still continue when storage is unavailable.
@@ -258,16 +427,21 @@
         storageKey,
         schemaVersion,
         legacyKeys,
+        sessionStorageKey,
         read,
         write,
         recordEvent,
         recordVisit,
         recordQuestionAttempt,
         recordMockAttempt,
+        ensureSession,
+        startPageActivity,
+        stopPageActivity: null,
         setFocusState,
         getFocusState,
         topicStats,
         getSummary,
+        getSyncSnapshot,
         exportData,
         importData,
         clear

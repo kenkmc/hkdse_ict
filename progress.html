@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <meta name="description" content="HKDSE ICT 我的學習：在目前瀏覽器整理課堂瀏覽、練習表現、弱項、重練及模擬考紀錄。">
+    <meta name="description" content="HKDSE ICT 我的學習：整理課堂瀏覽、練習表現、弱項、重練及模擬考紀錄，並可選擇同步至校方Google服務。">
     <title>我的學習 - ICT 學習資源網</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,9 +18,9 @@
             <div>
                 <p class="progress-kicker">My learning · Local progress</p>
                 <h1>我的學習</h1>
-                <p>把課堂瀏覽、練習、課業、遊戲及模擬考整理成下一步行動。所有資料只保存在目前瀏覽器，不會上載至 GitHub 或伺服器。</p>
+                <p>把課堂瀏覽、練習、課業、遊戲及模擬考整理成下一步行動。資料預設只保存在目前瀏覽器；連接校方服務後，亦只會在你按下同步時傳送摘要。</p>
             </div>
-            <span class="progress-local-badge">只存於這個瀏覽器</span>
+            <span id="progress-storage-badge" class="progress-local-badge">只存於這個瀏覽器</span>
         </header>
 
         <section class="progress-summary" aria-label="學習摘要">
@@ -64,6 +64,39 @@
             <div id="progress-mock-history" class="progress-mock-history"></div>
         </section>
 
+        <section id="school-sync-panel" class="progress-section school-sync-panel" aria-labelledby="school-sync-title">
+            <div class="school-sync-panel-head">
+                <div>
+                    <p class="progress-kicker">School sync · Student controlled</p>
+                    <h2 id="school-sync-title">同步進度至學校</h2>
+                    <p id="school-sync-description">讀取校園同步設定中……</p>
+                </div>
+                <span id="school-sync-badge" class="school-sync-status is-setup">檢查中</span>
+            </div>
+            <div id="school-student-summary" class="school-student-summary" hidden></div>
+            <div class="school-assignment-section" aria-labelledby="school-assignment-title">
+                <div class="school-assignment-title-row">
+                    <h3 id="school-assignment-title">老師指定進度</h3>
+                    <span>只顯示屬於你的班別或組別的課業</span>
+                </div>
+                <div id="school-assignment-list" class="school-assignment-list">
+                    <p class="school-assignment-empty">連接校園帳戶後，這裡會顯示老師指派的學習內容。</p>
+                </div>
+            </div>
+            <div class="school-sync-actions">
+                <a id="school-sync-connect" class="school-sync-button" href="#" target="_blank" rel="noopener">使用校園 Google 帳戶連接</a>
+                <form id="school-sync-form" method="post" target="_blank" hidden>
+                    <input id="school-sync-payload" type="hidden" name="payload">
+                    <input id="school-sync-token" type="hidden" name="connectionToken">
+                    <button class="school-sync-button" type="submit">立即同步至學校</button>
+                </form>
+                <button id="school-sync-disconnect" class="school-sync-secondary" type="button" hidden>中斷本次連接</button>
+            </div>
+            <p id="school-sync-last" class="school-sync-meta">尚未有成功同步紀錄。</p>
+            <output id="school-sync-output" aria-live="polite"></output>
+            <p class="school-sync-privacy"><strong>私隱設計：</strong>Google 登入及身份核實只在校方 Apps Script 進行；試算表不保存校園電郵。連接碼只保留在目前分頁工作階段。同步資料包括有效學習時間、瀏覽頁面、練習結果及課業進度，不包括IP地址、裝置資料或完整短答內容。閒置超過兩分鐘不計入學習時間。</p>
+        </section>
+
         <section class="progress-section progress-data" aria-labelledby="progress-data-title">
             <div>
                 <p class="progress-kicker">Privacy and backup</p>
@@ -78,11 +111,11 @@
             </div>
         </section>
 
-        <p class="progress-disclaimer"><strong>重要：</strong>此頁提供自我檢討證據，不會預測 HKDSE 等級。未登入的 GitHub Pages 無法把資料跨裝置同步；清除網站資料、使用另一瀏覽器或私隱模式會看不到原有紀錄。</p>
+        <p class="progress-disclaimer"><strong>重要：</strong>此頁提供自我檢討證據，不會預測 HKDSE 等級。校園同步只供老師了解學習情況，不應直接當作正式校內成績；未成功同步前，清除網站資料或轉用裝置仍會失去本機紀錄。</p>
     </main>
-    <script src="course_data.js?v=7"></script><script src="assets/js/progress_store.js?v=1"></script>
+    <script src="course_data.js?v=7"></script><script src="assets/js/progress_store.js?v=2"></script>
     
-    <script src="assets/js/site_navigation.js?v=6"></script>
+    <script src="assets/js/site_navigation.js?v=7"></script>
     <script src="learning_data.js?v=14"></script>
     <script src="assets/js/progress_dashboard.js?v=1"></script>
 </body>

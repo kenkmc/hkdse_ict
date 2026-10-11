@@ -25,6 +25,7 @@
         document.body.dataset.syllabusRef = currentItem.syllabusRef;
         document.title = `${currentItem.title.replace(/^[ivx]+\.\s*/i, "")} | ${platform.config.siteName}`;
         window.HKDSEProgress?.recordVisit(currentItem.id);
+        window.HKDSEProgress?.startPageActivity(currentItem.id);
     }
 
     const bodyStyle = window.getComputedStyle(document.body);
@@ -73,4 +74,29 @@
         </p>
     `;
     if (shouldAppendFooter) document.body.appendChild(footer);
+
+    function loadSchoolSync() {
+        const loadClient = () => {
+            if (document.querySelector('script[data-school-sync-client]')) return;
+            const client = document.createElement("script");
+            client.src = "assets/js/school_sync.js?v=2";
+            client.dataset.schoolSyncClient = "true";
+            document.body.appendChild(client);
+        };
+        if (window.HKDSE_SCHOOL_SYNC_CONFIG) {
+            loadClient();
+            return;
+        }
+        const existing = document.querySelector('script[data-school-sync-config]');
+        if (existing) {
+            existing.addEventListener("load", loadClient, { once: true });
+            return;
+        }
+        const settings = document.createElement("script");
+        settings.src = "school_sync_config.js?v=2";
+        settings.dataset.schoolSyncConfig = "true";
+        settings.addEventListener("load", loadClient, { once: true });
+        document.body.appendChild(settings);
+    }
+    loadSchoolSync();
 })();
