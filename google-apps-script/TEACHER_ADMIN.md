@@ -61,6 +61,8 @@
 
 ## 部署及回復點
 
+2026-10-12（香港時間）已上載並部署為 Apps Script **第 5 版**，API 讀回確認原 deployment 的版本為 5、權限仍是 DOMAIN／USER_DEPLOYING。來源提交 `c290e45`，分支 `feat/phase-1-platform-foundation`；沒有合併 main。11 組驗證通過，正式帳戶的 iframe／RPC 端到端待部署老師驗收；沒有修改真實名冊、群組或課業資料。
+
 上載以下來源（連同既有私密 DeploymentConfig，不把私密設定加入 Git）：
 
 - Code.gs → 雲端「程式碼.gs」
