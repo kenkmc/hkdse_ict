@@ -58,18 +58,25 @@ const REQUIREMENT_TYPES = Object.freeze([
   'COMPLETE_LAYER', 'COMPLETE_GAME', 'MOCK_ATTEMPT'
 ]);
 
+const SCHOOL_SYNC_DEFAULTS = Object.freeze({
+  schoolDomain: 'jcmkec.edu.hk',
+  siteProgressUrl: 'https://kenkmc.github.io/hkdse_ict/progress.html'
+});
+
 /** Run once after the script is bound to the teacher-owned Google Sheet. */
 function initialiseSchoolSync() {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   if (!spreadsheet) throw new Error('請由目標 Google Sheet 的「擴充功能 → Apps Script」建立及執行此專案。');
   const properties = PropertiesService.getScriptProperties();
   properties.setProperty('SHEET_ID', spreadsheet.getId());
+  if (!properties.getProperty('SCHOOL_DOMAIN')) properties.setProperty('SCHOOL_DOMAIN', SCHOOL_SYNC_DEFAULTS.schoolDomain);
+  if (!properties.getProperty('SITE_PROGRESS_URL')) properties.setProperty('SITE_PROGRESS_URL', SCHOOL_SYNC_DEFAULTS.siteProgressUrl);
   if (!properties.getProperty('TOKEN_TTL_SECONDS')) properties.setProperty('TOKEN_TTL_SECONDS', '18000');
   if (!properties.getProperty('ACCOUNT_KEY_SECRET')) properties.setProperty('ACCOUNT_KEY_SECRET', `${Utilities.getUuid()}${Utilities.getUuid()}`);
   Object.values(SCHOOL_SYNC_SHEETS).forEach(definition => ensureSheet_(spreadsheet, definition));
   configureSheets_(spreadsheet);
   refreshTeacherDashboard_(spreadsheet);
-  return '工作表已建立。請輸入學生名冊後執行 generateActivationCodes()，並在指令碼屬性設定 SCHOOL_DOMAIN 及 SITE_PROGRESS_URL。';
+  return '工作表已建立並套用校方網域及正式 progress.html 網址。請輸入學生名冊後執行 generateActivationCodes()。';
 }
 
 /** Fill stable student IDs and one-time activation codes for unlinked active students. */

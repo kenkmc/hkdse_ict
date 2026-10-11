@@ -69,11 +69,11 @@
 
 ## 6. 設定指令碼屬性
 
-在「專案設定 → 指令碼屬性」加入：
+`initialiseSchoolSync()` 會先寫入本校預設值；日後搬站或轉校時，才需要在「專案設定 → 指令碼屬性」修改：
 
 | 名稱 | 示例 | 說明 |
 | --- | --- | --- |
-| `SCHOOL_DOMAIN` | `school.edu.hk` | 不要包含 `@` |
+| `SCHOOL_DOMAIN` | `jcmkec.edu.hk` | 不要包含 `@` |
 | `SITE_PROGRESS_URL` | `https://kenkmc.github.io/hkdse_ict/progress.html` | 固定返回頁面 |
 | `TOKEN_TTL_SECONDS` | `18000` | 選填；預設五小時，最大六小時 |
 
@@ -95,7 +95,7 @@
 ```js
 window.HKDSE_SCHOOL_SYNC_CONFIG = Object.freeze({
     enabled: true,
-    schoolName: "學校名稱",
+    schoolName: "賽馬會萬鈞毅智書院",
     webAppUrl: "https://script.google.com/macros/s/正式部署ID/exec",
     connectionHours: 5
 });
