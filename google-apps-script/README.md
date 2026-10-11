@@ -1,5 +1,7 @@
 # 校園進度同步部署
 
+老師現在可使用原 Web App 的 `?admin=1` 入口，在網頁管理名冊、群組、群組成員、課業、派發對象及要求，並唯讀查看 7 類進度／學習紀錄。見 [老師管理操作及回復指南](TEACHER_ADMIN.md)。只有部署老師可進入，不公開學生資料到 GitHub Pages。
+
 學生以校園 Google Workspace 帳戶開啟 Web App。Apps Script 只在登入當刻讀取電郵以產生不可直接還原的 `AccountKey`，不會把電郵地址寫入試算表。學生按「同步至學校」後，GitHub Pages 才會傳送學習活動。
 
 ## 1. 建立校方試算表
@@ -7,7 +9,7 @@
 1. 使用校方擁有的 Google Workspace 帳戶建立或匯入「HKDSE ICT 學習進度」試算表。
 2. 只把存取權授予負責老師；不要設定成「知道連結的任何人」。
 3. 選擇「擴充功能 → Apps Script」。
-4. 以本資料夾的 `Code.gs` 取代編輯器內容。
+4. 上載本資料夾的 `Code.gs`、`TeacherAdmin.gs`、`TeacherResources.gs` 及 `TeacherAdminUI.html`（主程式可放於原有「程式碼.gs」）。
 5. 顯示資訊清單檔案後，以 `appsscript.json` 取代原有內容。
 
 本校的試算表及 Apps Script 現已建立，程式已經由 API 上載及讀回核對，不用再手動貼上。雲端主程式放在原有的「程式碼.gs」，來源則是本資料夾的 `Code.gs`。

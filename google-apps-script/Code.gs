@@ -111,6 +111,7 @@ function refreshTeacherDashboard() {
 
 function doGet(event) {
   try {
+    if (String(event && event.parameter && event.parameter.admin || '') === '1') return teacherAdminPage_();
     if (String(event && event.parameter && event.parameter.setup || '') === '1') return teacherSetupPage_();
     const settings = settings_();
     const email = authorisedEmail_(settings.schoolDomain);
@@ -142,13 +143,13 @@ function teacherSetupPage_() {
   const action = escapeHtml_(ScriptApp.getService().getUrl() || '');
   const form = `<form method="post" action="${action}"><input type="hidden" name="action" value="generate-codes"><input type="hidden" name="adminToken" value="${token}"><button class="button" type="submit" style="border:0;font:inherit">名冊填妥後：產生啟用碼</button></form>`;
   const sheetId = settings_().sheetId;
-  return page_('校園同步設定完成', `13 張工作表及安全屬性已設定。請在 Students 填入班別、學號及中英文姓名，再用下面的按鈕產生一次性啟用碼。學生資料及學習紀錄不會公開到 GitHub。${form}`, `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/edit`, '開啟老師試算表');
+  return page_('校園同步設定完成', `13 張工作表及安全屬性已設定。可使用<a href="${action}?admin=1" target="_top">老師網頁管理介面</a>管理名冊、群組及課業，或直接填寫 Students。學生資料及學習紀錄不會公開到 GitHub。${form}`, `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/edit`, '開啟老師試算表');
 }
 
 function assertDeploymentOwner_() {
   const email = authorisedEmail_(SCHOOL_SYNC_DEFAULTS.schoolDomain);
   const ownerEmail = String(Session.getEffectiveUser().getEmail() || '').trim().toLowerCase();
-  if (!ownerEmail || email !== ownerEmail) throw new Error('只有部署這個 Web App 的老師可以執行初始設定。');
+  if (!ownerEmail || email !== ownerEmail) throw new Error('只有部署這個 Web App 的老師可以管理校方資料。');
 }
 
 function teacherGenerateCodes_(event) {
@@ -415,6 +416,7 @@ function buildSchoolData_(spreadsheet, studentId) {
   const groups = objects_(spreadsheet.getSheetByName(SCHOOL_SYNC_SHEETS.groups.name))
     .filter(row => groupIds.has(String(row.GroupId || '')) && truthy_(row.Active))
     .map(row => ({ groupId: safeId_(row.GroupId), name: safeText_(row.GroupName, 80), type: safeId_(row.GroupType, 20) }));
+  const activeGroupIds = new Set(groups.map(group => group.groupId));
   const targets = objects_(spreadsheet.getSheetByName(SCHOOL_SYNC_SHEETS.assignmentTargets.name)).filter(row => truthy_(row.Active));
   const items = objects_(spreadsheet.getSheetByName(SCHOOL_SYNC_SHEETS.assignmentItems.name));
   const now = Date.now();
@@ -424,7 +426,7 @@ function buildSchoolData_(spreadsheet, studentId) {
     .filter(row => targets.some(target => target.AssignmentId === row.AssignmentId && (
       String(target.TargetType || '').toUpperCase() === 'ALL'
       || (String(target.TargetType || '').toUpperCase() === 'STUDENT' && target.TargetId === studentId)
-      || (String(target.TargetType || '').toUpperCase() === 'GROUP' && groupIds.has(String(target.TargetId || '')))
+      || (String(target.TargetType || '').toUpperCase() === 'GROUP' && activeGroupIds.has(String(target.TargetId || '')))
     )))
     .map(row => ({
       assignmentId: safeId_(row.AssignmentId), title: safeText_(row.Title, 100), instructions: safeText_(row.Instructions, 500),

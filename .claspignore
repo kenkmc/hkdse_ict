@@ -1,4 +1,7 @@
 **/**
 !Code.gs
+!TeacherAdmin.gs
+!TeacherResources.gs
+!TeacherAdminUI.html
 !appsscript.json
 !DeploymentConfig.gs
