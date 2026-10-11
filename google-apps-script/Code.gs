@@ -65,7 +65,11 @@ const SCHOOL_SYNC_DEFAULTS = Object.freeze({
 
 /** Run once after the script is bound to the teacher-owned Google Sheet. */
 function initialiseSchoolSync() {
-  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  assertDeploymentOwner_();
+  const configuredId = PropertiesService.getScriptProperties().getProperty('SHEET_ID')
+    || (typeof SCHOOL_SYNC_BOUND_SHEET_ID === 'string' ? SCHOOL_SYNC_BOUND_SHEET_ID : '');
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet()
+    || (configuredId ? SpreadsheetApp.openById(configuredId) : null);
   if (!spreadsheet) throw new Error('請由目標 Google Sheet 的「擴充功能 → Apps Script」建立及執行此專案。');
   const properties = PropertiesService.getScriptProperties();
   properties.setProperty('SHEET_ID', spreadsheet.getId());
@@ -81,6 +85,7 @@ function initialiseSchoolSync() {
 
 /** Fill stable student IDs and one-time activation codes for unlinked active students. */
 function generateActivationCodes() {
+  assertDeploymentOwner_();
   const spreadsheet = activeOrConfiguredSpreadsheet_();
   const sheet = ensureSheet_(spreadsheet, SCHOOL_SYNC_SHEETS.students);
   if (sheet.getLastRow() < 2) return 'Students 尚未有學生資料。';
@@ -99,12 +104,14 @@ function generateActivationCodes() {
 }
 
 function refreshTeacherDashboard() {
+  assertDeploymentOwner_();
   refreshTeacherDashboard_(activeOrConfiguredSpreadsheet_());
   return 'TeacherDashboard 已更新。';
 }
 
-function doGet() {
+function doGet(event) {
   try {
+    if (String(event && event.parameter && event.parameter.setup || '') === '1') return teacherSetupPage_();
     const settings = settings_();
     const email = authorisedEmail_(settings.schoolDomain);
     const accountKey = accountKey_(email, settings.accountKeySecret);
@@ -122,9 +129,42 @@ function doGet() {
   }
 }
 
+/** Only the deployment owner can initialize or refresh the school backend. */
+function teacherSetupPage_() {
+  const authorization = ScriptApp.getAuthorizationInfo(ScriptApp.AuthMode.FULL);
+  if (authorization.getAuthorizationStatus() === ScriptApp.AuthorizationStatus.REQUIRED) {
+    return page_('老師執行授權', 'Google 尚未授權這個校方 Script 讀寫試算表。請由部署老師確認 Google 權限後，重新開啟這個老師設定頁；不用到編輯器尋找函數。', authorization.getAuthorizationUrl(), '確認 Google 權限');
+  }
+  assertDeploymentOwner_();
+  initialiseSchoolSync();
+  const token = `${Utilities.getUuid().replace(/-/g, '')}${Utilities.getUuid().replace(/-/g, '')}`;
+  CacheService.getScriptCache().put(`school-admin-${token}`, 'enabled', 600);
+  const action = escapeHtml_(ScriptApp.getService().getUrl() || '');
+  const form = `<form method="post" action="${action}"><input type="hidden" name="action" value="generate-codes"><input type="hidden" name="adminToken" value="${token}"><button class="button" type="submit" style="border:0;font:inherit">名冊填妥後：產生啟用碼</button></form>`;
+  const sheetId = settings_().sheetId;
+  return page_('校園同步設定完成', `13 張工作表及安全屬性已設定。請在 Students 填入班別、學號及中英文姓名，再用下面的按鈕產生一次性啟用碼。學生資料及學習紀錄不會公開到 GitHub。${form}`, `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/edit`, '開啟老師試算表');
+}
+
+function assertDeploymentOwner_() {
+  const email = authorisedEmail_(SCHOOL_SYNC_DEFAULTS.schoolDomain);
+  const ownerEmail = String(Session.getEffectiveUser().getEmail() || '').trim().toLowerCase();
+  if (!ownerEmail || email !== ownerEmail) throw new Error('只有部署這個 Web App 的老師可以執行初始設定。');
+}
+
+function teacherGenerateCodes_(event) {
+  assertDeploymentOwner_();
+  const token = String(event && event.parameter && event.parameter.adminToken || '');
+  if (!/^[a-f0-9]{64}$/i.test(token) || !CacheService.getScriptCache().get(`school-admin-${token}`)) throw new Error('老師操作確認碼已失效，請重新開啟初始化頁。');
+  CacheService.getScriptCache().remove(`school-admin-${token}`);
+  const message = generateActivationCodes();
+  refreshTeacherDashboard();
+  return page_('學生啟用碼', escapeHtml_(message), `${ScriptApp.getService().getUrl()}?setup=1`, '返回老師設定');
+}
+
 function doPost(event) {
   try {
     const action = String(event && event.parameter && event.parameter.action || 'sync').toLowerCase();
+    if (action === 'generate-codes') return teacherGenerateCodes_(event);
     return action === 'activate' ? activateStudent_(event) : syncProgress_(event);
   } catch (error) {
     return page_('未能完成要求', `${safeError_(error)} 請返回校園連接頁面再試。`, ScriptApp.getService().getUrl() || '', '重新連接');
@@ -451,15 +491,16 @@ function configureSheets_(spreadsheet) {
   students.getRange('G2:G1000').setDataValidation(SpreadsheetApp.newDataValidation().requireValueInList(['ACTIVE', 'INACTIVE'], true).setAllowInvalid(false).build());
   const groups = spreadsheet.getSheetByName(SCHOOL_SYNC_SHEETS.groups.name);
   groups.getRange('C2:C1000').setDataValidation(SpreadsheetApp.newDataValidation().requireValueInList(['LEVEL', 'ELECTIVE', 'CUSTOM'], true).setAllowInvalid(false).build());
-  groups.getRange('E2:E1000').insertCheckboxes();
-  spreadsheet.getSheetByName(SCHOOL_SYNC_SHEETS.groupMembers.name).getRange('D2:D5000').insertCheckboxes();
+  const checkboxRule = SpreadsheetApp.newDataValidation().requireCheckbox().build();
+  groups.getRange('E2:E1000').setDataValidation(checkboxRule);
+  spreadsheet.getSheetByName(SCHOOL_SYNC_SHEETS.groupMembers.name).getRange('D2:D5000').setDataValidation(checkboxRule);
   spreadsheet.getSheetByName(SCHOOL_SYNC_SHEETS.assignments.name).getRange('F2:F1000').setDataValidation(SpreadsheetApp.newDataValidation().requireValueInList(['DRAFT', 'PUBLISHED', 'ARCHIVED'], true).setAllowInvalid(false).build());
   const targets = spreadsheet.getSheetByName(SCHOOL_SYNC_SHEETS.assignmentTargets.name);
   targets.getRange('C2:C5000').setDataValidation(SpreadsheetApp.newDataValidation().requireValueInList(['ALL', 'GROUP', 'STUDENT'], true).setAllowInvalid(false).build());
-  targets.getRange('E2:E5000').insertCheckboxes();
+  targets.getRange('E2:E5000').setDataValidation(checkboxRule);
   const items = spreadsheet.getSheetByName(SCHOOL_SYNC_SHEETS.assignmentItems.name);
   items.getRange('D2:D5000').setDataValidation(SpreadsheetApp.newDataValidation().requireValueInList(REQUIREMENT_TYPES, true).setAllowInvalid(false).build());
-  items.getRange('H2:H5000').insertCheckboxes();
+  items.getRange('H2:H5000').setDataValidation(checkboxRule);
   Object.values(SCHOOL_SYNC_SHEETS).forEach(definition => {
     const sheet = spreadsheet.getSheetByName(definition.name);
     if (sheet && definition.name !== SCHOOL_SYNC_SHEETS.dashboard.name) sheet.autoResizeColumns(1, definition.headers.length);

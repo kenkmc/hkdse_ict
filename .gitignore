@@ -1,0 +1,6 @@
+# OAuth credentials and local deployment files must stay on this computer.
+.clasprc*.json
+.clasp.json
+.local-school-sync/
+google-apps-script/DeploymentConfig.gs
+node_modules/

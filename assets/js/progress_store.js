@@ -415,8 +415,13 @@
     }
     function clear() {
         try {
+            window.HKDSEProgress?.stopPageActivity?.();
             window.localStorage.removeItem(storageKey);
             window.sessionStorage.removeItem(sessionStorageKey);
+            legacyKeys.forEach(key => window.localStorage.removeItem(key));
+            if (typeof window.CustomEvent === "function") {
+                window.dispatchEvent(new CustomEvent("hkdse-progress-clear"));
+            }
             dispatchChange();
         } catch (error) {
             // The in-memory page can still continue when storage is unavailable.

@@ -10,7 +10,7 @@
     const schoolProfileKey = "hkdse-ict-school-profile-v1";
     const channelName = "hkdse-ict-school-sync";
     const configured = Boolean(config.enabled)
-        && /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(String(config.webAppUrl || ""));
+        && /^https:\/\/script\.google\.com\/(?:a\/macros\/[a-z0-9.-]+\/|macros\/)s\/[A-Za-z0-9_-]+\/exec$/.test(String(config.webAppUrl || ""));
     let internalNavigation = false;
     let channel = null;
 
@@ -100,6 +100,13 @@
 
     function setConnectionToken(token, schoolData, notify = true) {
         if (!validToken(token)) return false;
+        const state = readSyncState();
+        const studentId = schoolData?.student?.studentId;
+        if (!studentId || (state.linkedStudentId && state.linkedStudentId !== studentId)) {
+            if (notify) window.alert("這個瀏覽器保留了另一位學生的學習紀錄。請先匯出備份，再在『我的學習』清除本機紀錄，或使用獨立的瀏覽器設定檔，然後重新連接。未有傳送任何資料。");
+            return false;
+        }
+        writeSyncState({ ...state, linkedStudentId: studentId });
         window.sessionStorage.setItem(connectionTokenKey, token);
         if (schoolData) writeSchoolProfile(schoolData);
         progress.ensureSession?.();
@@ -112,10 +119,9 @@
         const token = params.get("school-connect") || "";
         if (!token) return;
         const schoolData = decodeSchoolData(params.get("school-data"));
-        if (setConnectionToken(token, schoolData)) {
-            const cleanUrl = `${window.location.pathname}${window.location.search}`;
-            window.history.replaceState({}, "", cleanUrl);
-        }
+        setConnectionToken(token, schoolData);
+        const cleanUrl = `${window.location.pathname}${window.location.search}`;
+        window.history.replaceState({}, "", cleanUrl);
     }
 
     function evaluateRequirement(item, snapshot) {
@@ -167,22 +173,33 @@
     function evaluateAssignments(snapshot) {
         const profile = readSchoolProfile();
         const assignments = Array.isArray(profile?.assignments) ? profile.assignments : [];
-        return assignments.map(assignment => {
+        const state = readSyncState();
+        const savedTimes = state.assignmentCompletionTimes || {};
+        const completionTimes = {};
+        const results = assignments.map(assignment => {
             const items = (assignment.items || []).map(item => evaluateRequirement(item, snapshot));
             const assessed = items.some(item => item.required) ? items.filter(item => item.required) : items;
             const completedItems = assessed.filter(item => item.complete).length;
             const totalItems = assessed.length;
             const percentage = totalItems ? Math.round(completedItems / totalItems * 100) : 0;
+            const completionKey = `${profile.student?.studentId || ""}|${assignment.assignmentId}`;
+            if (percentage >= 100) {
+                completionTimes[completionKey] = savedTimes[completionKey] || snapshot.lastActivityAt || new Date().toISOString();
+            }
             return {
                 assignmentId: assignment.assignmentId,
                 completedItems,
                 totalItems,
                 percentage,
                 status: percentage >= 100 ? "COMPLETED" : completedItems ? "IN_PROGRESS" : "NOT_STARTED",
-                completedAt: percentage >= 100 ? new Date().toISOString() : "",
+                completedAt: completionTimes[completionKey] || "",
                 items
             };
         });
+        if (JSON.stringify(completionTimes) !== JSON.stringify(savedTimes)) {
+            writeSyncState({ ...state, assignmentCompletionTimes: completionTimes });
+        }
+        return results;
     }
 
     function resourceLabel(resourceId) {
@@ -380,11 +397,19 @@
         });
     }
 
+    function clearConnection() {
+        window.sessionStorage.removeItem(connectionTokenKey);
+        window.sessionStorage.removeItem(schoolProfileKey);
+        window.localStorage.removeItem(syncStateKey);
+        render();
+    }
+
     function setupChannel() {
         if (typeof window.BroadcastChannel !== "function") return;
         channel = new BroadcastChannel(channelName);
         channel.addEventListener("message", event => {
             if (event.data?.type === "connection-token" && setConnectionToken(event.data.token, event.data.schoolData, false)) render();
+            if (event.data?.type === "clear-connection") clearConnection();
         });
     }
 
@@ -394,7 +419,12 @@
             if (!link) return;
             try {
                 const destination = new URL(link.href, window.location.href);
-                internalNavigation = destination.origin === window.location.origin;
+                const current = new URL(window.location.href);
+                internalNavigation = !event.defaultPrevented && event.button === 0
+                    && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey
+                    && (!link.target || link.target === "_self") && !link.hasAttribute("download")
+                    && destination.origin === current.origin
+                    && (destination.pathname !== current.pathname || destination.search !== current.search);
             } catch (error) {
                 internalNavigation = false;
             }
@@ -414,6 +444,10 @@
     bindProgressPanel();
     trackNavigation();
     window.addEventListener("hkdse-progress-change", render);
+    window.addEventListener("hkdse-progress-clear", () => {
+        clearConnection();
+        channel?.postMessage({ type: "clear-connection" });
+    });
     window.addEventListener("storage", event => {
         if (event.key === syncStateKey) render();
     });

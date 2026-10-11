@@ -79,7 +79,7 @@
         const loadClient = () => {
             if (document.querySelector('script[data-school-sync-client]')) return;
             const client = document.createElement("script");
-            client.src = "assets/js/school_sync.js?v=2";
+            client.src = "assets/js/school_sync.js?v=3";
             client.dataset.schoolSyncClient = "true";
             document.body.appendChild(client);
         };
@@ -93,7 +93,7 @@
             return;
         }
         const settings = document.createElement("script");
-        settings.src = "school_sync_config.js?v=2";
+        settings.src = "school_sync_config.js?v=3";
         settings.dataset.schoolSyncConfig = "true";
         settings.addEventListener("load", loadClient, { once: true });
         document.body.appendChild(settings);

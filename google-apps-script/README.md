@@ -10,9 +10,11 @@
 4. 以本資料夾的 `Code.gs` 取代編輯器內容。
 5. 顯示資訊清單檔案後，以 `appsscript.json` 取代原有內容。
 
+本校的試算表及 Apps Script 現已建立，程式已經由 API 上載及讀回核對，不用再手動貼上。雲端主程式放在原有的「程式碼.gs」，來源則是本資料夾的 `Code.gs`。
+
 ## 2. 初始化
 
-在 Apps Script 編輯器執行一次 `initialiseSchoolSync()`。程式會建立及格式化：
+老師可開啟正式 Web App 網址並加上 `?setup=1`，由老師設定頁執行初始化；如 Google 要求執行授權，須由部署老師本人確認。這個入口會核對登入者等於部署者，學生不能執行。亦可在 Apps Script 編輯器執行一次 `initialiseSchoolSync()`。程式會建立及格式化：
 
 - `TeacherDashboard`：老師查看學生登入、有效學習時間、瀏覽、練習和課業完成情況；
 - `Students`：班別、學號、中英文姓名、不可還原的帳戶代碼及一次性啟用碼；
@@ -31,7 +33,7 @@
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 留空 | 4A | 01 | 陳大文 | CHAN Tai Man | 留空 | ACTIVE | 留空 |
 
-`ClassNo`應以文字輸入以保留前置零。完成後執行 `generateActivationCodes()`：
+`ClassNo`應以文字輸入以保留前置零。完成後在老師設定頁按「名冊填妥後：產生啟用碼」，或在編輯器執行 `generateActivationCodes()`：
 
 - 程式會補上穩定的 `StudentId`；
 - 為尚未連接的學生產生八位一次性啟用碼；
@@ -88,6 +90,8 @@
 5. 使用學生帳戶測試首次啟用及重新登入。
 6. 使用私人 Gmail 或未登入視窗測試，確認不能進入。
 
+Google Workspace 可能提供 `https://script.google.com/a/macros/校園網域/s/部署ID/exec`；本站亦支援這個正式網址，應保留 API／部署畫面提供的網址。
+
 ## 8. 啟用網站端
 
 修改網站根目錄 `school_sync_config.js`：
@@ -113,6 +117,17 @@ window.HKDSE_SCHOOL_SYNC_CONFIG = Object.freeze({
 - 同步後活動表、課題進度、課業進度及 `TeacherDashboard` 均更新；
 - 連接碼過期後必須重新登入；
 - 老師以外的人不能開啟試算表。
+- 共用瀏覽器連接不同學生時會拒絕切換，須先自行匯出備份，再清除本機紀錄；清除紀錄亦會清除該瀏覽器的校園連接及學生顯示資料。
+
+## 10. 日後直接上載及回復
+
+可用 Google 的 `clasp` 或 Apps Script API 管理程式，不需要透過瀏覽器逐行編輯。管理用 OAuth 授權與 Apps Script 執行時的試算表授權是兩回事；首次初始化的 Google 權限確認仍須由老師完成。
+
+上載前必須下載整個遠端專案及部署資料作本機備份。`projects.updateContent` 會取代整個專案檔案集合，不能只傳一個檔案而忽略其他原稿。本次已備份原有空白「程式碼」檔案，並以主程式取代；第 1 版曾使用的 `Code` 檔案已合併移除，避免重複函數。
+
+Web App 執行時沒有試算表編輯器的 active container。本機 `DeploymentConfig.gs` 保存綁定試算表 ID，只上載到校方 Script，Git 已忽略它；沒有此檔案時須先由試算表編輯器執行初始化。重複初始化會保留既有組別、課業核取值及帳戶密鑰。
+
+本機 `.clasp.json`、OAuth 憑證及 `.local-school-sync/` 已被 Git 忽略。不要把 OAuth 憑證、學生資料或 `ACCOUNT_KEY_SECRET` 放到 GitHub。
 
 ## 限制
 

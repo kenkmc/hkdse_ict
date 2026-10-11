@@ -2,9 +2,9 @@
     "use strict";
 
     window.HKDSE_SCHOOL_SYNC_CONFIG = Object.freeze({
-        enabled: false,
+        enabled: true,
         schoolName: "賽馬會萬鈞毅智書院",
-        webAppUrl: "",
-        connectionHours: 6
+        webAppUrl: "https://script.google.com/a/macros/jcmkec.edu.hk/s/AKfycbySDrQGZedy7CU0UHJuIVOpimo2cmgGWDla1slXofeN3NU4DWqgxVDmH1dTciuvWRoBhg/exec",
+        connectionHours: 5
     });
 })();

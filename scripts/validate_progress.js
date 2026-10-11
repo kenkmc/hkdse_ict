@@ -66,7 +66,7 @@ if (!progressHtml.includes("progress_dashboard.js") || !progressHtml.includes("s
 items.forEach(item => {
     const html = fs.readFileSync(path.join(root, item.file), "utf8");
     const courseIndex = html.indexOf("course_data.js?v=7");
-    const progressIndex = html.indexOf("assets/js/progress_store.js?v=2");
+    const progressIndex = html.indexOf("assets/js/progress_store.js?v=3");
     if (progressIndex < 0) errors.push(`${item.file} 未載入統一進度記錄。`);
     if (courseIndex >= 0 && progressIndex < courseIndex) errors.push(`${item.file} 在中央目錄之前載入進度記錄。`);
     ["question_engine.js", "mock_exam.js", "site_navigation.js", "lesson_companion.js"].forEach(script => {
