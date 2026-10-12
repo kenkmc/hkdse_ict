@@ -18,9 +18,11 @@ let uuid = 0;
 let locks = 0;
 const cache = new Map();
 const sheets = new Map();
+const properties = new Map();
 const spreadsheet = { getSheetByName: name => sheets.get(name), getUrl: () => 'https://docs.google.com/spreadsheets/d/TEST/edit' };
 const context = {
   Date, console,
+  PropertiesService: { getScriptProperties: () => ({ getProperty: key => properties.get(key) || '', setProperty: (key,value) => properties.set(key,value), deleteProperty: key => properties.delete(key) }) },
   Session: { getActiveUser: () => ({ getEmail: () => email }), getEffectiveUser: () => ({ getEmail: () => 'teacher@jcmkec.edu.hk' }) },
   Utilities: {
     getUuid: () => (++uuid).toString(16).padStart(12, '0') + 'abcdef0123456789abcd',
@@ -34,7 +36,7 @@ const context = {
   ScriptApp: { getService: () => ({ getUrl: () => 'https://script.google.com/macros/s/TEST/exec' }) }
 };
 vm.createContext(context);
-vm.runInContext(read('google-apps-script/Code.gs') + '\n' + read('google-apps-script/TeacherResources.gs') + '\n' + read('google-apps-script/TeacherAdmin.gs') + '\nthis.definitions = SCHOOL_SYNC_SHEETS; this.resources = TEACHER_ADMIN_RESOURCES;', context);
+vm.runInContext(read('google-apps-script/Code.gs') + '\n' + read('google-apps-script/GoogleAuth.gs') + '\n' + read('google-apps-script/TeacherResources.gs') + '\n' + read('google-apps-script/TeacherAdmin.gs') + '\nthis.definitions = SCHOOL_SYNC_SHEETS; this.resources = TEACHER_ADMIN_RESOURCES;', context);
 class FakeSheet {
   constructor(headers, headerRow=1) { this.rows = Array.from({ length: headerRow-1 }, () => []); this.rows.push([...headers]); this.writes = 0; }
   getLastRow() { return this.rows.length; }

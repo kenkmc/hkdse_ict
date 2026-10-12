@@ -1,5 +1,17 @@
 # 校園同步部署及回復紀錄
 
+## 2026-10-12：Google 登入遷移準備
+
+- 同一 Web App 已更新至固定版本 **6**；Apps Script API 已逐檔讀回核對、再核對部署版本、原 URL 及 `DOMAIN / USER_DEPLOYING` 權限未變。
+- 新增 `GoogleAuth.gs`、`GoogleAuthSettings.html`，教師入口 `?auth-settings=1`；學生名冊提供「登入配對」修正／解除電郵。首次配對即時啟用，按用戶選擇不加審批。
+- Students 只新增 **K1 = GoogleEmail**，原 A:J、學生名冊行、帳戶綁定、群組及學習紀錄未重設。Sheets 技能採精確範圍寫入、沿用鄰欄標頭格式並讀回核對；原生 Google Sheet 視覺畫面未驗證，格式以 API 核對。
+- 完整 Google Sheet 遷移前備份：`1TUWsF5sPWt75Sb2QIi4RBf2uBDJufJFmxXuq1ubOpro`；原表及備份權限均已核對只有部署老師擁有。
+- **尚未啟用新 OAuth 登入**：沒有專用校方 Web OAuth Client ID／secret。舊登入仍作過渡；沒有使用 clasp Client 代替學生登入，沒有以偽造帳戶／資料填入名冊，沒有執行綁定重設。
+- 啟用需部署老師在設定頁確認新 Script 連網權限、建立 Internal Web OAuth Client、設定頁輸入憑證、測試老師登入，最後确认備份及重設。此流程只需 `openid email`；學生不需要 Sheet 權限。
+- 12 個驗證套件通過。隔離瀏覽器以虛構資料測試老師 13 個畫面、新設定頁及首次配對頁，尺寸 1920×1080、1280×720、390×844 通過；真實 Google OAuth／學生帳戶端到端測試待設定後完成。
+- Google 登入程式仍受 Apps Script 原生多帳戶入口限制；必要時用只登入校園帳戶的瀏覽器／無痕視窗。跨設備登入辨認不包含雲端下載／合併本機進度。
+- 回復到新流程前：固定版本 **5**、Git **a923aa2**，原稿 `.local-school-sync/before-upload-2026-10-12T00-56-33-165Z.json`。已啟用後還需按 StudentId 回復登入欄及 Script Properties，不能只改部署版本；見 [Google 登入及回復指南](GOOGLE_LOGIN.md)。不合併 main。
+
 ## 2026-10-11（香港時間）
 
 - 工作分支：`feat/phase-1-platform-foundation`；不合併 `main`。

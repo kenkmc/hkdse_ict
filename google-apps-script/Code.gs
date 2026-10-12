@@ -5,7 +5,7 @@ const SCHOOL_SYNC_SHEETS = Object.freeze({
   },
   students: {
     name: 'Students',
-    headers: ['StudentId', 'Class', 'ClassNo', 'ChineseName', 'EnglishName', 'AccountKey', 'Status', 'ActivationCode', 'FirstLinkedAt', 'LastLoginAt']
+    headers: ['StudentId', 'Class', 'ClassNo', 'ChineseName', 'EnglishName', 'AccountKey', 'Status', 'ActivationCode', 'FirstLinkedAt', 'LastLoginAt', 'GoogleEmail']
   },
   groups: {
     name: 'Groups',
@@ -80,12 +80,13 @@ function initialiseSchoolSync() {
   Object.values(SCHOOL_SYNC_SHEETS).forEach(definition => ensureSheet_(spreadsheet, definition));
   configureSheets_(spreadsheet);
   refreshTeacherDashboard_(spreadsheet);
-  return '工作表已建立並套用校方網域及正式 progress.html 網址。請輸入學生名冊後執行 generateActivationCodes()。';
+  return googleLoginEnabled_() ? '工作表已核對，Google 登入已啟用。名冊及歷史進度保留。' : '工作表已建立並套用校方網域及正式 progress.html 網址。可在老師管理頁設定 Google 登入；設定完成前保留舊啟用碼流程。';
 }
 
 /** Fill stable student IDs and one-time activation codes for unlinked active students. */
 function generateActivationCodes() {
   assertDeploymentOwner_();
+  if (googleLoginEnabled_()) throw new Error('已改用 Google 登入，毋須產生啟用碼。');
   const spreadsheet = activeOrConfiguredSpreadsheet_();
   const sheet = ensureSheet_(spreadsheet, SCHOOL_SYNC_SHEETS.students);
   if (sheet.getLastRow() < 2) return 'Students 尚未有學生資料。';
@@ -113,6 +114,10 @@ function doGet(event) {
   try {
     if (String(event && event.parameter && event.parameter.admin || '') === '1') return teacherAdminPage_();
     if (String(event && event.parameter && event.parameter.setup || '') === '1') return teacherSetupPage_();
+    if (String(event && event.parameter && event.parameter['auth-settings'] || '') === '1') return googleAuthSettingsPage_();
+    if (event && event.parameter && (event.parameter.code || event.parameter.error || event.parameter.state)) return googleOAuthCallback_(event);
+    if (String(event && event.parameter && event.parameter['google-test'] || '') === '1') return googleLoginPage_(true);
+    if (googleLoginEnabled_()) return googleLoginPage_(false);
     const settings = settings_();
     const email = authorisedEmail_(settings.schoolDomain);
     const accountKey = accountKey_(email, settings.accountKeySecret);
@@ -141,9 +146,9 @@ function teacherSetupPage_() {
   const token = `${Utilities.getUuid().replace(/-/g, '')}${Utilities.getUuid().replace(/-/g, '')}`;
   CacheService.getScriptCache().put(`school-admin-${token}`, 'enabled', 600);
   const action = escapeHtml_(ScriptApp.getService().getUrl() || '');
-  const form = `<form method="post" action="${action}"><input type="hidden" name="action" value="generate-codes"><input type="hidden" name="adminToken" value="${token}"><button class="button" type="submit" style="border:0;font:inherit">名冊填妥後：產生啟用碼</button></form>`;
+  const form = googleLoginEnabled_() ? '<p>Google 登入已啟用，學生毋須啟用碼。</p>' : `<form method="post" action="${action}"><input type="hidden" name="action" value="generate-codes"><input type="hidden" name="adminToken" value="${token}"><button class="button" type="submit" style="border:0;font:inherit">名冊填妥後：產生啟用碼</button></form>`;
   const sheetId = settings_().sheetId;
-  return page_('校園同步設定完成', `13 張工作表及安全屬性已設定。可使用<a href="${action}?admin=1" target="_top">老師網頁管理介面</a>管理名冊、群組及課業，或直接填寫 Students。學生資料及學習紀錄不會公開到 GitHub。${form}`, `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/edit`, '開啟老師試算表');
+  return page_('校園同步設定完成', `13 張工作表及安全屬性已設定。可使用<a href="${action}?admin=1" target="_top">老師網頁管理介面</a>管理名冊、群組及課業，或直接填寫 Students。<a href="${action}?auth-settings=1" target="_top">設定 Google 登入</a>。學生資料及學習紀錄不會公開到 GitHub。${form}`, `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/edit`, '開啟老師試算表');
 }
 
 function assertDeploymentOwner_() {
@@ -166,6 +171,7 @@ function doPost(event) {
   try {
     const action = String(event && event.parameter && event.parameter.action || 'sync').toLowerCase();
     if (action === 'generate-codes') return teacherGenerateCodes_(event);
+    if (action === 'google-register') return registerGoogleStudent_(event);
     return action === 'activate' ? activateStudent_(event) : syncProgress_(event);
   } catch (error) {
     return page_('未能完成要求', `${safeError_(error)} 請返回校園連接頁面再試。`, ScriptApp.getService().getUrl() || '', '重新連接');
@@ -173,6 +179,7 @@ function doPost(event) {
 }
 
 function activateStudent_(event) {
+  if (googleLoginEnabled_()) throw new Error('請改用 Google 登入及選擇班別、學號。');
   const settings = settings_();
   const email = authorisedEmail_(settings.schoolDomain);
   const accountKey = accountKey_(email, settings.accountKeySecret);
@@ -208,22 +215,29 @@ function activateStudent_(event) {
 
 function syncProgress_(event) {
   const settings = settings_();
-  const email = authorisedEmail_(settings.schoolDomain);
-  const accountKey = accountKey_(email, settings.accountKeySecret);
   const requestLength = Number(event && event.postData && event.postData.length || 0);
   if (requestLength > 500000) throw new Error('同步資料過大，請返回網站重新整理後再試。');
   const token = String(event && event.parameter && event.parameter.connectionToken || '');
-  const tokenSession = verifyConnectionToken_(token, accountKey);
+  const googleIdentity = googleLoginEnabled_() ? verifyGoogleConnection_(token) : null;
+  const accountKey = googleIdentity ? googleIdentity.accountKey : accountKey_(authorisedEmail_(settings.schoolDomain), settings.accountKeySecret);
+  const tokenSession = googleIdentity || verifyConnectionToken_(token, accountKey);
   const body = parsePayload_(event && event.parameter && event.parameter.payload);
   const snapshot = normaliseSnapshot_(body.snapshot);
   const spreadsheet = SpreadsheetApp.openById(settings.sheetId);
   const student = findStudentByAccountKey_(spreadsheet, accountKey);
   if (!student || student.StudentId !== tokenSession.studentId) throw new Error('學生連接已失效，請重新登入。');
   assertActiveStudent_(student);
+  if (googleIdentity && (!student.GoogleEmail || accountKey_(googleTeacherEmail_(student.GoogleEmail), settings.accountKeySecret) !== accountKey)) throw new Error('學生電郵配對已更改，請重新登入或聯絡老師。');
   const syncedAt = new Date();
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
+    // Re-check after acquiring the same lock used by teacher binding corrections.
+    const current = findStudentByAccountKey_(spreadsheet, accountKey);
+    if (!current || current.StudentId !== student.StudentId) throw new Error('學生綁定已更改，請重新登入。');
+    assertActiveStudent_(current);
+    if (googleIdentity && (!current.GoogleEmail || accountKey_(googleTeacherEmail_(current.GoogleEmail), settings.accountKeySecret) !== accountKey)) throw new Error('學生電郵配對已更改，請重新登入或聯絡老師。');
+    if (googleIdentity) verifyGoogleConnection_(token);
     Object.values(SCHOOL_SYNC_SHEETS).forEach(definition => ensureSheet_(spreadsheet, definition));
     touchStudentLogin_(spreadsheet, student.rowNumber);
     saveLatest_(spreadsheet, student.StudentId, snapshot, syncedAt);
@@ -238,7 +252,7 @@ function syncProgress_(event) {
     lock.releaseLock();
   }
   CacheService.getScriptCache().remove(tokenSession.cacheKey);
-  const replacementToken = createConnectionToken_(accountKey, student.StudentId, settings.tokenTtlSeconds);
+  const replacementToken = createConnectionToken_(accountKey, student.StudentId, settings.tokenTtlSeconds, googleIdentity);
   const schoolData = buildSchoolData_(spreadsheet, student.StudentId);
   return page_('同步完成', '學習紀錄已寫入校方 Google Sheet。請返回網站確認本次同步。', returnUrl_(settings.siteProgressUrl, replacementToken, schoolData, { sync: 'success', receipt: body.clientNonce }), '返回學習網站');
 }
@@ -275,10 +289,11 @@ function accountKey_(email, secret) {
   return Utilities.base64EncodeWebSafe(signature).replace(/=+$/g, '').slice(0, 32);
 }
 
-function createConnectionToken_(accountKey, studentId, ttlSeconds) {
+function createConnectionToken_(accountKey, studentId, ttlSeconds, googleIdentity) {
   const token = `${Utilities.getUuid().replace(/-/g, '')}${Utilities.getUuid().replace(/-/g, '')}`;
   const cacheKey = tokenCacheKey_(token);
-  CacheService.getScriptCache().put(cacheKey, JSON.stringify({ accountKey, studentId }), ttlSeconds);
+  const identity = googleIdentity ? { authMode: 'google', authEpoch: googleIdentity.authEpoch, callerKey: googleIdentity.callerKey } : {};
+  CacheService.getScriptCache().put(cacheKey, JSON.stringify(Object.assign({ accountKey, studentId }, identity)), ttlSeconds);
   return token;
 }
 
@@ -483,6 +498,11 @@ function ensureSheet_(spreadsheet, definition) {
     sheet.setFrozenRows(1);
   } else if (definition.name !== SCHOOL_SYNC_SHEETS.dashboard.name) {
     const headers = sheet.getRange(1, 1, 1, definition.headers.length).getValues()[0].map(String);
+    // Add only the new trailing column; never rebuild the roster or shift existing fields.
+    if (definition.name === 'Students' && headers.slice(0, 10).join('|') === definition.headers.slice(0, 10).join('|') && !headers[10]) {
+      const cell = sheet.getRange(1, 11); cell.setValue('GoogleEmail'); styleHeader_(cell);
+      return sheet;
+    }
     if (headers.join('|') !== definition.headers.join('|')) throw new Error(`${definition.name} 欄位與目前程式版本不符，請使用新範本或先完成資料遷移。`);
   }
   return sheet;

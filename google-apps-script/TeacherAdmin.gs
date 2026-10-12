@@ -22,8 +22,10 @@ function teacherAdminBootstrap() {
   const token = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
   CacheService.getScriptCache().put('teacher-console-' + token, Session.getActiveUser().getEmail().toLowerCase(), 1800);
   const spreadsheet = activeOrConfiguredSpreadsheet_();
+  ensureSheet_(spreadsheet, SCHOOL_SYNC_SHEETS.students);
   return {
     token, spreadsheetUrl: spreadsheet.getUrl(), studentUrl: ScriptApp.getService().getUrl(),
+    googleLogin: googleAuthPublicStatus_(), authSettingsUrl: ScriptApp.getService().getUrl() + '?auth-settings=1',
     tables: Object.keys(SCHOOL_SYNC_SHEETS).map(key => ({ key, name: SCHOOL_SYNC_SHEETS[key].name,
       columns: SCHOOL_SYNC_SHEETS[key].headers.filter(column => column !== 'AccountKey' && column !== 'RecentMocksJson'),
       editable: TEACHER_ADMIN_FIELDS[key] || [] })),

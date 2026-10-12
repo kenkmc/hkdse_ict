@@ -5,3 +5,5 @@
 !TeacherAdminUI.html
 !appsscript.json
 !DeploymentConfig.gs
+!GoogleAuth.gs
+!GoogleAuthSettings.html

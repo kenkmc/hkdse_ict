@@ -89,7 +89,7 @@ if (!indexHtml.includes("school_sync_config.js?v=3") || !indexHtml.includes("ass
 ].forEach(marker => {
     if (!server.includes(marker)) errors.push(`Apps Script 後端缺少 ${marker}。`);
 });
-if (server.includes("SchoolEmail")) errors.push("Students 不應保存校園電郵地址。");
+if (!server.includes("GoogleEmail")) errors.push("名冊缺少供跨設備 Google 登入配對的電郵欄。");
 if (!client.includes("school-assignment-list") || !client.includes("evaluateAssignments")) {
     errors.push("學生畫面缺少指定課業及完成度計算。");
 }
@@ -196,6 +196,7 @@ if (!clickLink("", "https://kenkmc.github.io/hkdse_ict/cha.1.html", { ctrlKey: t
 // The owner-only setup must work from a Web App, where no active container is available.
 const serverContext = { console };
 vm.runInNewContext(server, serverContext, { filename: "Code.gs" });
+serverContext.googleLoginEnabled_ = () => false; // These tests cover the retained legacy/setup path.
 const originalInitialise = serverContext.initialiseSchoolSync;
 let initialised = 0;
 let activeEmail = "teacher@example.edu.hk";
