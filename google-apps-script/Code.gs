@@ -5,7 +5,7 @@ const SCHOOL_SYNC_SHEETS = Object.freeze({
   },
   students: {
     name: 'Students',
-    headers: ['StudentId', 'Class', 'ClassNo', 'ChineseName', 'EnglishName', 'AccountKey', 'Status', 'ActivationCode', 'FirstLinkedAt', 'LastLoginAt', 'GoogleEmail']
+    headers: ['StudentId', 'Class', 'ClassNo', 'ChineseName', 'EnglishName', 'AccountKey', 'Status', 'FirstLinkedAt', 'LastLoginAt', 'GoogleEmail']
   },
   groups: {
     name: 'Groups',
@@ -80,28 +80,7 @@ function initialiseSchoolSync() {
   Object.values(SCHOOL_SYNC_SHEETS).forEach(definition => ensureSheet_(spreadsheet, definition));
   configureSheets_(spreadsheet);
   refreshTeacherDashboard_(spreadsheet);
-  return googleLoginEnabled_() ? '工作表已核對，Google 登入已啟用。名冊及歷史進度保留。' : '工作表已建立並套用校方網域及正式 progress.html 網址。可在老師管理頁設定 Google 登入；設定完成前保留舊啟用碼流程。';
-}
-
-/** Fill stable student IDs and one-time activation codes for unlinked active students. */
-function generateActivationCodes() {
-  assertDeploymentOwner_();
-  if (googleLoginEnabled_()) throw new Error('已改用 Google 登入，毋須產生啟用碼。');
-  const spreadsheet = activeOrConfiguredSpreadsheet_();
-  const sheet = ensureSheet_(spreadsheet, SCHOOL_SYNC_SHEETS.students);
-  if (sheet.getLastRow() < 2) return 'Students 尚未有學生資料。';
-  const values = sheet.getRange(2, 1, sheet.getLastRow() - 1, SCHOOL_SYNC_SHEETS.students.headers.length).getValues();
-  let generated = 0;
-  values.forEach(row => {
-    if (!String(row[0] || '').trim()) row[0] = `STU-${Utilities.getUuid().replace(/-/g, '').slice(0, 12).toUpperCase()}`;
-    if (!String(row[6] || '').trim()) row[6] = 'ACTIVE';
-    if (String(row[6]).toUpperCase() === 'ACTIVE' && !String(row[5] || '').trim() && !String(row[7] || '').trim()) {
-      row[7] = activationCode_();
-      generated += 1;
-    }
-  });
-  sheet.getRange(2, 1, values.length, SCHOOL_SYNC_SHEETS.students.headers.length).setValues(values);
-  return `已產生 ${generated} 個一次性啟用碼。學生完成連接後，該啟用碼會自動清除。`;
+  return googleLoginEnabled_() ? '工作表已核對，Google 登入已啟用。名冊及歷史進度保留。' : '工作表已核對；請在老師設定頁完成 Google 登入測試及啟用。學生入口不再提供啟用碼登入。';
 }
 
 function refreshTeacherDashboard() {
@@ -117,19 +96,8 @@ function doGet(event) {
     if (String(event && event.parameter && event.parameter['auth-settings'] || '') === '1') return googleAuthSettingsPage_();
     if (event && event.parameter && (event.parameter.code || event.parameter.error || event.parameter.state)) return googleOAuthCallback_(event);
     if (String(event && event.parameter && event.parameter['google-test'] || '') === '1') return googleLoginPage_(true);
-    if (googleLoginEnabled_()) return googleLoginPage_(false);
-    const settings = settings_();
-    const email = authorisedEmail_(settings.schoolDomain);
-    const accountKey = accountKey_(email, settings.accountKeySecret);
-    const spreadsheet = SpreadsheetApp.openById(settings.sheetId);
-    Object.values(SCHOOL_SYNC_SHEETS).forEach(definition => ensureSheet_(spreadsheet, definition));
-    const student = findStudentByAccountKey_(spreadsheet, accountKey);
-    if (!student) return activationPage_();
-    assertActiveStudent_(student);
-    touchStudentLogin_(spreadsheet, student.rowNumber);
-    const token = createConnectionToken_(accountKey, student.StudentId, settings.tokenTtlSeconds);
-    const schoolData = buildSchoolData_(spreadsheet, student.StudentId);
-    return page_('校園學習連接', '校園身份已驗證。網站只會在你按下「同步至學校」後傳送學習紀錄。', returnUrl_(settings.siteProgressUrl, token, schoolData, {}), '前往 ICT 學習網站');
+    if (!googleLoginEnabled_()) return page_('Google 登入尚未啟用', '本網站只使用校園 Google 帳戶登入，不需要一次性啟用碼。老師仍需完成 Google 登入設定、測試及啟用；目前未有同步任何學習紀錄。', ScriptApp.getService().getUrl() + '?auth-settings=1', '老師登入設定（只限部署老師）');
+    return googleLoginPage_(false);
   } catch (error) {
     return page_('未能連接', safeError_(error), '', '');
   }
@@ -143,10 +111,8 @@ function teacherSetupPage_() {
   }
   assertDeploymentOwner_();
   initialiseSchoolSync();
-  const token = `${Utilities.getUuid().replace(/-/g, '')}${Utilities.getUuid().replace(/-/g, '')}`;
-  CacheService.getScriptCache().put(`school-admin-${token}`, 'enabled', 600);
   const action = escapeHtml_(ScriptApp.getService().getUrl() || '');
-  const form = googleLoginEnabled_() ? '<p>Google 登入已啟用，學生毋須啟用碼。</p>' : `<form method="post" action="${action}"><input type="hidden" name="action" value="generate-codes"><input type="hidden" name="adminToken" value="${token}"><button class="button" type="submit" style="border:0;font:inherit">名冊填妥後：產生啟用碼</button></form>`;
+  const form = '<p>' + (googleLoginEnabled_() ? 'Google 登入已啟用。' : 'Google 登入尚未啟用，請完成下方登入設定。') + '學生不需要啟用碼；首次登入選自己的班別及學號。</p>';
   const sheetId = settings_().sheetId;
   return page_('校園同步設定完成', `13 張工作表及安全屬性已設定。可使用<a href="${action}?admin=1" target="_top">老師網頁管理介面</a>管理名冊、群組及課業，或直接填寫 Students。<a href="${action}?auth-settings=1" target="_top">設定 Google 登入</a>。學生資料及學習紀錄不會公開到 GitHub。${form}`, `https://docs.google.com/spreadsheets/d/${encodeURIComponent(sheetId)}/edit`, '開啟老師試算表');
 }
@@ -157,71 +123,27 @@ function assertDeploymentOwner_() {
   if (!ownerEmail || email !== ownerEmail) throw new Error('只有部署這個 Web App 的老師可以管理校方資料。');
 }
 
-function teacherGenerateCodes_(event) {
-  assertDeploymentOwner_();
-  const token = String(event && event.parameter && event.parameter.adminToken || '');
-  if (!/^[a-f0-9]{64}$/i.test(token) || !CacheService.getScriptCache().get(`school-admin-${token}`)) throw new Error('老師操作確認碼已失效，請重新開啟初始化頁。');
-  CacheService.getScriptCache().remove(`school-admin-${token}`);
-  const message = generateActivationCodes();
-  refreshTeacherDashboard();
-  return page_('學生啟用碼', escapeHtml_(message), `${ScriptApp.getService().getUrl()}?setup=1`, '返回老師設定');
-}
-
 function doPost(event) {
   try {
     const action = String(event && event.parameter && event.parameter.action || 'sync').toLowerCase();
-    if (action === 'generate-codes') return teacherGenerateCodes_(event);
     if (action === 'google-save-config') return saveGoogleAuthForm_(event);
     if (action === 'google-register') return registerGoogleStudent_(event);
-    return action === 'activate' ? activateStudent_(event) : syncProgress_(event);
+    if (action !== 'sync') throw new Error('此操作已停用。請重新開啟校園 Google 登入頁。');
+    return syncProgress_(event);
   } catch (error) {
     return page_('未能完成要求', `${safeError_(error)} 請返回校園連接頁面再試。`, ScriptApp.getService().getUrl() || '', '重新連接');
   }
 }
 
-function activateStudent_(event) {
-  if (googleLoginEnabled_()) throw new Error('請改用 Google 登入及選擇班別、學號。');
-  const settings = settings_();
-  const email = authorisedEmail_(settings.schoolDomain);
-  const accountKey = accountKey_(email, settings.accountKeySecret);
-  const className = safeText_(event && event.parameter && event.parameter.className, 20).toUpperCase();
-  const classNo = safeText_(event && event.parameter && event.parameter.classNo, 12);
-  const activationCode = String(event && event.parameter && event.parameter.activationCode || '').trim().toUpperCase();
-  if (!className || !classNo || !/^[A-HJ-NP-Z2-9]{8}$/.test(activationCode)) throw new Error('班別、學號或一次性啟用碼不正確。');
-  const spreadsheet = SpreadsheetApp.openById(settings.sheetId);
-  const sheet = ensureSheet_(spreadsheet, SCHOOL_SYNC_SHEETS.students);
-  const lock = LockService.getScriptLock();
-  lock.waitLock(10000);
-  try {
-    if (findStudentByAccountKey_(spreadsheet, accountKey)) throw new Error('這個校園帳戶已連接學生資料。');
-    const rows = objects_(sheet);
-    const student = rows.find(row => String(row.Class || '').trim().toUpperCase() === className
-      && String(row.ClassNo || '').trim() === classNo
-      && String(row.ActivationCode || '').trim().toUpperCase() === activationCode);
-    if (!student) throw new Error('找不到相符的學生資料或啟用碼已失效。');
-    assertActiveStudent_(student);
-    if (String(student.AccountKey || '').trim()) throw new Error('這名學生已連接另一個校園帳戶。');
-    const now = new Date();
-    sheet.getRange(student.rowNumber, 6).setValue(accountKey);
-    sheet.getRange(student.rowNumber, 8).clearContent();
-    sheet.getRange(student.rowNumber, 9, 1, 2).setValues([[now, now]]);
-    student.AccountKey = accountKey;
-    const token = createConnectionToken_(accountKey, student.StudentId, settings.tokenTtlSeconds);
-    const schoolData = buildSchoolData_(spreadsheet, student.StudentId);
-    return page_('連接完成', '你的校園帳戶已連接學生資料。電郵地址沒有寫入試算表。', returnUrl_(settings.siteProgressUrl, token, schoolData, {}), '前往 ICT 學習網站');
-  } finally {
-    lock.releaseLock();
-  }
-}
-
 function syncProgress_(event) {
+  if (!googleLoginEnabled_()) throw new Error('Google 登入尚未啟用，沒有同步學習紀錄。請由老師完成設定。');
   const settings = settings_();
   const requestLength = Number(event && event.postData && event.postData.length || 0);
   if (requestLength > 500000) throw new Error('同步資料過大，請返回網站重新整理後再試。');
   const token = String(event && event.parameter && event.parameter.connectionToken || '');
-  const googleIdentity = googleLoginEnabled_() ? verifyGoogleConnection_(token) : null;
-  const accountKey = googleIdentity ? googleIdentity.accountKey : accountKey_(authorisedEmail_(settings.schoolDomain), settings.accountKeySecret);
-  const tokenSession = googleIdentity || verifyConnectionToken_(token, accountKey);
+  const googleIdentity = verifyGoogleConnection_(token);
+  const accountKey = googleIdentity.accountKey;
+  const tokenSession = googleIdentity;
   const body = parsePayload_(event && event.parameter && event.parameter.payload);
   const snapshot = normaliseSnapshot_(body.snapshot);
   const spreadsheet = SpreadsheetApp.openById(settings.sheetId);
@@ -255,7 +177,13 @@ function syncProgress_(event) {
   CacheService.getScriptCache().remove(tokenSession.cacheKey);
   const replacementToken = createConnectionToken_(accountKey, student.StudentId, settings.tokenTtlSeconds, googleIdentity);
   const schoolData = buildSchoolData_(spreadsheet, student.StudentId);
-  return page_('同步完成', '學習紀錄已寫入校方 Google Sheet。請返回網站確認本次同步。', returnUrl_(settings.siteProgressUrl, replacementToken, schoolData, { sync: 'success', receipt: body.clientNonce }), '返回學習網站');
+  const receiptTime = new Date(syncedAt.getTime() + 8 * 60 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' ');
+  const receiptMessage = '學習紀錄已寫入校方 Google Sheet。<br>登入方式：Google 電郵登入'
+    + '<br>學生：' + escapeHtml_(student.Class) + '（' + escapeHtml_(student.ClassNo) + '）'
+    + '<br>本次同步時間（香港）：' + receiptTime
+    + '<br>本次摘要：課題瀏覽 ' + snapshot.summary.visitedLessons + '、練習次數 ' + snapshot.summary.questionAttempts
+    + '<br>請在 ProgressLatest 核對這名學生的 SyncedAt；更新既有紀錄不一定會新增一行。請返回網站確認本次同步。';
+  return page_('同步完成', receiptMessage, returnUrl_(settings.siteProgressUrl, replacementToken, schoolData, { sync: 'success', receipt: body.clientNonce }), '返回學習網站');
 }
 
 function settings_() {
@@ -296,16 +224,6 @@ function createConnectionToken_(accountKey, studentId, ttlSeconds, googleIdentit
   const identity = googleIdentity ? { authMode: 'google', authEpoch: googleIdentity.authEpoch, callerKey: googleIdentity.callerKey } : {};
   CacheService.getScriptCache().put(cacheKey, JSON.stringify(Object.assign({ accountKey, studentId }, identity)), ttlSeconds);
   return token;
-}
-
-function verifyConnectionToken_(token, accountKey) {
-  if (!/^[A-Za-z0-9_-]{32,160}$/.test(token)) throw new Error('連接碼不正確或已失效。');
-  const cacheKey = tokenCacheKey_(token);
-  const stored = CacheService.getScriptCache().get(cacheKey);
-  if (!stored) throw new Error('連接碼已失效。');
-  const session = JSON.parse(stored);
-  if (String(session.accountKey || '') !== accountKey) throw new Error('連接碼與目前登入帳戶不相符。');
-  return { cacheKey, studentId: String(session.studentId || '') };
 }
 
 function tokenCacheKey_(token) {
@@ -375,7 +293,7 @@ function assertActiveStudent_(student) {
 }
 
 function touchStudentLogin_(spreadsheet, rowNumber) {
-  spreadsheet.getSheetByName(SCHOOL_SYNC_SHEETS.students.name).getRange(rowNumber, 10).setValue(new Date());
+  writeStudentFields_(spreadsheet.getSheetByName(SCHOOL_SYNC_SHEETS.students.name), rowNumber, { LastLoginAt: new Date() });
 }
 
 function saveLatest_(spreadsheet, studentId, snapshot, syncedAt) {
@@ -499,11 +417,7 @@ function ensureSheet_(spreadsheet, definition) {
     sheet.setFrozenRows(1);
   } else if (definition.name !== SCHOOL_SYNC_SHEETS.dashboard.name) {
     const headers = sheet.getRange(1, 1, 1, definition.headers.length).getValues()[0].map(String);
-    // Add only the new trailing column; never rebuild the roster or shift existing fields.
-    if (definition.name === 'Students' && headers.slice(0, 10).join('|') === definition.headers.slice(0, 10).join('|') && !headers[10]) {
-      const cell = sheet.getRange(1, 11); cell.setValue('GoogleEmail'); styleHeader_(cell);
-      return sheet;
-    }
+    if (definition.name === 'Students') { studentHeaders_(sheet); return sheet; }
     if (headers.join('|') !== definition.headers.join('|')) throw new Error(`${definition.name} 欄位與目前程式版本不符，請使用新範本或先完成資料遷移。`);
   }
   return sheet;
@@ -557,14 +471,22 @@ function upsertByKey_(sheet, key, row, keyColumn) {
   else sheet.appendRow(row);
 }
 
-function activationCode_() {
-  const source = Utilities.getUuid().replace(/[^A-HJ-NP-Z2-9]/gi, '').toUpperCase();
-  return `${source}ABCDEFGH23456789`.slice(0, 8);
+/** Read by header during the coordinated removal of the obsolete column. Never create/use codes. */
+function studentHeaders_(sheet) {
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map(String);
+  while (headers.length && !headers[headers.length - 1]) headers.pop();
+  const expected = SCHOOL_SYNC_SHEETS.students.headers;
+  const old = expected.slice(); old.splice(7, 0, 'ActivationCode');
+  if (headers.join('|') !== expected.join('|') && headers.join('|') !== old.join('|')) throw new Error('Students 欄位結構不符，請先核對名冊；沒有移動或覆寫資料。');
+  return headers;
 }
 
-function activationPage_() {
-  const action = escapeHtml_(ScriptApp.getService().getUrl() || '');
-  return HtmlService.createHtmlOutput(`<!doctype html><html lang="zh-Hant"><head><base target="_top"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>首次連接</title><style>${pageStyles_()}label{display:grid;gap:6px;text-align:left;margin:12px 0;font-weight:700;color:#334155}input{box-sizing:border-box;width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:9px;font:inherit}button{border:0}</style></head><body><main><h1>首次連接學生資料</h1><p>請輸入老師提供的資料。Google 帳戶只會轉成不可直接還原的代碼，電郵地址不會寫入試算表。</p><form method="post" action="${action}"><input type="hidden" name="action" value="activate"><label>班別<input name="className" maxlength="20" required autocomplete="organization-title"></label><label>學號<input name="classNo" maxlength="12" required inputmode="numeric"></label><label>一次性啟用碼<input name="activationCode" maxlength="8" required autocomplete="one-time-code"></label><button class="button" type="submit">連接學生資料</button></form></main></body></html>`).setTitle('首次連接');
+function writeStudentFields_(sheet, rowNumber, fields) {
+  const headers = studentHeaders_(sheet);
+  Object.keys(fields).forEach(field => {
+    if (!SCHOOL_SYNC_SHEETS.students.headers.includes(field)) throw new Error('不支援的學生欄位。');
+  });
+  Object.keys(fields).forEach(field => sheet.getRange(rowNumber, headers.indexOf(field) + 1).setValue(fields[field]));
 }
 
 function returnUrl_(siteUrl, token, schoolData, queryValues) {

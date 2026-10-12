@@ -79,7 +79,7 @@
         const loadClient = () => {
             if (document.querySelector('script[data-school-sync-client]')) return;
             const client = document.createElement("script");
-            client.src = "assets/js/school_sync.js?v=3";
+            client.src = "assets/js/school_sync.js?v=4";
             client.dataset.schoolSyncClient = "true";
             document.body.appendChild(client);
         };

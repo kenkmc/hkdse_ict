@@ -340,8 +340,10 @@
             return;
         }
 
-        badge.textContent = !connected ? "未連接" : pending ? "尚未同步" : "已同步";
-        badge.className = `school-sync-status ${!connected ? "is-disconnected" : pending ? "is-pending" : "is-synced"}`;
+        // An empty snapshot is not evidence of a successful server write.
+        const confirmed = Boolean(state.lastSyncedAt && state.lastSyncedFingerprint === currentFingerprint());
+        badge.textContent = !connected ? "未連接" : confirmed ? "已同步" : pending ? "尚未同步" : "已連接";
+        badge.className = `school-sync-status ${!connected ? "is-disconnected" : confirmed ? "is-synced" : "is-pending"}`;
         description.textContent = connected
             ? `本次瀏覽器工作階段已連接${config.schoolName || "學校"}；只會在你按下按鈕後傳送摘要。`
             : `先以${config.schoolName || "學校"}的 Google 帳戶登入，取得短期連接碼。`;
@@ -354,7 +356,7 @@
             ? `上次成功同步：${formatDate(state.lastSyncedAt)}`
             : "尚未有成功同步紀錄。";
         if (heroBadge) heroBadge.textContent = connected
-            ? pending ? "已連接 · 尚未同步" : "已連接 · 進度已同步"
+            ? confirmed ? "已連接 · 進度已同步" : pending ? "已連接 · 尚未同步" : "已連接 · 尚無可同步紀錄"
             : "本機保存 · 可連接學校";
         renderAssignments();
     }

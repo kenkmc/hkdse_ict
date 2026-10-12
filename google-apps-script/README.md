@@ -2,7 +2,7 @@
 
 老師現在可使用原 Web App 的 `?admin=1` 入口，在網頁管理名冊、群組、群組成員、課業、派發對象及要求，並唯讀查看 7 類進度／學習紀錄。見 [老師管理操作及回復指南](TEACHER_ADMIN.md)。只有部署老師可進入，不公開學生資料到 GitHub Pages。
 
-新增正式 Google 帳戶選擇登入、名冊 K 欄 `GoogleEmail` 及老師修正配對。需先在私有 `?auth-settings=1` 頁完成 OAuth Client 設定、測試和遷移；未啟用前保留舊啟用碼流程。見 [Google 登入、遷移及回復指南](GOOGLE_LOGIN.md)。新流程的電郵只保存於校方私有名冊，不公開到 GitHub；學生按「同步至學校」後才傳送學習活動。
+只使用 Google 帳戶登入，已移除一次性啟用碼流程及 `ActivationCode` 欄。名冊 J 欄為 `GoogleEmail`。需先在私有 `?auth-settings=1` 頁完成 OAuth Client 設定、測試和啟用；完成前學生入口顯示「Google 登入尚未啟用」，不會退回舊登入或接收舊連接碼同步。見 [Google 登入、遷移及回復指南](GOOGLE_LOGIN.md)。電郵只保存於校方私有名冊；學生按「同步至學校」後才傳送學習活動。
 
 ## 1. 建立校方試算表
 
@@ -19,7 +19,7 @@
 老師可開啟正式 Web App 網址並加上 `?setup=1`，由老師設定頁執行初始化；如 Google 要求執行授權，須由部署老師本人確認。這個入口會核對登入者等於部署者，學生不能執行。亦可在 Apps Script 編輯器執行一次 `initialiseSchoolSync()`。程式會建立及格式化：
 
 - `TeacherDashboard`：老師查看學生登入、有效學習時間、瀏覽、練習和課業完成情況；
-- `Students`：班別、學號、中英文姓名、不可還原的帳戶代碼及一次性啟用碼；
+- `Students`：班別、學號、中英文姓名、內部帳戶代碼、登入时间及 Google 電郵；
 - `Groups`、`GroupMembers`：基礎、標準、進階、選修或自訂小組；
 - `Assignments`、`AssignmentTargets`、`AssignmentItems`、`AssignmentProgress`：課業、指派對象、要求及完成度；
 - `ProgressLatest`、`TopicProgress`：目前摘要及課題表現；
@@ -27,19 +27,13 @@
 
 試算表不會記錄 IP、裝置資料、滑鼠軌跡、按鍵內容或完整短答答案。
 
-## 3. 匯入學生名冊（下列啟用碼說明只適用於舊流程）
+## 3. 匯入學生名冊
 
-在 `Students` 填寫：
+建議在老師管理頁「貼上名冊」，輸入班別、學號、中英文姓名四欄；系統會產生穩定 `StudentId`。`ClassNo` 以文字保存前置零。不要直接新增缺少 StudentId 的名冊列。
 
-| StudentId | Class | ClassNo | ChineseName | EnglishName | AccountKey | Status | ActivationCode |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 留空 | 4A | 01 | 陳大文 | CHAN Tai Man | 留空 | ACTIVE | 留空 |
+現行 `Students` 欄位依次為：`StudentId`、`Class`、`ClassNo`、`ChineseName`、`EnglishName`、`AccountKey`、`Status`、`FirstLinkedAt`、`LastLoginAt`、`GoogleEmail`。
 
-`ClassNo`應以文字輸入以保留前置零。完成後在老師設定頁按「名冊填妥後：產生啟用碼」，或在編輯器執行 `generateActivationCodes()`：
-
-- 程式會補上穩定的 `StudentId`；
-- 為尚未連接的學生產生八位一次性啟用碼；
-- 學生首次以班別、學號和啟用碼連接後，啟用碼會自動清除。
+學生首次以 Google 帳戶登入後，只選自己的班別、學號並確認。電郵由 Google 驗證，不由學生手動填入；之後使用同一帳戶跨設備登入。老師可在「登入配對」預填或修正校園電郵。
 
 ## 4. 設定組別
 
@@ -112,7 +106,7 @@ window.HKDSE_SCHOOL_SYNC_CONFIG = Object.freeze({
 ## 9. 驗收
 
 - 校園帳戶可開啟，私人帳戶不可開啟；
-- 學生首次連接後，`Students.AccountKey`有值、`ActivationCode`已清除、試算表沒有校園電郵；
+- 學生首次連接後，`Students.AccountKey` 及 `GoogleEmail` 有值；再次登入不要求啟用碼；
 - 學生只看見自己及所屬組別的已發布課業；
 - 切換分頁或閒置超過兩分鐘後不再累計有效學習時間；
 - 同一登入時段和同一頁面的紀錄會更新，不會因心跳重複新增；

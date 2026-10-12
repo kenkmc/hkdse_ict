@@ -3,14 +3,30 @@ function googleLoginEnabled_() {
   return PropertiesService.getScriptProperties().getProperty('STUDENT_AUTH_MODE') === 'GOOGLE';
 }
 
-function googleAuthConfig_() {
+/** Inspect independent setup steps; never return the secret in public status. */
+function googleAuthInspection_() {
   const properties = PropertiesService.getScriptProperties();
   const clientId = String(properties.getProperty('GOOGLE_LOGIN_CLIENT_ID') || '').trim();
   const clientSecret = String(properties.getProperty('GOOGLE_LOGIN_CLIENT_SECRET') || '').trim();
-  const redirectUri = ScriptApp.getService().getUrl();
-  if (!/^\d+-[a-z0-9_-]+\.apps\.googleusercontent\.com$/i.test(clientId) || !clientSecret) throw new Error('老師尚未完成 Google OAuth 登入設定。');
-  if (!/^https:\/\/script\.google\.com\/(?:a\/macros\/jcmkec\.edu\.hk\/s|macros\/s)\/[A-Za-z0-9_-]+\/exec$/.test(redirectUri || '')) throw new Error('請從正式 Web App 開啟 Google 登入。');
-  return { clientId, clientSecret, redirectUri };
+  let redirectUri = '', redirectAvailable = true;
+  try { redirectUri = String(ScriptApp.getService().getUrl() || ''); } catch (error) { redirectAvailable = false; }
+  const clientIdValid = /^\d+-[a-z0-9_-]+\.apps\.googleusercontent\.com$/i.test(clientId);
+  const credentialsSaved = Boolean(clientId && clientSecret);
+  const redirectValid = /^https:\/\/script\.google\.com\/(?:a\/macros\/jcmkec\.edu\.hk\/s|macros\/s)\/[A-Za-z0-9_-]+\/exec$/.test(redirectUri);
+  const issues = [];
+  if (!clientId) issues.push(['MISSING_CLIENT_ID', '尚未儲存 Client ID。']);
+  else if (!clientIdValid) issues.push(['INVALID_CLIENT_ID', '已儲存的 Client ID 格式不正確。']);
+  if (!clientSecret) issues.push(['MISSING_CLIENT_SECRET', '尚未儲存 Client secret。']);
+  if (!redirectAvailable) issues.push(['REDIRECT_UNAVAILABLE', 'Google 未能提供 Web App 回跳網址；這不代表憑證未儲存。']);
+  else if (!redirectValid) issues.push(['INVALID_REDIRECT_URI', 'Web App 回跳網址未通過正式 /exec 網址檢查；這不代表憑證未儲存。']);
+  return { config: { clientId, clientSecret, redirectUri }, credentialsSaved, clientIdValid,
+    clientSecretSaved: Boolean(clientSecret), redirectValid, issues };
+}
+
+function googleAuthConfig_() {
+  const inspection = googleAuthInspection_();
+  if (inspection.issues.length) throw new Error(inspection.issues.map(issue => issue[1]).join(' '));
+  return inspection.config;
 }
 
 function googleAuthFingerprint_(config) {
@@ -19,12 +35,27 @@ function googleAuthFingerprint_(config) {
 
 function googleAuthPublicStatus_() {
   const properties = PropertiesService.getScriptProperties();
-  let config = null;
-  try { config = googleAuthConfig_(); } catch (error) { /* Unconfigured is a normal state. */ }
-  return { enabled: googleLoginEnabled_(), configured: Boolean(config),
-    clientId: properties.getProperty('GOOGLE_LOGIN_CLIENT_ID') || '',
-    tested: Boolean(config && properties.getProperty('GOOGLE_LOGIN_TESTED') === googleAuthFingerprint_(config)),
-    redirectUri: ScriptApp.getService().getUrl(),
+  const inspection = googleAuthInspection_();
+  const configured = inspection.issues.length === 0;
+  const enabled = googleLoginEnabled_();
+  const tested = configured && properties.getProperty('GOOGLE_LOGIN_TESTED') === googleAuthFingerprint_(inspection.config);
+  const statusMessage = !configured ? (inspection.credentialsSaved ? 'OAuth 憑證已儲存，但設定檢查未通過。' : 'OAuth 憑證尚未完整儲存。')
+    : enabled ? 'Google 登入已啟用。登入本身不會上傳學習紀錄。'
+    : tested ? 'Google 登入測試通過，但尚未啟用；學生登入及同步暫未開放。'
+    : 'OAuth 設定已儲存，尚未測試／啟用；學生登入及同步暫未開放。';
+  const diagnosticText = [
+    '設定介面：8', '讀取時間（香港）：' + new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' '),
+    '學生入口模式：' + (enabled ? 'GOOGLE（電郵登入）' : 'NOT_ENABLED（等待 Google 登入啟用，不提供啟用碼）'),
+    'Client ID：' + (inspection.clientIdValid ? '已儲存，格式有效' : '未儲存或格式無效'),
+    'Client secret：' + (inspection.clientSecretSaved ? '已儲存（不顯示內容）' : '未儲存'),
+    '回跳網址檢查：' + (inspection.redirectValid ? '通過' : '未通過'),
+    '回跳網址：' + (inspection.config.redirectUri || '未提供'),
+    'Google 登入測試：' + (tested ? '通過' : '尚未通過／設定已改變'),
+    '錯誤代碼：' + (inspection.issues.map(issue => issue[0]).join(', ') || '無')
+  ].join('\n');
+  return { enabled, configured, credentialsSaved: inspection.credentialsSaved,
+    clientId: inspection.config.clientId, tested, redirectUri: inspection.config.redirectUri,
+    statusMessage, diagnosticText, configError: inspection.issues.map(issue => issue[1]).join(' '),
     backupSheet: properties.getProperty('GOOGLE_LOGIN_BACKUP_SHEET') || '' };
 }
 
@@ -43,6 +74,7 @@ function googleCallerKey_() {
 
 function googleLoginPage_(test) {
   if (test) assertDeploymentOwner_();
+  else if (!googleLoginEnabled_()) throw new Error('Google 登入尚未啟用，請由老師完成設定。');
   const config = googleAuthConfig_();
   const state = googleRandom_();
   const verifier = googleRandom_();
@@ -89,7 +121,7 @@ function googleOAuthCallback_(event) {
     assertDeploymentOwner_();
     if (email !== String(Session.getEffectiveUser().getEmail()).toLowerCase()) throw new Error('測試時請選擇部署老師的校園帳戶。');
     PropertiesService.getScriptProperties().setProperty('GOOGLE_LOGIN_TESTED', googleAuthFingerprint_(config));
-    return page_('Google 登入測試成功', '已透過 Google 驗證帳戶：' + escapeHtml_(email) + '。尚未清除學生綁定；返回設定頁後才可啟用新流程。', config.redirectUri + '?auth-settings=1', '返回登入設定');
+    return page_('Google 登入測試成功', '已透過 Google 驗證帳戶：' + escapeHtml_(email) + '。<br><strong>這只是老師登入測試，不是學生進度同步；沒有寫入學生學習紀錄。</strong><br>尚未清除學生綁定；返回設定頁後才可啟用新流程。', config.redirectUri + '?auth-settings=1', '返回登入設定');
   }
   if (!googleLoginEnabled_()) throw new Error('新登入流程尚未啟用，請先由老師完成設定。');
   return teacherAdminLocked_(() => {
@@ -102,7 +134,7 @@ function googleOAuthCallback_(event) {
     if (matches.length === 1) {
       assertActiveStudent_(matches[0]);
       if (matches[0].AccountKey && matches[0].AccountKey !== accountKey) throw new Error('名冊綁定不一致，請通知老師在後台修正電郵。');
-      spreadsheet.getSheetByName('Students').getRange(matches[0].rowNumber, 6).setValue(accountKey);
+      writeStudentFields_(spreadsheet.getSheetByName('Students'), matches[0].rowNumber, { AccountKey: accountKey });
       return googleConnectedPage_(spreadsheet, matches[0], identity);
     }
     const ticket = googleRandom_();
@@ -163,7 +195,7 @@ function registerGoogleStudent_(event) {
     assertActiveStudent_(student);
     if (student.AccountKey || student.GoogleEmail) throw new Error('這名學生已配對另一個 Google 帳戶，請由老師修正；不會覆蓋原有綁定。');
     cache.remove(key);
-    sheet.getRange(student.rowNumber, 6, 1, 6).setValues([[identity.accountKey, student.Status, '', new Date(), student.LastLoginAt || '', identity.email]]);
+    writeStudentFields_(sheet, student.rowNumber, { AccountKey: identity.accountKey, FirstLinkedAt: new Date(), GoogleEmail: identity.email });
     return googleConnectedPage_(spreadsheet, student, identity);
   });
 }
@@ -208,8 +240,12 @@ function teacherGoogleAuthBootstrap() {
 function saveGoogleAuthForm_(event) {
   const settingsUrl = ScriptApp.getService().getUrl() + '?auth-settings=1';
   try {
-    teacherGoogleAuthSave(event && event.parameter || {});
-    return page_('OAuth 設定已儲存', '下一步請測試 Google 帳戶登入。<br><a href="' + escapeHtml_(settingsUrl) + '" target="_top">返回登入設定</a>', ScriptApp.getService().getUrl() + '?google-test=1', '測試 Google 帳戶選擇');
+    const result = teacherGoogleAuthSave(event && event.parameter || {});
+    const status = result.status;
+    const message = escapeHtml_(status.statusMessage) + (status.configError ? '<br>' + escapeHtml_(status.configError) : '')
+      + '<br>儲存 OAuth 憑證不會同步學習紀錄，也不會自動啟用新登入。<br><a href="' + escapeHtml_(settingsUrl) + '" target="_top">返回登入設定</a>';
+    return page_('OAuth 設定已儲存', message, status.configured ? status.redirectUri + '?google-test=1' : settingsUrl,
+      status.configured ? '測試 Google 帳戶選擇' : '查看設定診斷');
   } catch (error) {
     return page_('OAuth 設定未能儲存', safeError_(error), settingsUrl, '返回登入設定再試');
   }
@@ -253,12 +289,14 @@ function teacherGoogleAuthEnable(request) {
     const backup = sheet.copyTo(spreadsheet).setName(backupName);
     if (backup.getLastRow() !== sheet.getLastRow()) throw new Error('未能確認名冊備份，沒有重設綁定。');
     const count = sheet.getLastRow() - 1;
-    const original = count > 0 ? sheet.getRange(2, 1, count, 11).getValues() : [];
-    if (count > 0 && googleHash_(JSON.stringify(original)) !== googleHash_(JSON.stringify(backup.getRange(2, 1, count, 11).getValues()))) throw new Error('名冊備份內容未能核對，沒有重設綁定。');
+    const headers = studentHeaders_(sheet);
+    const resetColumns = ['AccountKey', 'FirstLinkedAt'].map(field => headers.indexOf(field) + 1);
+    const original = count > 0 ? sheet.getRange(2, 1, count, headers.length).getValues() : [];
+    if (count > 0 && googleHash_(JSON.stringify(original)) !== googleHash_(JSON.stringify(backup.getRange(2, 1, count, headers.length).getValues()))) throw new Error('名冊備份內容未能核對，沒有重設綁定。');
     const properties = PropertiesService.getScriptProperties();
     try {
       if (count > 0) {
-        [6, 8, 9].forEach(column => sheet.getRange(2, column, count, 1).clearContent());
+        resetColumns.forEach(column => sheet.getRange(2, column, count, 1).clearContent());
         // Teacher-prefilled new GoogleEmail values are intentionally kept.
       }
       SpreadsheetApp.flush();
@@ -266,7 +304,7 @@ function teacherGoogleAuthEnable(request) {
       properties.setProperty('GOOGLE_LOGIN_EPOCH', googleRandom_());
       properties.setProperty('STUDENT_AUTH_MODE', 'GOOGLE'); // Activate last; legacy tokens now fail closed.
     } catch (error) {
-      if (count > 0) [6, 8, 9].forEach(column => sheet.getRange(2, column, count, 1).setValues(original.map(row => [row[column - 1]])));
+      if (count > 0) resetColumns.forEach(column => sheet.getRange(2, column, count, 1).setValues(original.map(row => [row[column - 1]])));
       properties.deleteProperty('STUDENT_AUTH_MODE');
       throw new Error('啟用未完成；已保留／復原舊綁定。請核對備份 ' + backupName + '。');
     }
@@ -291,12 +329,12 @@ function teacherGoogleAuthCorrect(request) {
     if (email && students.some(other => other.StudentId !== row.StudentId && String(other.GoogleEmail || '').toLowerCase() === email)) throw new Error('此 Google 電郵已配對另一名學生；請先解除錯誤名冊的配對。');
     const sheet = teacherAdminSheet_(spreadsheet, 'students');
     if (!googleLoginEnabled_()) {
-      sheet.getRange(row.rowNumber, 11).setValue(email);
+      writeStudentFields_(sheet, row.rowNumber, { GoogleEmail: email });
       return { message: '已預填 Google 電郵；尚未啟用新登入，舊綁定沒有更改。', lookups: teacherAdminLookups_(spreadsheet) };
     }
     // Rotate epoch to invalidate previously issued tickets/tokens, including rebind to the same email.
     PropertiesService.getScriptProperties().setProperty('GOOGLE_LOGIN_EPOCH', googleRandom_());
-    sheet.getRange(row.rowNumber, 6, 1, 6).setValues([['', row.Status, '', '', row.LastLoginAt || '', email]]);
+    writeStudentFields_(sheet, row.rowNumber, { AccountKey: '', FirstLinkedAt: '', GoogleEmail: email });
     return { message: '登入配對已修改。所有學生需重新連接學校；StudentId、群組和已有學習紀錄沒有更改。', lookups: teacherAdminLookups_(spreadsheet) };
   });
 }

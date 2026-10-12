@@ -2,7 +2,7 @@
 
 ## 現況及啟用條件
 
-程式支援專用 Google OAuth authorization-code flow：帳戶選擇、校園身份驗證、首次以班別／學號立即配對、同帳戶跨設備登入、老師修正／解除配對。**部署新程式不等於已啟用 OAuth**：需老師建立校方 Web OAuth Client、儲存設定、成功測試，再啟用。未完成前保留舊登入，不能聲稱真實學生流程已驗收。
+程式只支援 Google OAuth authorization-code flow：帳戶選擇、校園身份驗證、首次以班別／學號立即配對、同帳戶跨設備登入、老師修正／解除配對。**不需要一次性啟用碼**；產生啟用碼、舊登入表單及舊票據同步已移除。**部署新程式不等於已啟用 OAuth**：需老師建立校方 Web OAuth Client、儲存設定、成功測試，再啟用。未完成時顯示「Google 登入尚未啟用」，不會退回舊流程；不能聲稱真實學生流程已驗收。
 
 學生可自選名冊，不經老師審批。重複電郵及已配對名冊會被拒絕，但不能防止第一個登入者冒認未配對的學生。老師可預填正確 GoogleEmail 減少風險。修正配對不會自動搬移可能誤記於別人的歷史紀錄。
 
@@ -13,11 +13,15 @@
 3. Clients → Create client → **Web application**。Authorized redirect URIs 複製設定頁顯示的**完整**正式 `/exec` 網址，不加查詢參數。此流程不需要 JavaScript origin。不要使用 clasp 的 OAuth Client。
 4. 將 Client ID 和完整 Client secret 填入私有設定頁，按「儲存 OAuth 設定」；**儲存結果在新分頁顯示**。成功頁可直接按「測試 Google 帳戶選擇」；失敗頁會顯示具體原因及返回設定的連結。Secret 只存 Script Properties，**不要貼到聊天、名冊或 GitHub**。不要求學生 Drive／Sheets 權限；登入只索取 `openid email`。
 5. 按「測試 Google 帳戶選擇」，選部署老師本人的帳戶。確認成功後返回設定頁按「重新讀取狀態」。測試不改學生資料。
-6. 勾選遷移確認，再按「備份舊綁定並啟用 Google 登入」。系統先檢查名冊識別碼和班別學號不重複，複製 Students 工作表並核對內容，再清除舊 AccountKey、ActivationCode、FirstLinkedAt，最後才啟用。StudentId、名冊、LastLoginAt、預填 GoogleEmail、群組、課業及歷史进度保留。重複按啟用不會再次清除。
+6. 勾選遷移確認，再按「備份舊綁定並啟用 Google 登入」。系統先檢查名冊識別碼和班別學號不重複，複製 Students 工作表並核對內容，再清除舊 AccountKey、FirstLinkedAt，最後才啟用。StudentId、名冊、LastLoginAt、預填 GoogleEmail、群組、課業及歷史進度保留。重複按啟用不會再次清除。
 
 **Workspace 限制：**Web App 仍為 `DOMAIN / USER_DEPLOYING`，不改匿名公開，不把 Sheet 分享給學生。Apps Script 的多帳戶存取本身有 Google 限制；若未能進入 Web App，使用只登入校園帳戶的瀏覽器／無痕視窗。OAuth 帳戶選擇並不能消除 Google 在 Web App 入口的限制。校方可能需要允許這個 Internal OAuth app。
 
 **設定頁没有反應時：**重新開啟正式 `?auth-settings=1` 頁面。新版由伺服器直接產生設定及管理確認碼，毋須等候學生／群組／課業資料；即使即時狀態連線不能運作，也可用標準表單儲存。按儲存後查看新分頁結果，再返回按「重新讀取狀態」。即時讀取／啟用等候 45 秒後會顯示恢復方法；逾時不代表伺服器已取消，應先重新開啟設定頁確認結果，不要連按啟用。管理連線過期時，重新開啟頁面取得新確認碼。
+
+**已儲存卻仍未設定：**版本 8 的第 4 部分「設定診斷」分開顯示憑證是否存在、回跳網址檢查、登入測試及是否啟用。診斷不含 Secret 或學生資料，可提供給維護者核對；不要再次傳送密鑰。回跳網址檢查失敗不再顯示成憑證未儲存。
+
+**成功訊息的分別：**儲存設定不會啟用登入；老師「Google 登入測試成功」不會寫入學習紀錄；學生「Google 登入成功」只建立連接；真正「同步完成」才在寫入及 flush 成功後顯示，並列出班別學號、香港時間、瀏覽及練習摘要。網站沒有學習紀錄時只顯示「已連接」，不冒稱「已同步」。
 
 ## 學生流程
 
@@ -33,19 +37,19 @@
 
 ## 結構及安全
 
-- 原 Students 的 A:J 不移位，只在 K 新增 `GoogleEmail`。舊 AccountKey 仍用作不公開的內部識別；ActivationCode 僅供過渡相容，新登入不使用。
+- Students 已移除舊 H 欄 `ActivationCode`：A:G 不變，H 為 `FirstLinkedAt`、I 為 `LastLoginAt`、J 為 `GoogleEmail`。AccountKey 保留作不公開的內部識別。程式按欄位名稱讀寫；部署過渡期可辨認舊 11 欄排列，但不會產生、顯示、核對或重新加入啟用碼。
 - OAuth 使用一次性 10 分鐘 state、PKCE、Workspace 使用者工作階段綁定；code 只在伺服器交換，Google UserInfo 嚴格核對 `email_verified`、校方 `hd` 及電郵網域。
 - 不保存 Google access／refresh tokens、不把 Client secret 傳回前端。無離線 Google 權限；不信任瀏覽器傳入的電郵或解碼而未驗證的 JWT。
 - 初次配對頁不公開其他學生姓名、電郵或綁定狀態。票據一次性、最多 10 分鐘，配對與老師修正共用鎖。
 - 同步採用 OAuth 已驗證的伺服器連接票據，不以瀏覽器預設 Google 帳戶電郵替代學生身份；每次同步重新核對綁定／狀態，成功後輪替票據。
-- 12 個自動驗證套件包括 OAuth 模擬、舊流程相容、重複配對、跨設備辨認、非校園帳戶拒絕、老師限定、名冊備份及歷史保留。模擬測試不能替代 Google Cloud 的真實端到端測試。
+- 自動驗證包括 OAuth 模擬、新舊名冊欄位排列、拒絕舊登入及舊票據、重複配對、跨設備辨認、非校園帳戶拒絕、老師限定、名冊備份及歷史保留。模擬測試不能替代 Google Cloud 的真實端到端測試。
 
 ## 回復
 
 啟用前完整 Google Sheet 備份：`HKDSE ICT 學生進度管理 — Google 登入遷移前備份 2026-10-12`，ID `1TUWsF5sPWt75Sb2QIi4RBf2uBDJufJFmxXuq1ubOpro`，只有部署老師擁有。不要公開備份或覆蓋整本現有試算表，以免丟失其後進度。
 
-新流程**尚未啟用時**：可把原 Web App 部署改回固定版本 **5**，網站原回復提交 `a923aa2`；新增的 K 欄不影響舊版。Script 原稿備份在 Git 忽略的 `.local-school-sync/before-upload-2026-10-12T00-56-33-165Z.json`。
+移除啟用碼前的程式回復點是固定版本 **7**、Git `e2fc0d7`。**不能只把部署改回舊版**：舊版按 11 欄固定位置讀寫，需要先停止學生同步、備份現況，在 Students 的 G 後插入 `ActivationCode`，讓登入時間及電郵回到 I/J/K。只按 StudentId 從刪欄前備份恢復該欄，不覆蓋整張名冊或歷史紀錄，再回復相符的程式版本。
 
-新流程**已啟用後**：只改回版本 5 **不會還原綁定或 Script Properties**。先停止學生同步／備份當前資料；由部署老師將 `STUDENT_AUTH_MODE` 改回 `LEGACY`，輪替 `GOOGLE_LOGIN_EPOCH`；從啟用時的 `StudentsLoginBackup_*` 按 **StudentId** 回復登入欄 F、H、I（不要按排序後的行號，不要改 A:E 或任何進度表）。新登入時保存的 K 欄不必刪除；原有 LastLoginAt 保留最近值。其後回復版本 5；新流程啟用後新增的學生需要舊啟用碼。不要 `git reset --hard` 或刪除試算表。
+若其後已啟用 Google 登入，回復程式與名冊結構也不會回復 Script Properties 或舊綁定。須由部署老師另行確認所需登入模式及帳戶配對；不要直接重設整份 Sheet。新版的名冊遷移備份可能是 10 欄，必須按欄位名稱／StudentId 回復，不能依舊欄號套用。
 
 參考：[Google Web OAuth](https://developers.google.com/identity/protocols/oauth2/web-server)、[Google OpenID Connect](https://developers.google.com/identity/openid-connect)、[Apps Script 多帳戶限制](https://developers.google.com/apps-script/guides/support/troubleshooting#issues_with_multiple_google_accounts)。

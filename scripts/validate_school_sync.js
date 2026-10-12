@@ -46,10 +46,10 @@ if (!progress.includes("getSyncSnapshot") || !progress.includes('format: "hkdse-
 ].forEach(marker => {
     if (!progress.includes(marker)) errors.push(`有效學習時間記錄缺少 ${marker}。`);
 });
-if (!navigation.includes("school_sync_config.js?v=3") || !navigation.includes("assets/js/school_sync.js?v=3")) {
+if (!navigation.includes("school_sync_config.js?v=3") || !navigation.includes("assets/js/school_sync.js?v=4")) {
     errors.push("內容頁面的全站導覽沒有載入校園同步模組。");
 }
-if (!indexHtml.includes("school_sync_config.js?v=3") || !indexHtml.includes("assets/js/school_sync.js?v=3")) {
+if (!indexHtml.includes("school_sync_config.js?v=3") || !indexHtml.includes("assets/js/school_sync.js?v=4")) {
     errors.push("首頁沒有載入校園同步模組。");
 }
 [
@@ -83,8 +83,6 @@ if (!indexHtml.includes("school_sync_config.js?v=3") || !indexHtml.includes("ass
     "ProgressLatest",
     "TopicProgress",
     "initialiseSchoolSync",
-    "generateActivationCodes",
-    "ActivationCode",
     "AccountKey"
 ].forEach(marker => {
     if (!server.includes(marker)) errors.push(`Apps Script 後端缺少 ${marker}。`);
@@ -102,7 +100,7 @@ if (!setup.includes("SCHOOL_DOMAIN") || !setup.includes("/exec") || !setup.inclu
 }
 
 // Exercise the real browser module with isolated storage and a small DOM stub.
-function runClient(webAppUrl, enabled = true, connectedStudentId = "", incomingStudentId = "") {
+function runClient(webAppUrl, enabled = true, connectedStudentId = "", incomingStudentId = "", options = {}) {
     const localValues = new Map();
     const sessionValues = new Map();
     const storage = values => ({
@@ -111,11 +109,13 @@ function runClient(webAppUrl, enabled = true, connectedStudentId = "", incomingS
         removeItem(key) { values.delete(key); }
     });
     if (connectedStudentId) localValues.set("hkdse-ict-school-sync-state-v1", JSON.stringify({ linkedStudentId: connectedStudentId }));
+    if (options.state) localValues.set("hkdse-ict-school-sync-state-v1", JSON.stringify(options.state));
     const snapshot = {
         summary: { visitedLessons: 1 },
         topics: [], recentMocks: [], exerciseAttempts: [],
         pageActivity: [{ pageId: "cha-1", viewCount: 1, activeSeconds: 0 }]
     };
+    if (options.empty) { snapshot.summary = {}; snapshot.pageActivity = []; }
     sessionValues.set("hkdse-ict-school-profile-v1", JSON.stringify({
         student: { studentId: "TEST-STUDENT" },
         assignments: [{ assignmentId: "TEST-TASK", items: [{
@@ -129,12 +129,17 @@ function runClient(webAppUrl, enabled = true, connectedStudentId = "", incomingS
     }
     const windowEvents = {};
     const documentEvents = {};
+    const elements = new Map();
+    const element = id => {
+        if (!elements.has(id)) elements.set(id, { textContent: "", hidden: false, addEventListener(type, handler) { this[type] = handler; } });
+        return elements.get(id);
+    };
     let reminder;
     const document = {
         body: { append(node) { reminder = node; } },
         head: { append() {} },
         querySelector(selector) { return selector.includes("reminder") ? reminder : null; },
-        getElementById() { return null; },
+        getElementById(id) { return options.panel ? element(id) : null; },
         createElement() { return { dataset: {}, setAttribute() {}, querySelector() { return { addEventListener() {} }; } }; },
         addEventListener(type, handler) { documentEvents[type] = handler; }
     };
@@ -148,8 +153,9 @@ function runClient(webAppUrl, enabled = true, connectedStudentId = "", incomingS
         HKDSE_SCHOOL_SYNC_CONFIG: { enabled, webAppUrl },
         addEventListener(type, handler) { windowEvents[type] = handler; }
     };
+    if (options.search) browser.location.search = options.search;
     vm.runInNewContext(client, { window: browser, document, URL, URLSearchParams, Date: TestDate, TextDecoder, Uint8Array, console });
-    return { api: browser.HKDSESchoolSync, browser, snapshot, windowEvents, documentEvents, advanceTime() { testNow += 60000; } };
+    return { api: browser.HKDSESchoolSync, browser, snapshot, windowEvents, documentEvents, elements, advanceTime() { testNow += 60000; } };
 }
 
 const canonical = "https://script.google.com/macros/s/TEST_DEPLOYMENT/exec";
@@ -165,6 +171,21 @@ const blockedAccount = runClient(domainUrl, true, "STUDENT-A", "STUDENT-B");
 if (blockedAccount.browser.sessionStorage.getItem("hkdse-ict-school-sync-token-v1")) errors.push("共用瀏覽器錯誤地把原有紀錄連接到另一名學生。");
 const sameAccount = runClient(domainUrl, true, "STUDENT-A", "STUDENT-A");
 if (!sameAccount.browser.sessionStorage.getItem("hkdse-ict-school-sync-token-v1")) errors.push("同一學生無法重新連接。");
+const connectedEmpty = runClient(domainUrl, true, "STUDENT-A", "STUDENT-A", { panel: true, empty: true });
+if (connectedEmpty.elements.get("school-sync-badge").textContent !== "已連接"
+    || connectedEmpty.elements.get("progress-storage-badge").textContent.includes("進度已同步")) {
+    errors.push("只登入但尚無學習紀錄時，錯誤顯示已同步。");
+}
+const learning = runClient(domainUrl, true, "STUDENT-A", "STUDENT-A", { panel: true });
+if (learning.elements.get("school-sync-badge").textContent !== "尚未同步") errors.push("未提交學習紀錄被當作成功同步。");
+learning.elements.get("school-sync-form").submit({ preventDefault() { throw new Error("Valid sync unexpectedly blocked"); } });
+const submittedState = JSON.parse(learning.browser.localStorage.getItem("hkdse-ict-school-sync-state-v1"));
+if (submittedState.lastSyncedAt) errors.push("提交表單被誤當作伺服器已成功寫入。");
+const receiptOptions = { panel: true, state: submittedState, search: `?sync=success&receipt=${submittedState.pendingNonce}` };
+const received = runClient(domainUrl, true, "STUDENT-A", "STUDENT-A", receiptOptions);
+if (received.elements.get("school-sync-badge").textContent !== "已同步") errors.push("相符同步回執未確認已提交版本。");
+const invalidReceipt = runClient(domainUrl, true, "STUDENT-A", "STUDENT-A", { ...receiptOptions, search: "?sync=success&receipt=wrong" });
+if (invalidReceipt.elements.get("school-sync-badge").textContent === "已同步") errors.push("不相符回執被誤當成功。");
 sameAccount.windowEvents["hkdse-progress-clear"]();
 if (sameAccount.browser.sessionStorage.getItem("hkdse-ict-school-sync-token-v1") || sameAccount.browser.sessionStorage.getItem("hkdse-ict-school-profile-v1")) {
     errors.push("清除本機紀錄後仍保留校園連接或學生資料。");
@@ -196,7 +217,7 @@ if (!clickLink("", "https://kenkmc.github.io/hkdse_ict/cha.1.html", { ctrlKey: t
 // The owner-only setup must work from a Web App, where no active container is available.
 const serverContext = { console };
 vm.runInNewContext(server, serverContext, { filename: "Code.gs" });
-serverContext.googleLoginEnabled_ = () => false; // These tests cover the retained legacy/setup path.
+serverContext.googleLoginEnabled_ = () => false; // Unconfigured Google login must fail closed, with no legacy fallback.
 const originalInitialise = serverContext.initialiseSchoolSync;
 let initialised = 0;
 let activeEmail = "teacher@example.edu.hk";
@@ -216,7 +237,9 @@ serverContext.ScriptApp = {
 serverContext.settings_ = () => ({ sheetId: "TEST-SHEET" });
 serverContext.page_ = (title, message) => ({ title, message });
 const ownerResult = serverContext.teacherSetupPage_();
-if (initialised !== 1 || !ownerResult.message.includes("generate-codes")) errors.push("老師設定頁未執行初始化或缺少產生啟用碼按鈕。");
+if (initialised !== 1 || ownerResult.message.includes("generate-codes") || !ownerResult.message.includes("auth-settings=1")) errors.push("老師設定頁應初始化並引導 Google 登入設定，不提供啟用碼。");
+const notEnabled = serverContext.doGet({ parameter: {} });
+if (notEnabled.title !== "Google 登入尚未啟用" || notEnabled.message.includes('name="activationCode"')) errors.push("未啟用 Google 登入時錯誤退回舊啟用碼流程。");
 needsAuthorization = true;
 if (serverContext.teacherSetupPage_().title !== "老師執行授權" || initialised !== 1) errors.push("未獲 Google 執行授權時仍嘗試寫入試算表。");
 needsAuthorization = false;
@@ -224,15 +247,13 @@ activeEmail = "student@example.edu.hk";
 let deniedStudent = false;
 try { serverContext.teacherSetupPage_(); } catch (error) { deniedStudent = true; }
 if (!deniedStudent || initialised !== 1) errors.push("學生能執行老師初始設定。");
-for (const adminFunction of [originalInitialise, serverContext.generateActivationCodes, serverContext.refreshTeacherDashboard]) {
+for (const adminFunction of [originalInitialise, serverContext.refreshTeacherDashboard]) {
     let deniedDirectCall = false;
     try { adminFunction(); } catch (error) { deniedDirectCall = error.message.includes("只有部署"); }
     if (!deniedDirectCall) errors.push("學生能直接呼叫公開的管理函數，繞過老師設定頁。");
 }
 activeEmail = ownerEmail;
-let deniedInvalidToken = false;
-try { serverContext.teacherGenerateCodes_({ parameter: { adminToken: "invalid" } }); } catch (error) { deniedInvalidToken = true; }
-if (!deniedInvalidToken) errors.push("老師管理表單接受了無效操作確認碼。");
+if (typeof serverContext.generateActivationCodes !== "undefined" || typeof serverContext.activateStudent_ !== "undefined") errors.push("仍保留舊啟用碼產生／登入函數。");
 
 const properties = new Map();
 serverContext.PropertiesService = { getScriptProperties() { return { getProperty(key) { return properties.get(key); }, setProperty(key, value) { properties.set(key, value); } }; } };

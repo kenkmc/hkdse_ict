@@ -80,7 +80,8 @@ function teacherAdminSave(request) {
       else next[keyField] = ({ students: 'STU', groups: 'GRP', assignments: 'TASK', assignmentItems: 'ITEM' }[request.table]) + '-' + Utilities.getUuid().replace(/-/g, '').slice(0, 12).toUpperCase();
       if (rows.some(row => String(row[keyField]) === String(next[keyField]))) throw new Error('這個成員或對象已存在，請編輯原有紀錄。');
       if (request.table === 'students') sheet.getRange(sheet.getLastRow() + 1, 3).setNumberFormat('@');
-      sheet.appendRow(definition.headers.map(field => next[field] === undefined ? '' : next[field]));
+      const headers = request.table === 'students' ? studentHeaders_(sheet) : definition.headers;
+      sheet.appendRow(headers.map(field => next[field] === undefined ? '' : next[field]));
     } else {
       if (request.table === 'students') sheet.getRange(current.rowNumber, 3).setNumberFormat('@');
       TEACHER_ADMIN_FIELDS[request.table].forEach(field => sheet.getRange(current.rowNumber, definition.headers.indexOf(field) + 1).setValue(next[field]));
@@ -129,16 +130,11 @@ function teacherAdminImportStudents(request) {
     });
     const sheet = teacherAdminSheet_(spreadsheet, 'students');
     sheet.getRange(sheet.getLastRow() + 1, 3, prepared.length, 1).setNumberFormat('@');
-    sheet.getRange(sheet.getLastRow() + 1, 1, prepared.length, SCHOOL_SYNC_SHEETS.students.headers.length)
-      .setValues(prepared.map(row => SCHOOL_SYNC_SHEETS.students.headers.map(field => row[field] === undefined ? '' : row[field])));
-    return { message: '已匯入 ' + prepared.length + ' 名學生；啟用碼請另按「產生啟用碼」。', lookups: teacherAdminLookups_(spreadsheet) };
+    const headers = studentHeaders_(sheet);
+    sheet.getRange(sheet.getLastRow() + 1, 1, prepared.length, headers.length)
+      .setValues(prepared.map(row => headers.map(field => row[field] === undefined ? '' : row[field])));
+    return { message: '已匯入 ' + prepared.length + ' 名學生。Google 登入啟用後，學生首次選自己的班別及學號即可。', lookups: teacherAdminLookups_(spreadsheet) };
   });
-}
-
-function teacherAdminGenerateCodes(request) {
-  assertDeploymentOwner_();
-  teacherAdminAuthorize_(request);
-  return teacherAdminLocked_(() => ({ message: generateActivationCodes(), lookups: teacherAdminLookups_(activeOrConfiguredSpreadsheet_()) }));
 }
 
 function teacherAdminRefresh(request) {
@@ -207,6 +203,7 @@ function teacherAdminSheet_(spreadsheet, key) {
   const definition = teacherAdminDefinition_(key);
   const sheet = spreadsheet.getSheetByName(definition.name);
   if (!sheet) throw new Error('工作表未初始化，請先開啟老師設定頁。');
+  if (key === 'students') { studentHeaders_(sheet); return sheet; }
   const headerRow = key === 'dashboard' ? 5 : 1;
   if (sheet.getRange(headerRow, 1, 1, definition.headers.length).getValues()[0].map(String).join('|') !== definition.headers.join('|')) throw new Error(definition.name + ' 欄位結構已變更，請先核對試算表。');
   return sheet;
@@ -217,10 +214,11 @@ function teacherAdminRows_(spreadsheet, key) {
   const definition = teacherAdminDefinition_(key);
   const first = key === 'dashboard' ? 6 : 2;
   if (sheet.getLastRow() < first) return [];
-  return sheet.getRange(first, 1, sheet.getLastRow() - first + 1, definition.headers.length).getValues()
+  const headers = key === 'students' ? studentHeaders_(sheet) : definition.headers;
+  return sheet.getRange(first, 1, sheet.getLastRow() - first + 1, headers.length).getValues()
     .map((values, index) => {
       const row = { rowNumber: first + index };
-      definition.headers.forEach((field, column) => { row[field] = values[column]; });
+      headers.forEach((field, column) => { row[field] = values[column]; });
       return row;
     }).filter(row => definition.headers.some(field => row[field] !== '' && row[field] !== null));
 }

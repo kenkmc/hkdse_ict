@@ -57,10 +57,11 @@ Object.entries(context.definitions).forEach(([key, definition]) => sheets.set(de
 const sheet = key => sheets.get(context.definitions[key].name);
 const append = (key, object) => sheet(key).appendRow(context.definitions[key].headers.map(field => object[field] ?? ''));
 append('students', {StudentId:'STU-1',Class:'4A',ClassNo:'01',ChineseName:'測試甲',EnglishName:'TEST A',AccountKey:'PRIVATE-HASH',Status:'ACTIVE',LastLoginAt:new Date('2026-10-12T01:00:00Z')});
-append('students', {StudentId:'STU-2',Class:'5B',ClassNo:'02',ChineseName:'測試乙',EnglishName:'TEST B',Status:'ACTIVE',ActivationCode:'ABCDEFGH'});
+append('students', {StudentId:'STU-2',Class:'5B',ClassNo:'02',ChineseName:'測試乙',EnglishName:'TEST B',Status:'ACTIVE'});
 append('groups', {GroupId:'GRP-1',GroupName:'中四補底',GroupType:'LEVEL',AcademicYear:'2026-2027',Active:true});
 append('dashboard', {StudentId:'STU-1',Class:'4A',ClassNo:'01',ChineseName:'測試甲',ActiveMinutes:15});
 append('pages', {RecordKey:'P-1',StudentId:'STU-1',PageId:'chc-1',ActiveSeconds:120});
+if (process.env.LEGACY_COLUMN_LAYOUT === '1') sheet('students').rows.forEach((r,i)=>r.splice(7,0,i===0?'ActivationCode':'RETIRED-CODE'));
 const bootstrap = context.teacherAdminBootstrap();
 const token = bootstrap.token;
 const rpc = (name, payload={}) => context[name]({...payload,token});
@@ -82,7 +83,10 @@ expectNoWrite(()=>rpc('teacherAdminSave',{table:'topics',values:{Score:99}}),/�
 expectNoWrite(()=>rpc('teacherAdminRead',{table:'__proto__'}),/不支援/);
 expectNoWrite(()=>context.teacherAdminRead({table:'students',token:'not-a-token'}),/過期/);
 
-const publicNames=['teacherAdminBootstrap','teacherAdminRead','teacherAdminSave','teacherAdminAddMembers','teacherAdminImportStudents','teacherAdminGenerateCodes','teacherAdminRefresh','teacherAdminDeleteItem','teacherAdminUndo'];
+assert.equal(typeof context.teacherAdminGenerateCodes,'undefined');
+assert(!html.includes('ActivationCode')&&!html.includes('產生啟用碼'));
+assert(!bootstrap.tables.find(item=>item.key==='students').columns.includes('ActivationCode'));
+const publicNames=['teacherAdminBootstrap','teacherAdminRead','teacherAdminSave','teacherAdminAddMembers','teacherAdminImportStudents','teacherAdminRefresh','teacherAdminDeleteItem','teacherAdminUndo'];
 email='student@jcmkec.edu.hk';
 publicNames.forEach(name=>expectNoWrite(()=>context[name]({token,table:'students'}),/只有部署/));
 email='outsider@gmail.com';
@@ -93,7 +97,7 @@ const first = rows('students')[0];
 save('students',{Class:'4A',ClassNo:'01',ChineseName:'測試甲修訂',EnglishName:'TEST A',Status:'ACTIVE',AccountKey:'ATTACK',ActivationCode:'ATTACK'},first);
 assert.equal(sheet('students').rows[1][5],'PRIVATE-HASH');
 assert.equal(sheet('students').rows[1][2],'01');
-assert.equal(sheet('students').rows[1][9].toISOString(),'2026-10-12T01:00:00.000Z');
+assert.equal(sheet('students').rows[1][sheet('students').rows[0].indexOf('LastLoginAt')].toISOString(),'2026-10-12T01:00:00.000Z');
 expectNoWrite(()=>save('students',{ChineseName:'舊分頁修改'},first),/另一個頁面/);
 expectNoWrite(()=>save('students',{Class:'4A',ClassNo:'1',ChineseName:'重複',EnglishName:'DUP',Status:'ACTIVE'}),/已存在/);
 expectNoWrite(()=>save('groups',{GroupName:'=IMPORTXML("x")',GroupType:'CUSTOM',AcademicYear:'2026-2027',Active:true}),/公式/);

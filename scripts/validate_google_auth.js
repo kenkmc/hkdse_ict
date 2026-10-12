@@ -9,6 +9,7 @@ const properties = new Map(Object.entries({ SCHOOL_DOMAIN:'jcmkec.edu.hk', SHEET
   SITE_PROGRESS_URL:'https://kenkmc.github.io/hkdse_ict/progress.html', TOKEN_TTL_SECONDS:'18000' }));
 let nativeEmail = 'teacher@jcmkec.edu.hk', caller = 'native-browser-session', locks = 0, fetched = 0;
 let googleEmail = 'student@jcmkec.edu.hk', googleDomain = 'jcmkec.edu.hk', verified = true, responseStatus = 200;
+let serviceUrl = 'https://script.google.com/a/macros/jcmkec.edu.hk/s/TEST/exec';
 const cache = new Map(), sheets = new Map();
 class Sheet {
   constructor(name, headers) {this.name=name;this.rows=[Array.from(headers)];}
@@ -34,7 +35,7 @@ const context={Date,console,
     computeHmacSha256Signature:(value,secret)=>crypto.createHmac('sha256',secret).update(value).digest(),
     base64EncodeWebSafe:value=>Buffer.from(value).toString('base64url')},
   SpreadsheetApp:{getActiveSpreadsheet:()=>spreadsheet,openById:()=>spreadsheet,flush(){}},
-  ScriptApp:{getService:()=>({getUrl:()=> 'https://script.google.com/a/macros/jcmkec.edu.hk/s/TEST/exec'})},
+  ScriptApp:{getService:()=>({getUrl:()=> serviceUrl})},
   HtmlService:{createHtmlOutput:html=>({html,setTitle(){return this;}})},
   UrlFetchApp:{fetch(url,options){fetched++;assert.equal(options.followRedirects,false);let result;
     if(url.endsWith('/token')){assert.equal(options.payload.grant_type,'authorization_code');assert(options.payload.client_secret);assert(options.payload.code_verifier);result={access_token:'private-access-token',token_type:'Bearer'};}
@@ -47,7 +48,7 @@ vm.runInContext(['Code.gs','GoogleAuth.gs','TeacherResources.gs','TeacherAdmin.g
 Object.values(context.defs).forEach(def=>sheets.set(def.name,new Sheet(def.name,def.headers)));
 const students=sheets.get('Students');
 const add=object=>students.appendRow(context.defs.students.headers.map(field=>object[field]??''));
-add({StudentId:'STU-1',Class:'4A',ClassNo:'01',ChineseName:'甲',EnglishName:'TEST A',AccountKey:'legacy-key',Status:'ACTIVE',ActivationCode:'ABCDEFGH',FirstLinkedAt:'legacy-date',LastLoginAt:'keep-last-date'});
+add({StudentId:'STU-1',Class:'4A',ClassNo:'01',ChineseName:'甲',EnglishName:'TEST A',AccountKey:'legacy-key',Status:'ACTIVE',FirstLinkedAt:'legacy-date',LastLoginAt:'keep-last-date'});
 add({StudentId:'STU-2',Class:'5B',ClassNo:'02',ChineseName:'乙',EnglishName:'TEST B',Status:'ACTIVE'});
 add({StudentId:'STU-3',Class:'6C',ClassNo:'03',ChineseName:'丙',EnglishName:'TEST C',Status:'INACTIVE'});
 sheets.get('GroupMembers').appendRow(['STU-1|GROUP','STU-1','GROUP',true]);
@@ -58,9 +59,26 @@ const admin=(name,payload={})=>context[name](Object.assign({token:adminToken},pa
 const row=id=>context.teacherAdminPublicRow_('students',context.objects_(students).find(item=>item.StudentId===id));
 const correct=(id,email)=>{const r=row(id);return admin('teacherGoogleAuthCorrect',{key:r._key,revision:r._revision,email});};
 
-// Schema upgrade appends only K1; original roster fields remain intact.
-students.rows[0].pop();const original=JSON.stringify(students.rows.slice(1));context.ensureSheet_(spreadsheet,context.defs.students);
-assert.equal(students.rows[0][10],'GoogleEmail');assert.equal(JSON.stringify(students.rows.slice(1)),original);
+// Both old and new physical layouts work during rollout; never recreate the removed code column.
+const original=JSON.stringify(students.rows);
+context.ensureSheet_(spreadsheet,context.defs.students);assert.equal(JSON.stringify(students.rows),original);
+students.rows.forEach((r,i)=>r.splice(7,0,i===0?'ActivationCode':'OLD-CODE'));
+context.ensureSheet_(spreadsheet,context.defs.students);
+context.writeStudentFields_(students,2,{GoogleEmail:'layout-test@jcmkec.edu.hk'});
+assert.equal(students.rows[1][10],'layout-test@jcmkec.edu.hk');assert.equal(students.rows[1][7],'OLD-CODE');
+assert.equal(context.teacherAdminRows_(spreadsheet,'students')[0].GoogleEmail,'layout-test@jcmkec.edu.hk');
+context.writeStudentFields_(students,2,{GoogleEmail:''});
+students.rows.forEach(r=>r.splice(7,1));
+context.ensureSheet_(spreadsheet,context.defs.students);assert.equal(JSON.stringify(students.rows),original);
+assert.equal(students.rows[0].length,10);assert.equal(students.rows[0][9],'GoogleEmail');
+assert(context.doGet({parameter:{}}).html.includes('Google 登入尚未啟用'));
+assert.throws(()=>context.syncProgress_({parameter:{}}),/Google 登入尚未啟用/);
+for (const action of ['activate','generate-codes']) {
+  const retired=context.doPost({parameter:{action}});assert(retired.html.includes('此操作已停用'));assert(!retired.html.includes('name="activationCode"'));
+}
+assert.equal(typeof context.activateStudent_,'undefined');assert.equal(typeof context.generateActivationCodes,'undefined');
+if (process.env.LEGACY_COLUMN_LAYOUT === '1') students.rows.forEach((r,i)=>r.splice(7,0,i===0?'ActivationCode':'RETIRED-CODE'));
+const col=field=>students.rows[0].indexOf(field);
 const before=JSON.stringify(students.rows);
 assert.throws(()=>admin('teacherGoogleAuthEnable',{confirm:'RESET_OLD_BINDINGS'}),/先完成/);
 assert.equal(JSON.stringify(students.rows),before);
@@ -87,9 +105,31 @@ assert(formResult.html.includes('OAuth 設定已儲存'));assert(formResult.html
 assert(!formResult.html.includes(credentials.clientSecret));assert.equal(JSON.stringify(students.rows),before);
 const status=admin('teacherAdminBootstrap').googleLogin;
 assert.equal(status.configured,true);assert(!JSON.stringify(status).includes(credentials.clientSecret));
+assert(status.credentialsSaved);assert(status.statusMessage.includes('尚未測試／啟用'));
+assert(status.diagnosticText.includes('NOT_ENABLED'));assert(!status.diagnosticText.includes(adminToken));
+const productionUrl=serviceUrl;
+for (const invalidUrl of [productionUrl.replace('/exec','/dev'),'',productionUrl.replace('script.google.com','script.google.com.example.org')]) {
+  serviceUrl=invalidUrl;
+  const badStatus=context.googleAuthPublicStatus_();
+  assert(badStatus.credentialsSaved);assert.equal(badStatus.configured,false);assert.equal(badStatus.tested,false);
+  assert(badStatus.statusMessage.includes('已儲存'));assert(badStatus.configError.includes('回跳網址'));
+  assert(badStatus.diagnosticText.includes('INVALID_REDIRECT_URI'));assert(!JSON.stringify(badStatus).includes(credentials.clientSecret));
+  assert.throws(()=>context.googleAuthConfig_(),/回跳網址/);
+}
+serviceUrl=productionUrl.replace('/exec','/dev');
+const savedButInvalid=context.doPost({parameter:{action:'google-save-config',...credentials,token:adminToken}});
+assert(savedButInvalid.html.includes('OAuth 設定已儲存'));assert(savedButInvalid.html.includes('查看設定診斷'));
+assert(!savedButInvalid.html.includes('google-test=1'));
+serviceUrl=productionUrl;
+properties.delete('GOOGLE_LOGIN_CLIENT_SECRET');
+assert.equal(context.googleAuthPublicStatus_().credentialsSaved,false);
+assert(context.googleAuthPublicStatus_().diagnosticText.includes('MISSING_CLIENT_SECRET'));
+properties.set('GOOGLE_LOGIN_CLIENT_SECRET',credentials.clientSecret);
 const start=(test=false)=>{const page=context.googleLoginPage_(test);const url=new URL(page.html.match(/href="(https:\/\/accounts[^\"]+)"/)[1].replace(/&amp;/g,'&'));assert.equal(url.searchParams.get('prompt'),'select_account');assert.equal(url.searchParams.get('scope'),'openid email');assert.equal(url.searchParams.get('code_challenge_method'),'S256');return url.searchParams.get('state');};
 const callback=state=>context.googleOAuthCallback_({parameter:{state,code:'google-one-use-code'}});
 googleEmail='teacher@jcmkec.edu.hk';let state=start(true);const tested=callback(state);assert(tested.html.includes('測試成功'));assert(properties.get('GOOGLE_LOGIN_TESTED'));assert.equal(JSON.stringify(students.rows),before);
+assert(tested.html.includes('不是學生進度同步'));
+assert(context.googleAuthPublicStatus_().statusMessage.includes('尚未啟用'));
 assert.throws(()=>callback(state),/逾時或已使用/);
 state=start(true);caller='different-session';assert.throws(()=>callback(state),/工作階段不相符/);caller='native-browser-session';
 responseStatus=400;assert.throws(()=>callback(state),/未能確認/);responseStatus=200;assert.throws(()=>callback(state),/逾時或已使用/);
@@ -97,11 +137,10 @@ state=start(true);assert.throws(()=>context.googleOAuthCallback_({parameter:{sta
 correct('STU-2','assigned@jcmkec.edu.hk');assert.equal(students.rows[1][5],'legacy-key','Prefilling email must preserve the legacy login.');
 admin('teacherGoogleAuthEnable',{confirm:'RESET_OLD_BINDINGS'});
 assert.equal(properties.get('STUDENT_AUTH_MODE'),'GOOGLE');
-assert.equal(students.rows[1][0],'STU-1');assert.equal(students.rows[1][5],'');assert.equal(students.rows[1][7],'');assert.equal(students.rows[1][8],'');assert.equal(students.rows[1][9],'keep-last-date');
-assert.equal(students.rows[2][10],'assigned@jcmkec.edu.hk');
+assert.equal(students.rows[1][0],'STU-1');assert.equal(students.rows[1][5],'');assert.equal(students.rows[1][col('FirstLinkedAt')],'');assert.equal(students.rows[1][col('LastLoginAt')],'keep-last-date');
+assert.equal(students.rows[2][col('GoogleEmail')],'assigned@jcmkec.edu.hk');
 const backup=sheets.get(properties.get('GOOGLE_LOGIN_BACKUP_SHEET'));assert.equal(backup.rows[1][5],'legacy-key');
 const afterEnable=JSON.stringify(students.rows);admin('teacherGoogleAuthEnable',{confirm:'RESET_OLD_BINDINGS'});assert.equal(JSON.stringify(students.rows),afterEnable,'Migration must be idempotent.');
-assert.throws(()=>context.activateStudent_({parameter:{}}),/改用 Google/);
 assert.throws(()=>admin('teacherGoogleAuthSave',credentials),/已啟用/);
 
 nativeEmail='native-account@jcmkec.edu.hk';googleEmail='student@jcmkec.edu.hk';
@@ -114,7 +153,7 @@ const pair=(overrides={})=>context.registerGoogleStudent_({parameter:{identityTi
 assert.throws(()=>pair({classNo:'999'}),/名冊/);assert.throws(()=>pair({className:'6C',classNo:'3'}),/未啟用/);
 assert.throws(()=>pair({confirmOwnRoster:''}),/確認/);
 register=pair({email:'spoofed@jcmkec.edu.hk',activationCode:'ignored'});assert(register.html.includes('登入成功'));
-assert.equal(students.rows[1][10],'student@jcmkec.edu.hk');assert.equal(students.rows[1][0],'STU-1');assert.throws(()=>pair(),/已使用/);
+assert.equal(students.rows[1][col('GoogleEmail')],'student@jcmkec.edu.hk');assert.equal(students.rows[1][0],'STU-1');assert.throws(()=>pair(),/已使用/);
 const getToken=page=>page.html.match(/school-connect=([a-f0-9]+)/)[1];
 const token=getToken(register), identity=context.verifyGoogleConnection_(token);
 assert.equal(identity.studentId,'STU-1');assert.equal(identity.authMode,'google');
@@ -126,15 +165,28 @@ const secondToken=getToken(repeat);assert.equal(context.verifyGoogleConnection_(
 const sinks=['saveLatest_','saveTopics_','saveSessions_','savePages_','saveAttempts_','saveAssignmentProgress_','refreshTeacherDashboard_'];
 const savedSinks=Object.fromEntries(sinks.map(name=>[name,context[name]]));let writes=0;
 sinks.forEach(name=>context[name]=()=>{writes++;});
+const syncEvent=connectionToken=>({parameter:{connectionToken,payload:JSON.stringify({schemaVersion:2,clientNonce:'testnonce123456',snapshot:{format:'hkdse-ict-school-sync',schemaVersion:2,summary:{}}})}});
+// Even a well-formed server token cannot give an unlisted account a success receipt.
+const unknownToken=context.createConnectionToken_(context.accountKey_('teacher@jcmkec.edu.hk','test-secret'),'NO-STUDENT',18000,
+  {callerKey:context.googleCallerKey_(),authEpoch:properties.get('GOOGLE_LOGIN_EPOCH')});
+const unknownResult=context.doPost(syncEvent(unknownToken));
+assert(unknownResult.html.includes('未能完成要求'));assert(!unknownResult.html.includes('sync=success'));assert.equal(writes,0);
+const originalFlush=context.SpreadsheetApp.flush;
+context.SpreadsheetApp.flush=()=>{throw new Error('Test write flush failure');};
+const failedWrite=context.doPost(syncEvent(secondToken));
+assert(failedWrite.html.includes('未能完成要求'));assert(!failedWrite.html.includes('sync=success'));
+context.SpreadsheetApp.flush=originalFlush;writes=0;
 nativeEmail=''; // Explicit Google OAuth, not the browser's default/native account email, authorizes this sync.
 const synced=context.syncProgress_({parameter:{connectionToken:secondToken,payload:JSON.stringify({schemaVersion:2,clientNonce:'testnonce123456',snapshot:{format:'hkdse-ict-school-sync',schemaVersion:2,summary:{}}})}});
 assert(synced.html.includes('同步完成'));assert.equal(writes,7);
+assert(synced.html.includes('Google 電郵登入'));assert(synced.html.includes('學生：4A（01）'));
+assert(synced.html.includes('本次同步時間（香港）'));assert(synced.html.includes('練習次數 0'));
 assert.throws(()=>context.verifyGoogleConnection_(secondToken),/已過期/);
 const replacementToken=getToken(synced);assert.equal(context.verifyGoogleConnection_(replacementToken).studentId,'STU-1');
 Object.assign(context,savedSinks);
-students.rows[1][10]='manual-correction@jcmkec.edu.hk';
+students.rows[1][col('GoogleEmail')]='manual-correction@jcmkec.edu.hk';
 assert.throws(()=>context.syncProgress_({parameter:{connectionToken:replacementToken,payload:JSON.stringify({schemaVersion:2,clientNonce:'testnonce123456',snapshot:{format:'hkdse-ict-school-sync',schemaVersion:2,summary:{}}})}}),/電郵配對已更改/,'Even a direct Sheet email edit must invalidate old identity access.');
-students.rows[1][10]='student@jcmkec.edu.hk';
+students.rows[1][col('GoogleEmail')]='student@jcmkec.edu.hk';
 assert.throws(()=>context.verifyGoogleConnection_(token),/工作階段已更改/);
 const legacy=context.createConnectionToken_('legacy','STU-1',18000);assert.throws(()=>context.verifyGoogleConnection_(legacy),/工作階段已更改/);
 state=start();googleEmail='other@jcmkec.edu.hk';const other=callback(state);const otherTicket=other.html.match(/name="identityTicket" value="([a-f0-9]+)"/)[1];
@@ -143,9 +195,10 @@ assert.throws(()=>context.registerGoogleStudent_({parameter:{identityTicket:othe
 nativeEmail='teacher@jcmkec.edu.hk';adminToken=context.teacherAdminBootstrap().token;
 assert.throws(()=>correct('STU-2','student@jcmkec.edu.hk'),/另一名/);
 assert.throws(()=>correct('STU-1','outsider@gmail.com'),/本校/);
-correct('STU-1','corrected@jcmkec.edu.hk');assert.equal(students.rows[1][10],'corrected@jcmkec.edu.hk');assert.equal(students.rows[1][5],'');
+correct('STU-1','corrected@jcmkec.edu.hk');assert.equal(students.rows[1][col('GoogleEmail')],'corrected@jcmkec.edu.hk');assert.equal(students.rows[1][5],'');
 assert.throws(()=>context.verifyGoogleConnection_(replacementToken),/工作階段已更改/);
-correct('STU-1','');assert.equal(students.rows[1][10],'');
+correct('STU-1','');assert.equal(students.rows[1][col('GoogleEmail')],'');
+if (process.env.LEGACY_COLUMN_LAYOUT === '1') assert.equal(students.rows[1][7],'RETIRED-CODE','Transitional layout must ignore the obsolete code column, not reuse it.');
 for(const name of ['teacherGoogleAuthBootstrap','teacherGoogleAuthSave','teacherGoogleAuthEnable','teacherGoogleAuthCorrect']){nativeEmail='student@jcmkec.edu.hk';assert.throws(()=>context[name]({token:adminToken}),/只有部署/);}
 assert.equal(histories,JSON.stringify([...sheets].filter(([name])=>name!=='Students'&&!name.startsWith('StudentsLoginBackup_')).map(([name,sheet])=>[name,sheet.rows])),'No history, groups or tasks may be rewritten by login migration.');
 assert.equal(locks,0);assert(fetched>0);
