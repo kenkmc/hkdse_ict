@@ -11,11 +11,13 @@
 1. 正式 Web App 加上 `?auth-settings=1`（或學生名冊 → Google 登入設定）。新版本可能要求部署老師確認新增的 `script.external_request` 權限。
 2. 校園帳戶進入 [Google Auth Platform](https://console.cloud.google.com/auth/overview)，建立校方擁有的專案；Audience 選 **Internal**，設定應用名稱及校方聯絡資料。
 3. Clients → Create client → **Web application**。Authorized redirect URIs 複製設定頁顯示的**完整**正式 `/exec` 網址，不加查詢參數。此流程不需要 JavaScript origin。不要使用 clasp 的 OAuth Client。
-4. 將 Client ID 和 Client secret 填入私有設定頁。Secret 只存 Script Properties，**不要貼到聊天、名冊或 GitHub**。不要求學生 Drive／Sheets 權限；登入只索取 `openid email`。
+4. 將 Client ID 和完整 Client secret 填入私有設定頁，按「儲存 OAuth 設定」；**儲存結果在新分頁顯示**。成功頁可直接按「測試 Google 帳戶選擇」；失敗頁會顯示具體原因及返回設定的連結。Secret 只存 Script Properties，**不要貼到聊天、名冊或 GitHub**。不要求學生 Drive／Sheets 權限；登入只索取 `openid email`。
 5. 按「測試 Google 帳戶選擇」，選部署老師本人的帳戶。確認成功後返回設定頁按「重新讀取狀態」。測試不改學生資料。
 6. 勾選遷移確認，再按「備份舊綁定並啟用 Google 登入」。系統先檢查名冊識別碼和班別學號不重複，複製 Students 工作表並核對內容，再清除舊 AccountKey、ActivationCode、FirstLinkedAt，最後才啟用。StudentId、名冊、LastLoginAt、預填 GoogleEmail、群組、課業及歷史进度保留。重複按啟用不會再次清除。
 
 **Workspace 限制：**Web App 仍為 `DOMAIN / USER_DEPLOYING`，不改匿名公開，不把 Sheet 分享給學生。Apps Script 的多帳戶存取本身有 Google 限制；若未能進入 Web App，使用只登入校園帳戶的瀏覽器／無痕視窗。OAuth 帳戶選擇並不能消除 Google 在 Web App 入口的限制。校方可能需要允許這個 Internal OAuth app。
+
+**設定頁没有反應時：**重新開啟正式 `?auth-settings=1` 頁面。新版由伺服器直接產生設定及管理確認碼，毋須等候學生／群組／課業資料；即使即時狀態連線不能運作，也可用標準表單儲存。按儲存後查看新分頁結果，再返回按「重新讀取狀態」。即時讀取／啟用等候 45 秒後會顯示恢復方法；逾時不代表伺服器已取消，應先重新開啟設定頁確認結果，不要連按啟用。管理連線過期時，重新開啟頁面取得新確認碼。
 
 ## 學生流程
 

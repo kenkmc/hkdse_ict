@@ -1,5 +1,14 @@
 # 校園同步部署及回復紀錄
 
+## 2026-10-12：設定頁無回應修正（版本 7）
+
+- 原 Web App 已更新至固定版本 **7**，API 已逐檔讀回核對及確認部署版本；原 URL、`DOMAIN / USER_DEPLOYING` 和 OAuth 權限不變。
+- Google 登入設定改為伺服器產生初始內容，獨立 bootstrap 不再讀取學生、群組或課業。儲存改用帶老師管理確認碼的標準 POST，結果在新分頁顯示，毋須依賴 `google.script.run`；失敗會顯示具體欄位／權限錯誤和返回設定的連結。
+- 重新讀取／啟用加入 45 秒回應逾時提示；讀取狀態不再清除尚未儲存的 Client ID。逾時後先核對最新狀態，避免重複啟用。
+- Google 登入、校園同步、老師管理三套驗證通過；隔離瀏覽器驗證 1920×1080、1280×720、390×844、無 JavaScript 的表單儲存、缺少／逾時 RPC、具頁框限制的 POST 新分頁、憑證不回顯及未測試不能啟用。手機畫面已檢視。
+- 本次未代填 Client secret、未啟用遷移或修改學生名冊／綁定。使用者實際 Google OAuth 儲存及登入結果仍需在正式頁面確認；本機模擬不能替代端到端驗收。
+- 本次回復點為固定版本 **6**、Git **51ee724**；雲端原稿備份 `.local-school-sync/before-upload-2026-10-12T03-40-21-840Z.json`。回復 UI 程式不會自動回復 Script Properties。若已執行登入遷移，仍須依 [Google 登入指南](GOOGLE_LOGIN.md) 處理綁定回復。
+
 ## 2026-10-12：Google 登入遷移準備
 
 - 同一 Web App 已更新至固定版本 **6**；Apps Script API 已逐檔讀回核對、再核對部署版本、原 URL 及 `DOMAIN / USER_DEPLOYING` 權限未變。

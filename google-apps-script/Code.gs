@@ -171,6 +171,7 @@ function doPost(event) {
   try {
     const action = String(event && event.parameter && event.parameter.action || 'sync').toLowerCase();
     if (action === 'generate-codes') return teacherGenerateCodes_(event);
+    if (action === 'google-save-config') return saveGoogleAuthForm_(event);
     if (action === 'google-register') return registerGoogleStudent_(event);
     return action === 'activate' ? activateStudent_(event) : syncProgress_(event);
   } catch (error) {

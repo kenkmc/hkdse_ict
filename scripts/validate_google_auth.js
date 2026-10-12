@@ -65,7 +65,26 @@ const before=JSON.stringify(students.rows);
 assert.throws(()=>admin('teacherGoogleAuthEnable',{confirm:'RESET_OLD_BINDINGS'}),/先完成/);
 assert.equal(JSON.stringify(students.rows),before);
 const credentials={clientId:'123456-test.apps.googleusercontent.com',clientSecret:'GOCSPX-test_secret_only'};
-admin('teacherGoogleAuthSave',credentials);
+// Settings must load even if the roster/assignment sheets cannot be read.
+const originalSpreadsheet=context.activeOrConfiguredSpreadsheet_;
+context.activeOrConfiguredSpreadsheet_=()=>{throw new Error('Settings must not load the roster');};
+const initial=context.teacherGoogleAuthBootstrap();
+assert.equal(initial.token.length,64);assert.deepEqual(Object.keys(initial).sort(),['googleLogin','token']);
+context.activeOrConfiguredSpreadsheet_=originalSpreadsheet;
+adminToken=initial.token;
+const originalProperties=JSON.stringify([...properties]);
+let formResult=context.doPost({parameter:{action:'google-save-config',...credentials,token:'invalid'}});
+assert(formResult.html.includes('未能儲存'));assert(formResult.html.includes('auth-settings=1'));
+assert.equal(JSON.stringify([...properties]),originalProperties);
+nativeEmail='student@jcmkec.edu.hk';
+formResult=context.doPost({parameter:{action:'google-save-config',...credentials,token:adminToken}});
+assert(formResult.html.includes('只有部署'));assert.equal(JSON.stringify([...properties]),originalProperties);
+nativeEmail='teacher@jcmkec.edu.hk';
+formResult=context.doPost({parameter:{action:'google-save-config',...credentials,token:adminToken,clientSecret:'****'}});
+assert(formResult.html.includes('Client secret 格式不正確'));assert.equal(JSON.stringify([...properties]),originalProperties);
+formResult=context.doPost({parameter:{action:'google-save-config',...credentials,token:adminToken}});
+assert(formResult.html.includes('OAuth 設定已儲存'));assert(formResult.html.includes('google-test=1'));
+assert(!formResult.html.includes(credentials.clientSecret));assert.equal(JSON.stringify(students.rows),before);
 const status=admin('teacherAdminBootstrap').googleLogin;
 assert.equal(status.configured,true);assert(!JSON.stringify(status).includes(credentials.clientSecret));
 const start=(test=false)=>{const page=context.googleLoginPage_(test);const url=new URL(page.html.match(/href="(https:\/\/accounts[^\"]+)"/)[1].replace(/&amp;/g,'&'));assert.equal(url.searchParams.get('prompt'),'select_account');assert.equal(url.searchParams.get('scope'),'openid email');assert.equal(url.searchParams.get('code_challenge_method'),'S256');return url.searchParams.get('state');};
@@ -127,7 +146,7 @@ assert.throws(()=>correct('STU-1','outsider@gmail.com'),/本校/);
 correct('STU-1','corrected@jcmkec.edu.hk');assert.equal(students.rows[1][10],'corrected@jcmkec.edu.hk');assert.equal(students.rows[1][5],'');
 assert.throws(()=>context.verifyGoogleConnection_(replacementToken),/工作階段已更改/);
 correct('STU-1','');assert.equal(students.rows[1][10],'');
-for(const name of ['teacherGoogleAuthSave','teacherGoogleAuthEnable','teacherGoogleAuthCorrect']){nativeEmail='student@jcmkec.edu.hk';assert.throws(()=>context[name]({token:adminToken}),/只有部署/);}
+for(const name of ['teacherGoogleAuthBootstrap','teacherGoogleAuthSave','teacherGoogleAuthEnable','teacherGoogleAuthCorrect']){nativeEmail='student@jcmkec.edu.hk';assert.throws(()=>context[name]({token:adminToken}),/只有部署/);}
 assert.equal(histories,JSON.stringify([...sheets].filter(([name])=>name!=='Students'&&!name.startsWith('StudentsLoginBackup_')).map(([name,sheet])=>[name,sheet.rows])),'No history, groups or tasks may be rewritten by login migration.');
 assert.equal(locks,0);assert(fetched>0);
 new vm.Script(read('google-apps-script/GoogleAuthSettings.html').match(/<script>([\s\S]*?)<\/script>/)[1]);

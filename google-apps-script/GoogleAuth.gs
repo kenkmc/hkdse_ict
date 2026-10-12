@@ -191,7 +191,28 @@ function googleAuthSettingsPage_() {
   const authorization = ScriptApp.getAuthorizationInfo(ScriptApp.AuthMode.FULL);
   if (authorization.getAuthorizationStatus() === ScriptApp.AuthorizationStatus.REQUIRED) return page_('老師執行授權', '新登入需要由 Script 連接 Google 身份服務，請由部署老師确认新權限後再返回。學生不會取得試算表權限。', authorization.getAuthorizationUrl(), '確認 Google 權限');
   assertDeploymentOwner_();
-  return HtmlService.createHtmlOutputFromFile('GoogleAuthSettings').setTitle('Google 登入設定').addMetaTag('viewport', 'width=device-width, initial-scale=1');
+  const template = HtmlService.createTemplateFromFile('GoogleAuthSettings');
+  template.initial = teacherGoogleAuthBootstrap();
+  return template.evaluate().setTitle('Google 登入設定').addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+/** This page needs only login settings, not the student/group/assignment lookups. */
+function teacherGoogleAuthBootstrap() {
+  assertDeploymentOwner_();
+  const token = googleRandom_();
+  CacheService.getScriptCache().put('teacher-console-' + token, Session.getActiveUser().getEmail().toLowerCase(), 1800);
+  return { token, googleLogin: googleAuthPublicStatus_() };
+}
+
+/** Standard POST works even when the browser cannot run google.script.run. */
+function saveGoogleAuthForm_(event) {
+  const settingsUrl = ScriptApp.getService().getUrl() + '?auth-settings=1';
+  try {
+    teacherGoogleAuthSave(event && event.parameter || {});
+    return page_('OAuth 設定已儲存', '下一步請測試 Google 帳戶登入。<br><a href="' + escapeHtml_(settingsUrl) + '" target="_top">返回登入設定</a>', ScriptApp.getService().getUrl() + '?google-test=1', '測試 Google 帳戶選擇');
+  } catch (error) {
+    return page_('OAuth 設定未能儲存', safeError_(error), settingsUrl, '返回登入設定再試');
+  }
 }
 
 function teacherGoogleAuthSave(request) {
@@ -200,7 +221,8 @@ function teacherGoogleAuthSave(request) {
     if (googleLoginEnabled_()) throw new Error('登入已啟用；如需更換 OAuth Client，請先由維護人員安排安全遷移。');
     const clientId = String(request.clientId || '').trim();
     const clientSecret = String(request.clientSecret || '').trim();
-    if (!/^\d+-[a-z0-9_-]+\.apps\.googleusercontent\.com$/i.test(clientId) || !/^[A-Za-z0-9_-]{12,256}$/.test(clientSecret)) throw new Error('請填入 Google Cloud Web application 的 Client ID 及 Client secret。');
+    if (!/^\d+-[a-z0-9_-]+\.apps\.googleusercontent\.com$/i.test(clientId)) throw new Error('Client ID 格式不正確：請貼上以 .apps.googleusercontent.com 結尾的識別碼，不是 Google Cloud 網址或專案編號。');
+    if (!/^[A-Za-z0-9_-]{12,256}$/.test(clientSecret)) throw new Error('Client secret 格式不正確：請貼上完整密鑰，不可使用遮罩、只有末幾位或整段 JSON。');
     const properties = PropertiesService.getScriptProperties();
     properties.setProperty('GOOGLE_LOGIN_CLIENT_ID', clientId);
     properties.setProperty('GOOGLE_LOGIN_CLIENT_SECRET', clientSecret);
