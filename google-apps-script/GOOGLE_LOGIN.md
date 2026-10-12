@@ -11,6 +11,7 @@
 1. 正式 Web App 加上 `?auth-settings=1`（或學生名冊 → Google 登入設定）。新版本可能要求部署老師確認新增的 `script.external_request` 權限。
 2. 校園帳戶進入 [Google Auth Platform](https://console.cloud.google.com/auth/overview)，建立校方擁有的專案；Audience 選 **Internal**，設定應用名稱及校方聯絡資料。
 3. Clients → Create client → **Web application**。Authorized redirect URIs 複製設定頁顯示的**完整**正式 `/exec` 網址，不加查詢參數。此流程不需要 JavaScript origin。不要使用 clasp 的 OAuth Client。
+   - 校園執行時可能顯示 `/a/jcmkec.edu.hk/macros/s/部署ID/exec`，部署 API 則可能顯示 `/a/macros/jcmkec.edu.hk/s/部署ID/exec`。程式接受兩者及一般 `/macros/s/部署ID/exec`，但不會把它們互換；Google OAuth 要求與 Client 登記的 redirect URI **完全一致**。請以設定頁顯示的網址為準，不是目前網址列的查詢參數。若 Google 顯示 `redirect_uri_mismatch`，在同一 Client 加入該完整網址，不必重建 Client 或 Secret。見 [Google OAuth 文件](https://developers.google.com/identity/protocols/oauth2/web-server)。
 4. 將 Client ID 和完整 Client secret 填入私有設定頁，按「儲存 OAuth 設定」；**儲存結果在新分頁顯示**。成功頁可直接按「測試 Google 帳戶選擇」；失敗頁會顯示具體原因及返回設定的連結。Secret 只存 Script Properties，**不要貼到聊天、名冊或 GitHub**。不要求學生 Drive／Sheets 權限；登入只索取 `openid email`。
 5. 按「測試 Google 帳戶選擇」，選部署老師本人的帳戶。確認成功後返回設定頁按「重新讀取狀態」。測試不改學生資料。
 6. 勾選遷移確認，再按「備份舊綁定並啟用 Google 登入」。系統先檢查名冊識別碼和班別學號不重複，複製 Students 工作表並核對內容，再清除舊 AccountKey、FirstLinkedAt，最後才啟用。StudentId、名冊、LastLoginAt、預填 GoogleEmail、群組、課業及歷史進度保留。重複按啟用不會再次清除。

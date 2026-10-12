@@ -1,5 +1,13 @@
 # 校園同步部署及回復紀錄
 
+## 2026-10-12：修正校園回跳網址誤判（版本 9）
+
+- 老師提供的正式執行時網址採用 `/a/jcmkec.edu.hk/macros/s/部署ID/exec`，但 v8 只接受部署 API 的 `/a/macros/jcmkec.edu.hk/s/部署ID/exec` 及一般 `/macros/s/部署ID/exec`，因此憑證已儲存仍錯報 `INVALID_REDIRECT_URI`、隱藏登入測試按鈕。
+- 新版接受以上三種正式網址，保留 Google 返回的原始網址供 OAuth 使用，不互換別名；仍拒絕 `/dev`、外部網域、其他校園網域、非 HTTPS、查詢參數、片段及尾端空白。已保存的 Client ID／secret、Script Properties、名冊及登入啟用狀態均未修改。
+- 同一正式 Web App 已更新至固定版本 **9**（香港時間 23:51），API 上載逐檔讀回核對及部署版本確認成功；原 URL 和 `DOMAIN / USER_DEPLOYING` 權限不變。
+- Google 登入、老師管理、校園同步三套測試通過；新增三種網址、非法網址及授權／token exchange 保留精確 redirect URI 的回歸測試。隔離 UI 測試通過 1920×1080、1280×720、390×844、測試／啟用閘門、無 JavaScript、逾時及憑證不回顯。尚未代替老師完成真實 OAuth 登入測試或啟用。
+- 回復點：固定版本 **8**、Git **da6ea70**，雲端原稿 `.local-school-sync/before-upload-2026-10-12T15-50-44-668Z.json`。本次不涉及 Sheet 結構或資料遷移；回復至 v8 不需改名冊，但會恢復此網址誤判。不要回復到使用 11 欄名冊的 v7。
+
 ## 2026-10-12：移除啟用碼，統一 Google 登入（版本 8）
 
 - 同一 Web App 已發佈至固定版本 **8**，API 上載後逐檔讀回核對，並確認正式部署版本、原 URL、`DOMAIN / USER_DEPLOYING` 及 OAuth 權限不變。

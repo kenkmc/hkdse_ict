@@ -12,7 +12,10 @@ function googleAuthInspection_() {
   try { redirectUri = String(ScriptApp.getService().getUrl() || ''); } catch (error) { redirectAvailable = false; }
   const clientIdValid = /^\d+-[a-z0-9_-]+\.apps\.googleusercontent\.com$/i.test(clientId);
   const credentialsSaved = Boolean(clientId && clientSecret);
-  const redirectValid = /^https:\/\/script\.google\.com\/(?:a\/macros\/jcmkec\.edu\.hk\/s|macros\/s)\/[A-Za-z0-9_-]+\/exec$/.test(redirectUri);
+  // Workspace's runtime URL can put the domain before "macros", unlike the deployment API URL.
+  // Preserve the exact URL for OAuth; aliases must not silently replace a registered redirect URI.
+  const redirectValid = /^https:\/\/script\.google\.com\/(?:a\/jcmkec\.edu\.hk\/macros\/s|a\/macros\/jcmkec\.edu\.hk\/s|macros\/s)\/[A-Za-z0-9_-]+\/exec$/.test(redirectUri)
+    && redirectUri === redirectUri.trim();
   const issues = [];
   if (!clientId) issues.push(['MISSING_CLIENT_ID', '尚未儲存 Client ID。']);
   else if (!clientIdValid) issues.push(['INVALID_CLIENT_ID', '已儲存的 Client ID 格式不正確。']);
@@ -44,7 +47,7 @@ function googleAuthPublicStatus_() {
     : tested ? 'Google 登入測試通過，但尚未啟用；學生登入及同步暫未開放。'
     : 'OAuth 設定已儲存，尚未測試／啟用；學生登入及同步暫未開放。';
   const diagnosticText = [
-    '設定介面：8', '讀取時間（香港）：' + new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' '),
+    '設定介面：9', '讀取時間（香港）：' + new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString().slice(0, 19).replace('T', ' '),
     '學生入口模式：' + (enabled ? 'GOOGLE（電郵登入）' : 'NOT_ENABLED（等待 Google 登入啟用，不提供啟用碼）'),
     'Client ID：' + (inspection.clientIdValid ? '已儲存，格式有效' : '未儲存或格式無效'),
     'Client secret：' + (inspection.clientSecretSaved ? '已儲存（不顯示內容）' : '未儲存'),

@@ -16,7 +16,7 @@
 <section><h2>3. 測試及啟用</h2><p>先選擇部署老師自己的 Google 帳戶測試，成功後返回並按「重新讀取狀態」。測試不改名冊。</p><a id="test" class="button secondary" href="<?= initial.googleLogin.redirectUri ?>?google-test=1" <? if (!initial.googleLogin.configured) { ?>hidden<? } ?>>測試 Google 帳戶選擇</a><button id="refresh" class="secondary" type="button">重新讀取狀態</button><a id="reload" class="button secondary" href="<?= initial.googleLogin.redirectUri ?>?auth-settings=1">重新開啟設定頁</a>
 <p id="test-status"><?= initial.googleLogin.statusMessage ?></p><p id="config-error" class="error"><?= initial.googleLogin.configError ?></p><div class="warning">啟用前會再備份 Students 工作表，然後重設舊帳戶代碼及首次配對時間。StudentId、班別、學號、姓名、群組、課業和學習紀錄保留。已有新 GoogleEmail 會保留。每名學生首次重新配對後即時啟用，沒有老師審批步驟。</div>
 <label class="check"><input id="confirm" type="checkbox">我確認保留名冊及進度，備份後重設舊綁定並啟用 Google 登入。已了解學生可自選名冊，老師需處理冒認／誤配。</label><button id="enable" type="button" disabled>備份舊綁定並啟用 Google 登入</button><p id="backup"></p></section>
-<section><h2>4. 設定診斷（唯讀）</h2><p>以下不包含 Secret、登入碼或學生資料。遇到「儲存後仍未設定」時，可複製這段文字協助檢查；不需要重新輸入 Secret。</p><pre id="diagnostics" class="uri" style="white-space:pre-wrap"><?= initial.googleLogin.diagnosticText ?></pre><small>介面版本 8。儲存、登入測試、啟用及學生同步是四個不同步驟。</small></section>
+<section><h2>4. 設定診斷（唯讀）</h2><p>以下不包含 Secret、登入碼或學生資料。遇到「儲存後仍未設定」時，可複製這段文字協助檢查；不需要重新輸入 Secret。</p><pre id="diagnostics" class="uri" style="white-space:pre-wrap"><?= initial.googleLogin.diagnosticText ?></pre><small>介面版本 9。儲存、登入測試、啟用及學生同步是四個不同步驟。</small></section>
 </main><script>
 'use strict';
 let token='',model=null,busy=false,uncertain=false,pendingSave=false;const $=id=>document.getElementById(id);

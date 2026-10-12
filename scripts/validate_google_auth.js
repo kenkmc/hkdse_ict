@@ -9,7 +9,7 @@ const properties = new Map(Object.entries({ SCHOOL_DOMAIN:'jcmkec.edu.hk', SHEET
   SITE_PROGRESS_URL:'https://kenkmc.github.io/hkdse_ict/progress.html', TOKEN_TTL_SECONDS:'18000' }));
 let nativeEmail = 'teacher@jcmkec.edu.hk', caller = 'native-browser-session', locks = 0, fetched = 0;
 let googleEmail = 'student@jcmkec.edu.hk', googleDomain = 'jcmkec.edu.hk', verified = true, responseStatus = 200;
-let serviceUrl = 'https://script.google.com/a/macros/jcmkec.edu.hk/s/TEST/exec';
+let serviceUrl = 'https://script.google.com/a/jcmkec.edu.hk/macros/s/TEST/exec';
 const cache = new Map(), sheets = new Map();
 class Sheet {
   constructor(name, headers) {this.name=name;this.rows=[Array.from(headers)];}
@@ -38,7 +38,7 @@ const context={Date,console,
   ScriptApp:{getService:()=>({getUrl:()=> serviceUrl})},
   HtmlService:{createHtmlOutput:html=>({html,setTitle(){return this;}})},
   UrlFetchApp:{fetch(url,options){fetched++;assert.equal(options.followRedirects,false);let result;
-    if(url.endsWith('/token')){assert.equal(options.payload.grant_type,'authorization_code');assert(options.payload.client_secret);assert(options.payload.code_verifier);result={access_token:'private-access-token',token_type:'Bearer'};}
+    if(url.endsWith('/token')){assert.equal(options.payload.grant_type,'authorization_code');assert.equal(options.payload.redirect_uri,serviceUrl,'Token exchange must retain the exact runtime redirect URI');assert(options.payload.client_secret);assert(options.payload.code_verifier);result={access_token:'private-access-token',token_type:'Bearer'};}
     else{assert.equal(url,'https://openidconnect.googleapis.com/v1/userinfo');assert.equal(options.headers.Authorization,'Bearer private-access-token');result={email:googleEmail,email_verified:verified,hd:googleDomain,sub:'google-subject'};}
     return {getResponseCode:()=>responseStatus,getContentText:()=>JSON.stringify(result)};
   }}
@@ -108,7 +108,23 @@ assert.equal(status.configured,true);assert(!JSON.stringify(status).includes(cre
 assert(status.credentialsSaved);assert(status.statusMessage.includes('尚未測試／啟用'));
 assert(status.diagnosticText.includes('NOT_ENABLED'));assert(!status.diagnosticText.includes(adminToken));
 const productionUrl=serviceUrl;
-for (const invalidUrl of [productionUrl.replace('/exec','/dev'),'',productionUrl.replace('script.google.com','script.google.com.example.org')]) {
+const validRedirectUrls=[productionUrl,'https://script.google.com/a/macros/jcmkec.edu.hk/s/TEST/exec','https://script.google.com/macros/s/TEST/exec'];
+const propertiesBeforeUrlChecks=JSON.stringify([...properties]);
+for (const validUrl of validRedirectUrls) {
+  serviceUrl=validUrl;
+  const validStatus=context.googleAuthPublicStatus_();
+  assert(validStatus.configured);assert.equal(validStatus.configError,'');
+  assert.equal(validStatus.redirectUri,validUrl,'Do not normalize Workspace URL aliases for OAuth');
+  const page=context.googleLoginPage_(true);
+  const authUrl=new URL(page.html.match(/href="(https:\/\/accounts[^\"]+)"/)[1].replace(/&amp;/g,'&'));
+  assert.equal(authUrl.searchParams.get('redirect_uri'),validUrl);
+}
+assert.equal(JSON.stringify([...properties]),propertiesBeforeUrlChecks,'URL validation must not modify saved credentials or auth mode');
+for (const invalidUrl of ['',...validRedirectUrls.flatMap(url=>[
+  url.replace('/exec','/dev'),url+'?auth-settings=1',url+'#fragment',url+'/',url+'\n',
+  url.replace('https:','http:'),url.replace('script.google.com','script.google.com.example.org'),
+  url.replace('script.google.com','script.google.com@evil.example'),url.replace('/s/TEST/','/s/../'),
+]),productionUrl.replace('jcmkec.edu.hk','other.edu.hk')]) {
   serviceUrl=invalidUrl;
   const badStatus=context.googleAuthPublicStatus_();
   assert(badStatus.credentialsSaved);assert.equal(badStatus.configured,false);assert.equal(badStatus.tested,false);
@@ -125,7 +141,7 @@ properties.delete('GOOGLE_LOGIN_CLIENT_SECRET');
 assert.equal(context.googleAuthPublicStatus_().credentialsSaved,false);
 assert(context.googleAuthPublicStatus_().diagnosticText.includes('MISSING_CLIENT_SECRET'));
 properties.set('GOOGLE_LOGIN_CLIENT_SECRET',credentials.clientSecret);
-const start=(test=false)=>{const page=context.googleLoginPage_(test);const url=new URL(page.html.match(/href="(https:\/\/accounts[^\"]+)"/)[1].replace(/&amp;/g,'&'));assert.equal(url.searchParams.get('prompt'),'select_account');assert.equal(url.searchParams.get('scope'),'openid email');assert.equal(url.searchParams.get('code_challenge_method'),'S256');return url.searchParams.get('state');};
+const start=(test=false)=>{const page=context.googleLoginPage_(test);const url=new URL(page.html.match(/href="(https:\/\/accounts[^\"]+)"/)[1].replace(/&amp;/g,'&'));assert.equal(url.searchParams.get('redirect_uri'),serviceUrl);assert.equal(url.searchParams.get('prompt'),'select_account');assert.equal(url.searchParams.get('scope'),'openid email');assert.equal(url.searchParams.get('code_challenge_method'),'S256');return url.searchParams.get('state');};
 const callback=state=>context.googleOAuthCallback_({parameter:{state,code:'google-one-use-code'}});
 googleEmail='teacher@jcmkec.edu.hk';let state=start(true);const tested=callback(state);assert(tested.html.includes('測試成功'));assert(properties.get('GOOGLE_LOGIN_TESTED'));assert.equal(JSON.stringify(students.rows),before);
 assert(tested.html.includes('不是學生進度同步'));
