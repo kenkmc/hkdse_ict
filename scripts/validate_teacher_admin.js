@@ -38,14 +38,17 @@ const context = {
 vm.createContext(context);
 vm.runInContext(read('google-apps-script/Code.gs') + '\n' + read('google-apps-script/GoogleAuth.gs') + '\n' + read('google-apps-script/TeacherResources.gs') + '\n' + read('google-apps-script/TeacherAdmin.gs') + '\nthis.definitions = SCHOOL_SYNC_SHEETS; this.resources = TEACHER_ADMIN_RESOURCES;', context);
 class FakeSheet {
-  constructor(headers, headerRow=1) { this.rows = Array.from({ length: headerRow-1 }, () => []); this.rows.push([...headers]); this.writes = 0; }
+  constructor(headers, headerRow=1) { this.rows = Array.from({ length: headerRow-1 }, () => []); this.rows.push([...headers]); this.formulas = []; this.maxRows = 1000; this.writes = 0; }
   getLastRow() { return this.rows.length; }
   getLastColumn() { return Math.max(...this.rows.map(row=>row.length)); }
+  getMaxRows() { return this.maxRows; }
+  insertRowsAfter(after, count) { assert.equal(after,this.maxRows); this.maxRows += count; return this; }
   getRange(row, column, height=1, width=1) {
     if (typeof row !== 'number') throw new Error('Test uses numeric ranges only.');
     const sheet = this;
     return {
       getValues() { return Array.from({length:height}, (_, index) => Array.from({length:width}, (_, col) => sheet.rows[row-1+index]?.[column-1+col] ?? '')); },
+      getFormulas() { return Array.from({length:height}, (_, index) => Array.from({length:width}, (_, col) => sheet.formulas[row-1+index]?.[column-1+col] ?? '')); },
       setValues(values) { values.forEach((cells,index) => cells.forEach((value,col) => { if (!sheet.rows[row-1+index]) sheet.rows[row-1+index]=[]; sheet.rows[row-1+index][column-1+col]=value; })); sheet.writes++; return this; },
       setValue(value) { return this.setValues([[value]]); }, setNumberFormat() { return this; }
     };
@@ -61,6 +64,11 @@ append('students', {StudentId:'STU-2',Class:'5B',ClassNo:'02',ChineseName:'測�
 append('groups', {GroupId:'GRP-1',GroupName:'中四補底',GroupType:'LEVEL',AcademicYear:'2026-2027',Active:true});
 append('dashboard', {StudentId:'STU-1',Class:'4A',ClassNo:'01',ChineseName:'測試甲',ActiveMinutes:15});
 append('pages', {RecordKey:'P-1',StudentId:'STU-1',PageId:'chc-1',ActiveSeconds:120});
+// Real Google Sheets templates contain FALSE in hundreds of otherwise empty checkbox rows.
+for (const key of ['groups','groupMembers','assignmentTargets','assignmentItems']) {
+  const headers=context.definitions[key].headers;
+  while(sheet(key).rows.length<1000) sheet(key).rows.push(headers.map(field=>['Active','Required'].includes(field)?false:''));
+}
 if (process.env.LEGACY_COLUMN_LAYOUT === '1') sheet('students').rows.forEach((r,i)=>r.splice(7,0,i===0?'ActivationCode':'RETIRED-CODE'));
 const bootstrap = context.teacherAdminBootstrap();
 const token = bootstrap.token;
@@ -143,4 +151,47 @@ expectNoWrite(()=>rpc('teacherAdminUndo',{undo:removed.undo}),/時限/);
 assert.equal(locks,0);
 assert.equal(context.resources.filter(resource=>resource.game).length,7);
 assert.equal(context.resources.filter(resource=>resource.layers).length,26);
-console.log('Teacher admin validation passed: owner-only RPC, privacy, all 13 schemas, CRUD, roster import, references, concurrency, publishing, inactive groups and undo.');
+for (const key of ['groupMembers','assignmentTargets','assignmentItems']) {
+  assert(context.teacherAdminRows_(spreadsheet,key).every(row=>row.rowNumber<=5),'Checkbox padding must not push writes to row 1001: '+key);
+}
+
+const originalGroups=sheet('groups');
+const groupHeaders=context.definitions.groups.headers;
+const blankGroup=()=>['','','','',false];
+const useGroups=data=>{const next=new FakeSheet(groupHeaders);next.rows.push(...data);next.maxRows=Math.max(1000,next.rows.length);sheets.set('Groups',next);return next;};
+const fixtureFirst=['GRP-FIRST','First','CUSTOM','2026-2027',true];
+let padded=useGroups([fixtureFirst,...Array.from({length:998},blankGroup),
+  ['GRP-LATE','Second','CUSTOM','2026-2027',true],['GRP-OFF','Second','CUSTOM','2026-2027',false]]);
+const result=rpc('teacherAdminRead',{table:'groups',page:1,pageSize:50});
+assert.equal(result.total,3);assert.equal(result.rows.length,3);assert.equal(result.counts.groups,2);
+assert.deepEqual(Array.from(result.rows,row=>row.GroupId),['GRP-FIRST','GRP-LATE','GRP-OFF']);
+assert.equal(context.teacherAdminLookups_(spreadsheet).groups.length,3);
+const lateBefore=JSON.stringify(padded.rows.slice(1000));
+save('groups',{GroupName:'Do not overwrite distant records',GroupType:'CUSTOM',AcademicYear:'2026-2027',Active:true});
+assert.equal(JSON.stringify(padded.rows.slice(1000,1002)),lateBefore);
+assert.equal(padded.rows[1002][1],'Do not overwrite distant records');assert.equal(padded.getMaxRows(),1003);
+
+padded=useGroups([fixtureFirst,...Array.from({length:998},blankGroup)]);
+save('groups',{GroupName:'New active',GroupType:'CUSTOM',AcademicYear:'2026-2027',Active:true});
+save('groups',{GroupName:'New inactive',GroupType:'CUSTOM',AcademicYear:'2026-2027',Active:false});
+save('groups',{GroupName:'Next',GroupType:'CUSTOM',AcademicYear:'2026-2027',Active:true});
+assert.deepEqual(padded.rows.slice(2,5).map(row=>row[1]),['New active','New inactive','Next']);
+assert.equal(padded.rows[3][4],false,'Keep inactive records, not just active ones');
+assert.equal(rows('groups').length,4);assert.equal(padded.rows.length,1000);
+
+// Insertion must protect partial rows, formulas displaying blank and cells beyond the schema.
+for (const mode of ['partial','formula','extra-column','checked']) {
+  padded=useGroups([fixtureFirst,...Array.from({length:998},blankGroup)]);
+  if(mode==='partial') padded.rows[2][1]='Unfinished group';
+  if(mode==='formula') padded.formulas[2]=['','=""'];
+  if(mode==='extra-column') padded.rows[2][6]='Keep teacher note';
+  if(mode==='checked') padded.rows[2][4]=true;
+  const protectedBefore=JSON.stringify(padded.rows[2]);
+  save('groups',{GroupName:'Safe insertion',GroupType:'CUSTOM',AcademicYear:'2026-2027',Active:true});
+  assert.equal(JSON.stringify(padded.rows[2]),protectedBefore,mode);
+  assert.equal(padded.rows[3][1],'Safe insertion',mode);
+  if(mode==='partial') assert(rows('groups').some(row=>row.GroupName==='Unfinished group'));
+}
+sheets.set('Groups',originalGroups);
+assert.equal(locks,0);
+console.log('Teacher admin validation passed: owner-only RPC, privacy, CRUD, roster import, references, concurrency, publishing, undo, 1000-row checkbox templates, distant/disabled records, safe append and formula protection.');

@@ -1,5 +1,15 @@
 # 校園同步部署及回復紀錄
 
+## 2026-10-13：群組空白列及新增位置修正（版本 10）
+
+- 原因：Groups 第 3–1000 行已有預設 checkbox FALSE，`appendRow` 因而將新群組寫到第 1001、1002 行；後台亦把 FALSE 視為非空資料，讓空白列佔滿分頁。有效群組數 2 正確，但列表第一頁未能顯示表尾群組。
+- 列表／下拉選單不再把只有 Active／Required 的列當成紀錄；仍保留已有 ID、名稱或其他實際內容的停用／未完成資料。新增、批量成員、名冊匯入及課業要求復原改用共用安全新增方法，忽略尾端 unchecked FALSE 範本列，保留既有遠端資料、已勾選列、空字串公式及額外欄位內容，不會自動搬動舊資料。
+- Apps Script 已發佈 **版本 10**，API 逐檔讀回及部署版本核對成功；原 URL、DOMAIN / USER_DEPLOYING、OAuth 設定及登入狀態均未修改。
+- 香港時間 **15:31**，原私有試算表新增 `GroupsBeforeRowFix_20261013_1531` 備份（sheetId `875449635`），再以原生 moveDimension 把 Groups 的第 1001–1002 行移到第 3–4 行。現在第 2–4 行依序為 2028DSE（有效）、2029DSE（有效）、2029DSE（停用）；同名停用紀錄未刪除或合併，GroupId 保持不變。
+- 已比較全部 1002 行的值、格式、驗證、chips 及 notes，與預期的行排列完全相同；備份與搬動前相同，GroupMembers 及 AssignmentTargets A:D／A:E 的 1000 行原樣保留。沒有改動學生資料或學習紀錄。
+- 測試加入 1000 行 FALSE 範本，涵蓋實際三筆群組在同頁顯示、有效數 2、下一筆接在真實資料後、停用／未填完資料不被覆寫、空白公式及額外欄位保護、批量成員與復原。全部 12 套 validate 腳本及額外的 LEGACY_COLUMN_LAYOUT=1 後台相容驗證通過。原生瀏覽器驗證工具無法啟動；本機完整試算表下載因含學生個人資料被安全審查阻止，故目前以 Sheets API 的逐格結構／格式核對為準，未聲稱完成原生版面驗收。
+- 程式回復點：固定版本 **9**、Git **cdd23fc**；原稿 `.local-school-sync/before-upload-2026-10-13T04-09-40-321Z.json`。回復程式不需還原群組位置，但會重新出現空白列／appendRow 問題。若要回復群組排列，先備份最新狀態並按 GroupId 核對，不直接整表覆蓋或按舊行號搬動，避免覆蓋之後新增的紀錄。保留 feature branch，不合併 main。
+
 ## 2026-10-12：修正校園回跳網址誤判（版本 9）
 
 - 老師提供的正式執行時網址採用 `/a/jcmkec.edu.hk/macros/s/部署ID/exec`，但 v8 只接受部署 API 的 `/a/macros/jcmkec.edu.hk/s/部署ID/exec` 及一般 `/macros/s/部署ID/exec`，因此憑證已儲存仍錯報 `INVALID_REDIRECT_URI`、隱藏登入測試按鈕。

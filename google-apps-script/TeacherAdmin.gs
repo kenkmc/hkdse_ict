@@ -79,9 +79,8 @@ function teacherAdminSave(request) {
       else if (request.table === 'assignmentTargets') next.RecordKey = next.AssignmentId + '|' + next.TargetType + '|' + next.TargetId;
       else next[keyField] = ({ students: 'STU', groups: 'GRP', assignments: 'TASK', assignmentItems: 'ITEM' }[request.table]) + '-' + Utilities.getUuid().replace(/-/g, '').slice(0, 12).toUpperCase();
       if (rows.some(row => String(row[keyField]) === String(next[keyField]))) throw new Error('這個成員或對象已存在，請編輯原有紀錄。');
-      if (request.table === 'students') sheet.getRange(sheet.getLastRow() + 1, 3).setNumberFormat('@');
       const headers = request.table === 'students' ? studentHeaders_(sheet) : definition.headers;
-      sheet.appendRow(headers.map(field => next[field] === undefined ? '' : next[field]));
+      teacherAdminAppendRows_(spreadsheet, request.table, [headers.map(field => next[field] === undefined ? '' : next[field])]);
     } else {
       if (request.table === 'students') sheet.getRange(current.rowNumber, 3).setNumberFormat('@');
       TEACHER_ADMIN_FIELDS[request.table].forEach(field => sheet.getRange(current.rowNumber, definition.headers.indexOf(field) + 1).setValue(next[field]));
@@ -105,11 +104,13 @@ function teacherAdminAddMembers(request) {
     if (ids.some(id => !students.some(row => row.StudentId === id && row.Status === 'ACTIVE'))) throw new Error('所選學生不存在或已停用，請重新整理。');
     const sheet = teacherAdminSheet_(spreadsheet, 'groupMembers');
     const rows = teacherAdminRows_(spreadsheet, 'groupMembers');
+    const additions = [];
     ids.forEach(id => {
       const existing = rows.find(row => row.StudentId === id && row.GroupId === request.groupId);
       if (existing) sheet.getRange(existing.rowNumber, 4).setValue(true);
-      else sheet.appendRow([id + '|' + request.groupId, id, request.groupId, true]);
+      else additions.push([id + '|' + request.groupId, id, request.groupId, true]);
     });
+    teacherAdminAppendRows_(spreadsheet, 'groupMembers', additions);
     return { message: '已加入／重新啟用 ' + ids.length + ' 名成員。', lookups: teacherAdminLookups_(spreadsheet) };
   });
 }
@@ -128,11 +129,8 @@ function teacherAdminImportStudents(request) {
       next.StudentId = 'STU-' + Utilities.getUuid().replace(/-/g, '').slice(0, 12).toUpperCase();
       prepared.push(next);
     });
-    const sheet = teacherAdminSheet_(spreadsheet, 'students');
-    sheet.getRange(sheet.getLastRow() + 1, 3, prepared.length, 1).setNumberFormat('@');
-    const headers = studentHeaders_(sheet);
-    sheet.getRange(sheet.getLastRow() + 1, 1, prepared.length, headers.length)
-      .setValues(prepared.map(row => headers.map(field => row[field] === undefined ? '' : row[field])));
+    const headers = studentHeaders_(teacherAdminSheet_(spreadsheet, 'students'));
+    teacherAdminAppendRows_(spreadsheet, 'students', prepared.map(row => headers.map(field => row[field] === undefined ? '' : row[field])));
     return { message: '已匯入 ' + prepared.length + ' 名學生。Google 登入啟用後，學生首次選自己的班別及學號即可。', lookups: teacherAdminLookups_(spreadsheet) };
   });
 }
@@ -175,7 +173,7 @@ function teacherAdminUndo(request) {
     const assignment = teacherAdminRows_(spreadsheet, 'assignments').find(row => row.AssignmentId === record.values[1]);
     if (!assignment) throw new Error('原課業已不存在，請先恢復課業。');
     if (['PUBLISHED', 'ACTIVE'].includes(assignment.Status)) throw new Error('請先將課業轉成草稿再復原要求。');
-    teacherAdminSheet_(spreadsheet, 'assignmentItems').appendRow(record.values);
+    teacherAdminAppendRows_(spreadsheet, 'assignmentItems', [record.values]);
     cache.remove('teacher-undo-' + request.undo);
     return { message: '要求已復原。' };
   });
@@ -220,7 +218,39 @@ function teacherAdminRows_(spreadsheet, key) {
       const row = { rowNumber: first + index };
       headers.forEach((field, column) => { row[field] = values[column]; });
       return row;
-    }).filter(row => definition.headers.some(field => row[field] !== '' && row[field] !== null));
+    // Pre-filled checkbox cells are form controls, not records. Keep partially entered real rows.
+    }).filter(row => definition.headers.some(field => !['Active', 'Required'].includes(field)
+      && row[field] !== '' && row[field] !== null && row[field] !== undefined));
+}
+
+/** Append after the last real row, not after thousands of template checkbox FALSE values.
+ * Called only inside the teacher write lock. Never compact/move existing rows implicitly.
+ */
+function teacherAdminAppendRows_(spreadsheet, key, records) {
+  if (!records.length) return;
+  if (!TEACHER_ADMIN_FIELDS[key]) throw new Error('只可新增可編輯資料表的紀錄。');
+  const sheet = teacherAdminSheet_(spreadsheet, key);
+  const headers = key === 'students' ? studentHeaders_(sheet) : teacherAdminDefinition_(key).headers;
+  if (records.some(row => !Array.isArray(row) || row.length !== headers.length)) throw new Error('新增紀錄的欄位數目不正確。');
+  const width = Math.max(headers.length, sheet.getLastColumn());
+  const count = Math.max(0, sheet.getLastRow() - 1);
+  let start = 2;
+  if (count) {
+    const range = sheet.getRange(2, 1, count, width);
+    const values = range.getValues(), formulas = range.getFormulas();
+    for (let index = values.length - 1; index >= 0; index--) {
+      // Preserve formulas returning "", partial records, checked boxes and data outside the schema.
+      const occupied = formulas[index].some(Boolean) || values[index].some((value, column) =>
+        value !== '' && value !== null && value !== undefined
+        && !(value === false && ['Active', 'Required'].includes(headers[column])));
+      if (occupied) { start = index + 3; break; }
+    }
+  }
+  const end = start + records.length - 1;
+  if (end > sheet.getMaxRows()) sheet.insertRowsAfter(sheet.getMaxRows(), end - sheet.getMaxRows());
+  if (key === 'students') sheet.getRange(start, 3, records.length, 1).setNumberFormat('@');
+  // Writing only values retains the template's existing formats and validation.
+  sheet.getRange(start, 1, records.length, headers.length).setValues(records);
 }
 
 function teacherAdminRevision_(key, row) {
