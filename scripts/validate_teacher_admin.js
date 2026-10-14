@@ -38,7 +38,7 @@ const context = {
 vm.createContext(context);
 vm.runInContext(read('google-apps-script/Code.gs') + '\n' + read('google-apps-script/GoogleAuth.gs') + '\n' + read('google-apps-script/TeacherResources.gs') + '\n' + read('google-apps-script/TeacherAdmin.gs') + '\nthis.definitions = SCHOOL_SYNC_SHEETS; this.resources = TEACHER_ADMIN_RESOURCES;', context);
 class FakeSheet {
-  constructor(headers, headerRow=1) { this.rows = Array.from({ length: headerRow-1 }, () => []); this.rows.push([...headers]); this.formulas = []; this.maxRows = 1000; this.writes = 0; }
+  constructor(headers, headerRow=1) { this.rows = Array.from({ length: headerRow-1 }, () => []); this.rows.push([...headers]); this.formulas = []; this.maxRows = 1000; this.writes = 0; this.reads=[]; this.rangeListWrites=0; }
   getLastRow() { return this.rows.length; }
   getLastColumn() { return Math.max(...this.rows.map(row=>row.length)); }
   getMaxRows() { return this.maxRows; }
@@ -47,13 +47,14 @@ class FakeSheet {
     if (typeof row !== 'number') throw new Error('Test uses numeric ranges only.');
     const sheet = this;
     return {
-      getValues() { return Array.from({length:height}, (_, index) => Array.from({length:width}, (_, col) => sheet.rows[row-1+index]?.[column-1+col] ?? '')); },
+      getValues() { sheet.reads.push({row,column,height,width}); return Array.from({length:height}, (_, index) => Array.from({length:width}, (_, col) => sheet.rows[row-1+index]?.[column-1+col] ?? '')); },
       getFormulas() { return Array.from({length:height}, (_, index) => Array.from({length:width}, (_, col) => sheet.formulas[row-1+index]?.[column-1+col] ?? '')); },
       setValues(values) { values.forEach((cells,index) => cells.forEach((value,col) => { if (!sheet.rows[row-1+index]) sheet.rows[row-1+index]=[]; sheet.rows[row-1+index][column-1+col]=value; })); sheet.writes++; return this; },
       setValue(value) { return this.setValues([[value]]); }, setNumberFormat() { return this; }
     };
   }
   appendRow(values) { this.rows.push([...values]); this.writes++; }
+  getRangeList(addresses) {return {setValue:value=>{addresses.forEach(address=>{const match=/^D(\d+)$/.exec(address);assert(match);this.rows[Number(match[1])-1][3]=value;});this.rangeListWrites++;this.writes++;}};}
   deleteRow(row) { this.rows.splice(row-1,1); this.writes++; }
 }
 Object.entries(context.definitions).forEach(([key, definition]) => sheets.set(definition.name, new FakeSheet(definition.headers, key==='dashboard'?5:1)));
@@ -79,6 +80,10 @@ const writeCount = () => [...sheets.values()].reduce((sum,item)=>sum+item.writes
 const expectNoWrite = (callback, pattern) => {const before=writeCount();assert.throws(callback,pattern);assert.equal(writeCount(),before);assert.equal(locks,0);};
 
 assert(!JSON.stringify(bootstrap).includes('PRIVATE-HASH'));
+assert.equal(bootstrap.initialData.rows[0].ActiveMinutes,15,'Bootstrap includes the first screen in a single RPC');
+const resetReads=()=>[...sheets.values()].forEach(item=>item.reads=[]);
+resetReads();rpc('teacherAdminRead',{table:'students'});
+for(const key of ['students','groups','groupMembers','assignments'])assert.equal(sheet(key).reads.filter(call=>call.row===2).length,sheet(key).rows.length>1?1:0,'Read data at most once per RPC: '+key);
 assert(bootstrap.tables.find(item=>item.key==='students').columns.every(field=>field!=='AccountKey'));
 assert.equal(rows('students')[0].LastLoginAt,'2026-10-12T01:00:00.000Z');
 assert.equal(rows('students')[0]._linked,true);
@@ -115,10 +120,19 @@ rpc('teacherAdminImportStudents',{rows:[{Class:'6C',ClassNo:'03',ChineseName:'�
 assert.equal(rows('students').length,3);
 rpc('teacherAdminAddMembers',{groupId:'GRP-1',studentIds:['STU-1','STU-2','STU-1']});
 assert.equal(rows('groupMembers').length,2);
+assert.equal(rpc('teacherAdminRead',{table:'groups'}).lookups.groups[0].memberCount,2);
+assert.equal(rpc('teacherAdminRead',{table:'groupMembers'}).studentCount,2);
+const writesBeforeSkip=writeCount();const skip=rpc('teacherAdminAddMembers',{groupId:'GRP-1',studentIds:['STU-1','STU-2']});
+assert.equal(skip.skipped,2);assert.equal(skip.added,0);assert.equal(writeCount(),writesBeforeSkip,'Already-active members do not incur writes');
 const member=rows('groupMembers')[0];save('groupMembers',{StudentId:'STU-1',GroupId:'GRP-1',Active:false},member);
-rpc('teacherAdminAddMembers',{groupId:'GRP-1',studentIds:['STU-1']});
+assert.equal(rpc('teacherAdminRead',{table:'groups'}).lookups.groups[0].memberCount,1,'Fresh reads reflect removals');
+const reactivated=rpc('teacherAdminAddMembers',{groupId:'GRP-1',studentIds:['STU-1']});
+assert.equal(reactivated.reactivated,1);assert.equal(sheet('groupMembers').rangeListWrites,1);
+assert.equal(reactivated.lookups.groups[0].memberCount,2,'Post-write lookup must not reuse stale membership data');
 assert.equal(rows('groupMembers').length,2);assert.equal(rows('groupMembers')[0].Active,true);
 expectNoWrite(()=>rpc('teacherAdminAddMembers',{groupId:'GRP-1',studentIds:['STU-1','missing']}),/不存在/);
+expectNoWrite(()=>rpc('teacherAdminAddMembers',{groupId:'GRP-1',studentIds:Array.from({length:301},(_,i)=>'X'+i)}),/300/);
+expectNoWrite(()=>rpc('teacherAdminAddMembers',{groupId:'GRP-1',studentIds:[]}),/300/);
 
 save('assignments',{Title:'入門任務',Instructions:'閱讀及練習',StartAt:'2020-10-12T08:00:00+08:00',DueAt:'2026-10-19T23:59:00+08:00',Status:'DRAFT'});
 const task=rows('assignments')[0];
@@ -193,5 +207,22 @@ for (const mode of ['partial','formula','extra-column','checked']) {
   if(mode==='partial') assert(rows('groups').some(row=>row.GroupName==='Unfinished group'));
 }
 sheets.set('Groups',originalGroups);
+// Large batches use one RangeList write; active duplicates require no writes.
+const savedTables=new Map(['students','groups','groupMembers'].map(key=>[key,sheet(key)]));
+for(const key of savedTables.keys())sheets.set(context.definitions[key].name,new FakeSheet(context.definitions[key].headers));
+append('groups',{GroupId:'BATCH',GroupName:'Batch test',GroupType:'CUSTOM',AcademicYear:'2026-2027',Active:true});
+for(let index=1;index<=100;index++){
+  append('students',{StudentId:'BATCH-'+index,Class:index<=50?'4A':'4B',ClassNo:String(index),ChineseName:'批次測試',Status:'ACTIVE'});
+  append('groupMembers',{RecordKey:'BATCH-'+index+'|BATCH',StudentId:'BATCH-'+index,GroupId:'BATCH',Active:false});
+}
+const batchBefore=writeCount();const batch=rpc('teacherAdminAddMembers',{groupId:'BATCH',studentIds:Array.from({length:100},(_,i)=>'BATCH-'+(i+1))});
+assert.equal(writeCount()-batchBefore,1,'100 reactivations = one batch write');assert.equal(batch.reactivated,100);assert.equal(batch.lookups.groups[0].memberCount,100);
+sheet('students').rows[1][6]='INACTIVE';
+assert.equal(rpc('teacherAdminRead',{table:'groups'}).lookups.groups[0].memberCount,99,'Disabled roster entries do not inflate active group count');
+expectNoWrite(()=>rpc('teacherAdminAddMembers',{groupId:'BATCH',studentIds:['BATCH-1']}),/不存在或已停用/);
+append('groupMembers',{RecordKey:'DUPLICATE',StudentId:'BATCH-2',GroupId:'BATCH',Active:true});
+assert.equal(rpc('teacherAdminRead',{table:'groups'}).lookups.groups[0].memberCount,99,'Duplicate sheet rows cannot inflate member counts');
+expectNoWrite(()=>rpc('teacherAdminAddMembers',{groupId:'BATCH',studentIds:['BATCH-2']}),/重複紀錄/);
+for(const [key,original] of savedTables)sheets.set(context.definitions[key].name,original);
 assert.equal(locks,0);
-console.log('Teacher admin validation passed: owner-only RPC, privacy, CRUD, roster import, references, concurrency, publishing, undo, 1000-row checkbox templates, distant/disabled records, safe append and formula protection.');
+console.log('Teacher admin validation passed: owner-only RPC, privacy, CRUD, roster import, references, concurrency, publishing, undo, checkbox templates, safe append, accurate member counts, request-scoped reads, 100 reactivations in one write, duplicate/idempotent additions.');

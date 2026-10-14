@@ -46,6 +46,7 @@ const context={Date,console,
 vm.createContext(context);
 vm.runInContext(['Code.gs','GoogleAuth.gs','TeacherResources.gs','TeacherAdmin.gs'].map(file=>read('google-apps-script/'+file)).join('\n')+'\nthis.defs=SCHOOL_SYNC_SHEETS;',context);
 Object.values(context.defs).forEach(def=>sheets.set(def.name,new Sheet(def.name,def.headers)));
+sheets.get('TeacherDashboard').rows.unshift([],[],[],[]);
 const students=sheets.get('Students');
 const add=object=>students.appendRow(context.defs.students.headers.map(field=>object[field]??''));
 add({StudentId:'STU-1',Class:'4A',ClassNo:'01',ChineseName:'甲',EnglishName:'TEST A',AccountKey:'legacy-key',Status:'ACTIVE',FirstLinkedAt:'legacy-date',LastLoginAt:'keep-last-date'});

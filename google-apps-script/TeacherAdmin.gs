@@ -23,24 +23,46 @@ function teacherAdminBootstrap() {
   CacheService.getScriptCache().put('teacher-console-' + token, Session.getActiveUser().getEmail().toLowerCase(), 1800);
   const spreadsheet = activeOrConfiguredSpreadsheet_();
   ensureSheet_(spreadsheet, SCHOOL_SYNC_SHEETS.students);
+  const read = teacherAdminReader_(spreadsheet);
+  const lookups = teacherAdminLookups_(spreadsheet, read);
+  let initialData = null;
+  // A damaged/uninitialised dashboard must not block access to roster/group repair screens.
+  try { initialData = teacherAdminReadData_(spreadsheet, { table: 'dashboard' }, read); } catch (error) { /* The first table read will display its error. */ }
+  if (initialData) delete initialData.lookups; // Send the roster/member lookup once, not twice.
   return {
     token, spreadsheetUrl: spreadsheet.getUrl(), studentUrl: ScriptApp.getService().getUrl(),
     googleLogin: googleAuthPublicStatus_(), authSettingsUrl: ScriptApp.getService().getUrl() + '?auth-settings=1',
     tables: Object.keys(SCHOOL_SYNC_SHEETS).map(key => ({ key, name: SCHOOL_SYNC_SHEETS[key].name,
       columns: SCHOOL_SYNC_SHEETS[key].headers.filter(column => column !== 'AccountKey' && column !== 'RecentMocksJson'),
       editable: TEACHER_ADMIN_FIELDS[key] || [] })),
-    lookups: teacherAdminLookups_(spreadsheet), resources: TEACHER_ADMIN_RESOURCES
+    resources: TEACHER_ADMIN_RESOURCES, lookups, initialData
   };
 }
 
 function teacherAdminRead(request) {
   assertDeploymentOwner_();
   teacherAdminAuthorize_(request);
-  const definition = teacherAdminDefinition_(request.table);
   const spreadsheet = activeOrConfiguredSpreadsheet_();
-  const rows = teacherAdminRows_(spreadsheet, request.table);
+  return teacherAdminReadData_(spreadsheet, request, teacherAdminReader_(spreadsheet));
+}
+
+/** Memoization lives only in this RPC, never in a shared cache or browser storage. */
+function teacherAdminReader_(spreadsheet) {
+  const rows = new Map();
+  const read = key => {
+    if (!rows.has(key)) rows.set(key, teacherAdminRows_(spreadsheet, key));
+    return rows.get(key);
+  };
+  read.invalidate = key => rows.delete(key);
+  return read;
+}
+
+function teacherAdminReadData_(spreadsheet, request, read) {
+  const definition = teacherAdminDefinition_(request.table);
+  const rows = read(request.table);
   const query = String(request.search || '').trim().toLowerCase().slice(0, 100);
-  const students = teacherAdminRows_(spreadsheet, 'students');
+  const students = read('students');
+  const allowed = definition.headers.filter(field => !['AccountKey', 'RecentMocksJson'].includes(field));
   const studentMap = new Map(students.map(row => [String(row.StudentId), row]));
   const filtered = rows.filter(row => {
     const student = request.table === 'students' ? row : studentMap.get(String(row.StudentId));
@@ -48,18 +70,19 @@ function teacherAdminRead(request) {
     if (request.studentId && String(row.StudentId) !== String(request.studentId)) return false;
     if (request.groupId && String(row.GroupId) !== String(request.groupId)) return false;
     if (request.assignmentId && String(row.AssignmentId) !== String(request.assignmentId)) return false;
-    const allowed = definition.headers.filter(field => !['AccountKey', 'RecentMocksJson'].includes(field));
     return !query || allowed.some(field => String(row[field] || '').toLowerCase().includes(query))
       || Boolean(student && [student.ChineseName, student.EnglishName, student.Class].some(value => String(value || '').toLowerCase().includes(query)));
   });
   const size = Math.max(10, Math.min(100, Math.floor(Number(request.pageSize) || 50)));
   const page = Math.max(1, Math.min(Math.ceil(filtered.length / size) || 1, Math.floor(Number(request.page) || 1)));
   const result = filtered.slice((page - 1) * size, page * size).map(row => teacherAdminPublicRow_(request.table, row));
-  return { rows: result, total: filtered.length, page, pageSize: size,
+  return { rows: result, total: filtered.length, page, pageSize: size, lookups: teacherAdminLookups_(spreadsheet, read),
+    studentCount: definition.headers.includes('StudentId') ? new Set(filtered.filter(row => row.StudentId).map(row => String(row.StudentId))).size : null,
+    fetchedAt: new Date().toISOString(),
     counts: { students: students.length, activeStudents: students.filter(row => row.Status === 'ACTIVE').length,
       linkedStudents: students.filter(row => Boolean(row.AccountKey)).length,
-      groups: teacherAdminRows_(spreadsheet, 'groups').filter(row => truthy_(row.Active)).length,
-      assignments: teacherAdminRows_(spreadsheet, 'assignments').filter(row => ['PUBLISHED', 'ACTIVE'].includes(row.Status)).length } };
+      groups: read('groups').filter(row => truthy_(row.Active)).length,
+      assignments: read('assignments').filter(row => ['PUBLISHED', 'ACTIVE'].includes(row.Status)).length } };
 }
 
 function teacherAdminSave(request) {
@@ -83,7 +106,7 @@ function teacherAdminSave(request) {
       teacherAdminAppendRows_(spreadsheet, request.table, [headers.map(field => next[field] === undefined ? '' : next[field])]);
     } else {
       if (request.table === 'students') sheet.getRange(current.rowNumber, 3).setNumberFormat('@');
-      TEACHER_ADMIN_FIELDS[request.table].forEach(field => sheet.getRange(current.rowNumber, definition.headers.indexOf(field) + 1).setValue(next[field]));
+      teacherAdminWriteFields_(sheet, current.rowNumber, definition.headers, TEACHER_ADMIN_FIELDS[request.table], next);
     }
     SpreadsheetApp.flush();
     return { message: current ? '修改已儲存。' : '新紀錄已建立。', lookups: teacherAdminLookups_(spreadsheet) };
@@ -96,22 +119,33 @@ function teacherAdminAddMembers(request) {
   teacherAdminAuthorize_(request);
   return teacherAdminLocked_(() => {
     const spreadsheet = activeOrConfiguredSpreadsheet_();
-    const group = teacherAdminRows_(spreadsheet, 'groups').find(row => row.GroupId === request.groupId && truthy_(row.Active));
+    const read = teacherAdminReader_(spreadsheet);
+    const group = read('groups').find(row => row.GroupId === request.groupId && truthy_(row.Active));
     if (!group) throw new Error('請先選擇有效群組。');
     const ids = Array.from(new Set(Array.isArray(request.studentIds) ? request.studentIds.map(String) : []));
     if (!ids.length || ids.length > 300) throw new Error('每次請選擇 1–300 名學生。');
-    const students = teacherAdminRows_(spreadsheet, 'students');
-    if (ids.some(id => !students.some(row => row.StudentId === id && row.Status === 'ACTIVE'))) throw new Error('所選學生不存在或已停用，請重新整理。');
+    const activeStudents = new Set(read('students').filter(row => row.Status === 'ACTIVE').map(row => String(row.StudentId)));
+    if (ids.some(id => !activeStudents.has(id))) throw new Error('所選學生不存在或已停用，請重新整理。');
     const sheet = teacherAdminSheet_(spreadsheet, 'groupMembers');
-    const rows = teacherAdminRows_(spreadsheet, 'groupMembers');
-    const additions = [];
+    const rows = read('groupMembers').filter(row => row.GroupId === request.groupId);
+    const members = new Map();
+    rows.forEach(row => {
+      if (members.has(String(row.StudentId))) throw new Error('群組成員有重複紀錄，請先核對試算表，未有寫入。');
+      members.set(String(row.StudentId), row);
+    });
+    const additions = [], reactivations = [];
+    let skipped = 0;
     ids.forEach(id => {
-      const existing = rows.find(row => row.StudentId === id && row.GroupId === request.groupId);
-      if (existing) sheet.getRange(existing.rowNumber, 4).setValue(true);
+      const existing = members.get(id);
+      if (existing && truthy_(existing.Active)) skipped++;
+      else if (existing) reactivations.push('D' + existing.rowNumber);
       else additions.push([id + '|' + request.groupId, id, request.groupId, true]);
     });
+    if (reactivations.length) sheet.getRangeList(reactivations).setValue(true);
     teacherAdminAppendRows_(spreadsheet, 'groupMembers', additions);
-    return { message: '已加入／重新啟用 ' + ids.length + ' 名成員。', lookups: teacherAdminLookups_(spreadsheet) };
+    if (reactivations.length || additions.length) { SpreadsheetApp.flush(); read.invalidate('groupMembers'); }
+    return { message: '新增 ' + additions.length + ' 人，重新啟用 ' + reactivations.length + ' 人，已在群組 ' + skipped + ' 人（未重複寫入）。',
+      added: additions.length, reactivated: reactivations.length, skipped, lookups: teacherAdminLookups_(spreadsheet, read) };
   });
 }
 
@@ -223,6 +257,19 @@ function teacherAdminRows_(spreadsheet, key) {
       && row[field] !== '' && row[field] !== null && row[field] !== undefined));
 }
 
+/** Batch contiguous editable cells without touching keys, login bindings or formulas in other columns. */
+function teacherAdminWriteFields_(sheet, rowNumber, headers, fields, values) {
+  const columns = fields.map(field => headers.indexOf(field)).sort((a, b) => a - b);
+  if (columns.some(column => column < 0)) throw new Error('可編輯欄位結構不正確。');
+  for (let index = 0; index < columns.length;) {
+    const first = columns[index];
+    let end = index + 1;
+    while (end < columns.length && columns[end] === columns[end - 1] + 1) end++;
+    sheet.getRange(rowNumber, first + 1, 1, end - index).setValues([columns.slice(index, end).map(column => values[headers[column]])]);
+    index = end;
+  }
+}
+
 /** Append after the last real row, not after thousands of template checkbox FALSE values.
  * Called only inside the teacher write lock. Never compact/move existing rows implicitly.
  */
@@ -279,12 +326,26 @@ function teacherAdminCurrent_(request, rows) {
   return matches[0];
 }
 
-function teacherAdminLookups_(spreadsheet) {
+function teacherAdminLookups_(spreadsheet, read) {
+  read = read || teacherAdminReader_(spreadsheet);
+  const students = read('students');
+  const activeStudents = new Set(students.filter(row => row.Status === 'ACTIVE').map(row => String(row.StudentId)));
+  const members = read('groupMembers').filter(row => row.StudentId && row.GroupId)
+    .map(row => ({ studentId: String(row.StudentId), groupId: String(row.GroupId), active: truthy_(row.Active) }));
+  const counts = new Map();
+  members.forEach(row => {
+    if (row.active && activeStudents.has(row.studentId)) {
+      if (!counts.has(row.groupId)) counts.set(row.groupId, new Set());
+      counts.get(row.groupId).add(row.studentId);
+    }
+  });
   return {
-    students: teacherAdminRows_(spreadsheet, 'students').map(row => ({ id: String(row.StudentId), className: String(row.Class), classNo: String(row.ClassNo),
-      name: String(row.ChineseName || row.EnglishName), status: row.Status, linked: Boolean(row.AccountKey) })).filter(row => row.id),
-    groups: teacherAdminRows_(spreadsheet, 'groups').map(row => ({ id: String(row.GroupId), name: String(row.GroupName), active: truthy_(row.Active), year: String(row.AcademicYear) })),
-    assignments: teacherAdminRows_(spreadsheet, 'assignments').map(row => ({ id: String(row.AssignmentId), name: String(row.Title), status: String(row.Status) }))
+    students: students.map(row => ({ id: String(row.StudentId || ''), className: String(row.Class || ''), classNo: String(row.ClassNo || ''),
+      name: String(row.ChineseName || row.EnglishName || ''), englishName: String(row.EnglishName || ''), status: row.Status, linked: Boolean(row.AccountKey) })).filter(row => row.id),
+    groups: read('groups').filter(row => row.GroupId).map(row => ({ id: String(row.GroupId), name: String(row.GroupName), type: String(row.GroupType),
+      active: truthy_(row.Active), year: String(row.AcademicYear), memberCount: counts.get(String(row.GroupId))?.size || 0 })),
+    members,
+    assignments: read('assignments').filter(row => row.AssignmentId).map(row => ({ id: String(row.AssignmentId), name: String(row.Title), status: String(row.Status) }))
   };
 }
 
