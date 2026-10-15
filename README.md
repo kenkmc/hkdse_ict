@@ -115,3 +115,8 @@ node scripts/validate_school_sync.js
 HTML5、JavaScript、Tailwind CSS、React、SQLite WebAssembly、Pyodide、Mermaid 及 Lucide Icons。網站可直接透過 GitHub Pages 使用，毋須後端服務。
 
 線上版本：https://kenkmc.github.io/hkdse_ict/
+
+
+## 逐步動畫教材
+
+主站各課現已接入129組逐步講解及四個可調模型；[獨立動畫目錄](animations/index.html)按42個課題整理，並附[課程對照](animations/curriculum.html)。原有題庫、進度、登入及教師功能繼續使用原介面。整合與驗證詳見[發布說明](ANIMATION_INTEGRATION.md)。

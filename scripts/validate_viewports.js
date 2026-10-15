@@ -48,7 +48,9 @@ const viewportCSS = fs.readFileSync(path.join(root, "assets/css/viewport-fixes.c
 });
 
 const sqlHTML = fs.readFileSync(path.join(root, "db_simulator.html"), "utf8");
-if (!sqlHTML.includes("h-screen flex flex-col overflow-hidden")) errors.push("SQL 工具的已知固定高度風險模式改變，請重新審核 viewport 規則。");
+const legacySqlLayout = sqlHTML.includes("h-screen flex flex-col overflow-hidden");
+const responsiveSqlLayout = sqlHTML.includes("sql-main-layout") && sqlHTML.includes("sql-work-area min-w-0") && sqlHTML.includes("@media(max-width:768px)") && sqlHTML.includes("min-height:680px");
+if (!legacySqlLayout && !responsiveSqlLayout) errors.push("SQL 工具缺少已審核的固定視窗或響應式工作區配置。");
 const pythonHTML = fs.readFileSync(path.join(root, "python_converter.html"), "utf8");
 if (!pythonHTML.includes("#flow-canvas { position: relative; width: 1200px; height: 1200px")) errors.push("Python 大畫布尺寸改變，請重新審核 viewport 規則。");
 if (!pythonHTML.includes("#flow-workspace") || !pythonHTML.includes("overflow: auto")) errors.push("Python 大畫布沒有放在可捲動工作區。" );

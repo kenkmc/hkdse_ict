@@ -1,0 +1,39 @@
+.im-model { margin: 1.5rem 0; padding: clamp(1rem, 3vw, 1.7rem); border: 1px solid #bacbdc; border-radius: 1rem; background: #fff; color: #172b43; font: 1rem/1.65 system-ui, sans-serif; box-shadow: 0 3px 14px #1634560a; }
+.im-model h3 { font-size: 1.3rem; margin: 0 0 .6rem; color: #153c66; }
+.im-model p { margin: .65rem 0; }
+.im-model .im-intro, .im-model .im-invariant { font-size: .93rem; color: #3f536b; }
+.im-model .im-fields, .im-model .im-controls { display: flex; flex-wrap: wrap; gap: .65rem; align-items: end; margin: 1rem 0; }
+.im-model label { display: flex; flex-direction: column; gap: .2rem; font-size: .92rem; font-weight: 650; }
+.im-model input, .im-model select { min-height: 2.6rem; min-width: 5rem; border: 1px solid #8297b1; border-radius: .4rem; padding: .4rem .65rem; color: #142d48; background: #fff; font: inherit; }
+.im-model input[type=number] { width: 7rem; }
+.im-model input[type=text] { width: min(100%, 22rem); }
+.im-model button { min-height: 2.6rem; border: 1px solid #40658b; border-radius: .4rem; background: #edf4fc; color: #163d67; padding: .4rem .8rem; font: 650 .93rem/1.4 system-ui, sans-serif; cursor: pointer; }
+.im-model button:hover { background: #dbeafa; }
+.im-model button:disabled { opacity: .5; cursor: default; }
+.im-model :focus-visible { outline: 3px solid #b05700; outline-offset: 3px; }
+.im-model .im-status { min-height: 3.4rem; background: #eef5fb; border-left: 4px solid #326fa7; padding: .65rem .8rem; border-radius: .25rem; }
+.im-model .im-status.is-error { background: #fff4e5; border-color: #a84d00; color: #713300; }
+.im-model .im-visual { padding: .7rem; border: 1px solid #d2deea; border-radius: .6rem; background: #f8fbfe; overflow: auto; }
+.im-model svg { width: 100%; height: auto; min-width: 280px; display: block; }
+.im-model .im-bits { min-width: 290px; }
+.im-model .im-bitrow { display: grid; grid-template-columns: 4.1rem repeat(var(--im-bits), minmax(1.6rem, 1fr)); gap: .2rem; align-items: center; margin: .3rem 0; font: 650 1rem/2 monospace; text-align: center; }
+.im-model .im-bitrow:first-child { font-size: .8rem; color: #435d78; }
+.im-model .im-bit { border: 1px solid #b2c6dc; border-radius: .25rem; background: #fff; }
+.im-model .im-bit.is-active { outline: 3px solid #a94f00; background: #fff0d4; color: #713100; }
+.im-model .im-result { display: flex; flex-wrap: wrap; gap: .6rem; margin: .8rem 0; }
+.im-model .im-result span { display: block; padding: .45rem .7rem; border: 1px solid #c2d3e5; border-radius: .4rem; background: #f5f9fd; }
+.im-model .im-result strong { font-size: 1.1rem; }
+.im-model .im-slots { display: flex; gap: .45rem; align-items: stretch; min-height: 6rem; padding: .8rem; overflow: auto; }
+.im-model .im-slots.is-stack { flex-direction: column-reverse; align-items: stretch; width: min(100%, 20rem); margin: auto; }
+.im-model .im-slot { min-width: 5.3rem; min-height: 3.2rem; border: 2px dashed #afc0d1; border-radius: .4rem; padding: .4rem; text-align: center; flex: 1; background: #fff; }
+.im-model .im-slot.is-filled { border-style: solid; background: #e9f2fc; border-color: #5381b1; }
+.im-model .im-slot.is-active { border-color: #a54a00; background: #fff0d6; }
+.im-model .im-slot small { display: block; font-size: .76rem; color: #4b6075; }
+.im-model .im-slot strong { display: block; overflow-wrap: anywhere; }
+.im-model .im-counter { font-variant-numeric: tabular-nums; }
+.im-model .im-tablewrap { overflow: auto; }
+.im-model table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.im-model th, .im-model td { padding: .35rem .55rem; border: 1px solid #c4d5e6; text-align: left; }
+.im-model .im-key { font-family: monospace; color: #713100; }
+@media (prefers-reduced-motion: no-preference) { .im-model .im-bit.is-active, .im-model .im-slot.is-active { animation: im-focus .3s ease-out; } @keyframes im-focus { from { background: #ffd899; } to { background: #fff0d6; } } }
+@media (max-width: 480px) { .im-model .im-fields label { width: 100%; } .im-model input[type=text] { width: 100%; } .im-model button { flex-grow: 1; } }
