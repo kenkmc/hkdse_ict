@@ -11,7 +11,6 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- MathJax for Formulas -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <style>
@@ -154,6 +153,9 @@
             to { opacity: 1; transform: scale(1); }
         }
     </style>
+    <link rel="stylesheet" href="assets/learning-lab.css">
+    <link rel="stylesheet" href="assets/core-a-labs.css">
+<link rel="stylesheet" href="assets/interactive-models.css">
 </head>
 <body class="text-slate-700">
 
@@ -307,7 +309,7 @@
             </div>
             
             <p class="mb-8 text-slate-600 leading-relaxed">
-                在電腦系統中，我們不僅需要處理正整數 (Unsigned Integer)，還需要處理負數。最常見的表示方法有兩種：<b>符號和值 (Sign and Magnitude)</b> 與 <b>二進制補碼 (Two's Complement)</b>。
+                在電腦系統中，我們不僅需要處理非負整數（包括 0，Unsigned Integer），還需要處理負數。最常見的表示方法有兩種：<b>符號和值 (Sign and Magnitude)</b> 與 <b>二進制補碼 (Two's Complement)</b>。
             </p>
 
             <!-- Theory Cards -->
@@ -495,6 +497,7 @@
 
         <!-- 3.2 數據表示 (多媒體) -->
         <section id="sec3-2" class="mb-20 scroll-mt-32">
+            <div class="bg-blue-50 border border-blue-200 p-5 rounded-xl mb-6 text-sm"><strong>檔案格式與計算假設：</strong>BMP 常保存點陣圖（可未壓縮或使用壓縮）；TXT 保存純文字，DOCX／ODT 保存格式化文件，PDF 適合保持版面交換。副檔名不能單獨決定大小或品質。以下原始圖像／PCM 音訊／視像大小估算忽略檔頭、容器及填充；1 Byte＝8 bits，1 KiB＝1024 Bytes，1 kB＝1000 Bytes。動畫例題會註明所用假設。</div>
             <div class="flex items-center gap-3 mb-6">
                 <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold text-sm">3.2</span>
                 <h2 class="text-3xl font-bold text-slate-800">數據表示 (多媒體)</h2>
@@ -520,9 +523,9 @@
                             <div>
                                 <h4 class="font-bold text-slate-700 mb-2">ASCII (美國標準信息交換碼)</h4>
                                 <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
-                                    <li>使用 7 位元 (Standard) 或 8 位元 (Extended)。</li>
+                                    <li>標準 ASCII 使用 7 位元，共 128 個編碼；各種 8-bit 擴展並非同一套標準。</li>
                                     <li>只能表示英文字母、數字和基本符號。</li>
-                                    <li>佔用空間少 (1 Byte)。</li>
+                                    <li>實際儲存常以每個字符 1 Byte 計算，未用的最高位為 0。</li>
                                 </ul>
                             </div>
                             <div>
@@ -659,7 +662,7 @@
                                     </tr>
                                     <tr>
                                         <td class="font-bold text-indigo-600">TIFF</td>
-                                        <td>無損 / 未壓縮</td>
+                                        <td>可未壓縮／無損，亦可使用其他壓縮</td>
                                         <td>適合<b>印刷出版</b>。檔案極大，保留所有細節。</td>
                                     </tr>
                                     <tr>
@@ -711,8 +714,8 @@
                                 <tbody>
                                     <tr>
                                         <td class="font-bold text-indigo-600">WAV</td>
-                                        <td>未壓縮 (Uncompressed)</td>
-                                        <td>檔案最大，音質最好，保留所有原始數據。</td>
+                                        <td>容器：常用未壓縮 PCM</td>
+                                        <td>WAV 是容器，常用未壓縮 PCM，亦可容納壓縮音訊；音質取決於採樣及編碼設定，不能只看副檔名。</td>
                                     </tr>
                                     <tr>
                                         <td class="font-bold text-indigo-600">MP3</td>
@@ -932,7 +935,7 @@
 
     <script>
         // Init Lucide Icons
-        lucide.createIcons();
+        if (window.lucide) lucide.createIcons();
 
         // ----------------------------------------------------
         // 1. 短除法演示邏輯
@@ -958,8 +961,8 @@
             const input = document.getElementById('decimalInput').value;
             const resultDiv = document.getElementById('division-result');
             
-            if (!input || input < 0) {
-                alert("請輸入有效的正整數");
+            if (!/^[0-9]+$/.test(input) || !Number.isSafeInteger(Number(input)) || Number(input) > 65535) {
+                alert("請輸入 0 至 65535 的整數");
                 return;
             }
 
@@ -1036,8 +1039,8 @@
             const strB = document.getElementById('binB').value.trim();
             const display = document.getElementById('calcDisplay');
 
-            if(!/^[01]+$/.test(strA) || !/^[01]+$/.test(strB)) {
-                display.innerHTML = "<span class='text-red-400 text-sm'>錯誤: 請輸入有效的二進制數字</span>";
+            if(!/^[01]{1,32}$/.test(strA) || !/^[01]{1,32}$/.test(strB)) {
+                display.innerHTML = "<span class='text-red-400 text-sm'>錯誤：請輸入 1 至 32 位二進制數字</span>";
                 return;
             }
 
@@ -1077,52 +1080,31 @@
             
             btn.classList.add('active');
             document.getElementById('content-' + tabId).classList.add('active');
-            lucide.createIcons();
+            if (window.lucide) lucide.createIcons();
         }
 
         function inspectText() {
             const text = document.getElementById('charInput').value;
             const tbody = document.getElementById('char-table-body');
             const resultDiv = document.getElementById('char-result');
-            
-            if(!text) {
-                resultDiv.classList.add('hidden');
-                return;
-            }
-
-            tbody.innerHTML = '';
-            for (let i = 0; i < text.length; i++) {
-                const char = text[i];
-                const code = text.codePointAt(i); 
-                if (code > 0xFFFF) i++;
-
-                const ascii = code < 128 ? code : "-";
-                const hex = code.toString(16).toUpperCase().padStart(4, '0');
-                
-                let note = "";
-                if(code < 128) note = "Standard ASCII";
-                else if(code >= 0x4E00 && code <= 0x9FFF) note = "CJK Unified Ideograph (中文字)";
-                else if(code > 128) note = "Unicode Character";
-
-                const row = `
-                    <tr>
-                        <td class="font-bold text-lg text-indigo-600">${char}</td>
-                        <td>${ascii}</td>
-                        <td>U+${hex}</td>
-                        <td class="text-xs text-slate-500">${note}</td>
-                    </tr>
-                `;
-                tbody.innerHTML += row;
+            tbody.replaceChildren();
+            if (!text) { resultDiv.classList.add('hidden'); return; }
+            for (const char of text) {
+                const code = char.codePointAt(0), row = document.createElement('tr');
+                const values = [char, code < 128 ? String(code) : '—', 'U+' + code.toString(16).toUpperCase().padStart(4, '0'), (code < 128 ? 'Standard ASCII' : 'Unicode') + '；UTF-8 ' + new TextEncoder().encode(char).length + ' Bytes'];
+                values.forEach(value => { const td = document.createElement('td'); td.textContent = value; row.appendChild(td); });
+                tbody.appendChild(row);
             }
             resultDiv.classList.remove('hidden');
         }
 
         function formatBytes(bytes, decimals = 2) {
+            if (!Number.isFinite(bytes) || bytes < 0) return '無效的數值';
             if (bytes === 0) return '0 Bytes';
             const k = 1024;
             const dm = decimals < 0 ? 0 : decimals;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            const sizes = ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB'];
+            const i = Math.max(0, Math.min(sizes.length - 1, Math.floor(Math.log(bytes) / Math.log(k))));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
         }
 
@@ -1131,7 +1113,7 @@
             const h = document.getElementById('calcH').value;
             const d = document.getElementById('calcD').value;
             
-            if(w && h && d) {
+            if([w, h, d].every(v => Number.isInteger(Number(v)) && Number(v) > 0) && Number.isSafeInteger(w * h * d)) {
                 const bits = w * h * d;
                 const bytes = bits / 8;
                 document.getElementById('sizeResult').classList.remove('hidden');
@@ -1149,7 +1131,7 @@
             const ch = document.getElementById('audioCh').value;
             const time = document.getElementById('audioTime').value;
 
-            if(rate && res && ch && time) {
+            if([rate, res, ch, time].every(v => v !== "" && Number.isFinite(Number(v)) && Number(v) > 0) && Number.isSafeInteger(rate * res * ch * time)) {
                 const bits = rate * res * ch * time;
                 const bytes = bits / 8;
                 document.getElementById('audioSizeResult').classList.remove('hidden');
@@ -1193,7 +1175,7 @@
                 audioDetails = `<br><span class="text-xs text-amber-600">+ 音訊大小: ${formatBytes(audioBytes)}</span>`;
             }
 
-            if(w && h && depth && fps && time) {
+            if([w, h, depth, fps, time].every(v => v !== "" && Number.isFinite(Number(v)) && Number(v) > 0) && Number.isSafeInteger(w * h * depth * fps * time + audioBits)) {
                 const videoBitsPerFrame = w * h * depth;
                 const totalVideoBits = videoBitsPerFrame * fps * time;
                 const grandTotalBits = totalVideoBits + audioBits;
@@ -1222,7 +1204,10 @@
             container.innerHTML = '';
             
             bits.forEach((bit, index) => {
-                const div = document.createElement('div');
+                const div = document.createElement('button');
+                div.type = 'button';
+                div.setAttribute('aria-label', `第 ${index + 1} 位，值 ${bit}，按下切換`);
+                div.setAttribute('aria-pressed', String(Boolean(bit)));
                 div.className = `bit-switch ${bit ? 'on' : 'off'}`;
                 if (index === 0) div.style.borderColor = bit ? '#f43f5e' : '#e2e8f0'; 
                 if (index === 0 && bit) div.style.backgroundColor = '#f43f5e';
@@ -1290,9 +1275,12 @@
         // ----------------------------------------------------
         // 5. Converter Demo Logic
         // ----------------------------------------------------
+        let twosDemoTimers = [];
         function startTwosCompDemo() {
-            let num = parseInt(document.getElementById('convertInput').value);
-            if(isNaN(num) || num < 0 || num > 127) {
+            twosDemoTimers.forEach(clearTimeout); twosDemoTimers = [];
+            let raw = document.getElementById('convertInput').value;
+            let num = Number(raw);
+            if(!raw || !Number.isInteger(num) || num < 0 || num > 127) {
                 alert("請輸入 0 至 127 之間的整數");
                 return;
             }
@@ -1306,23 +1294,23 @@
             document.getElementById('step3-row').style.opacity = '0.3';
             document.getElementById('demo-result').innerText = '--------';
 
-            setTimeout(() => {
+            twosDemoTimers.push(setTimeout(() => {
                 let inverted = "";
                 for(let char of bin) inverted += (char === '0' ? '1' : '0');
                 document.getElementById('demo-inverted').innerText = inverted;
                 document.getElementById('step2-row').style.opacity = '1';
 
-                setTimeout(() => {
+                twosDemoTimers.push(setTimeout(() => {
                     let valInv = parseInt(inverted, 2);
                     let resultVal = valInv + 1;
                     let resultBin = resultVal.toString(2).padStart(8, '0');
                     if(resultBin.length > 8) resultBin = resultBin.slice(-8);
 
-                    document.getElementById('demo-result').innerText = resultBin + ` (-${num})`;
+                    document.getElementById('demo-result').innerText = resultBin + ` (${num === 0 ? 0 : -num})`;
                     document.getElementById('step3-row').style.opacity = '1';
-                }, 1000);
+                }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1000));
 
-            }, 800);
+            }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 800));
         }
 
         // ----------------------------------------------------
@@ -1383,7 +1371,7 @@
                     // Simple text calculation: ASCII
                     const chars = Math.floor(Math.random() * 500) + 100;
                     currentChallenge = { ans: (chars * 8).toString(), type: 'text' }; // in bits
-                    qEl.innerText = `一份純文字文件包含 ${chars} 個 ASCII 字符。它的檔案大小是多少 bits？`;
+                    qEl.innerText = `一份純文字文件以每個 ASCII 字符佔 1 Byte 儲存（不計檔頭），共 ${chars} 個字符。大小是多少 bits？`;
                     ansInput.placeholder = "只輸入數字";
                     break;
             }
@@ -1407,5 +1395,8 @@
         }
 
     </script>
+    <script src="assets/core-a-labs.js"></script>
+    <script src="assets/learning-lab.js"></script>
+<script src="assets/interactive-models.js"></script>
 </body>
 </html>

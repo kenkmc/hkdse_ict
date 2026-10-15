@@ -1,0 +1,6 @@
+.flip-card.is-flipped .flip-card-inner { transform: rotateY(180deg); }
+.flip-card:focus-visible { outline: 3px solid #6366f1; outline-offset: 5px; border-radius: 1rem; }
+.bit-switch:focus-visible { outline: 3px solid #6366f1; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+}

@@ -55,6 +55,8 @@
             position: relative;
         }
     </style>
+    <link rel="stylesheet" href="assets/learning-lab.css">
+    <link rel="stylesheet" href="assets/core-a-labs.css">
 </head>
 <body class="text-slate-700 flex flex-col min-h-screen">
 
@@ -113,6 +115,7 @@
                                     <th class="sheet-header-row">A</th>
                                     <th class="sheet-header-row">B</th>
                                     <th class="sheet-header-row">C</th>
+                                    <th class="sheet-header-row">D</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -367,7 +370,7 @@
                 <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm group">
                     <h3 class="text-xl font-bold text-rose-700 mb-2">絕對參照 (Absolute)</h3>
                     <span class="bg-rose-100 text-rose-800 text-xs px-2 py-1 rounded font-mono mb-4 inline-block">$A$1</span>
-                    <p class="text-sm text-slate-600 mb-4">使用 <code>$</code> 鎖定。複製時地址保持不變。</p>
+                    <p class="text-sm text-slate-600 mb-4">使用 <code>$</code> 鎖定欄及列。<code>$A$1</code> 複製時保持不變；混合參照 <code>$A1</code> 只鎖欄，<code>A$1</code> 只鎖列。</p>
                     <div class="bg-slate-100 p-4 rounded h-32 relative flex justify-center border overflow-hidden">
                         <div class="absolute top-4 w-32 bg-white border border-rose-300 text-rose-600 p-2 rounded text-center z-10">=$A$1*B1</div>
                         <div class="absolute top-4 w-32 bg-rose-600/10 border border-rose-300 text-rose-600 p-2 rounded text-center ref-anim-box group-hover:translate-y-16">
@@ -567,7 +570,7 @@
     </footer>
 
     <script>
-        lucide.createIcons();
+        if (window.lucide) lucide.createIcons();
 
         // 進度條
         window.onscroll = function() {
@@ -608,7 +611,7 @@
                 resultDiv.innerHTML = `<span class="text-emerald-600">這是 數值 (Value)</span> <span class="text-xs text-emerald-400 block font-normal">預設靠右對齊</span>`;
                 resultDiv.className = "p-3 bg-emerald-50 rounded-lg border border-emerald-200 text-center text-sm font-bold";
                 
-                const num = parseFloat(input);
+                const num = Number(input);
                 document.getElementById('fmtCurrency').textContent = '$' + num.toFixed(2);
                 document.getElementById('fmtPercent').textContent = (num * 100).toFixed(0) + '%';
                 previewDiv.classList.remove('hidden');
@@ -716,12 +719,12 @@
         }
         
         function sortTable(key) {
-            tableData.sort((a, b) => a[key] > b[key] ? 1 : -1);
+            tableData.sort((a, b) => a[key] === b[key] ? 0 : a[key] > b[key] ? 1 : -1);
             renderTable();
         }
 
         function filterTable() {
-            tableData = initialData.filter(row => row.score >= 50);
+            tableData = tableData.filter(row => row.score >= 50);
             renderTable();
         }
 
@@ -752,6 +755,8 @@
 
         // 測驗
         function checkFinalQuiz(btn, isCorrect) {
+            if (btn.disabled) return;
+            btn.disabled = true;
             if (isCorrect) {
                 btn.classList.add('correct-anim', 'bg-green-600');
                 btn.innerHTML += ' ✅';
@@ -761,5 +766,7 @@
             }
         }
     </script>
+    <script src="assets/core-a-labs.js"></script>
+    <script src="assets/learning-lab.js"></script>
 </body>
 </html>

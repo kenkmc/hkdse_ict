@@ -99,11 +99,13 @@
         body.maximized #flow-workspace { height: calc(100vh - 140px); } 
 
     </style>
+    <link rel="stylesheet" href="assets/learning-lab.css">
+<style>@media(max-width:700px){body{padding:12px}.header{flex-wrap:wrap;gap:10px}.container{min-width:0}.panel{box-sizing:border-box;min-width:0;width:100%;flex:1 1 100%;padding:14px}#example-select,#mode-select{min-width:0!important;max-width:100%;width:100%}.header h1{overflow-wrap:anywhere}}</style>
 </head>
 <body>
 
 <div class="header">
-    <h1 id="main-title">🚀 系統開發生命週期 (SDLC) 輔助工具</h1>
+    <h1 id="main-title">🚀 邏輯與程式碼雙向轉換工具</h1>
     <div class="lang-switch">
         <select id="lang-select" onchange="changeLang()">
             <option value="zh">繁體中文</option>
@@ -195,10 +197,10 @@
             inputTitleFlow: "✍️ 互動流程圖編輯器",
             placeholderPy: "請輸入 Python 程式碼...\n\n# 範例\nfor i in range(1, 5):\n    print(i)",
             placeholderPs: "請輸入偽代碼...\n\n# 範例\n對於每個 i 在 range(1, 5) 執行\n    輸出 i",
-            btnCheck: "1. 檢查語法", btnPseudo: "2. 轉為偽代碼", btnToPython: "1. 轉為 Python", btnFlow: "轉為流程圖", btnRun: "▶️ 執行程式", btnRunTitle: "若程式使用 input()，因目前網頁版尚未提供頁面內輸入欄位，執行時會改以彈出式視窗請您輸入。",
+            btnCheck: "1. 檢查輸入", btnPseudo: "2. 轉為偽代碼", btnToPython: "1. 轉為 Python", btnFlow: "轉為流程圖", btnRun: "▶️ 執行程式", btnRunTitle: "若程式使用 input()，因目前網頁版尚未提供頁面內輸入欄位，執行時會改以彈出式視窗請您輸入。",
             btnCompileFlow: "⚙️ 1. 轉換流程圖為 Python 程式碼",
             outputTitle: "📊 結果輸出區", msgEmpty: "請先輸入內容或選擇範例！",
-            msgFlowEmpty: "流程圖目前沒有節點，請先繪製！", msgSyntaxOk: "✅ 完美！語法與縮排檢查皆通過！",
+            msgFlowEmpty: "流程圖目前沒有節點，請先繪製！", msgSyntaxOk: "ℹ️ 已讀取內容；轉換器只支援教學範例常用語法。執行時由 Python 真正解析語法。",
             msgCompileSuccess: "✅ 流程圖轉換成功！已自動切換為 Python 模式。", msgInputPopup: "ℹ️ 程式含有 input()；因網頁版目前未提供頁面內輸入欄位，執行時會改用彈出式視窗請您輸入。", inputPromptNote: "提示：此網頁目前尚未提供頁面內輸入欄位，所以程式執行到 input() 時，會以彈出式視窗請您輸入。",
             modeLabel: "⚙️ 轉換模式: ", exampleLabel: "📖 範例: ", modePy: "🐍 Python ➡️ 偽代碼 / 流程圖", modePs: "📝 偽代碼 ➡️ Python / 流程圖",
             modeFlow: "✍️ 互動流程圖編輯器 ➡️ Python (本機)", defaultSelectExample: "-- 請選擇教學範例 --",
@@ -206,7 +208,7 @@
             pseudo: { func: "函數", begin: "開始", if: "如果", then: "則", elif: "否則如果", else: "否則", forEach: "對於每個", in: "在", do: "執行", while: "當", output: "輸出", input: "輸入" }, flow: { start: "開始", end: "結束", true: "是", false: "否", output: "輸出", input: "輸入" }
         },
         en: {
-            mainTitle: "🚀 Logic & Code Bidirectional Tool", inputTitlePy: "🐍 Python Code Input", inputTitlePs: "📝 Pseudo-code Input", inputTitleFlow: "✍️ Interactive Flowchart", placeholderPy: "Enter Python code here...", placeholderPs: "Enter Pseudo-code here...", btnCheck: "1. Check Syntax", btnPseudo: "2. To Pseudo-code", btnToPython: "1. To Python", btnFlow: "To Flowchart", btnRun: "▶️ Run Code", btnRunTitle: "If the program uses input(), the web version currently falls back to a popup dialog because inline input fields are not yet available.", btnCompileFlow: "⚙️ 1. Compile Flowchart to Python", outputTitle: "📊 Output Area", msgEmpty: "Please enter content first!", msgFlowEmpty: "Flowchart is empty!", msgSyntaxOk: "✅ Syntax passed!", msgCompileSuccess: "✅ Flowchart compiled!", msgInputPopup: "ℹ️ This program uses input(); because the web version does not yet provide inline input fields, it will ask through popup dialogs.", inputPromptNote: "Note: Inline input fields are not yet available in this web page, so when the program reaches input(), a popup dialog will be used for your entry.", modeLabel: "⚙️ Mode: ", exampleLabel: "📖 Examples: ", modePy: "🐍 Python ➡️ Pseudo / Flow", modePs: "📝 Pseudo ➡️ Python / Flow", modeFlow: "✍️ Interactive Flowchart ➡️ Python", defaultSelectExample: "-- Select Example --", flowTools: { start: "Start", end: "End", process: "Process", io: "I/O", decision: "Decision", del: "Delete", clear: "Clear", maximize: "Maximize", restore: "Restore", hint: "💡 Drag blue dot 🔵 to connect.", defaultText: "Click to edit" }, pseudo: { func: "FUNCTION", begin: "BEGIN", if: "IF", then: "THEN", elif: "ELSE IF", else: "ELSE", forEach: "FOR EACH", in: "IN", do: "DO", while: "WHILE", output: "OUTPUT", input: "INPUT" }, flow: { start: "Start", end: "End", true: "True", false: "False", output: "Output", input: "Input" }
+            mainTitle: "🚀 Logic & Code Bidirectional Tool", inputTitlePy: "🐍 Python Code Input", inputTitlePs: "📝 Pseudo-code Input", inputTitleFlow: "✍️ Interactive Flowchart", placeholderPy: "Enter Python code here...", placeholderPs: "Enter Pseudo-code here...", btnCheck: "1. Check Input", btnPseudo: "2. To Pseudo-code", btnToPython: "1. To Python", btnFlow: "To Flowchart", btnRun: "▶️ Run Code", btnRunTitle: "If the program uses input(), the web version currently falls back to a popup dialog because inline input fields are not yet available.", btnCompileFlow: "⚙️ 1. Compile Flowchart to Python", outputTitle: "📊 Output Area", msgEmpty: "Please enter content first!", msgFlowEmpty: "Flowchart is empty!", msgSyntaxOk: "ℹ️ Content loaded. Conversion supports a teaching subset; Python parses syntax when Run is used.", msgCompileSuccess: "✅ Flowchart compiled!", msgInputPopup: "ℹ️ This program uses input(); because the web version does not yet provide inline input fields, it will ask through popup dialogs.", inputPromptNote: "Note: Inline input fields are not yet available in this web page, so when the program reaches input(), a popup dialog will be used for your entry.", modeLabel: "⚙️ Mode: ", exampleLabel: "📖 Examples: ", modePy: "🐍 Python ➡️ Pseudo / Flow", modePs: "📝 Pseudo ➡️ Python / Flow", modeFlow: "✍️ Interactive Flowchart ➡️ Python", defaultSelectExample: "-- Select Example --", flowTools: { start: "Start", end: "End", process: "Process", io: "I/O", decision: "Decision", del: "Delete", clear: "Clear", maximize: "Maximize", restore: "Restore", hint: "💡 Drag blue dot 🔵 to connect.", defaultText: "Click to edit" }, pseudo: { func: "FUNCTION", begin: "BEGIN", if: "IF", then: "THEN", elif: "ELSE IF", else: "ELSE", forEach: "FOR EACH", in: "IN", do: "DO", while: "WHILE", output: "OUTPUT", input: "INPUT" }, flow: { start: "Start", end: "End", true: "True", false: "False", output: "Output", input: "Input" }
         }
     };
 
@@ -1014,7 +1016,7 @@
     function checkSyntax() {
         const code = getPythonCode();
         if (!code.trim()) { setStatus(i18n[currentLang].msgEmpty, 'error'); return false; }
-        setStatus(i18n[currentLang].msgSyntaxOk, 'success'); return true;
+        setStatus(i18n[currentLang].msgSyntaxOk, 'info'); return true;
     }
 
     function toPseudoCode() {
@@ -1100,7 +1102,10 @@
         while (blockStack.length > 0) popBlock();
         mermaidGraph += `End([${t.flow.end}])\n`; connectPathsTo("End");
 
-        document.getElementById('output-area').innerHTML = `<div class="mermaid">${mermaidGraph}</div>`;
+        const chart = document.createElement('div');
+        chart.className = 'mermaid';
+        chart.textContent = mermaidGraph;
+        document.getElementById('output-area').replaceChildren(chart);
         if(typeof mermaid !== 'undefined') setTimeout(() => mermaid.init(undefined, document.querySelectorAll('.mermaid')), 100);
     }
 
@@ -1183,5 +1188,8 @@ builtins.input = __pyodide_browser_input
     changeLang();
 </script>
 
+<section id="python-topic-labs" style="max-width:1100px;margin:2rem auto"><p>轉換器以文字規則處理常見順序、選擇及迭代範例，並非完整 Python 編譯器。請檢查轉換結果；語法正確也不代表邏輯正確。</p></section>
+<script src="assets/network-labs.js"></script>
+<script src="assets/learning-lab.js"></script>
 </body>
 </html>
