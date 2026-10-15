@@ -38,7 +38,9 @@
         .drop-target.correct { border: 2px solid #10b981; background: #ecfdf5; }
         .draggable { cursor: grab; user-select: none; transition: transform 0.2s; }
         .draggable:active { cursor: grabbing; transform: scale(1.05); }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
     </style>
+    <link rel="stylesheet" href="assets/learning-lab.css">
 </head>
 <body class="text-slate-800">
 
@@ -83,7 +85,7 @@
                     <p class="text-[11px] text-emerald-600 font-mono mb-4">Local Area Network</p>
                     <ul class="text-sm space-y-3 text-slate-700">
                         <li class="flex items-start gap-2"><i data-lucide="map-pin" class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5"></i> <b>地理範圍：</b> 覆蓋面積較小（如學校）。</li>
-                        <li class="flex items-start gap-2"><i data-lucide="zap" class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5"></i> <b>傳輸速度：</b> 快且錯誤率低。</li>
+                        <li class="flex items-start gap-2"><i data-lucide="zap" class="w-4 h-4 text-emerald-500 shrink-0 mt-0.5"></i> <b>傳輸特性：</b> 通常有較高容量及低延遲；實際速度及可靠性取決於設備、鏈路與負載。</li>
                     </ul>
                 </div>
 
@@ -96,7 +98,7 @@
                     <p class="text-[11px] text-sky-600 font-mono mb-4">Wide Area Network</p>
                     <ul class="text-sm space-y-3 text-slate-700">
                         <li class="flex items-start gap-2"><i data-lucide="map" class="w-4 h-4 text-sky-500 shrink-0 mt-0.5"></i> <b>地理範圍：</b> 跨城市、國家（如互聯網）。</li>
-                        <li class="flex items-start gap-2"><i data-lucide="activity" class="w-4 h-4 text-sky-500 shrink-0 mt-0.5"></i> <b>傳輸媒介：</b> 依賴 ISP 公共線路。</li>
+                        <li class="flex items-start gap-2"><i data-lucide="activity" class="w-4 h-4 text-sky-500 shrink-0 mt-0.5"></i> <b>傳輸媒介：</b> 可透過電訊供應商網絡、租用專線等連接不同地區。</li>
                     </ul>
                 </div>
             </div>
@@ -141,7 +143,7 @@
                     
                     <ul class="text-sm space-y-2 text-slate-600 bg-sky-50/50 p-4 rounded-2xl border border-sky-100">
                         <li class="flex items-start gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-sky-500 mt-0.5 shrink-0"></i> <b>伺服器</b>：提供服務與資源給客戶端。</li>
-                        <li class="flex items-start gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-500 mt-0.5 shrink-0"></i> <b>特點</b>：管理方便、安全性較高。</li>
+                        <li class="flex items-start gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-emerald-500 mt-0.5 shrink-0"></i> <b>特點</b>：便於集中管理帳戶、權限及備份；安全性仍依賴正確設定與維護。</li>
                     </ul>
                 </div>
 
@@ -168,7 +170,7 @@
                     </div>
 
                     <ul class="text-sm space-y-2 text-slate-600 bg-sky-50/50 p-4 rounded-2xl border border-sky-100">
-                        <li class="flex items-start gap-2"><i data-lucide="users" class="w-4 h-4 text-sky-500 mt-0.5 shrink-0"></i> <b>人人平等</b>：每台電腦既是客戶端也是伺服器。</li>
+                        <li class="flex items-start gap-2"><i data-lucide="users" class="w-4 h-4 text-sky-500 mt-0.5 shrink-0"></i> <b>角色對等</b>：每台電腦都可以提供及索取資源；角色取決於當次通訊。</li>
                         <li class="flex items-start gap-2"><i data-lucide="coins" class="w-4 h-4 text-emerald-500 mt-0.5 shrink-0"></i> <b>特點</b>：低成本，適合小型家庭網絡。</li>
                     </ul>
                 </div>
@@ -237,7 +239,7 @@
                     <h2 class="text-2xl font-bold text-sky-900 flex items-center gap-2">
                         <i data-lucide="mouse-pointer-click" class="text-sky-600"></i> 互動組網：搭建 LAN
                     </h2>
-                    <p class="text-sm text-slate-500 mt-1">請按正確順序將硬件拖入對應位置。</p>
+                    <p class="text-sm text-slate-500 mt-1">把硬件拖入位置，或先點選硬件再點選位置（支援鍵盤 Enter／空白鍵）。圖示是一種可行設計，設備功能可整合。</p>
                 </div>
                 <div class="flex items-center gap-4">
                     <span id="score" class="bg-white text-sky-700 border border-sky-200 px-4 py-2 rounded-full font-bold shadow-sm">已完成: 0/4</span>
@@ -305,35 +307,45 @@
         const targets = document.querySelectorAll('.drop-target');
         let solved = 0;
 
+        let selectedHardware = null;
+        function placeHardware(tar, id) {
+            if (tar.classList.contains('correct')) return;
+            const el = document.getElementById(id);
+            if (!el || tar.dataset.answer !== id) return;
+            tar.replaceChildren(el);
+            tar.classList.add('correct');
+            el.setAttribute('draggable', 'false');
+            el.setAttribute('aria-pressed', 'false');
+            selectedHardware = null;
+            solved++;
+            document.getElementById('score').innerText = `已完成: ${solved}/4`;
+            if (solved === 4) document.getElementById('win').classList.remove('hidden');
+        }
         draggables.forEach(dr => {
-            dr.addEventListener('dragstart', (e) => e.dataTransfer.setData('text', dr.id));
+            dr.tabIndex = 0;
+            dr.setAttribute('role', 'button');
+            dr.setAttribute('aria-pressed', 'false');
+            dr.addEventListener('dragstart', e => e.dataTransfer.setData('text', dr.id));
+            const select = () => {
+                if (dr.closest('.correct')) return;
+                selectedHardware = dr.id;
+                draggables.forEach(x => x.setAttribute('aria-pressed', String(x === dr)));
+            };
+            dr.addEventListener('click', e => { e.stopPropagation(); select(); });
+            dr.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); select(); } });
         });
-
         targets.forEach(tar => {
-            tar.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                tar.classList.add('active');
-            });
-
+            tar.tabIndex = 0;
+            tar.setAttribute('role', 'button');
+            tar.setAttribute('aria-label', '放置：' + document.getElementById(tar.dataset.answer).textContent.trim());
+            tar.addEventListener('dragover', e => { e.preventDefault(); tar.classList.add('active'); });
             tar.addEventListener('dragleave', () => tar.classList.remove('active'));
-
-            tar.addEventListener('drop', (e) => {
-                e.preventDefault();
-                tar.classList.remove('active');
-                const id = e.dataTransfer.getData('text');
-                
-                if (tar.dataset.answer === id) {
-                    const el = document.getElementById(id);
-                    tar.innerHTML = "";
-                    tar.appendChild(el);
-                    tar.classList.add('correct');
-                    el.setAttribute('draggable', 'false');
-                    solved++;
-                    document.getElementById('score').innerText = `已完成: ${solved}/4`;
-                    if (solved === 4) document.getElementById('win').classList.remove('hidden');
-                }
-            });
+            tar.addEventListener('drop', e => { e.preventDefault(); tar.classList.remove('active'); placeHardware(tar, e.dataTransfer.getData('text')); });
+            tar.addEventListener('click', () => placeHardware(tar, selectedHardware));
+            tar.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); placeHardware(tar, selectedHardware); } });
         });
     </script>
+<script src="assets/network-labs.js"></script>
+<script src="assets/learning-lab.js"></script>
 </body>
 </html>

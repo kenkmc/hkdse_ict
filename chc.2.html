@@ -108,7 +108,9 @@
             font-size: 10px;
             font-family: monospace;
         }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
     </style>
+    <link rel="stylesheet" href="assets/learning-lab.css">
 </head>
 <body class="text-slate-800">
 
@@ -509,6 +511,8 @@
         let step = 0;
         let isPaused = false;
         let timer = null;
+        let elapsed = 0;
+        let lastTick = 0;
         const packets = [];
         const statusText = document.getElementById('status-text');
         const packetArea = document.getElementById('packets-area');
@@ -517,6 +521,7 @@
 
         function createPackets() {
             packetArea.innerHTML = '';
+            packets.length = 0;
             for (let i = 1; i <= 3; i++) {
                 const p = document.createElement('div');
                 p.className = 'packet';
@@ -529,34 +534,46 @@
             }
         }
 
-        async function startTransmission() {
-            if (timer) return;
+        function startTransmission() {
+            if (timer !== null || step >= 4) return;
             btnStart.disabled = true;
             btnPause.disabled = false;
-            
-            if (step === 0) {
-                createPackets();
-                await wait(500);
-            }
+            if (!packets.length) createPackets();
+            isPaused = false;
+            lastTick = performance.now();
             runStepByStep();
         }
 
-        async function runStepByStep() {
-            while (step < 4 && !isPaused) {
-                step++;
-                updateUIForStep(step);
-                await wait(2800); 
+        function runStepByStep() {
+            if (isPaused) return;
+            const now = performance.now();
+            elapsed += now - lastTick;
+            lastTick = now;
+            const nextStep = Math.min(4, 1 + Math.floor(elapsed / 2800));
+            if (nextStep !== step) { step = nextStep; updateUIForStep(step); }
+            if (step === 3) {
+                const progress = Math.min(1, (elapsed - 5600) / 2800);
+                packets.forEach((p, idx) => {
+                    p.style.transition = 'none';
+                    p.style.left = `${20 + 55 * progress}%`;
+                    p.style.top = `${40 + idx * 15 + Math.sin(progress * Math.PI) * (idx - 1) * 15}%`;
+                });
             }
-            if (step >= 4) {
+            if (elapsed >= 9200) {
+                timer = null;
                 btnPause.disabled = true;
-                btnStart.disabled = true;
+                const rxImg = document.getElementById('receiver-image');
+                if (rxImg) rxImg.classList.remove('hidden');
+                statusText.textContent = '傳輸成功！接收端 TCP 按序重組位元組串流；遺失資料可透過重傳補回。';
+                return;
             }
+            timer = setTimeout(runStepByStep, 50);
         }
 
         function updateUIForStep(s) {
             switch(s) {
                 case 1:
-                    statusText.innerText = "第一階段：TCP 正在將大檔案分割成 3 個小封包 (Packets)，並標上序號。";
+                    statusText.innerText = "第一階段：TCP 把位元組串流分段並使用序號。#1–#3 是教學標籤；實際 TCP 序號按位元組計算。";
                     packets.forEach(p => p.classList.add('visible'));
                     break;
                 case 2:
@@ -570,13 +587,6 @@
                         p.style.left = idx === 0 ? '35%' : (idx === 1 ? '50%' : '65%');
                         p.style.top = idx === 0 ? '25%' : (idx === 1 ? '50%' : '75%');
                     });
-                    setTimeout(() => {
-                        if (step !== 3) return;
-                        packets.forEach((p, idx) => {
-                            p.style.left = '75%';
-                            p.style.top = `${25 + idx * 15}%`;
-                        });
-                    }, 1400);
                     break;
                 case 4:
                     statusText.innerText = "第四階段：接收端 TCP 檢查封包，重新組合成原始檔案。";
@@ -586,26 +596,19 @@
                         p.style.opacity = '0';
                         p.style.transform = 'translate(-50%, -50%) scale(0.5)';
                     });
-                    setTimeout(() => {
-                        if (step !== 4) return;
-                        const rxImg = document.getElementById('receiver-image');
-                        if(rxImg) {
-                            rxImg.classList.remove('hidden');
-                            rxImg.classList.add('animate-bounce');
-                        }
-                        statusText.innerHTML = "<span class='text-emerald-600 font-bold'>傳輸成功！數據已完整重組。</span>";
-                    }, 800);
                     break;
             }
         }
 
         function togglePause() {
             isPaused = !isPaused;
+            clearTimeout(timer);
+            timer = null;
             btnPause.innerHTML = isPaused ? 
                 '<i data-lucide="play" class="w-4 h-4"></i> 恢復' : 
                 '<i data-lucide="pause" class="w-4 h-4"></i> 暫停';
             lucide.createIcons();
-            if (!isPaused) runStepByStep();
+            if (!isPaused) { lastTick = performance.now(); runStepByStep(); }
         }
 
         function resetTransmission() {
@@ -613,6 +616,8 @@
             isPaused = false;
             clearTimeout(timer);
             timer = null;
+            elapsed = 0;
+            packets.length = 0;
             packetArea.innerHTML = '';
             
             const rxImg = document.getElementById('receiver-image');
@@ -628,12 +633,10 @@
             lucide.createIcons();
         }
 
-        function wait(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
         // ipconfig 模擬邏輯
+        let ipconfigTimer = null;
         function runIpconfig() {
+            clearTimeout(ipconfigTimer);
             const typing = document.getElementById('cmd-typing');
             const output = document.getElementById('cmd-output');
             
@@ -647,9 +650,9 @@
                 if (i < text.length) {
                     typing.innerHTML += text.charAt(i);
                     i++;
-                    setTimeout(typeWriter, 100);
+                    ipconfigTimer = setTimeout(typeWriter, 100);
                 } else {
-                    setTimeout(() => {
+                    ipconfigTimer = setTimeout(() => {
                         output.classList.remove('hidden');
                     }, 200);
                 }
@@ -658,22 +661,28 @@
         }
 
         // DNS 模擬邏輯
+        let dnsTimers = [];
         function simulateDNS() {
-            const input = document.getElementById('dns-input').value;
+            dnsTimers.forEach(clearTimeout);
+            dnsTimers = [];
+            const input = document.getElementById('dns-input').value.trim();
             const consoleBox = document.getElementById('dns-console');
-            consoleBox.innerHTML = `> 正在查詢域名：${input}...`;
-            
-            setTimeout(() => {
-                consoleBox.innerHTML += `<br>> 聯絡 DNS 伺服器進行解析...`;
-            }, 600);
-            
-            setTimeout(() => {
-                const fakeIp = `142.250.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}`;
-                consoleBox.innerHTML += `<br>> 解析成功！回傳 IP 位址: <span class="text-white font-bold">${fakeIp}</span>`;
-                consoleBox.innerHTML += `<br><span class='text-sky-400'>> 電腦正使用此 IP 位址建立連線...</span>`;
+            consoleBox.style.whiteSpace = 'pre-wrap';
+            if (!/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}\.?$/i.test(input)) {
+                consoleBox.textContent = '> 請輸入有效域名，例如 www.example.com（不含 https:// 或路徑）。';
+                return;
+            }
+            consoleBox.textContent = `> 教學模擬（不會查詢真正 DNS）：${input}\n> 先檢查本機／解析器快取。`;
+            dnsTimers.push(setTimeout(() => {
+                consoleBox.textContent += '\n> 假設快取未命中，解析器向 DNS 伺服器查詢。';
+            }, 600));
+            dnsTimers.push(setTimeout(() => {
+                consoleBox.textContent += '\n> 模擬 A 記錄：192.0.2.80（文件示例位址，非該域名的真實 IP）。\n> DNS 回覆會按 TTL 快取；瀏覽器之後才建立連線。';
                 consoleBox.scrollTop = consoleBox.scrollHeight;
-            }, 1500);
+            }, 1500));
         }
     </script>
+<script src="assets/network-labs.js"></script>
+<script src="assets/learning-lab.js"></script>
 </body>
 </html>

@@ -31,30 +31,33 @@
         .table-container::-webkit-scrollbar-thumb, .sidebar-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .table-container::-webkit-scrollbar-thumb:hover, .sidebar-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
+    <link rel="stylesheet" href="assets/learning-lab.css">
+<style>@media(max-width:768px){#root,#root>div{height:auto!important;min-height:100vh}#root header{flex-wrap:wrap;gap:.6rem}.sql-main-layout{flex-direction:column;overflow:visible!important;flex:none!important}.sql-main-layout>aside{width:100%;max-height:250px;flex:none}.sql-work-area{height:680px;min-height:680px;flex:none!important;width:100%}}</style>
 </head>
-<body class="bg-gray-50 text-gray-800 h-screen flex flex-col overflow-hidden">
-    <div id="root" class="h-full flex flex-col"></div>
+<body class="bg-gray-50 text-gray-800">
+    <div id="root" class="h-screen flex flex-col"></div>
 
+    <section id="sql-topic-labs" style="max-width:1100px;margin:2rem auto;padding:1rem"><h2 class="text-xl font-bold">逐步理解 SQL 與關聯資料庫</h2><p>以下動畫使用固定教學數據，與上方可編輯資料庫獨立。</p></section>
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
         // DSE Dummy Database Initialization SQL
         const initSqlSchema = `
             CREATE TABLE STUDENT (
-                SID VARCHAR(4) PRIMARY KEY, 
+                SID VARCHAR(4) NOT NULL PRIMARY KEY,
                 SName VARCHAR(20), 
                 SClass VARCHAR(2), 
                 SGender VARCHAR(1)
             );
             
             CREATE TABLE SUBJECT (
-                SubCode VARCHAR(4) PRIMARY KEY, 
+                SubCode VARCHAR(4) NOT NULL PRIMARY KEY,
                 SubName VARCHAR(20)
             );
             
             CREATE TABLE EXAM (
-                SID VARCHAR(4), 
-                SubCode VARCHAR(4), 
+                SID VARCHAR(4) NOT NULL,
+                SubCode VARCHAR(4) NOT NULL,
                 Mark INTEGER, 
                 PRIMARY KEY (SID, SubCode),
                 FOREIGN KEY (SID) REFERENCES STUDENT(SID),
@@ -128,7 +131,7 @@
                     { name: "4.3 子查詢 (使用 IN 條件)", sql: "-- 找出有選修 ICT 的學生姓名\nSELECT SName \nFROM STUDENT \nWHERE SID IN (\n  SELECT SID FROM EXAM WHERE SubCode = 'ICT'\n);" },
                     { name: "4.4 聯集 (UNION)", sql: "-- 將選修 ICT 與 MATH 的學生編號合併列出\nSELECT SID FROM EXAM WHERE SubCode = 'ICT'\nUNION\nSELECT SID FROM EXAM WHERE SubCode = 'MATH';" },
                     { name: "4.5 存在測試 (EXISTS)", sql: "-- 找出有報考 ICT 的學生資料\nSELECT * \nFROM STUDENT S \nWHERE EXISTS (\n  SELECT 1 FROM EXAM E \n  WHERE S.SID = E.SID AND SubCode = 'ICT'\n);" },
-                    { name: "4.6 差集 (MINUS / EXCEPT)", sql: "-- 找出沒有任何考試記錄的學生編號\n-- 注意：DSE 語法為 MINUS，但實際 SQL (如 SQLite) 通常使用 EXCEPT\nSELECT SID FROM STUDENT \nEXCEPT \nSELECT SID FROM EXAM;" }
+                    { name: "4.6 差集 (MINUS / EXCEPT)", sql: "-- 找出沒有任何考試記錄的學生編號\n-- 注意：本工具採用 SQLite 的 EXCEPT；其他系統可能用 MINUS。考試請依題目指定語法作答\nSELECT SID FROM STUDENT \nEXCEPT \nSELECT SID FROM EXAM;" }
                 ]
             },
             {
@@ -177,7 +180,7 @@
                         const fkRes = database.exec(`PRAGMA foreign_key_list('${tableName}');`);
                         
                         schema[tableName] = {
-                            columns: infoRes.length > 0 ? infoRes[0].values.map(row => ({ name: row[1], type: row[2], pk: row[5] > 0 })) : [],
+                            columns: infoRes.length > 0 ? infoRes[0].values.map(row => ({ name: row[1], type: row[2], notnull: row[3] > 0, pk: row[5] > 0 })) : [],
                             foreignKeys: fkRes.length > 0 ? fkRes[0].values.map(row => ({ table: row[2], from: row[3], to: row[4] })) : []
                         };
                     });
@@ -196,6 +199,7 @@
                             locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
                         });
                         const newDb = new SQL.Database();
+                        newDb.run('PRAGMA foreign_keys = ON;');
                         newDb.run(initSqlSchema);
                         setDb(newDb);
                         setIsLoading(false);
@@ -234,7 +238,9 @@
                                 tableDef.foreignKeys.forEach(fk => { 
                                     if (dbSchema[fk.table]) {
                                         // fk.table (父表, 必須為1) ||--o{ tableName (子表, 允許為0到多)
-                                        mCode += `    ${fk.table} ||--o{ ${tableName} : "關聯"\n`; 
+                                        const fkCol = tableDef.columns.find(c => c.name === fk.from);
+                                        const mandatory = fkCol && (fkCol.notnull || fkCol.pk);
+                                        mCode += `    ${fk.table} ${mandatory ? "||" : "|o"}--o{ ${tableName} : "關聯"\n`;
                                     }
                                 });
                             });
@@ -329,7 +335,7 @@
 
             const handleExampleClick = (exampleSql) => {
                 setQuery(exampleSql);
-                if (db) executeSql(db, exampleSql);
+                // Selecting an example loads it; Run explicitly executes DML/DDL.
             };
 
             // 動態顏色配置，為不同資料表分配不同顏色
@@ -355,7 +361,7 @@
                     </header>
 
                     {/* Main Content */}
-                    <div className="flex flex-1 overflow-hidden">
+                    <div className="sql-main-layout flex flex-1 overflow-hidden">
                         
                         {/* Sidebar */}
                         <aside className="w-64 bg-white border-r border-gray-200 flex flex-col hidden md:flex">
@@ -389,15 +395,15 @@
                             <div className="p-4 bg-blue-50/50 shrink-0 border-t border-gray-200">
                                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">學習小貼士</h3>
                                 <p className="text-xs text-gray-600 leading-relaxed">
-                                    在 DSE 卷一及卷二 (Databases) 中，經常要求同學根據資料表結構編寫 SQL 指令。請注意<b>主鍵 (Primary Key)</b> 和 <b>外鍵 (Foreign Key)</b> 在 `JOIN` 時的關係。
+                                    在 DSE 卷一及卷二 (Databases) 中，經常要求同學根據資料表結構編寫 SQL 指令。例題點選後只會載入編輯器，按「執行」才運行。請注意<b>主鍵 (Primary Key)</b> 和 <b>外鍵 (Foreign Key)</b> 在 `JOIN` 時的關係。
                                 </p>
                             </div>
                         </aside>
 
                         {/* Main Work Area */}
-                        <main className="flex-1 flex flex-col relative">
+                        <main className="sql-work-area min-w-0 flex-1 flex flex-col relative">
                             {/* Tabs */}
-                            <div className="flex bg-gray-200 px-2 pt-2 gap-1 border-b border-gray-300">
+                            <div className="flex flex-wrap bg-gray-200 px-2 pt-2 gap-1 border-b border-gray-300">
                                 <button 
                                     onClick={() => setActiveTab('sql')}
                                     className={`px-4 py-2 rounded-t-lg font-medium text-sm flex items-center gap-2 transition-colors ${activeTab === 'sql' ? 'bg-white text-blue-700 shadow-[0_-2px_5px_rgba(0,0,0,0.05)]' : 'bg-gray-300 text-gray-600 hover:bg-gray-100'}`}
@@ -509,9 +515,9 @@
                                             <div className="mt-8 p-4 bg-blue-50 rounded-lg text-sm text-gray-700">
                                                 <ul className="list-disc pl-5 space-y-2">
                                                     <li className="text-red-600 font-bold">注意：由於網頁繪圖技術所限，此實體關係圖的畫法與 HKDSE 的標準版本可能有少許分別。</li>
-                                                    <li>此圖表會根據您使用 <code className="bg-white px-1 py-0.5 rounded border border-gray-200">CREATE TABLE</code> 創建的資料表自動更新。</li>
+                                                    <li>基數是根據外鍵及非空約束的簡化推斷；複合外鍵、唯一約束及業務規則仍須人工檢查。此圖表會根據您使用 <code className="bg-white px-1 py-0.5 rounded border border-gray-200">CREATE TABLE</code> 創建的資料表自動更新。</li>
                                                     <li><b>實體與欄位</b>：方框代表實體，內部列出資料類型與欄位名稱。<code className="text-gray-800 font-bold">PK</code> 為主鍵，<code className="text-gray-800 font-bold">FK</code> 為外鍵。</li>
-                                                    <li><b>關係 (Relationship)</b>：系統已透過動態技術將關聯文字加上<b>菱形邊框</b>，完全符合 DSE 實體關係圖的繪圖標準。</li>
+                                                    <li><b>關係 (Relationship)</b>：系統已透過動態技術將關聯文字加上<b>菱形邊框</b>，只是輔助辨認關係，不能視為自動符合試卷指定畫法；請按題目要求繪圖。</li>
                                                     <li><b>基數表示法 (Crow's Foot Notation)</b>：採用標準的「鳥足符號」精確表達基數與 <b>0</b> 的概念：
                                                         <div className="mt-1 ml-4 text-gray-600 space-y-1">
                                                             - <b>雙直線 <code className="font-bold text-gray-800">||</code></b>：代表「必須存在且只有 1 個」(Exactly 1)。<br/>
@@ -571,5 +577,7 @@
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
+<script src="assets/network-labs.js"></script>
+<script src="assets/learning-lab.js"></script>
 </body>
 </html>

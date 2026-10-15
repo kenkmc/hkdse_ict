@@ -57,6 +57,8 @@
         .access-active { background-color: #fbbf24 !important; border-color: #d97706 !important; transform: scale(1.1); box-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
         .head-pointer { transition: left 0.5s ease-in-out, top 0.5s ease-in-out; }
     </style>
+    <link rel="stylesheet" href="assets/learning-lab.css">
+    <link rel="stylesheet" href="assets/core-a-labs.css">
 </head>
 <body class="text-slate-700">
 
@@ -132,9 +134,9 @@
                     </div>
                     <!-- Byte -->
                     <div class="hierarchy-level w-[60%] bg-indigo-400 text-white p-2 text-center cursor-pointer group relative">
-                        <div class="font-bold text-sm">位元組 (Byte) / 字符 (Character)</div>
+                        <div class="font-bold text-sm">位元組 (Byte) 與字符 (Character)</div>
                         <div class="absolute inset-0 bg-black/80 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition">
-                            例子：字母 "C" (由8個bit組成)
+                            1 Byte＝8 bits；字符所需 Bytes 視編碼而定。例如 ASCII 的 C 可用 1 Byte，UTF-8 的中需 3 Bytes。
                         </div>
                     </div>
                     <!-- Bit -->
@@ -304,8 +306,8 @@
                             <div class="text-xs text-slate-600">數據不重複 (如學號)。</div>
                         </div>
                         <div class="bg-white p-4 rounded-xl border border-gray-200 hover:shadow-md transition border-t-4 border-t-purple-500">
-                            <h4 class="font-bold text-purple-700 mb-2 text-sm">9. 奇偶檢測 (Parity Check)</h4>
-                            <div class="text-xs text-slate-600">檢查傳輸時位元是否遺失/錯誤。</div>
+                            <h4 class="font-bold text-purple-700 mb-2 text-sm">另：傳輸錯誤偵測 (Parity Check)</h4>
+                            <div class="text-xs text-slate-600">傳輸／儲存錯誤偵測：與語義有效性檢驗不同；單一奇偶校驗不能偵測所有錯誤或修正錯誤。</div>
                         </div>
                     </div>
                 </div>
@@ -530,7 +532,7 @@
                                 <i data-lucide="zap" class="w-4 h-4"></i> 索引 (Indexing)
                             </h4>
                             <p class="text-xs text-emerald-700 leading-relaxed">
-                                就像書本後面的目錄，索引讓電腦能直接跳到數據所在位置，而無需從頭逐一搜尋 (Sequential Search)，大大提升速度。
+                                就像書本後面的目錄，索引讓電腦能更有效地定位數據，而無需從頭逐一搜尋全部記錄；索引也佔用儲存空間並須隨資料更新。
                             </p>
                         </div>
                     </div>
@@ -656,7 +658,7 @@
 
                     <ul class="list-disc list-inside text-sm text-slate-600 space-y-2">
                         <li>可以直接<span class="font-bold text-green-600">跳到</span>任何位置讀寫。</li>
-                        <li>無需經過前面的資料，速度極快。</li>
+                        <li>無需經過前面的資料，仍需定位及傳輸時間，實際速度視媒體及存取模式而定。</li>
                         <li>適合：實時系統 (如訂票)。</li>
                     </ul>
                 </div>
@@ -693,7 +695,7 @@
 
     <script src="course_data.js"></script>
     <script>
-        lucide.createIcons();
+        if (window.lucide) lucide.createIcons();
 
         // 進度條
         window.onscroll = function() {
@@ -721,107 +723,59 @@
         }
         document.addEventListener('DOMContentLoaded', renderIdxGrid);
 
+        const indexTimers = [];
         function playIndexDemo(mode) {
-            renderIdxGrid(); // Reset
-            const target = 6;
+            indexTimers.forEach(clearTimeout); indexTimers.length = 0;
+            renderIdxGrid();
             const status = document.getElementById('idxStatus');
             const book = document.getElementById('idxBook');
-            
-            // Clear any active styles
-            document.querySelectorAll('.idx-block').forEach(b => b.className = 'w-full aspect-square bg-white border border-slate-200 rounded flex items-center justify-center text-sm font-bold text-slate-400 font-mono idx-block transition-all duration-300');
-            
-            if(mode === 'seq') {
-                status.textContent = "逐一尋找中...";
-                let current = 1;
-                const timer = setInterval(() => {
-                    if(current > 1) {
-                        const prev = document.getElementById(`idx-block-${current-1}`);
-                        if(prev) prev.classList.add('idx-visited');
-                    }
-                    
-                    const block = document.getElementById(`idx-block-${current}`);
-                    block.classList.add('idx-scanning');
-                    
-                    if(current === target) {
-                        clearInterval(timer);
-                        block.classList.remove('idx-scanning');
-                        block.classList.add('idx-found');
-                        status.textContent = "找到! (速度慢)";
-                    }
-                    current++;
-                }, 400); // Slow scan
+            book.style.opacity = '0';
+            const delay = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 450;
+            if (mode === 'seq') {
+                for (let id = 1; id <= 6; id++) indexTimers.push(setTimeout(() => {
+                    document.querySelectorAll('.idx-scanning').forEach(b => { b.classList.remove('idx-scanning'); b.classList.add('idx-visited'); });
+                    document.getElementById(`idx-block-${id}`).classList.add(id === 6 ? 'idx-found' : 'idx-scanning');
+                    status.textContent = id === 6 ? '找到 ID 6：共比較 6 筆記錄。' : `比較第 ${id} 筆記錄…`;
+                }, (id - 1) * delay));
             } else {
-                status.textContent = "查閱索引目錄...";
-                book.style.opacity = '1';
-                book.style.transform = 'scale(1)';
-                
-                setTimeout(() => {
-                    book.style.opacity = '0';
-                    book.style.transform = 'scale(0.9)';
-                    status.textContent = "直接跳轉! (極快)";
-                    const block = document.getElementById(`idx-block-${target}`);
-                    block.classList.add('idx-found');
-                }, 1000);
+                book.style.opacity = '1'; book.style.transform = 'scale(1)';
+                status.textContent = '先查索引取得記錄位置…';
+                indexTimers.push(setTimeout(() => { book.style.opacity = '0'; document.getElementById('idx-block-6').classList.add('idx-found'); status.textContent = '按索引取得 ID 6；此模型省略實際索引搜尋時間。'; }, delay * 2));
             }
         }
+        const accessTimers = { seq: [], direct: [] };
+        const clearAccess = kind => { accessTimers[kind].forEach(clearTimeout); accessTimers[kind] = []; };
 
-        // ----------------------------------------
-        // 檔案存取動畫邏輯
-        // ----------------------------------------
+
         function playSequential() {
-            const target = parseInt(document.getElementById('seqTarget').value);
-            const status = document.getElementById('seqStatus');
+            clearAccess('seq');
+            const raw = document.getElementById('seqTarget').value;
+            const target = Number(raw), status = document.getElementById('seqStatus');
+            if (!raw || !Number.isInteger(target) || target < 1 || target > 10) { status.textContent = '請輸入 1 至 10 的整數。'; return; }
             const progress = document.getElementById('tapeProgress');
-            const leftReel = document.getElementById('tapeLeft');
-            const rightReel = document.getElementById('tapeRight');
-            
-            // Reset
-            progress.style.width = '0%';
-            progress.style.transition = 'none';
-            status.textContent = "準備...";
-            leftReel.classList.remove('tape-reel');
-            rightReel.classList.remove('tape-reel');
-            
-            setTimeout(() => {
-                const duration = Math.max(0.5, (target - 1) * 0.5); 
-                
-                status.textContent = `正在快進經過前 ${target-1} 首...`;
-                progress.style.transition = `width ${duration}s linear`;
-                progress.style.width = `${target * 10}%`; 
-                
-                leftReel.classList.add('tape-reel');
-                rightReel.classList.add('tape-reel');
-                leftReel.style.animationDuration = '0.3s'; 
-                rightReel.style.animationDuration = '0.3s';
-
-                setTimeout(() => {
-                    status.textContent = `✅ 已找到第 ${target} 首 (需時 ${duration.toFixed(1)}秒)`;
-                    leftReel.classList.remove('tape-reel');
-                    rightReel.classList.remove('tape-reel');
-                }, duration * 1000);
-            }, 100);
+            const reels = [document.getElementById('tapeLeft'), document.getElementById('tapeRight')];
+            progress.style.transition = 'none'; progress.style.width = '0%';
+            reels.forEach(r => r.classList.remove('tape-reel'));
+            const duration = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : Math.max(.3, target * .3);
+            status.textContent = `從起點依次經過前 ${target - 1} 筆，再讀第 ${target} 筆（示意時間）。`;
+            accessTimers.seq.push(setTimeout(() => {
+                progress.style.transition = `width ${duration}s linear`; progress.style.width = `${target * 10}%`;
+                reels.forEach(r => r.classList.add('tape-reel'));
+                accessTimers.seq.push(setTimeout(() => { status.textContent = `已讀取第 ${target} 筆；此前經過 ${target - 1} 筆。時間比例僅為示意。`; reels.forEach(r => r.classList.remove('tape-reel')); }, duration * 1000));
+            }, 30));
         }
 
         function playDirect() {
-            const target = parseInt(document.getElementById('dirTarget').value);
+            clearAccess('direct');
+            const raw = document.getElementById('dirTarget').value, target = Number(raw);
             const status = document.getElementById('dirStatus');
-            const arm = document.getElementById('diskArm');
-            
-            status.textContent = "正在跳轉...";
-            
-            const angle = -45 + (target * 40) % 360; 
-            
-            setTimeout(() => {
-                arm.style.transform = `rotate(${angle}deg)`;
-                setTimeout(() => {
-                    status.textContent = `⚡ 瞬間到達第 ${target} 區 (極快)`;
-                }, 300);
-            }, 100);
+            if (!raw || !Number.isInteger(target) || target < 1 || target > 10) { status.textContent = '請輸入 1 至 10 的整數。'; return; }
+            status.textContent = `按地址定位第 ${target} 區，不須逐筆經過前面的記錄…`;
+            document.getElementById('diskArm').style.transform = `rotate(${-45 + target * 8}deg)`;
+            accessTimers.direct.push(setTimeout(() => { status.textContent = `已讀取第 ${target} 區；實際裝置仍有定位及傳輸時間。`; }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 500));
         }
+        let parityTimer;
 
-        // ----------------------------------------
-        // 奇偶檢測動畫邏輯
-        // ----------------------------------------
         function runParityCheck(type) {
             const input = document.getElementById('parityInput').value.trim();
             const display = document.getElementById('parityDisplay');
@@ -851,7 +805,8 @@
             display.innerHTML = html;
             explain.classList.remove('hidden');
 
-            setTimeout(() => {
+            clearTimeout(parityTimer);
+            parityTimer = setTimeout(() => {
                 const pBox = document.createElement('div');
                 pBox.className = "bit-box w-8 h-8 bg-yellow-300 border-2 border-yellow-500 flex items-center justify-center font-mono font-bold text-yellow-900 rounded bit-new ml-2";
                 pBox.textContent = parityBit;
@@ -863,9 +818,9 @@
         // 互動驗證實驗室邏輯
         // ----------------------------------------
         function validateForm() {
-            const age = document.getElementById('inputAge').value;
-            const id = document.getElementById('inputID').value;
-            const email = document.getElementById('inputEmail').value;
+            const age = document.getElementById('inputAge').value.trim();
+            const id = document.getElementById('inputID').value.trim();
+            const email = document.getElementById('inputEmail').value.trim();
             const resultBox = document.getElementById('validationResult');
             
             document.getElementById('errAge').classList.add('hidden');
@@ -874,18 +829,18 @@
             
             let errors = [];
 
-            if (age && (age < 18 || age > 60)) {
-                document.querySelector('#errAge span').textContent = "範圍錯誤！必須 18-60。";
+            if (!age || !Number.isInteger(Number(age)) || Number(age) < 18 || Number(age) > 60) {
+                document.querySelector('#errAge span').textContent = "此欄必填，必須是 18 至 60 的整數。";
                 document.getElementById('errAge').classList.remove('hidden');
                 errors.push("年齡範圍錯誤");
             }
-            if (id && id.length !== 5) {
+            if (id.length !== 5) {
                 document.querySelector('#errID span').textContent = "長度錯誤！必須 5 位。";
                 document.getElementById('errID').classList.remove('hidden');
                 errors.push("學號長度錯誤");
             }
-            if (email && !email.includes('@')) {
-                document.querySelector('#errEmail span').textContent = "格式錯誤！欠缺 @。";
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                document.querySelector('#errEmail span').textContent = "此欄必填；請輸入例如 student@example.com 的格式。";
                 document.getElementById('errEmail').classList.remove('hidden');
                 errors.push("電郵格式錯誤");
             }
@@ -900,11 +855,11 @@
                     </ul>
                 `;
             } else if (age || id || email) {
-                resultBox.innerHTML = `<div class="text-green-400 font-bold text-xl flex items-center gap-2"><i data-lucide="check-circle" class="w-6 h-6"></i> 驗證通過</div>`;
+                resultBox.innerHTML = `<div class="text-green-400 font-bold text-xl flex items-center gap-2"><i data-lucide="check-circle" class="w-6 h-6"></i> 有效性檢驗通過：符合本示例規則，但不證明資料真確。</div>`;
             } else {
                 resultBox.innerHTML = `<p class="text-gray-400">等待輸入...</p>`;
             }
-            lucide.createIcons();
+            if (window.lucide) lucide.createIcons();
         }
 
         // ----------------------------------------
@@ -920,8 +875,9 @@
             let charPart = input.replace(/[0-9]/g, '');
             let numPart = input.replace(/[^0-9]/g, '');
             
-            if(charPart.length === 0 || numPart.length !== 6) {
-                 alert("格式錯誤。請輸入例如 A123456");
+            if(!/^[A-Z]{1,2}[0-9]{6}$/.test(input)) {
+                 resultDiv.classList.add("hidden"); stepsDiv.classList.add("hidden");
+                 alert("請輸入一或兩個英文字母，後接六個數字，例如 A123456；毋須輸入括號或檢查數位。");
                  return;
             }
 
@@ -1001,5 +957,7 @@
             }
         }
     </script>
+    <script src="assets/core-a-labs.js"></script>
+    <script src="assets/learning-lab.js"></script>
 </body>
 </html>
