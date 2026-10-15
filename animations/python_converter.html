@@ -1,0 +1,1196 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Converter / 互動流程圖編輯器</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #1e1e1e; color: #f0f0f0; transition: padding 0.3s; }
+        .header { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto 15px auto; transition: all 0.3s; }
+        .header h1 { margin: 0; font-size: 1.5rem; color: #61dafb; display: flex; align-items: center; gap: 10px; }
+        .lang-switch select { padding: 8px 12px; font-size: 14px; background: #333; color: white; border: 1px solid #555; border-radius: 4px; cursor: pointer; outline: none; }
+
+        .container { display: flex; gap: 20px; max-width: 1200px; margin: auto; min-height: 85vh; flex-wrap: wrap; align-items: stretch; transition: all 0.3s; }
+        .panel { flex: 1; min-width: 320px; min-height: 500px; display: flex; flex-direction: column; background: #2d2d2d; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: all 0.3s; }
+
+        h2 { margin-top: 0; font-size: 1.2rem; color: #61dafb; display: flex; align-items: center; gap: 10px;}
+        textarea { flex: 1; width: 100%; min-height: 300px; padding: 15px; font-family: 'Consolas', 'Courier New', monospace; font-size: 15px; border: 1px solid #444; border-radius: 6px; resize: none; box-sizing: border-box; background: #1e1e1e; color: #d4d4d4; line-height: 1.5; tab-size: 4;}
+        textarea:focus { outline: none; border-color: #61dafb; }
+        .controls { margin: 15px 0; display: flex; gap: 10px; flex-wrap: wrap; }
+        button { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; transition: all 0.2s; font-size: 14px; }
+        button.primary { background: #4CAF50; color: white; }
+        button.primary:hover { background: #45a049; transform: translateY(-2px); }
+        button.secondary { background: #007acc; color: white; }
+        button.secondary:hover { background: #005f9e; transform: translateY(-2px); }
+        button.ai-btn { background: #9c27b0; color: white; width: 100%; font-size: 16px; padding: 12px; margin-top: 10px;}
+        button.ai-btn:hover { background: #7b1fa2; transform: translateY(-2px); }
+        #status-msg { margin-top: 10px; padding: 10px; border-radius: 4px; display: none; font-weight: bold; }
+        .error { background: #ffebee; color: #d32f2f; display: block !important; border-left: 5px solid #d32f2f; }
+        .success { background: #e8f5e9; color: #2e7d32; display: block !important; border-left: 5px solid #2e7d32; }
+        .info { background: #e3f2fd; color: #1565c0; display: block !important; border-left: 5px solid #1565c0; }
+        #output-area { flex: 1; min-height: 300px; border: 1px solid #444; border-radius: 6px; padding: 15px; background: #1e1e1e; overflow-y: auto; white-space: pre-wrap; font-family: 'Consolas', 'Courier New', monospace; font-size: 15px; color: #d4d4d4;}
+
+        #flow-editor-container { flex: 1; display: none; flex-direction: column; min-height: 450px; }
+        .flow-toolbar { display: flex; gap: 8px; margin-bottom: 10px; background: #333; padding: 8px; border-radius: 6px; flex-wrap: wrap; align-items: center; }
+        .flow-btn { padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; color: white; display: flex; align-items: center; gap: 5px; }
+
+        /* 支援捲動的大畫布容器 */
+        #flow-workspace { flex: 1; width: 100%; min-height: 450px; background: #eceff1; border-radius: 6px; border: 1px solid #555; overflow: auto; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); transition: all 0.3s; }
+        /* 實際的畫布大小 */
+        #flow-canvas { position: relative; width: 1200px; height: 1200px; touch-action: none; transform-origin: top left; }
+
+        .flow-node { position: absolute; min-width: 120px; padding: 10px; background: white; border: 2px solid #333; display: flex; align-items: center; justify-content: center; cursor: move; user-select: none; box-shadow: 2px 2px 6px rgba(0,0,0,0.3); z-index: 10; font-size: 14px; color: #333; transition: box-shadow 0.2s; }
+        .flow-node.selected { border-color: #ff5722; box-shadow: 0 0 12px #ff5722; z-index: 12; }
+        .flow-node input { width: 90%; border: none; background: transparent; text-align: center; font-size: 14px; outline: none; font-weight: bold; font-family: 'Segoe UI', sans-serif; }
+        .flow-node input::placeholder { color: #888; font-weight: normal; }
+
+        .connect-port { position: absolute; width: 14px; height: 14px; background-color: #2196f3; border: 2px solid #fff; border-radius: 50%; cursor: crosshair; z-index: 15; box-shadow: 0 0 4px rgba(0,0,0,0.5); display: none; transition: transform 0.1s, background-color 0.1s; }
+        .connect-port:hover { transform: scale(1.4); background-color: #ff5722; }
+        .port-top { top: -7px; left: 50%; margin-left: -7px; }
+        .port-bottom { bottom: -7px; left: 50%; margin-left: -7px; }
+        .port-left { left: -7px; top: 50%; margin-top: -7px; }
+        .port-right { right: -7px; top: 50%; margin-top: -7px; }
+
+        .flow-node.selected .connect-port, .flow-node:hover .connect-port { display: block; }
+
+        .node-start { border-radius: 30px; background: #c8e6c9; border-color: #388e3c; }
+        .node-end { border-radius: 30px; background: #ffccbc; border-color: #d32f2f; }
+        .node-process { border-radius: 6px; background: #bbdefb; border-color: #1976d2; }
+        .node-io { border-radius: 6px; background: #ffe082; border-color: #f57c00; transform: skewX(-10deg); }
+        .node-io input { transform: skewX(10deg); }
+
+        .node-decision {
+            background: url('data:image/svg+xml;utf8,<svg preserveAspectRatio="none" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,2 98,50 50,98 2,50" fill="%23e1bee7" stroke="%238e24aa" stroke-width="3" stroke-linejoin="round"/></svg>') no-repeat center center;
+            background-size: 100% 100%;
+            border: none;
+            border-radius: 0;
+            min-width: 140px;
+            min-height: 90px;
+            padding: 0 25px;
+            box-shadow: none !important;
+        }
+        .flow-node.node-decision.selected {
+            background: url('data:image/svg+xml;utf8,<svg preserveAspectRatio="none" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,2 98,50 50,98 2,50" fill="%23e1bee7" stroke="%23ff5722" stroke-width="4" stroke-linejoin="round"/></svg>') no-repeat center center;
+            background-size: 100% 100%;
+            border: none;
+            box-shadow: none;
+            filter: drop-shadow(0 0 8px #ff5722);
+            z-index: 12;
+        }
+        .node-decision input { width: 100%; }
+
+        .edge-label-input {
+            width: 70px; height: 28px;
+            border-radius: 4px; text-align: center; font-size: 13px; font-weight: bold;
+            outline: none; font-family: sans-serif; box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+            transition: all 0.2s; box-sizing: border-box;
+        }
+        .edge-label-input:focus { border-color: #ff5722 !important; box-shadow: 0 0 8px #ff5722; }
+
+        /* 全螢幕模式 CSS */
+        body.maximized { padding: 0; overflow: hidden; }
+        body.maximized .header { display: none; }
+        body.maximized .container { max-width: 100%; width: 100vw; height: 100vh; margin: 0; gap: 0; }
+        body.maximized .panel { border-radius: 0; min-height: 100vh; padding: 15px; }
+        body.maximized #right-panel { display: none; }
+        body.maximized #flow-workspace { height: calc(100vh - 140px); }
+
+    </style>
+    <link rel="stylesheet" href="assets/learning-lab.css">
+<style>@media(max-width:700px){body{padding:12px}.header{flex-wrap:wrap;gap:10px}.container{min-width:0}.panel{box-sizing:border-box;min-width:0;width:100%;flex:1 1 100%;padding:14px}#example-select,#mode-select{min-width:0!important;max-width:100%;width:100%}.header h1{overflow-wrap:anywhere}}</style>
+</head>
+<body>
+
+<div class="header">
+    <h1 id="main-title">🚀 邏輯與程式碼雙向轉換工具</h1>
+    <div class="lang-switch">
+        <select id="lang-select" onchange="changeLang()">
+            <option value="zh">繁體中文</option>
+            <option value="en">English</option>
+        </select>
+    </div>
+</div>
+
+<div class="container">
+    <div class="panel" id="left-panel">
+        <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px; background: #333; padding: 10px; border-radius: 6px; flex-wrap: wrap;">
+            <label id="mode-label" style="font-weight: bold; color: #61dafb; font-size: 14px;">⚙️ 轉換模式: </label>
+            <select id="mode-select" onchange="changeMode()" style="padding: 5px; border-radius: 4px; background: #222; color: white; border: 1px solid #555; outline: none; cursor: pointer; flex: 1; min-width: 180px;">
+                <option value="flow">✍️ 互動流程圖編輯器 ➡️ Python</option>
+                <option value="python">🐍 Python ➡️ 偽代碼 / 流程圖</option>
+                <option value="pseudo">📝 偽代碼 ➡️ Python / 流程圖</option>
+            </select>
+
+            <label id="example-label" style="font-weight: bold; color: #ffeb3b; font-size: 14px; margin-left: 10px;">📖 範例: </label>
+            <select id="example-select" onchange="loadExample()" style="padding: 5px; border-radius: 4px; background: #222; color: white; border: 1px solid #555; outline: none; cursor: pointer; flex: 1; min-width: 250px;">
+                <option value="">-- 請選擇範例 --</option>
+            </select>
+        </div>
+
+        <h2 id="input-title">✍️ 互動流程圖編輯器</h2>
+
+        <textarea id="python-code" style="display:none;" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'    '+v.substring(e);this.selectionStart=this.selectionEnd=s+4;return false;}"></textarea>
+
+        <div id="flow-editor-container" style="display: flex;">
+            <div class="flow-toolbar">
+                <button class="flow-btn" onclick="window.flowApp.addNode('start')" style="background:#4caf50;">🟢 <span id="lbl-add-start">開始</span></button>
+                <button class="flow-btn" onclick="window.flowApp.addNode('end')" style="background:#f44336;">🔴 <span id="lbl-add-end">結束</span></button>
+                <button class="flow-btn" onclick="window.flowApp.addNode('process')" style="background:#2196f3;">▭ <span id="lbl-add-process">處理/賦值</span></button>
+                <button class="flow-btn" onclick="window.flowApp.addNode('io')" style="background:#ff9800;">▱ <span id="lbl-add-io">輸入/輸出</span></button>
+                <button class="flow-btn" onclick="window.flowApp.addNode('decision')" style="background:#9c27b0;">◇ <span id="lbl-add-decision">判斷</span></button>
+                <div style="width: 2px; height: 20px; background: #555; margin: 0 5px;"></div>
+                <button class="flow-btn" onclick="window.flowApp.deleteSelected()" style="background:#795548;" title="快捷鍵: Delete / Backspace">✂️ <span id="lbl-delete">刪除</span></button>
+                <button class="flow-btn" onclick="window.flowApp.clearAll()" style="background:#d32f2f;">🗑️ <span id="lbl-clear-all">清空</span></button>
+                <button class="flow-btn" onclick="toggleMaximize()" style="background:#607d8b; margin-left:auto;">🔲 <span id="lbl-maximize">最大化</span></button>
+            </div>
+
+            <div id="flow-workspace">
+                <div id="flow-canvas">
+                    <svg id="flow-lines" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1;">
+                        <defs>
+                            <marker id="arrowhead" markerWidth="12" markerHeight="9" refX="11" refY="4.5" orient="auto"><polygon points="0 0, 12 4.5, 0 9" fill="#333" /></marker>
+                            <marker id="arrowhead-true" markerWidth="12" markerHeight="9" refX="11" refY="4.5" orient="auto"><polygon points="0 0, 12 4.5, 0 9" fill="#2e7d32" /></marker>
+                            <marker id="arrowhead-false" markerWidth="12" markerHeight="9" refX="11" refY="4.5" orient="auto"><polygon points="0 0, 12 4.5, 0 9" fill="#c62828" /></marker>
+                            <marker id="arrowhead-selected" markerWidth="12" markerHeight="9" refX="11" refY="4.5" orient="auto"><polygon points="0 0, 12 4.5, 0 9" fill="#ff5722" /></marker>
+                        </defs>
+                        <g id="lines-group"></g>
+                        <line id="temp-line" x1="0" y1="0" x2="0" y2="0" stroke="#2196f3" stroke-width="3" stroke-dasharray="6" style="display:none;" />
+                    </svg>
+                    <div id="nodes-container" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:2; pointer-events:none;"></div>
+                    <div id="labels-container" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:3; pointer-events:none;"></div>
+                </div>
+            </div>
+            <p style="font-size: 13px; color: #ffeb3b; margin-top: 8px; text-align: center; font-weight: bold;" id="flow-hint">💡 畫布可向下捲動。拖曳圖形邊緣的藍點 🔵 連線。若連線來自「判斷」，可在線上的文字欄修改條件。</p>
+        </div>
+
+        <div class="controls" id="btn-group-standard" style="display:none;">
+            <button class="primary" id="btn-check" onclick="checkSyntax()">1. 檢查語法</button>
+            <button class="secondary" id="btn-pseudo" onclick="toPseudoCode()">2. 轉為偽代碼</button>
+            <button class="primary" id="btn-to-python" style="display: none;" onclick="toPythonAction()">1. 轉為 Python</button>
+            <button class="secondary" id="btn-flow" onclick="toFlowchart()">3. 轉為流程圖</button>
+            <button class="primary" id="btn-run" style="background: #e91e63;" onclick="runPython()">▶️ 4. 執行程式</button>
+        </div>
+
+        <div class="controls" id="btn-group-flow">
+            <button class="ai-btn" id="btn-compile-flow" onclick="window.flowApp.compileToPython()" style="background:#009688;">⚙️ 1. 轉換流程圖為 Python 程式碼 (本機轉換)</button>
+        </div>
+
+        <div id="status-msg"></div>
+    </div>
+
+    <div class="panel" id="right-panel">
+        <h2 id="output-title">📊 結果輸出區</h2>
+        <div id="output-area"></div>
+    </div>
+</div>
+
+<script>
+    try { if(typeof mermaid !== 'undefined') mermaid.initialize({ startOnLoad: true, theme: 'dark' }); }
+    catch(e) { console.warn("Mermaid載入失敗", e); }
+
+    const i18n = {
+        zh: {
+            mainTitle: "🚀 邏輯與程式碼雙向轉換工具", inputTitlePy: "🐍 Python 程式碼", inputTitlePs: "📝 偽代碼 (Pseudo-code)",
+            inputTitleFlow: "✍️ 互動流程圖編輯器",
+            placeholderPy: "請輸入 Python 程式碼...\n\n# 範例\nfor i in range(1, 5):\n    print(i)",
+            placeholderPs: "請輸入偽代碼...\n\n# 範例\n對於每個 i 在 range(1, 5) 執行\n    輸出 i",
+            btnCheck: "1. 檢查輸入", btnPseudo: "2. 轉為偽代碼", btnToPython: "1. 轉為 Python", btnFlow: "轉為流程圖", btnRun: "▶️ 執行程式", btnRunTitle: "若程式使用 input()，因目前網頁版尚未提供頁面內輸入欄位，執行時會改以彈出式視窗請您輸入。",
+            btnCompileFlow: "⚙️ 1. 轉換流程圖為 Python 程式碼",
+            outputTitle: "📊 結果輸出區", msgEmpty: "請先輸入內容或選擇範例！",
+            msgFlowEmpty: "流程圖目前沒有節點，請先繪製！", msgSyntaxOk: "ℹ️ 已讀取內容；轉換器只支援教學範例常用語法。執行時由 Python 真正解析語法。",
+            msgCompileSuccess: "✅ 流程圖轉換成功！已自動切換為 Python 模式。", msgInputPopup: "ℹ️ 程式含有 input()；因網頁版目前未提供頁面內輸入欄位，執行時會改用彈出式視窗請您輸入。", inputPromptNote: "提示：此網頁目前尚未提供頁面內輸入欄位，所以程式執行到 input() 時，會以彈出式視窗請您輸入。",
+            modeLabel: "⚙️ 轉換模式: ", exampleLabel: "📖 範例: ", modePy: "🐍 Python ➡️ 偽代碼 / 流程圖", modePs: "📝 偽代碼 ➡️ Python / 流程圖",
+            modeFlow: "✍️ 互動流程圖編輯器 ➡️ Python (本機)", defaultSelectExample: "-- 請選擇教學範例 --",
+            flowTools: { start: "開始", end: "結束", process: "處理/賦值", io: "輸入/輸出", decision: "判斷", del: "刪除", clear: "清空畫布", maximize: "最大化", restore: "還原", hint: "💡 畫布可向下捲動。拖曳圖形邊緣的藍點 🔵 連線。若連線來自「判斷(菱形)」，可在文字欄修改是/否。點擊連線本身可選取刪除。", defaultText: "點擊輸入", decisionPrompt: "請輸入這條路徑的條件：" },
+            pseudo: { func: "函數", begin: "開始", if: "如果", then: "則", elif: "否則如果", else: "否則", forEach: "對於每個", in: "在", do: "執行", while: "當", output: "輸出", input: "輸入" }, flow: { start: "開始", end: "結束", true: "是", false: "否", output: "輸出", input: "輸入" }
+        },
+        en: {
+            mainTitle: "🚀 Logic & Code Bidirectional Tool", inputTitlePy: "🐍 Python Code Input", inputTitlePs: "📝 Pseudo-code Input", inputTitleFlow: "✍️ Interactive Flowchart", placeholderPy: "Enter Python code here...", placeholderPs: "Enter Pseudo-code here...", btnCheck: "1. Check Input", btnPseudo: "2. To Pseudo-code", btnToPython: "1. To Python", btnFlow: "To Flowchart", btnRun: "▶️ Run Code", btnRunTitle: "If the program uses input(), the web version currently falls back to a popup dialog because inline input fields are not yet available.", btnCompileFlow: "⚙️ 1. Compile Flowchart to Python", outputTitle: "📊 Output Area", msgEmpty: "Please enter content first!", msgFlowEmpty: "Flowchart is empty!", msgSyntaxOk: "ℹ️ Content loaded. Conversion supports a teaching subset; Python parses syntax when Run is used.", msgCompileSuccess: "✅ Flowchart compiled!", msgInputPopup: "ℹ️ This program uses input(); because the web version does not yet provide inline input fields, it will ask through popup dialogs.", inputPromptNote: "Note: Inline input fields are not yet available in this web page, so when the program reaches input(), a popup dialog will be used for your entry.", modeLabel: "⚙️ Mode: ", exampleLabel: "📖 Examples: ", modePy: "🐍 Python ➡️ Pseudo / Flow", modePs: "📝 Pseudo ➡️ Python / Flow", modeFlow: "✍️ Interactive Flowchart ➡️ Python", defaultSelectExample: "-- Select Example --", flowTools: { start: "Start", end: "End", process: "Process", io: "I/O", decision: "Decision", del: "Delete", clear: "Clear", maximize: "Maximize", restore: "Restore", hint: "💡 Drag blue dot 🔵 to connect.", defaultText: "Click to edit" }, pseudo: { func: "FUNCTION", begin: "BEGIN", if: "IF", then: "THEN", elif: "ELSE IF", else: "ELSE", forEach: "FOR EACH", in: "IN", do: "DO", while: "WHILE", output: "OUTPUT", input: "INPUT" }, flow: { start: "Start", end: "End", true: "True", false: "False", output: "Output", input: "Input" }
+        }
+    };
+
+    // 輔助建構流程圖節點的快速函數
+    const N = (id, type, text, x, y) => ({ id, type, text, x, y });
+    const E = (from, to, label = "", fromPort = "bottom", toPort = "top") => ({ from, to, label, fromPort, toPort });
+
+    // === 漸進式且統一的教學範例庫 ===
+    const universalExamples = [
+        // --- 基礎篇 ---
+        { id: "b1", group: "[基礎]", name: "1. 簡單輸出 (Hello World)",
+          py: 'print("Hello, World!")',
+          ps: '輸出 "Hello, World!"',
+          fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸出 Hello, World!",250,100), N("n3","end","結束",250,180)], edges: [E("n1","n2"), E("n2","n3")] } },
+        { id: "b2", group: "[基礎]", name: "2. 變數與輸出 (個人資料)",
+          py: 'name = "小明"\nage = 15\nprint(name)\nprint(age)',
+          ps: 'name = "小明"\nage = 15\n輸出 name\n輸出 age',
+          fl: { nodes: [N("n1","start","開始",250,20), N("n2","process",'name = "小明"',250,100), N("n3","process","age = 15",250,180), N("n4","io","輸出 name",250,260), N("n5","io","輸出 age",250,340), N("n6","end","結束",250,420)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5"), E("n5","n6")] } },
+        { id: "b3", group: "[基礎]", name: "3. 讀取輸入 (打招呼)",
+          py: 'name = input("輸入名字:")\nprint("你好:")\nprint(name)',
+          ps: '輸出 "輸入名字:"\n輸入 name\n輸出 "你好:"\n輸出 name',
+          fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 name",250,100), N("n3","io","輸出 你好:",250,180), N("n4","io","輸出 name",250,260), N("n5","end","結束",250,340)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5")] } },
+        { id: "b4", group: "[基礎]", name: "4. 數值輸入 (年齡計算)",
+          py: 'age = int(input("輸入年齡:"))\nyear = 2024 - age\nprint("出生年份:")\nprint(year)',
+          ps: '輸出 "輸入年齡:"\n輸入 age\nyear = 2024 - age\n輸出 "出生年份:"\n輸出 year',
+          fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 age",250,100), N("n3","process","year = 2024 - age",250,180), N("n4","io","輸出 出生年份:",250,260), N("n5","io","輸出 year",250,340), N("n6","end","結束",250,420)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5"), E("n5","n6")] } },
+        { id: "b5", group: "[基礎]", name: "5. 多重輸入 (長寬資訊)",
+          py: 'w = input("輸入寬度:")\nh = input("輸入高度:")\nprint("寬與高:")\nprint(w)\nprint(h)',
+          ps: '輸出 "輸入寬度:"\n輸入 w\n輸出 "輸入高度:"\n輸入 h\n輸出 "寬與高:"\n輸出 w\n輸出 h',
+          fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 w",250,100), N("n3","io","輸入 h",250,180), N("n4","io","輸出 寬與高:",250,260), N("n5","io","輸出 w",250,340), N("n6","io","輸出 h",250,420), N("n7","end","結束",250,500)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5"), E("n5","n6"), E("n6","n7")] } },
+
+        // --- 運算篇 ---
+        { id: "m1", group: "[運算]", name: "1. 加法計算機",
+          py: 'a = int(input("數字1:"))\nb = int(input("數字2:"))\nc = a + b\nprint(c)',
+          ps: '輸出 "數字1:"\n輸入 a\n輸出 "數字2:"\n輸入 b\nc = a + b\n輸出 c',
+          fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 a",250,100), N("n3","io","輸入 b",250,180), N("n4","process","c = a + b",250,260), N("n5","io","輸出 c",250,340), N("n6","end","結束",250,420)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5"), E("n5","n6")] } },
+        { id: "m2", group: "[運算]", name: "2. 乘法 (總價計算)",
+          py: 'price = 50\nqty = int(input("購買數量:"))\ntotal = price * qty\nprint("總價為:")\nprint(total)',
+          ps: 'price = 50\n輸出 "購買數量:"\n輸入 qty\ntotal = price * qty\n輸出 "總價為:"\n輸出 total',
+          fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","price = 50",250,100), N("n3","io","輸入 qty",250,180), N("n4","process","total = price * qty",250,260), N("n5","io","輸出 總價為:",250,340), N("n6","io","輸出 total",250,420), N("n7","end","結束",250,500)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5"), E("n5","n6"), E("n6","n7")] } },
+        { id: "m3", group: "[運算]", name: "3. 計算圓面積",
+          py: 'r = float(input("輸入半徑:"))\narea = r * r * 3.14\nprint(area)',
+          ps: '輸出 "輸入半徑:"\n輸入 r\narea = r * r * 3.14\n輸出 area',
+          fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 r",250,100), N("n3","process","area = r * r * 3.14",250,180), N("n4","io","輸出 area",250,260), N("n5","end","結束",250,340)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5")] } },
+        { id: "m4", group: "[運算]", name: "4. BMI 計算器",
+          py: 'h = float(input("身高(m):"))\nw = float(input("體重(kg):"))\nbmi = w / (h * h)\nprint(bmi)',
+          ps: '輸出 "身高(m):"\n輸入 h\n輸出 "體重(kg):"\n輸入 w\nbmi = w / (h * h)\n輸出 bmi',
+          fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 h",250,100), N("n3","io","輸入 w",250,180), N("n4","process","bmi = w / (h * h)",250,260), N("n5","io","輸出 bmi",250,340), N("n6","end","結束",250,420)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5"), E("n5","n6")] } },
+        { id: "m5", group: "[運算]", name: "5. 餘數計算 (換算硬幣)",
+          py: 'money = int(input("輸入金額:"))\ntens = money // 10\nones = money % 10\nprint("十元數量:")\nprint(tens)\nprint("一元數量:")\nprint(ones)',
+          ps: '輸出 "輸入金額:"\n輸入 money\ntens = money // 10\nones = money % 10\n輸出 "十元數量:"\n輸出 tens\n輸出 "一元數量:"\n輸出 ones',
+          fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 money",250,100), N("n3","process","tens = money // 10",250,180), N("n4","process","ones = money % 10",250,260), N("n5","io","輸出 tens",250,340), N("n6","io","輸出 ones",250,420), N("n7","end","結束",250,500)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5"), E("n5","n6"), E("n6","n7")] } },
+
+        // --- 判斷篇 ---
+        { id: "c1", group: "[判斷]", name: "1. 單一判斷 (密碼檢查)",
+          py: 'pwd = input("輸入密碼:")\nif pwd == "1234":\n    print("歡迎")\nprint("檢查完畢")',
+          ps: '輸出 "輸入密碼:"\n輸入 pwd\n如果 pwd == "1234" 則\n    輸出 "歡迎"\n輸出 "檢查完畢"',
+          fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 pwd",250,100), N("n3","decision",'pwd == "1234"',250,180), N("n4","io","輸出 歡迎",100,280), N("n5","io","輸出 檢查完畢",250,380), N("n6","end","結束",250,460)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n5","否","right","top"), E("n4","n5","","bottom","left"), E("n5","n6")] } },
+        { id: "c2", group: "[判斷]", name: "2. 雙向判斷 (及格與否)",
+          py: 'score = int(input("分數:"))\nif score >= 60:\n    print("及格")\nelse:\n    print("不及格")',
+          ps: '輸出 "分數:"\n輸入 score\n如果 score >= 60 則\n    輸出 "及格"\n否則\n    輸出 "不及格"',
+          fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 score",250,100), N("n3","decision","score >= 60",250,180), N("n4","io","輸出 及格",100,280), N("n5","io","輸出 不及格",400,280), N("n6","end","結束",250,400)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n5","否","right","top"), E("n4","n6","","bottom","left"), E("n5","n6","","bottom","right")] } },
+        { id: "c3", group: "[判斷]", name: "3. 雙向判斷 (奇數與偶數)",
+          py: 'num = int(input("整數:"))\nif num % 2 == 0:\n    print("偶數")\nelse:\n    print("奇數")',
+          ps: '輸出 "整數:"\n輸入 num\n如果 num % 2 == 0 則\n    輸出 "偶數"\n否則\n    輸出 "奇數"',
+          fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 num",250,100), N("n3","decision","num % 2 == 0",250,180), N("n4","io","輸出 偶數",100,280), N("n5","io","輸出 奇數",400,280), N("n6","end","結束",250,400)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n5","否","right","top"), E("n4","n6","","bottom","left"), E("n5","n6","","bottom","right")] } },
+        { id: "c4", group: "[判斷]", name: "4. 多重判斷 (購物折扣)",
+          py: 'cost = int(input("金額:"))\nif cost >= 1000:\n    print("8折")\nelif cost >= 500:\n    print("9折")\nelse:\n    print("不打折")',
+          ps: '輸出 "金額:"\n輸入 cost\n如果 cost >= 1000 則\n    輸出 "8折"\n否則如果 cost >= 500 則\n    輸出 "9折"\n否則\n    輸出 "不打折"',
+          fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 cost",250,100), N("n3","decision","cost >= 1000",250,180), N("n4","io","輸出 8折",100,280), N("n5","decision","cost >= 500",400,280), N("n6","io","輸出 9折",250,380), N("n7","io","輸出 不打折",550,380), N("n8","end","結束",250,500)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n5","否","right","top"), E("n5","n6","是","left","top"), E("n5","n7","否","right","top"), E("n4","n8","","bottom","left"), E("n6","n8","","bottom","top"), E("n7","n8","","bottom","right")] } },
+        { id: "c5", group: "[判斷]", name: "5. 多重判斷 (成績等第)",
+          py: 's = int(input("分數:"))\nif s >= 90:\n    print("A")\nelif s >= 80:\n    print("B")\nelif s >= 70:\n    print("C")\nelse:\n    print("F")',
+          ps: '輸出 "分數:"\n輸入 s\n如果 s >= 90 則\n    輸出 "A"\n否則如果 s >= 80 則\n    輸出 "B"\n否則如果 s >= 70 則\n    輸出 "C"\n否則\n    輸出 "F"',
+          fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 s",250,100), N("n3","decision","s >= 90",250,180), N("n4","io","輸出 A",100,280), N("n5","decision","s >= 80",400,280), N("n6","io","輸出 B",250,380), N("n7","decision","s >= 70",550,380), N("n8","io","輸出 C",400,480), N("n9","io","輸出 F",700,480), N("n10","end","結束",250,600)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n5","否","right","top"), E("n5","n6","是","left","top"), E("n5","n7","否","right","top"), E("n7","n8","是","left","top"), E("n7","n9","否","right","top"), E("n4","n10","","bottom","left"), E("n6","n10","","bottom","left"), E("n8","n10","","bottom","right"), E("n9","n10","","bottom","right")] } },
+
+        // --- 迴圈篇 ---
+        { id: "l1", group: "[迴圈]", name: "1. 倒數計時",
+          py: 'n = 5\nwhile n > 0:\n    print(n)\n    n = n - 1\nprint("發射")',
+          ps: 'n = 5\n當 n > 0 執行\n    輸出 n\n    n = n - 1\n輸出 "發射"',
+          fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","n = 5",250,100), N("n3","decision","n > 0",250,180), N("n4","io","輸出 n",100,280), N("n5","process","n = n - 1",100,360), N("n6","io","輸出 發射",400,280), N("n7","end","結束",400,360)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n6","否","right","top"), E("n4","n5"), E("n5","n3","","left","left"), E("n6","n7")] } },
+        { id: "l2", group: "[迴圈]", name: "2. 順數計時",
+          py: 'i = 1\nwhile i <= 5:\n    print(i)\n    i = i + 1\nprint("結束")',
+          ps: 'i = 1\n當 i <= 5 執行\n    輸出 i\n    i = i + 1\n輸出 "結束"',
+          fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","i = 1",250,100), N("n3","decision","i <= 5",250,180), N("n4","io","輸出 i",100,280), N("n5","process","i = i + 1",100,360), N("n6","io","輸出 結束",400,280), N("n7","end","結束",400,360)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n6","否","right","top"), E("n4","n5"), E("n5","n3","","left","left"), E("n6","n7")] } },
+                { id: "l2f", group: "[迴圈]", name: "3. for 迴圈 (印出 1 到 5)",
+                    py: 'for i in range(1, 6):\n    print(i)\nprint("結束")',
+                    ps: '對於每個 i 在 range(1, 6) 執行\n    輸出 i\n輸出 "結束"',
+                    fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","i = 1",250,100), N("n3","decision","i <= 5",250,180), N("n4","io","輸出 i",100,280), N("n5","process","i = i + 1",100,360), N("n6","io","輸出 結束",400,280), N("n7","end","結束",400,360)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n6","否","right","top"), E("n4","n5"), E("n5","n3","","left","left"), E("n6","n7")] } },
+                { id: "l2g", group: "[迴圈]", name: "4. for 迴圈 (印出偶數)",
+                    py: 'for i in range(2, 11, 2):\n    print(i)\nprint("完成")',
+                    ps: '對於每個 i 在 range(2, 11, 2) 執行\n    輸出 i\n輸出 "完成"',
+                    fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","i = 2",250,100), N("n3","decision","i <= 10",250,180), N("n4","io","輸出 i",100,280), N("n5","process","i = i + 2",100,360), N("n6","io","輸出 完成",400,280), N("n7","end","結束",400,360)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n6","否","right","top"), E("n4","n5"), E("n5","n3","","left","left"), E("n6","n7")] } },
+                { id: "l2h", group: "[迴圈]", name: "5. for 迴圈 (累加 1 到 5)",
+                    py: 'total = 0\nfor i in range(1, 6):\n    total = total + i\nprint("總和:")\nprint(total)',
+                    ps: 'total = 0\n對於每個 i 在 range(1, 6) 執行\n    total = total + i\n輸出 "總和:"\n輸出 total',
+                    fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","total = 0",250,100), N("n3","process","i = 1",250,180), N("n4","decision","i <= 5",250,260), N("n5","process","total = total + i",100,360), N("n6","process","i = i + 1",100,440), N("n7","io","輸出 總和:",400,360), N("n8","io","輸出 total",400,440), N("n9","end","結束",400,520)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5","是","left","top"), E("n4","n7","否","right","top"), E("n5","n6"), E("n6","n4","","left","left"), E("n7","n8"), E("n8","n9")] } },
+                { id: "l2i", group: "[迴圈]", name: "6. for 迴圈 (3 的乘法練習)",
+                    py: 'for i in range(1, 10):\n    print(3 * i)\nprint("完成")',
+                    ps: '對於每個 i 在 range(1, 10) 執行\n    輸出 3 * i\n輸出 "完成"',
+                    fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","i = 1",250,100), N("n3","decision","i <= 9",250,180), N("n4","io","輸出 3 * i",100,280), N("n5","process","i = i + 1",100,360), N("n6","io","輸出 完成",400,280), N("n7","end","結束",400,360)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n6","否","right","top"), E("n4","n5"), E("n5","n3","","left","left"), E("n6","n7")] } },
+                { id: "l3", group: "[迴圈]", name: "7. 累加計算 (1加到N)",
+          py: 'target = int(input("加到多少?"))\ntotal = 0\ni = 1\nwhile i <= target:\n    total = total + i\n    i = i + 1\nprint("總和:")\nprint(total)',
+          ps: '輸出 "加到多少?"\n輸入 target\ntotal = 0\ni = 1\n當 i <= target 執行\n    total = total + i\n    i = i + 1\n輸出 "總和:"\n輸出 total',
+          fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 target",250,100), N("n3","process","total = 0",250,180), N("n4","process","i = 1",250,260), N("n5","decision","i <= target",250,340), N("n6","process","total = total + i",100,440), N("n7","process","i = i + 1",100,520), N("n8","io","輸出 total",400,440), N("n9","end","結束",400,520)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5"), E("n5","n6","是","left","top"), E("n5","n8","否","right","top"), E("n6","n7"), E("n7","n5","","left","left"), E("n8","n9")] } },
+                { id: "l4", group: "[迴圈]", name: "8. 密碼重試機制",
+          py: 'pwd = ""\nwhile pwd != "1234":\n    pwd = input("請輸入密碼:")\nprint("登入成功")',
+          ps: 'pwd = ""\n當 pwd != "1234" 執行\n    輸出 "請輸入密碼:"\n    輸入 pwd\n輸出 "登入成功"',
+          fl: { nodes: [N("n1","start","開始",250,20), N("n2","process",'pwd = ""',250,100), N("n3","decision",'pwd != "1234"',250,180), N("n4","io","輸入 pwd",100,280), N("n5","io","輸出 登入成功",400,280), N("n6","end","結束",400,360)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n5","否","right","top"), E("n4","n3","","left","left"), E("n5","n6")] } },
+                { id: "l5", group: "[迴圈]", name: "9. 存錢筒 (累計到目標金額)",
+          py: 'saved = 0\nwhile saved < 100:\n    add = int(input("存入金額:"))\n    saved = saved + add\n    print(saved)\nprint("目標達成!")',
+          ps: 'saved = 0\n當 saved < 100 執行\n    輸出 "存入金額:"\n    輸入 add\n    saved = saved + add\n    輸出 saved\n輸出 "目標達成!"',
+          fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","saved = 0",250,100), N("n3","decision","saved < 100",250,180), N("n4","io","輸入 add",100,280), N("n5","process","saved = saved + add",100,360), N("n6","io","輸出 saved",100,440), N("n7","io","輸出 目標達成!",400,280), N("n8","end","結束",400,360)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n7","否","right","top"), E("n4","n5"), E("n5","n6"), E("n6","n3","","left","left"), E("n7","n8")] } }
+    ];
+
+    let currentLang = 'zh';
+    let currentMode = 'flow';
+    let isMaximized = false;
+
+    function toggleMaximize() {
+        isMaximized = !isMaximized;
+        const body = document.body;
+        const btnText = document.getElementById('lbl-maximize');
+        const t = i18n[currentLang];
+
+        if (isMaximized) {
+            body.classList.add('maximized');
+            btnText.textContent = t.flowTools.restore;
+            document.getElementById('lbl-maximize').parentElement.style.background = '#e91e63';
+        } else {
+            body.classList.remove('maximized');
+            btnText.textContent = t.flowTools.maximize;
+            document.getElementById('lbl-maximize').parentElement.style.background = '#607d8b';
+        }
+
+        setTimeout(() => { if(window.flowApp) window.flowApp.renderEdges(); }, 350);
+    }
+
+    window.flowApp = {
+        nodes: [], edges: [], nodeCounter: 0,
+        selectedNodeId: null, selectedEdgeIndex: null, draggedNode: null,
+        connectingFromNode: null, connectingFromPort: null,
+        offsetX: 0, offsetY: 0, tempLineStartX: 0, tempLineStartY: 0,
+
+        init() {
+            document.addEventListener('mousemove', this.onMouseMove.bind(this));
+            document.addEventListener('mouseup', this.onMouseUp.bind(this));
+            document.addEventListener('touchmove', this.onTouchMove.bind(this), {passive: false});
+            document.addEventListener('touchend', this.onMouseUp.bind(this));
+
+            document.addEventListener('keydown', (e) => {
+                if ((e.key === 'Delete' || e.key === 'Backspace') && currentMode === 'flow') {
+                    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') {
+                        this.deleteSelected();
+                    }
+                }
+            });
+
+            // 修正為綁定在大畫布內部容器上，自動處理 Scroll 問題
+            const canvasInner = document.getElementById('flow-canvas');
+            if(canvasInner) {
+                const handleCanvasClick = (e) => {
+                    if (e.target.tagName === 'INPUT') return;
+                    const edgeGroup = e.target.closest('.edge-group');
+                    if (edgeGroup) {
+                        this.selectedEdgeIndex = parseInt(edgeGroup.getAttribute('data-edge-index'));
+                        this.selectedNodeId = null;
+                        this.renderNodes();
+                        this.renderEdges();
+                        e.stopPropagation();
+                        return;
+                    }
+                    if (e.target.id === 'flow-canvas' || e.target.id === 'flow-lines' || e.target.id === 'nodes-container' || e.target.id === 'labels-container') {
+                        this.selectNode(null);
+                        this.selectedEdgeIndex = null;
+                        this.renderEdges();
+                    }
+                };
+                canvasInner.addEventListener('mousedown', handleCanvasClick);
+                canvasInner.addEventListener('touchstart', handleCanvasClick, {passive: true});
+            }
+        },
+
+        addNode(type) {
+            const container = document.getElementById('flow-workspace');
+            const id = 'node_' + (++this.nodeCounter);
+            let text = "";
+            const t = i18n[currentLang];
+
+            if (type === 'start') text = t.flowTools.start;
+            else if (type === 'end') text = t.flowTools.end;
+
+            // 確保新節點出現在可視範圍的中間，加上目前的 scroll 值
+            const scrollLeft = container.scrollLeft;
+            const scrollTop = container.scrollTop;
+            const viewW = container.clientWidth;
+
+            const node = { id, type, text, x: scrollLeft + viewW/2 - 60, y: scrollTop + 50 + (this.nodeCounter * 20) % 150 };
+            this.nodes.push(node);
+            this.selectNode(id);
+            this.renderNodes();
+        },
+
+        selectNode(id) {
+            this.selectedNodeId = id;
+            if (id !== null) this.selectedEdgeIndex = null;
+            this.renderNodes();
+            this.renderEdges();
+        },
+
+        deleteSelected() {
+            if (this.selectedNodeId) {
+                this.nodes = this.nodes.filter(n => n.id !== this.selectedNodeId);
+                this.edges = this.edges.filter(e => e.from !== this.selectedNodeId && e.to !== this.selectedNodeId);
+                this.selectedNodeId = null;
+            } else if (this.selectedEdgeIndex !== null) {
+                this.edges.splice(this.selectedEdgeIndex, 1);
+                this.selectedEdgeIndex = null;
+            }
+            this.renderNodes();
+            this.renderEdges();
+        },
+
+        clearAll() {
+            this.nodes = []; this.edges = []; this.nodeCounter = 0;
+            this.selectedNodeId = null; this.selectedEdgeIndex = null;
+            document.getElementById('example-select').value = "";
+            this.renderNodes();
+            this.renderEdges();
+            setStatus(i18n[currentLang].flowTools.clear + " 完成", 'info');
+        },
+
+        getPortCoords(nodeId, pos) {
+            const el = document.getElementById(nodeId);
+            if (!el) return { x: 0, y: 0 };
+            const w = el.offsetWidth, h = el.offsetHeight;
+            const left = el.offsetLeft, top = el.offsetTop;
+
+            switch(pos) {
+                case 'top': return { x: left + w/2, y: top };
+                case 'bottom': return { x: left + w/2, y: top + h };
+                case 'left': return { x: left, y: top + h/2 };
+                case 'right': return { x: left + w, y: top + h/2 };
+                default: return { x: left + w/2, y: top + h/2 };
+            }
+        },
+
+        startConnect(e, nodeId, pos) {
+            e.stopPropagation();
+            this.connectingFromNode = nodeId;
+            this.connectingFromPort = pos;
+            this.selectNode(nodeId);
+
+            const coords = this.getPortCoords(nodeId, pos);
+            this.tempLineStartX = coords.x;
+            this.tempLineStartY = coords.y;
+
+            const tempLine = document.getElementById('temp-line');
+            tempLine.setAttribute('x1', this.tempLineStartX);
+            tempLine.setAttribute('y1', this.tempLineStartY);
+
+            let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            let clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const containerRect = document.getElementById('flow-canvas').getBoundingClientRect();
+            tempLine.setAttribute('x2', clientX - containerRect.left);
+            tempLine.setAttribute('y2', clientY - containerRect.top);
+            tempLine.style.display = 'block';
+        },
+
+        onNodeMouseDown(e, id) {
+            if (e.target.tagName === 'INPUT' || e.target.classList.contains('connect-port')) return;
+            e.stopPropagation();
+            this.selectNode(id);
+            this.draggedNode = this.nodes.find(n => n.id === id);
+            const rect = document.getElementById(id).getBoundingClientRect();
+            this.offsetX = e.clientX - rect.left;
+            this.offsetY = e.clientY - rect.top;
+        },
+
+        onNodeTouchStart(e, id) {
+            if (e.target.tagName === 'INPUT' || e.target.classList.contains('connect-port')) return;
+            e.stopPropagation();
+            let touch = e.touches[0];
+            this.selectNode(id);
+            this.draggedNode = this.nodes.find(n => n.id === id);
+            const rect = document.getElementById(id).getBoundingClientRect();
+            this.offsetX = touch.clientX - rect.left;
+            this.offsetY = touch.clientY - rect.top;
+        },
+
+        handleDrag(clientX, clientY) {
+            const containerRect = document.getElementById('flow-canvas').getBoundingClientRect();
+            let x = clientX - containerRect.left - this.offsetX;
+            let y = clientY - containerRect.top - this.offsetY;
+            // 允許在 1200x1200 畫布內拖曳
+            this.draggedNode.x = Math.max(0, Math.min(x, 1200 - 120));
+            this.draggedNode.y = Math.max(0, Math.min(y, 1200 - 40));
+
+            const el = document.getElementById(this.draggedNode.id);
+            if(el) { el.style.left = this.draggedNode.x + 'px'; el.style.top = this.draggedNode.y + 'px'; }
+            this.renderEdges();
+        },
+
+        onMouseMove(e) {
+            if (this.connectingFromNode) {
+                const containerRect = document.getElementById('flow-canvas').getBoundingClientRect();
+                const tempLine = document.getElementById('temp-line');
+                tempLine.setAttribute('x2', e.clientX - containerRect.left);
+                tempLine.setAttribute('y2', e.clientY - containerRect.top);
+            } else if (this.draggedNode) {
+                this.handleDrag(e.clientX, e.clientY);
+            }
+        },
+
+        onTouchMove(e) {
+            if (this.connectingFromNode) {
+                e.preventDefault();
+                const containerRect = document.getElementById('flow-canvas').getBoundingClientRect();
+                const tempLine = document.getElementById('temp-line');
+                tempLine.setAttribute('x2', e.touches[0].clientX - containerRect.left);
+                tempLine.setAttribute('y2', e.touches[0].clientY - containerRect.top);
+            } else if (this.draggedNode) {
+                e.preventDefault();
+                this.handleDrag(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        },
+
+        onMouseUp(e) {
+            if (this.connectingFromNode) {
+                const tempLine = document.getElementById('temp-line');
+                tempLine.style.display = 'none';
+
+                let clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+                let clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+
+                const svgEl = document.getElementById('flow-lines');
+                const labelsEl = document.getElementById('labels-container');
+                const origSvgDisplay = svgEl.style.display;
+                const origLabelsDisplay = labelsEl.style.display;
+
+                svgEl.style.display = 'none';
+                labelsEl.style.display = 'none';
+
+                const targetEl = document.elementFromPoint(clientX, clientY);
+
+                svgEl.style.display = origSvgDisplay;
+                labelsEl.style.display = origLabelsDisplay;
+
+                const nodeEl = targetEl ? targetEl.closest('.flow-node') : null;
+
+                if (nodeEl && nodeEl.id !== this.connectingFromNode) {
+                    const containerRect = document.getElementById('flow-canvas').getBoundingClientRect();
+                    const dropX = clientX - containerRect.left;
+                    const dropY = clientY - containerRect.top;
+
+                    const w = nodeEl.offsetWidth, h = nodeEl.offsetHeight;
+                    const left = nodeEl.offsetLeft, top = nodeEl.offsetTop;
+                    const ports = [
+                        { pos: 'top', x: left + w/2, y: top },
+                        { pos: 'bottom', x: left + w/2, y: top + h },
+                        { pos: 'left', x: left, y: top + h/2 },
+                        { pos: 'right', x: left + w, y: top + h/2 }
+                    ];
+                    ports.sort((a, b) => (Math.pow(a.x - dropX, 2) + Math.pow(a.y - dropY, 2)) - (Math.pow(b.x - dropX, 2) + Math.pow(b.y - dropY, 2)));
+                    const targetPort = ports[0].pos;
+
+                    const sourceNode = this.nodes.find(n => n.id === this.connectingFromNode);
+                    let label = undefined;
+
+                    if (sourceNode.type === 'decision') {
+                        let existingEdgesCount = this.edges.filter(ed => ed.from === sourceNode.id).length;
+                        label = existingEdgesCount === 0 ? "是" : (existingEdgesCount === 1 ? "否" : "");
+                    }
+
+                    if (!this.edges.some(e => e.from === this.connectingFromNode && e.to === nodeEl.id)) {
+                        this.edges.push({
+                            from: this.connectingFromNode, fromPort: this.connectingFromPort,
+                            to: nodeEl.id, toPort: targetPort,
+                            label: label
+                        });
+                        this.renderEdges();
+                    }
+                }
+                this.connectingFromNode = null;
+                this.connectingFromPort = null;
+            }
+            this.draggedNode = null;
+        },
+
+        onInputChanged(e, id) {
+            const node = this.nodes.find(n => n.id === id);
+            if (node) node.text = e.target.value;
+        },
+
+        updateEdgeLabel(index, val) {
+            if(this.edges[index]) {
+                this.edges[index].label = val.trim();
+                this.renderEdges();
+            }
+        },
+
+        renderNodes() {
+            const container = document.getElementById('nodes-container');
+            container.innerHTML = '';
+            const t = i18n[currentLang];
+
+            container.style.pointerEvents = 'auto';
+
+            this.nodes.forEach(node => {
+                const el = document.createElement('div');
+                el.className = `flow-node node-${node.type}`;
+                if (node.id === this.selectedNodeId) el.classList.add('selected');
+
+                el.id = node.id;
+                el.style.left = node.x + 'px';
+                el.style.top = node.y + 'px';
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = node.text;
+                input.placeholder = t.flowTools.defaultText;
+                input.oninput = (e) => this.onInputChanged(e, node.id);
+                if (node.type === 'start' || node.type === 'end') {
+                    input.readOnly = true;
+                    input.style.cursor = 'pointer';
+                }
+                el.appendChild(input);
+
+                ['top', 'bottom', 'left', 'right'].forEach(pos => {
+                    const port = document.createElement('div');
+                    port.className = `connect-port port-${pos}`;
+                    port.onmousedown = (e) => this.startConnect(e, node.id, pos);
+                    port.ontouchstart = (e) => this.startConnect(e, node.id, pos);
+                    el.appendChild(port);
+                });
+
+                el.onmousedown = (e) => this.onNodeMouseDown(e, node.id);
+                el.ontouchstart = (e) => this.onNodeTouchStart(e, node.id);
+                container.appendChild(el);
+            });
+            setTimeout(() => this.renderEdges(), 10);
+        },
+
+        renderEdges() {
+            const svg = document.getElementById('lines-group');
+            const labelsContainer = document.getElementById('labels-container');
+            if(!svg || !labelsContainer) return;
+
+            svg.innerHTML = '';
+            labelsContainer.innerHTML = '';
+
+            const trueLabels = ['true', 't', 'yes', 'y', '是', '對', '成立'];
+            const falseLabels = ['false', 'f', 'no', 'n', '否', '錯', '不成立'];
+
+            this.edges.forEach((edge, index) => {
+                const fromEl = document.getElementById(edge.from);
+                const toEl = document.getElementById(edge.to);
+                if (!fromEl || !toEl) return;
+
+                const startCoords = this.getPortCoords(edge.from, edge.fromPort || 'right');
+                const endCoords = this.getPortCoords(edge.to, edge.toPort || 'left');
+                const x1 = startCoords.x, y1 = startCoords.y;
+                const x2 = endCoords.x, y2 = endCoords.y;
+
+                let isSelected = (this.selectedEdgeIndex === index);
+                let text = edge.label || "";
+                let isTrue = trueLabels.includes(text.toLowerCase());
+                let isFalse = falseLabels.includes(text.toLowerCase());
+
+                let baseColor = isTrue ? '#2e7d32' : (isFalse ? '#c62828' : '#333');
+                let marker = isTrue ? 'url(#arrowhead-true)' : (isFalse ? 'url(#arrowhead-false)' : 'url(#arrowhead)');
+
+                let finalColor = isSelected ? '#ff5722' : baseColor;
+                let finalWidth = isSelected ? '4' : '2.5';
+                let finalMarker = isSelected ? 'url(#arrowhead-selected)' : marker;
+
+                let lineHTML = `<g class="edge-group" data-edge-index="${index}" style="pointer-events: auto; cursor: pointer;">`;
+                lineHTML += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="transparent" stroke-width="20"></line>`;
+
+                if (y2 < y1 - 40 && Math.abs(x1 - x2) > 20) {
+                     let midX = Math.min(x1, x2) - 60;
+                     lineHTML += `<polyline points="${x1},${y1} ${midX},${y1} ${midX},${y2} ${x2},${y2}" stroke="${finalColor}" fill="none" stroke-width="${finalWidth}" marker-end="${finalMarker}" stroke-dasharray="8,4"></polyline>`;
+                } else {
+                     lineHTML += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${finalColor}" stroke-width="${finalWidth}" marker-end="${finalMarker}"></line>`;
+                }
+
+                lineHTML += `</g>`;
+                svg.innerHTML += lineHTML;
+
+                let sourceNodeType = this.nodes.find(n => n.id === edge.from).type;
+                if (sourceNodeType === 'decision') {
+                    let mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+                    let bgCol = isTrue ? "#e8f5e9" : (isFalse ? "#ffebee" : "#ffffff");
+                    let txtCol = isTrue ? "#2e7d32" : (isFalse ? "#c62828" : "#333");
+                    let borderColor = isSelected ? "#ff5722" : (isTrue ? "#2e7d32" : (isFalse ? "#c62828" : "#999"));
+
+                    let labelHTML = `<input type="text" class="edge-label-input" value="${text}" placeholder="?"
+                           onchange="window.flowApp.updateEdgeLabel(${index}, this.value)"
+                           onmousedown="event.stopPropagation()"
+                           ontouchstart="event.stopPropagation()"
+                           title="直接修改條件"
+                           style="position:absolute; left:${mx - 35}px; top:${my - 14}px;
+                                  border: 2px solid ${borderColor}; background: ${bgCol}; color: ${txtCol};
+                                  pointer-events:auto; z-index:4;">`;
+
+                    labelsContainer.innerHTML += labelHTML;
+                }
+            });
+        },
+
+        compileToPython() {
+            const t = i18n[currentLang];
+            if (this.nodes.length === 0) return setStatus(t.msgFlowEmpty, 'error');
+
+            const startNode = this.nodes.find(n => n.type === 'start');
+            if (!startNode) return setStatus("錯誤：流程圖必須包含一個「開始」節點！", 'error');
+
+            let codeStr = "";
+            const processTextToPython = (rawText) => {
+                let text = rawText.trim();
+                if (text.match(/^(輸出|output)\s*(.*)/i)) {
+                    let content = text.replace(/^(輸出|output)\s*/i, "");
+                    if(!content.startsWith("(")) text = `print(${content})`;
+                    else text = `print${content}`;
+                }
+                if (text.match(/^(輸入|input)\s+(.*)/i)) {
+                    let varName = text.replace(/^(輸入|input)\s+/i, "");
+                    text = `${varName} = input()`;
+                }
+                return text;
+            };
+
+            const trueLabels = ['true', 't', 'yes', 'y', '是', '對', '成立'];
+            const falseLabels = ['false', 'f', 'no', 'n', '否', '錯', '不成立'];
+
+            const traverse = (nodeId, indent, pathVisited) => {
+                if (pathVisited.has(nodeId)) return;
+                let currentPathVisited = new Set(pathVisited);
+                currentPathVisited.add(nodeId);
+
+                const node = this.nodes.find(n => n.id === nodeId);
+                if (!node || node.type === 'end') return;
+
+                const prefix = "    ".repeat(indent);
+                let outgoingEdges = this.edges.filter(e => e.from === nodeId);
+
+                if (node.type === 'process' || node.type === 'io') {
+                    if (node.text.trim()) codeStr += prefix + processTextToPython(node.text) + "\n";
+                    outgoingEdges.forEach(e => traverse(e.to, indent, currentPathVisited));
+                } else if (node.type === 'decision') {
+                    let cond = node.text.trim() || "True";
+                    let trueEdges = outgoingEdges.filter(e => e.label && trueLabels.includes(e.label.trim().toLowerCase()));
+                    let falseEdges = outgoingEdges.filter(e => e.label && falseLabels.includes(e.label.trim().toLowerCase()));
+
+                    if (trueEdges.length === 0 && falseEdges.length === 0 && outgoingEdges.length > 0) {
+                        trueEdges = [outgoingEdges[0]];
+                        if (outgoingEdges.length > 1) falseEdges = [outgoingEdges[1]];
+                    }
+
+                    let isWhileLoop = false;
+                    if(trueEdges.length > 0) {
+                        let subPath = [trueEdges[0].to];
+                        for(let i=0; i<this.edges.length; i++) {
+                            let deepEdge = this.edges.find(e => subPath.includes(e.from));
+                            if(deepEdge) {
+                                if(deepEdge.to === nodeId) isWhileLoop = true;
+                                else subPath.push(deepEdge.to);
+                            }
+                        }
+                    }
+
+                    if (isWhileLoop) codeStr += prefix + "while " + cond + ":\n";
+                    else codeStr += prefix + "if " + cond + ":\n";
+
+                    let lenBeforeTrue = codeStr.length;
+                    trueEdges.forEach(e => traverse(e.to, indent + 1, currentPathVisited));
+                    if (codeStr.length === lenBeforeTrue) codeStr += prefix + "    pass\n";
+
+                    if (falseEdges.length > 0 && !isWhileLoop) {
+                        codeStr += prefix + "else:\n";
+                        let lenBeforeFalse = codeStr.length;
+                        falseEdges.forEach(e => traverse(e.to, indent + 1, currentPathVisited));
+                        if (codeStr.length === lenBeforeFalse) codeStr += prefix + "    pass\n";
+                    } else if (falseEdges.length > 0 && isWhileLoop) {
+                        falseEdges.forEach(e => traverse(e.to, indent, currentPathVisited));
+                    }
+                } else {
+                    outgoingEdges.forEach(e => traverse(e.to, indent, currentPathVisited));
+                }
+            };
+
+            let firstEdge = this.edges.find(e => e.from === startNode.id);
+            if (firstEdge) traverse(firstEdge.to, 0, new Set([startNode.id]));
+
+            if (!codeStr.trim()) codeStr = "# 未產生程式碼，請確認連線箭頭是否從「開始」節點出發！";
+
+            document.getElementById('python-code').value = codeStr;
+            if(isMaximized) toggleMaximize();
+
+            document.getElementById('mode-select').value = 'python';
+            changeMode();
+            document.getElementById('output-area').textContent = "【 本機編譯結果 】\n\n" + codeStr;
+            setStatus(t.msgCompileSuccess, 'success');
+        }
+    };
+
+    window.flowApp.init();
+
+    // 更新統一的教學範例清單
+    function updateExampleOptions() {
+        const t = i18n[currentLang];
+        const exSelect = document.getElementById('example-select');
+        const currentVal = exSelect.value; // 保留目前選擇
+        exSelect.innerHTML = `<option value="">${t.defaultSelectExample}</option>`;
+
+        universalExamples.forEach(ex => {
+            let opt = document.createElement('option');
+            opt.value = ex.id;
+            opt.textContent = `${ex.group} ${ex.name}`;
+            exSelect.appendChild(opt);
+        });
+
+        if (currentVal) {
+            exSelect.value = currentVal;
+            // 若有選擇，則強制切換內容
+            loadExample();
+        }
+    }
+
+    function loadExample() {
+        const exId = document.getElementById('example-select').value;
+        if (!exId) return;
+
+        let ex = universalExamples.find(e => e.id === exId);
+        if (!ex) return;
+
+        document.getElementById('status-msg').style.display = 'none';
+
+        if (currentMode === 'python') {
+            document.getElementById('python-code').value = ex.py;
+        } else if (currentMode === 'pseudo') {
+            document.getElementById('python-code').value = ex.ps;
+        } else if (currentMode === 'flow') {
+            window.flowApp.nodes = JSON.parse(JSON.stringify(ex.fl.nodes));
+            window.flowApp.edges = JSON.parse(JSON.stringify(ex.fl.edges));
+
+            let maxId = 0;
+            window.flowApp.nodes.forEach(n => {
+                let match = n.id.match(/\d+/);
+                if (match) maxId = Math.max(maxId, parseInt(match[0]));
+            });
+            window.flowApp.nodeCounter = maxId;
+
+            window.flowApp.selectNode(null);
+
+            // 將畫布捲動回頂部
+            document.getElementById('flow-workspace').scrollTo({top: 0, left: 0, behavior: 'smooth'});
+        }
+    }
+
+    function changeLang() {
+        currentLang = document.getElementById('lang-select').value;
+        const t = i18n[currentLang];
+        document.getElementById('main-title').textContent = t.mainTitle;
+        document.getElementById('output-title').textContent = t.outputTitle;
+        document.getElementById('mode-label').textContent = t.modeLabel;
+        document.getElementById('example-label').textContent = t.exampleLabel;
+
+        const modeSelect = document.getElementById('mode-select');
+        modeSelect.options[0].text = t.modeFlow; modeSelect.options[1].text = t.modePy; modeSelect.options[2].text = t.modePs;
+
+        document.getElementById('btn-compile-flow').textContent = t.btnCompileFlow;
+        document.getElementById('lbl-add-start').textContent = t.flowTools.start;
+        document.getElementById('lbl-add-end').textContent = t.flowTools.end;
+        document.getElementById('lbl-add-process').textContent = t.flowTools.process;
+        document.getElementById('lbl-add-io').textContent = t.flowTools.io;
+        document.getElementById('lbl-add-decision').textContent = t.flowTools.decision;
+        document.getElementById('lbl-delete').textContent = t.flowTools.del;
+        document.getElementById('lbl-clear-all').textContent = t.flowTools.clear;
+        document.getElementById('lbl-maximize').textContent = isMaximized ? t.flowTools.restore : t.flowTools.maximize;
+        document.getElementById('flow-hint').textContent = t.flowTools.hint;
+
+        changeMode();
+    }
+
+    function changeMode() {
+        currentMode = document.getElementById('mode-select').value;
+        const t = i18n[currentLang];
+
+        if(isMaximized && currentMode !== 'flow') toggleMaximize();
+
+        document.getElementById('status-msg').style.display = 'none';
+        document.getElementById('python-code').style.display = 'none';
+        document.getElementById('flow-editor-container').style.display = 'none';
+        document.getElementById('btn-group-standard').style.display = 'none';
+        document.getElementById('btn-group-flow').style.display = 'none';
+
+        if (currentMode === 'python' || currentMode === 'pseudo') {
+            document.getElementById('input-title').textContent = currentMode === 'python' ? t.inputTitlePy : t.inputTitlePs;
+            document.getElementById('python-code').style.display = 'block';
+            document.getElementById('python-code').placeholder = currentMode === 'python' ? t.placeholderPy : t.placeholderPs;
+            document.getElementById('btn-group-standard').style.display = 'flex';
+
+            document.getElementById('btn-check').style.display = currentMode === 'python' ? 'inline-block' : 'none';
+            document.getElementById('btn-pseudo').style.display = currentMode === 'python' ? 'inline-block' : 'none';
+            document.getElementById('btn-to-python').style.display = currentMode === 'pseudo' ? 'inline-block' : 'none';
+
+            document.getElementById('btn-check').textContent = t.btnCheck;
+            document.getElementById('btn-pseudo').textContent = t.btnPseudo;
+            document.getElementById('btn-to-python').textContent = t.btnToPython;
+            document.getElementById('btn-flow').textContent = t.btnFlow;
+            document.getElementById('btn-run').textContent = t.btnRun;
+            document.getElementById('btn-run').title = t.btnRunTitle;
+        } else if (currentMode === 'flow') {
+            document.getElementById('input-title').textContent = t.inputTitleFlow;
+            document.getElementById('flow-editor-container').style.display = 'flex';
+            document.getElementById('btn-group-flow').style.display = 'flex';
+            setTimeout(() => window.flowApp.renderEdges(), 50);
+        }
+
+        updateExampleOptions();
+    }
+
+    function setStatus(msg, type) {
+        const statusEl = document.getElementById('status-msg');
+        statusEl.textContent = msg; statusEl.className = type; statusEl.style.display = 'block';
+    }
+
+    function getCode() { return document.getElementById('python-code').value; }
+    function getPythonCode() { return currentMode === 'pseudo' ? pseudoToPythonInternal(getCode()) : getCode(); }
+
+    function pythonToPseudoInternal(code) {
+        const t = i18n[currentLang];
+        let pseudoLines = [];
+        let lines = code.split('\n');
+
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+
+            let inString = false;
+            let quoteChar = null;
+            let commentIdx = -1;
+            for(let j=0; j<line.length; j++){
+                let c = line[j];
+                if((c === '"' || c === "'") && (j === 0 || line[j-1] !== '\\')){
+                    if(!inString) { inString = true; quoteChar = c; }
+                    else if(quoteChar === c) { inString = false; }
+                }
+                if(c === '#' && !inString) {
+                    commentIdx = j;
+                    break;
+                }
+            }
+            if(commentIdx !== -1) line = line.substring(0, commentIdx);
+
+            if (line.trim() === '') {
+                if(lines[i].trim() !== '') continue;
+                pseudoLines.push('');
+                continue;
+            }
+
+            let indent = line.match(/^[ \t]*/)[0];
+            let text = line.trim().replace(/\*\*/g, '^');
+
+            let inputMatch = text.match(/^([a-zA-Z0-9_]+)\s*=\s*(?:int|float|str)?\s*\(\s*input\s*\(\s*(.*?)\s*\)\s*\)*$/);
+            if (inputMatch) {
+                let varName = inputMatch[1];
+                let prompt = inputMatch[2];
+                if (prompt) pseudoLines.push(indent + `${t.pseudo.output} ${prompt}`);
+                pseudoLines.push(indent + `${t.pseudo.input} ${varName}`);
+                continue;
+            }
+
+            text = text
+                .replace(/^def\s+(.*?)\((.*?)\):/, `${t.pseudo.func} $1($2) ${t.pseudo.begin}`)
+                .replace(/^if\s+(.*?):/, `${t.pseudo.if} $1 ${t.pseudo.then}`)
+                .replace(/^elif\s+(.*?):/, `${t.pseudo.elif} $1 ${t.pseudo.then}`)
+                .replace(/^else:/, `${t.pseudo.else}`)
+                .replace(/^for\s+(.*?)\s+in\s+(.*?):/, `${t.pseudo.forEach} $1 ${t.pseudo.in} $2 ${t.pseudo.do}`)
+                .replace(/^while\s+(.*?):/, `${t.pseudo.while} $1 ${t.pseudo.do}`)
+                .replace(/^print\s*\((.*?)\)$/, `${t.pseudo.output} $1`);
+
+            pseudoLines.push(indent + text);
+        }
+        return pseudoLines.join('\n');
+    }
+
+    function pseudoToPythonInternal(code) {
+        return code.split('\n').map(line => {
+            if (line.trim() === '') return '';
+            let indent = line.match(/^[ \t]*/)[0];
+            let text = line.trim()
+                .replace(/\^/g, '**')
+                .replace(/^(FUNCTION|函數)\s+(.*?)\((.*?)\)\s+(BEGIN|開始)/i, "def $2($3):")
+                .replace(/^(IF|如果)\s+(.*?)\s+(THEN|則)/i, "if $2:")
+                .replace(/^(ELSE IF|否則如果)\s+(.*?)\s+(THEN|則)/i, "elif $2:")
+                .replace(/^(ELSE|否則)/i, "else:")
+                .replace(/^(FOR EACH|對於每個)\s+(.*?)\s+(IN|在)\s+(.*?)\s+(DO|執行)/i, "for $2 in $4:")
+                .replace(/^(WHILE|當)\s+(.*?)\s+(DO|執行)/i, "while $2:")
+                .replace(/^(OUTPUT|輸出)\s+(.*)/i, "print($2)")
+                .replace(/^(INPUT|輸入)\s+(.*)/i, "$2 = input()");
+            return indent + text;
+        }).join('\n');
+    }
+
+    function checkSyntax() {
+        const code = getPythonCode();
+        if (!code.trim()) { setStatus(i18n[currentLang].msgEmpty, 'error'); return false; }
+        setStatus(i18n[currentLang].msgSyntaxOk, 'info'); return true;
+    }
+
+    function toPseudoCode() {
+        if (!checkSyntax()) return;
+        document.getElementById('output-area').textContent = "【 Pseudo-code 】\n\n" + pythonToPseudoInternal(getCode());
+    }
+
+    function toPythonAction() {
+        const code = getCode();
+        if (!code.trim()) return setStatus(i18n[currentLang].msgEmpty, 'error');
+        document.getElementById('output-area').textContent = "【 Python Code 】\n\n" + pseudoToPythonInternal(code);
+        setStatus("✅ 轉換成功！", 'success');
+    }
+
+    function toFlowchart() {
+        if (!checkSyntax()) return;
+        const t = i18n[currentLang]; const lines = getPythonCode().split('\n');
+        let mermaidGraph = "flowchart TD\nStart([" + t.flow.start + "])\n";
+        let nodeId = 0, activePaths = [{source: "Start", label: null}], blockStack = [];
+
+        function connectPathsTo(targetNodeId) {
+            activePaths.forEach(path => {
+                let edge = path.label ? ` -- ${path.label} --> ` : ` --> `;
+                mermaidGraph += `${path.source}${edge}${targetNodeId}\n`;
+            });
+            activePaths = [];
+        }
+
+        function popBlock() {
+            let block = blockStack.pop();
+            if (block.type === 'if') {
+                if (block.noPath) activePaths.push(block.noPath);
+                activePaths.push(...block.donePaths);
+            } else if (block.type === 'while' || block.type === 'for') {
+                if (block.type === 'for' && block.incCode) {
+                    nodeId++; let incId = "N" + nodeId; mermaidGraph += `${incId}["${block.incCode}"]\n`;
+                    connectPathsTo(incId); mermaidGraph += `${incId} --> ${block.condNode}\n`;
+                } else connectPathsTo(block.condNode);
+                activePaths = [ block.noPath ];
+            }
+        }
+
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+            let commentIdx = line.indexOf('#');
+            if (commentIdx !== -1) line = line.substring(0, commentIdx);
+
+            let stripped = line.trim();
+            if (!stripped) continue;
+            let indent = line.match(/^[ \t]*/)[0].length;
+
+            while (blockStack.length > 0 && indent <= blockStack[blockStack.length - 1].indent && !(stripped.startsWith("elif") || stripped.startsWith("else"))) { popBlock(); }
+
+            if (stripped.startsWith("if ") || stripped.startsWith("elif ")) {
+                nodeId++; let condId = "N" + nodeId;
+                mermaidGraph += `${condId}{"${stripped.replace(/^(if|elif) (.*?):/, "$2")}"}\n`;
+                connectPathsTo(condId);
+                blockStack.push({ type: 'if', indent: indent, donePaths: [], noPath: {source: condId, label: t.flow.false} });
+                activePaths = [ {source: condId, label: t.flow.true} ];
+            } else if (stripped.startsWith("else:")) {
+                let block = blockStack[blockStack.length - 1];
+                block.donePaths.push(...activePaths); activePaths = [ block.noPath ]; block.noPath = null;
+            } else if (stripped.startsWith("for ") || stripped.startsWith("while ")) {
+                nodeId++; let condId = "N" + nodeId;
+                let condText = stripped.startsWith("for") ? stripped.replace(/for (.*?) in (.*?):/, "Has next $1 in $2?") : stripped.replace(/while (.*?):/, "$1");
+                mermaidGraph += `${condId}{"${condText}"}\n`;
+                connectPathsTo(condId);
+                blockStack.push({ type: 'while', indent: indent, condNode: condId, noPath: {source: condId, label: t.flow.false} });
+                activePaths = [ {source: condId, label: t.flow.true} ];
+            } else {
+                nodeId++; let currentId = "N" + nodeId;
+                let text = stripped.replace(/"/g, "'");
+                if (text.includes("print(") || text.includes("input(")) {
+                    text = text.replace(/print\s*\(/g, t.flow.output + " (").replace(/input\s*\(/g, t.flow.input + " (");
+                    mermaidGraph += `${currentId}[/"${text}"/]\n`;
+                } else {
+                    mermaidGraph += `${currentId}["${text}"]\n`;
+                }
+                connectPathsTo(currentId);
+                activePaths = [ {source: currentId, label: null} ];
+            }
+        }
+        while (blockStack.length > 0) popBlock();
+        mermaidGraph += `End([${t.flow.end}])\n`; connectPathsTo("End");
+
+        const chart = document.createElement('div');
+        chart.className = 'mermaid';
+        chart.textContent = mermaidGraph;
+        document.getElementById('output-area').replaceChildren(chart);
+        if(typeof mermaid !== 'undefined') setTimeout(() => mermaid.init(undefined, document.querySelectorAll('.mermaid')), 100);
+    }
+
+    let pyodideReadyPromise;
+    let inputNoticeShown = false;
+
+    function codeUsesInput(code) {
+        return /\binput\s*\(/.test(code);
+    }
+
+    function appendToOutput(text, addNewLine = true) {
+        const outputEl = document.getElementById('output-area');
+        outputEl.textContent += addNewLine ? `${text}\n` : text;
+    }
+
+    function ensureInputNoticeShown() {
+        if (inputNoticeShown) return;
+        appendToOutput(i18n[currentLang].inputPromptNote);
+        appendToOutput("");
+        inputNoticeShown = true;
+    }
+
+    function promptForPythonInput(promptText = "") {
+        const promptMessage = String(promptText ?? "");
+        ensureInputNoticeShown();
+        const userInput = window.prompt(promptMessage, "");
+
+        if (userInput === null) {
+            throw new Error(currentLang === 'zh' ? '已取消輸入。' : 'Input cancelled.');
+        }
+
+        if (promptMessage) appendToOutput(promptMessage, false);
+        appendToOutput(userInput);
+        return userInput;
+    }
+
+    async function initPyodide() {
+        if (!pyodideReadyPromise) {
+            pyodideReadyPromise = (async () => {
+                const pyodide = await loadPyodide({
+                    stdout: (text) => { appendToOutput(text); },
+                    stderr: (text) => { appendToOutput(text); }
+                });
+
+                pyodide.globals.set('__browser_input__', (promptText = '') => promptForPythonInput(promptText));
+                await pyodide.runPythonAsync(`
+import builtins
+
+def __pyodide_browser_input(prompt=''):
+    return str(__browser_input__(prompt))
+
+builtins.input = __pyodide_browser_input
+                `);
+
+                return pyodide;
+            })();
+        }
+        return await pyodideReadyPromise;
+    }
+
+    async function runPython() {
+        if (!checkSyntax()) return;
+        const t = i18n[currentLang];
+        const code = getPythonCode();
+        inputNoticeShown = false;
+        document.getElementById('output-area').textContent = "⏳ 執行中...\n";
+        try {
+            let pyodide = await initPyodide();
+            document.getElementById('output-area').textContent = "";
+            if (codeUsesInput(code)) setStatus(t.msgInputPopup, 'info');
+
+            await pyodide.runPythonAsync(code);
+            setStatus("✅ 執行完畢！", 'success');
+        } catch (err) {
+            document.getElementById('output-area').textContent += `\n[Error]\n${err.message}`;
+            setStatus("❌ 執行錯誤", 'error');
+        }
+    }
+
+    changeLang();
+</script>
+
+<section id="python-topic-labs" style="max-width:1100px;margin:2rem auto"><p>轉換器以文字規則處理常見順序、選擇及迭代範例，並非完整 Python 編譯器。請檢查轉換結果；語法正確也不代表邏輯正確。</p></section>
+<script src="assets/network-labs.js"></script>
+<script src="assets/learning-lab.js"></script>
+<script src="assets/host-navigation.js"></script>
+</body>
+</html>

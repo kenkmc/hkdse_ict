@@ -46,6 +46,7 @@
         .access-obj-card { @apply cursor-pointer transition-all duration-300 border hover:shadow-md hover:border-indigo-300; }
         .access-obj-card.active { @apply border-indigo-500 bg-indigo-50 shadow-md transform scale-105; }
     </style>
+<link rel="stylesheet" href="animations/assets/learning-lab.css"><link rel="stylesheet" href="animations/assets/core-a-labs.css"><link rel="stylesheet" href="animations/assets/interactive-models.css"><link rel="stylesheet" href="assets/css/animation-bridge.css">
 </head>
 <body class="text-slate-700 flex flex-col min-h-screen">
 
@@ -96,7 +97,7 @@
                     </div>
                     <div class="bg-indigo-50 p-5 rounded-xl border border-indigo-100">
                         <h4 class="font-bold text-indigo-800 mb-4 flex items-center gap-2">
-                            <i data-lucide="database" class="w-5 h-5 text-indigo-600"></i> 數據庫系統 (DBMS)
+                            <i data-lucide="database" class="w-5 h-5 text-indigo-600"></i> 數據庫管理系統 (DBMS)
                         </h4>
                         <ul class="space-y-3 text-sm text-indigo-700">
                             <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-green-600 shrink-0"></i> 數據共享：多個用戶可同時存取。</li>
@@ -401,13 +402,13 @@
                         <div class="bg-gray-100 p-6 rounded-xl border border-gray-300 max-w-md mx-auto shadow-md">
                             <h4 class="font-bold text-gray-700 mb-4 border-b pb-2">產品輸入表單</h4>
                             <div class="space-y-3">
-                                <div><label class="block text-xs font-bold text-gray-500 mb-1">ID</label><input type="text" value="P001" class="w-full p-2 rounded border" disabled></div>
-                                <div><label class="block text-xs font-bold text-gray-500 mb-1">產品</label><input type="text" value="Notebook" class="w-full p-2 rounded border"></div>
-                                <div><label class="block text-xs font-bold text-gray-500 mb-1">價格</label><input type="text" value="$5000" class="w-full p-2 rounded border"></div>
+                                <div><label class="block text-xs font-bold text-gray-500 mb-1">ID</label><input id="productFormID" type="text" value="P001" class="w-full p-2 rounded border" disabled></div>
+                                <div><label class="block text-xs font-bold text-gray-500 mb-1">產品</label><input id="productFormName" type="text" value="Notebook" readonly class="w-full p-2 rounded border"></div>
+                                <div><label class="block text-xs font-bold text-gray-500 mb-1">價格</label><input id="productFormPrice" type="text" value="$5000" readonly class="w-full p-2 rounded border"></div>
                             </div>
                             <div class="mt-4 flex gap-2 justify-end">
-                                <button class="px-3 py-1 bg-gray-300 rounded text-xs text-gray-600">上一筆</button>
-                                <button class="px-3 py-1 bg-gray-300 rounded text-xs text-gray-600">下一筆</button>
+                                <button onclick="moveProduct(-1)" class="px-3 py-1 bg-gray-300 rounded text-xs text-gray-600">上一筆</button>
+                                <button onclick="moveProduct(1)" class="px-3 py-1 bg-gray-300 rounded text-xs text-gray-600">下一筆</button>
                             </div>
                         </div>
                         <p class="mt-4 text-sm text-slate-500 text-center"><i data-lucide="info" class="w-4 h-4 inline"></i> 用途：提供友善介面，方便用戶逐筆輸入或瀏覽。</p>
@@ -530,6 +531,7 @@
                         <span class="text-slate-400 text-xs w-full mb-1">條件值 (Values):</span>
                         <div class="sql-block sql-value" onclick="addToSQL('=')">=</div>
                         <div class="sql-block sql-value" onclick="addToSQL('\'4A\'')">'4A'</div>
+                        <div class="sql-block sql-value" onclick="addToSQL('\'4B\'')">'4B'</div>
                     </div>
                 </div>
 
@@ -591,7 +593,7 @@
     </footer>
 
     <script>
-        lucide.createIcons();
+        if (window.lucide) lucide.createIcons();
 
         // 進度條
         window.onscroll = function() {
@@ -624,11 +626,12 @@
                     break;
             }
             contentDiv.innerHTML = content;
-            lucide.createIcons();
+            if (window.lucide) lucide.createIcons();
         }
 
         // 5.2 結構高亮
         function highlightStructure(type) {
+            clearHighlight();
             const tip = document.getElementById('structTip');
             tip.style.opacity = '1';
             
@@ -655,6 +658,7 @@
             const errorMsg = document.getElementById('pkErrorMsg');
             const tbody = document.getElementById('pkDemoBody');
 
+            errorMsg.className = "mt-3 text-xs font-bold text-red-500 h-4";
             if(!id) {
                 errorMsg.textContent = "錯誤：主關鍵碼不能留空 (Null)！";
                 return;
@@ -671,8 +675,10 @@
             
             records.add(id);
             const row = document.createElement('tr');
-            row.innerHTML = `<td class="bg-green-50">${id}</td><td>${name || '-'}</td>`;
-            row.className = "animate-pulse";
+            const idCell = document.createElement("td"); idCell.className = "bg-green-50"; idCell.textContent = id;
+            const nameCell = document.createElement("td"); nameCell.textContent = name || "-";
+            row.append(idCell, nameCell);
+            row.className = "bg-green-50";
             tbody.appendChild(row);
             
             document.getElementById('inputPK').value = '';
@@ -714,18 +720,38 @@
             const display = document.getElementById('sqlDisplay');
             display.innerHTML = currentSQL.map(word => `<span class="bg-white/10 px-1 rounded">${word}</span>`).join(' ') + '<span class="animate-pulse">_</span>';
         }
+        const sqlStudents = [
+            { ID: 'S1001', Name: 'Chan Tai Man', Class: '4A' },
+            { ID: 'S1002', Name: 'Lee Siu Ming', Class: '4A' },
+            { ID: 'S1003', Name: 'Wong Mei Ling', Class: '4B' },
+            { ID: 'S1004', Name: 'Cheung Siu Fun', Class: '4A' }
+        ];
         function runSQL() {
-            const str = currentSQL.join(' ');
-            if(str.includes('SELECT') && str.includes('FROM') && str.includes('Students')) {
-                document.getElementById('sqlResultBox').classList.remove('hidden');
-                document.getElementById('sqlResultBox').classList.add('animate-bounce-in');
-            } else {
-                alert("SQL 語法似乎不完整，試試：SELECT * FROM Students ...");
-            }
+            const query = currentSQL.join(' ').trim();
+            const result = document.getElementById('sqlResultBox');
+            const match = query.match(/^SELECT\s+(\*|Name|Class)\s+FROM\s+Students(?:\s+WHERE\s+Class\s*=\s*'(4[AB])')?(?:\s+ORDER BY\s+(Name|Class))?\s*;?$/i);
+            result.replaceChildren(); result.classList.remove('hidden');
+            if (!match) { result.textContent = "此教學模擬器支援 SELECT *／Name／Class FROM Students，可加 WHERE Class = '4A'（或 '4B'）及 ORDER BY Name／Class；請檢查次序及引號。"; return; }
+            const canonical = value => ['ID', 'Name', 'Class'].find(key => key.toLowerCase() === value.toLowerCase());
+            const fields = match[1] === '*' ? ['ID', 'Name', 'Class'] : [canonical(match[1])];
+            let rows = sqlStudents.filter(row => !match[2] || row.Class === match[2].toUpperCase());
+            if (match[3]) { const key = canonical(match[3]); rows.sort((a,b) => a[key].localeCompare(b[key])); }
+            const caption = document.createElement('p'); caption.textContent = `查詢結果：${rows.length} 筆記錄。底層資料未被修改。`; result.append(caption);
+            const table = document.createElement('table'); table.className = 'w-full text-sm text-left mt-3';
+            const head = document.createElement('tr'); fields.forEach(field => { const th = document.createElement('th'); th.textContent = field; th.scope = 'col'; head.append(th); }); table.append(head);
+            rows.forEach(row => { const tr = document.createElement('tr'); fields.forEach(field => { const td = document.createElement('td'); td.textContent = row[field]; tr.append(td); }); table.append(tr); }); result.append(table);
+        }
+        let productPosition = 0;
+        const productRows = [['P001', 'Notebook', '$5000'], ['P002', 'Mouse', '$150'], ['P003', 'Keyboard', '$300']];
+        function moveProduct(direction) {
+            productPosition = (productPosition + direction + productRows.length) % productRows.length;
+            ['productFormID', 'productFormName', 'productFormPrice'].forEach((id,index) => { document.getElementById(id).value = productRows[productPosition][index]; });
         }
 
-        // 測驗邏輯
+
         function checkFinalQuiz(btn, isCorrect) {
+            if (btn.disabled) return;
+            btn.disabled = true;
             if (isCorrect) {
                 btn.classList.add('correct-anim', 'bg-green-600', 'text-white');
                 btn.innerHTML += ' ✅';
@@ -735,10 +761,11 @@
             }
         }
     </script>
-    <script src="course_data.js?v=7"></script><script src="assets/js/progress_store.js?v=3"></script>
-    <script src="assets/js/site_navigation.js?v=8"></script>
+    <script src="course_data.js?v=8"></script><script src="assets/js/progress_store.js?v=3"></script>
+    <script src="assets/js/site_navigation.js?v=8&animations=1"></script>
     <script src="question_data.js?v=3"></script>
     <script src="learning_data.js?v=14"></script>
     <script src="assets/js/lesson_companion.js?v=8"></script>
+<script src="animations/assets/new-lessons.js"></script><script src="animations/assets/programming-lessons.js"></script><script src="animations/assets/programming-supplements.js"></script><script src="animations/assets/core-a-labs.js"></script><script src="animations/assets/network-labs.js"></script><script src="assets/js/animation-bridge.js"></script><script src="animations/assets/learning-lab.js"></script><script src="animations/assets/interactive-models.js"></script>
 </body>
 </html>

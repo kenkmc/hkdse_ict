@@ -76,7 +76,9 @@
             box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
             border-color: #ef4444 !important;
         }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
     </style>
+<link rel="stylesheet" href="animations/assets/learning-lab.css"><link rel="stylesheet" href="animations/assets/core-a-labs.css"><link rel="stylesheet" href="animations/assets/interactive-models.css"><link rel="stylesheet" href="assets/css/animation-bridge.css">
 </head>
 <body class="p-4">
     <div class="max-w-6xl mx-auto">
@@ -84,7 +86,9 @@
             <h1 class="text-2xl font-bold text-slate-800">PKI 互動實戰：加密與數碼簽署</h1>
             
             <!-- 場景切換器 -->
-            <div class="flex justify-center gap-2 mt-4">
+            <p class="text-sm text-slate-600 mt-2">金鑰可拖放，也可點擊或按 Enter 使用。此為概念模擬，不執行真實加密。</p>
+            <div class="flex justify-center gap-2 mt-4 flex-wrap">
+                <button onclick="switchScenario(currentScenario)" class="px-4 py-2 rounded-full text-sm font-bold bg-white border">↺ 重設場景</button>
                 <button id="btn-conf" onclick="switchScenario('confidentiality')" class="scenario-btn active px-4 py-2 rounded-full text-sm font-bold bg-white text-slate-600 transition-all border">🔐 傳輸加密 (保密性)</button>
                 <button id="btn-auth" onclick="switchScenario('authentication')" class="scenario-btn px-4 py-2 rounded-full text-sm font-bold bg-white text-slate-600 transition-all border">✍️ 數碼簽署 (來源與完整性)</button>
             </div>
@@ -189,9 +193,12 @@
         let currentScenario = 'confidentiality';
         let step = 1; // 1: Alice, 2: Eve (Middle), 3: Bob
         let isProcessed = false;
+        let isInTransit = false;
+        let scenarioTimers = [];
+        function scheduleScenario(fn, ms) { const id = setTimeout(fn, ms); scenarioTimers.push(id); return id; }
         const msg = "秘密：明天下午三點開會。";
         const encryptedMsg = "0xAF882D...[密文內容]";
-        const signedMsg = "秘密：明天下午三點開會。\n[數碼簽署摘要: 0x92E1...]";
+        const signedMsg = "秘密：明天下午三點開會。\n[簽章: 0x92E1...]";
 
         function switchScenario(type) {
             currentScenario = type;
@@ -205,6 +212,10 @@
         }
 
         function resetUI() {
+            scenarioTimers.forEach(clearTimeout);
+            scenarioTimers = [];
+            isInTransit = false;
+            document.getElementById('toast').classList.remove('opacity-100');
             const packet = document.getElementById('main-packet');
             const path = document.getElementById('packet-path');
             
@@ -220,9 +231,9 @@
             document.getElementById('eve-avatar').classList.add('opacity-30', 'grayscale');
             
             if (currentScenario === 'confidentiality') {
-                updateGuide("場景：傳輸加密", "目標：確保只有 Bob 能看見內容。請點按或拖曳 <b>Bob 的公開密碼匙 (藍色🔑)</b> 到郵件上進行加密。");
+                updateGuide("場景：傳輸加密", "目標：確保只有 Bob 能看見內容。請將 <b>Bob 的公開密碼匙 (藍色🔑)</b> 拖到郵件上進行加密。");
             } else {
-                updateGuide("場景：數碼簽署", "目標：確認文件由持有 Alice 私人密碼匙的人簽署，而且內容未被更改。請點按或拖曳 <b>Alice 的私人密碼匙 (紅色🗝️)</b> 到郵件上進行簽署。");
+                updateGuide("場景：數碼簽署", "目標：驗證訊息完整性及簽署密碼匙；簽署本身不隱藏內容。請將 <b>Alice 的私人密碼匙 (紅色🗝️)</b> 拖到郵件上，對訊息摘要簽署（並非以私人密碼匙加密整封信）。");
             }
         }
 
@@ -231,20 +242,15 @@
             document.getElementById('guide-text').innerHTML = text;
         }
 
-        // 密碼匙可拖放、點按或以鍵盤操作，照顧手機及鍵盤使用者。
+        // 拖放邏輯
         let draggedKey = null;
         document.querySelectorAll('.draggable-key').forEach(k => {
-            k.setAttribute('role', 'button');
-            k.setAttribute('tabindex', '0');
-            k.setAttribute('aria-label', `${k.title}；按下以套用到目前封包`);
             k.addEventListener('dragstart', e => draggedKey = e.currentTarget.dataset.key);
+            k.tabIndex = 0;
+            k.setAttribute('role', 'button');
+            k.setAttribute('aria-label', '使用 ' + k.title);
             k.addEventListener('click', () => handleAction(k.dataset.key));
-            k.addEventListener('keydown', event => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    handleAction(k.dataset.key);
-                }
-            });
+            k.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleAction(k.dataset.key); } });
         });
 
         const dropTarget = document.getElementById('main-packet');
@@ -260,35 +266,32 @@
         });
 
         function handleAction(key) {
+            if (!key || isInTransit || step === 4) return;
             if (step === 1) {
                 // Alice 階段
                 if (currentScenario === 'confidentiality') {
                     if (key === 'bob-pub') {
                         processStep("🔒", "已加密", encryptedMsg, "#f87171", "加密完成！請點擊下方按鈕發送封包。");
                     } else {
-                        showToast("加密失敗！Alice 應使用 Bob 的公開密碼匙來『上鎖』。", "red");
+                        showToast("加密失敗！Alice 應該使用對方的公開密碼匙來「上鎖」。", "red");
                         shake(dropTarget);
                     }
                 } else {
                     if (key === 'alice-priv') {
                         processStep("✍️", "已簽署", signedMsg, "#60a5fa", "簽署完成！請點擊發送，將帶有簽名的郵件送出。");
                     } else {
-                        showToast("簽署失敗！應使用 Alice 自己的私人密碼匙產生有效簽署。", "red");
+                        showToast("簽署失敗！只有 Alice 自己的私人密碼匙才能產生獨一無二的簽名。", "red");
                         shake(dropTarget);
                     }
                 }
             } else if (step === 2) {
-                // Eve 攔截階段
+                // Signed plaintext is readable; a signature provides no confidentiality.
                 const eveAvatar = document.getElementById('eve-avatar');
-                if (key === 'eve-priv') {
-                    showToast("Eve 嘗試用自己的私人密碼匙解密……失敗！密文並非以她的公開密碼匙加密。", "red");
-                    shake(eveAvatar);
-                    updateDataDisplay("[ERROR] 無法解密：密鑰不正確", "#ef4444");
-                    setTimeout(() => updateDataDisplay(currentScenario === 'confidentiality' ? encryptedMsg : signedMsg, currentScenario === 'confidentiality' ? "#f87171" : "#60a5fa"), 1200);
-                } else if (key === 'alice-pub' || key === 'bob-pub') {
-                    showToast(currentScenario === 'confidentiality'
-                        ? "公開密碼匙可以公開取得，但不能解開以 Bob 公開密碼匙加密的內容。"
-                        : "Alice 的公開密碼匙可以驗證簽署，但不能產生 Alice 的有效簽署或暗中修改文件。", "orange");
+                if (currentScenario === 'authentication') {
+                    updateDataDisplay(signedMsg, '#60a5fa');
+                    showToast(key === 'alice-pub' ? 'Eve 也可用 Alice 的公開密碼匙驗證簽章；公開密碼匙可公開。' : 'Eve 可直接讀取明文；簽章沒有保密作用。她沒有 Alice 的私人密碼匙，不能替修改後的訊息產生有效簽章。', 'orange');
+                } else {
+                    showToast('Eve 沒有 Bob 的私人密碼匙，不能用這把密碼匙解開寄給 Bob 的密文。', 'red');
                     shake(eveAvatar);
                 }
             } else if (step === 3) {
@@ -297,14 +300,14 @@
                     if (key === 'bob-priv') {
                         finish("📖", "已還原", msg, "#10b981", "Bob 使用自己的私人密碼匙順利解開密文！");
                     } else {
-                        showToast("解密失敗！只有 Bob 的私人密碼匙能解開這封信。", "red");
+                        showToast("解密失敗！這個示例需要與 Bob 公開密碼匙配對的私人密碼匙。", "red");
                         shake(dropTarget);
                     }
                 } else {
                     if (key === 'alice-pub') {
-                        finish("✅", "已驗證", msg, "#10b981", "驗證成功！Bob 使用 Alice 的公開密碼匙確認簽署有效，而且文件內容未被更改。");
+                        finish("✅", "已驗證", msg, "#10b981", "驗證成功！Bob 用可信的 Alice 公開密碼匙核對簽章及摘要，確認內容未被修改；公開密碼匙與身份的綁定仍須驗證。");
                     } else {
-                        showToast("驗證失敗！需使用 Alice 的公開密碼匙來驗證簽署。", "red");
+                        showToast("驗證失敗！需使用寄件人 Alice 的公開密碼匙來比對簽章。", "red");
                         shake(dropTarget);
                     }
                 }
@@ -326,15 +329,18 @@
             const packet = document.getElementById('main-packet');
             const eveAvatar = document.getElementById('eve-avatar');
             
+            if (!isProcessed || step !== 1 || isInTransit) return;
+            isInTransit = true;
             // 移動到中間 (Eve)
             path.style.left = "calc(50% - 48px)";
             document.getElementById('send-btn').classList.add('hidden');
             step = 2;
             
-            setTimeout(() => {
+            scheduleScenario(() => {
+                isInTransit = false;
                 eveAvatar.classList.remove('opacity-30', 'grayscale');
                 packet.classList.add('eve-intercept-active');
-                updateGuide("⚠️ 數據被攔截！", "封包目前在攻擊者 Eve 手中。試用她自己的私人密碼匙或公開取得的密碼匙，觀察哪些操作可以成功。");
+                updateGuide("⚠️ 數據被攔截！", "封包目前在攻擊者 Eve 手中。試著將 <b>Eve 的密碼匙 (黑色工具區)</b> 拖到封包上進行破解。本頁展示的 Alice／Bob 私人密碼匙只是教學道具，真實私人密碼匙必須由擁有人保密。簽署模式的明文可直接閱讀。");
                 document.getElementById('continue-btn').classList.remove('hidden');
             }, 700);
         };
@@ -343,28 +349,32 @@
             const path = document.getElementById('packet-path');
             const packet = document.getElementById('main-packet');
             
+            if (step !== 2 || isInTransit) return;
+            isInTransit = true;
             packet.classList.remove('eve-intercept-active');
             path.style.left = "calc(100% - 110px)";
             document.getElementById('continue-btn').classList.add('hidden');
             step = 3;
             
-            setTimeout(() => {
+            scheduleScenario(() => {
+                isInTransit = false;
                 if (currentScenario === 'confidentiality') {
-                    updateGuide("Bob 已收到密文", "數據已送達。請點按或拖曳 <b>Bob 的私人密碼匙 (藍色🗝️)</b> 到封包上解密內容。");
+                    updateGuide("Bob 已收到密文", "數據已安全送達。請將 <b>Bob 的私人密碼匙 (藍色🗝️)</b> 拖到封包上解鎖內容。");
                 } else {
-                    updateGuide("Bob 已收到簽署文件", "數據已送達。請點按或拖曳 <b>Alice 的公開密碼匙 (紅色🔑)</b> 到封包上驗證簽署及文件完整性。");
+                    updateGuide("Bob 已收到簽署件", "數據已送達。請將 <b>Alice 的公開密碼匙 (紅色🔑)</b> 拖到封包上來驗證寄件人身份。");
                 }
             }, 700);
         };
 
         function finish(icon, label, data, color, guide) {
+            step = 4;
             document.getElementById('packet-icon').innerText = icon;
             document.getElementById('packet-label').innerText = label;
             document.getElementById('sim-data').innerText = data;
             document.getElementById('sim-data').style.color = color;
             document.getElementById('status-badge').innerText = "";
             updateGuide("實驗成功！", guide + "<br><br><b>小結：</b>" + 
-                (currentScenario === 'confidentiality' ? "即使攻擊者攔截密文並取得公開密碼匙，沒有 Bob 的私人密碼匙仍無法解密內容。" : "有效的數碼簽署顯示文件由持有 Alice 私人密碼匙的人簽署，並可偵測簽署後的內容改動。"));
+                (currentScenario === 'confidentiality' ? "即使攻擊者攔截並擁有多把公開密碼匙，沒有正確的『私人密碼匙』依然無法窺探隱私。" : "數碼簽署用私人密碼匙對訊息摘要產生簽章，公開密碼匙用於驗證。它提供完整性及來源驗證的證據；仍須驗證公開密碼匙身份綁定及保障私人密碼匙，且不提供保密性。"));
         }
 
         function updateDataDisplay(text, color) {
@@ -378,19 +388,20 @@
             t.innerText = m;
             t.style.backgroundColor = c === 'red' ? '#ef4444' : (c === 'orange' ? '#f59e0b' : '#3b82f6');
             t.classList.add('opacity-100');
-            setTimeout(() => t.classList.remove('opacity-100'), 2500);
+            scheduleScenario(() => t.classList.remove('opacity-100'), 2500);
         }
 
         function shake(el) {
             el.classList.add('shake');
-            setTimeout(() => el.classList.remove('shake'), 500);
+            scheduleScenario(() => el.classList.remove('shake'), 500);
         }
 
         resetUI();
     </script>
-    <script src="course_data.js?v=7"></script><script src="assets/js/progress_store.js?v=3"></script>
-    <script src="assets/js/site_navigation.js?v=8"></script>
+    <script src="course_data.js?v=8"></script><script src="assets/js/progress_store.js?v=3"></script>
+    <script src="assets/js/site_navigation.js?v=8&animations=1"></script>
     <script src="learning_data.js?v=14"></script>
     <script src="assets/js/lesson_companion.js?v=8"></script>
+<script src="animations/assets/new-lessons.js"></script><script src="animations/assets/programming-lessons.js"></script><script src="animations/assets/programming-supplements.js"></script><script src="animations/assets/core-a-labs.js"></script><script src="animations/assets/network-labs.js"></script><script src="assets/js/animation-bridge.js"></script><script src="animations/assets/learning-lab.js"></script><script src="animations/assets/interactive-models.js"></script>
 </body>
 </html>

@@ -81,6 +81,7 @@
             border-radius: 2px;
         }
     </style>
+<link rel="stylesheet" href="animations/assets/learning-lab.css"><link rel="stylesheet" href="animations/assets/core-a-labs.css"><link rel="stylesheet" href="animations/assets/interactive-models.css"><link rel="stylesheet" href="assets/css/animation-bridge.css">
 </head>
 <body class="text-slate-700">
 
@@ -125,8 +126,8 @@
                 </div>
             </div>
 
-            <h3 class="text-xl font-bold text-slate-700 mb-4 ml-2 border-l-4 border-indigo-500 pl-3">資訊系統的四大組成項目</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <h3 class="text-xl font-bold text-slate-700 mb-4 ml-2 border-l-4 border-indigo-500 pl-3">資訊系統的五大組成項目</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 <!-- A. 系統功能 -->
                 <div class="flip-card">
                     <div class="flip-card-inner">
@@ -187,6 +188,7 @@
                         </div>
                     </div>
                 </div>
+                <div class="flip-card"><div class="flip-card-inner"><div class="flip-card-front border-t-4 border-t-cyan-500"><h3 class="font-bold text-lg">從業員 (Personnel)</h3><p class="text-sm mt-2">使用及支援系統的人</p></div><div class="flip-card-back"><h4 class="font-bold mb-2">從業員</h4><p class="text-sm">包括用戶、操作員、管理員、分析員和程式編寫員；例如使用借書系統的讀者及圖書館員。</p></div></div></div>
             </div>
         </section>
 
@@ -369,7 +371,7 @@
                                     <p class="text-sm text-slate-600 mb-4">將聲波轉換為數碼訊號。主要概念包括：</p>
                                     <ul class="list-disc list-inside text-sm text-slate-600 space-y-1">
                                         <li><span class="font-bold">採樣率 (Sampling Rate)</span>：每秒鐘擷取聲音樣本的次數。</li>
-                                        <li>常見格式：<span class="font-mono bg-gray-100 px-1">.mp3</span> (有損壓縮), <span class="font-mono bg-gray-100 px-1">.wav</span> (無損), <span class="font-mono bg-gray-100 px-1">.mid</span> (MIDI 音符)。</li>
+                                        <li>常見格式：<span class="font-mono bg-gray-100 px-1">.mp3</span>（有損壓縮），<span class="font-mono bg-gray-100 px-1">.wav</span>（容器，常用未壓縮 PCM，亦可包含壓縮音訊），<span class="font-mono bg-gray-100 px-1">.mid</span>（MIDI 音符指令）。</li>
                                     </ul>
                                 </div>
                             </div>
@@ -381,9 +383,9 @@
                                 <div class="bg-cyan-100 p-3 rounded-lg"><i data-lucide="film" class="w-8 h-8 text-cyan-600"></i></div>
                                 <div>
                                     <h4 class="font-bold text-lg text-slate-800 mb-2">視像 (Video)</h4>
-                                    <p class="text-sm text-slate-600 mb-4">包含圖像和聲音的動態媒體。</p>
+                                    <p class="text-sm text-slate-600 mb-4">由連續畫面組成的動態媒體，可另含聲音。</p>
                                     <ul class="list-disc list-inside text-sm text-slate-600 space-y-1">
-                                        <li>由連續播放的靜態圖像（幀 Frame）組成，利用視覺暫留產生動感。</li>
+                                        <li>由連續播放的靜態圖像（幀 Frame）形成動態視覺效果；幀率表示每秒播放的幀數。</li>
                                         <li>檔案體積通常最大，需要壓縮技術。</li>
                                         <li>常見格式：<span class="font-mono bg-gray-100 px-1">.mp4</span>, <span class="font-mono bg-gray-100 px-1">.avi</span>, <span class="font-mono bg-gray-100 px-1">.mov</span>。</li>
                                     </ul>
@@ -405,7 +407,7 @@
             <div class="bg-white p-8 rounded-2xl shadow-lg border-2 border-indigo-100 mb-12">
                 <div class="mb-8">
                     <p class="text-lg leading-relaxed text-slate-700">
-                        資訊處理是將原始數據轉變為有意義資訊的過程。這個過程通常分為以下 <span class="font-bold text-indigo-700">七個主要階段</span>：
+                        資訊處理是將原始數據轉變為有意義資訊的過程。以下列出資訊處理的主要活動（可重複、並行或按需要調整次序），包括 <span class="font-bold text-indigo-700">七個主要階段</span>：
                     </p>
                 </div>
 
@@ -644,7 +646,7 @@
                             <div class="bg-white/5 p-4 rounded-xl border border-white/10 hover:bg-white/10 transition">
                                 <div class="text-emerald-400 font-bold mb-2">1. 知識產權</div>
                                 <p class="text-xs text-slate-300 font-mono mb-2">Intellectual Property</p>
-                                <p class="text-xs text-slate-400">尊重原創作品的版權。使用他人作品時需獲得授權或註明出處。</p>
+                                <p class="text-xs text-slate-400">尊重原創作品的版權，核對授權條款或適用例外並註明來源；單憑註明出處不等同獲准使用。</p>
                             </div>
                             
                             <!-- 2. 數據私隱 -->
@@ -724,9 +726,9 @@
         <p>高中 ICT 學習資源網 &copy; 2025</p>
     </footer>
 
-    <script src="course_data.js?v=7"></script><script src="assets/js/progress_store.js?v=3"></script>
+    <script src="course_data.js?v=8"></script><script src="assets/js/progress_store.js?v=3"></script>
     <script>
-        lucide.createIcons();
+        if (window.lucide) lucide.createIcons();
 
         // 進度條
         window.onscroll = function() {
@@ -828,9 +830,10 @@
         });
         
     </script>
-    <script src="assets/js/site_navigation.js?v=8"></script>
+    <script src="assets/js/site_navigation.js?v=8&animations=1"></script>
     <script src="question_data.js?v=3"></script>
     <script src="learning_data.js?v=14"></script>
     <script src="assets/js/lesson_companion.js?v=8"></script>
+<script src="animations/assets/new-lessons.js"></script><script src="animations/assets/programming-lessons.js"></script><script src="animations/assets/programming-supplements.js"></script><script src="animations/assets/core-a-labs.js"></script><script src="animations/assets/network-labs.js"></script><script src="assets/js/animation-bridge.js"></script><script src="animations/assets/learning-lab.js"></script><script src="animations/assets/interactive-models.js"></script>
 </body>
 </html>

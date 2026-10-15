@@ -55,6 +55,7 @@
         <div class="platform-actions">
             ${currentItem?.id === "tool-my-learning" ? "" : '<a class="platform-action" href="progress.html">我的學習</a>'}
             ${practiceAction}
+            <a class="platform-action" href="animations/index.html">逐步動畫</a>
             <button class="platform-action platform-action-random" type="button" data-platform-random>隨機學習</button>
             <a class="platform-action" href="index.html">課程目錄</a>
         </div>
