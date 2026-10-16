@@ -45,7 +45,7 @@
     </style>
     <link rel="stylesheet" href="assets/learning-lab.css">
     <link rel="stylesheet" href="assets/core-a-labs.css">
-<link rel="stylesheet" href="../assets/css/topic-runtime.css?v=20261016"><link rel="stylesheet" href="../assets/css/topic-data.css?v=20261016"><link rel="stylesheet" href="../assets/css/topic-network.css?v=20261016"><link rel="stylesheet" href="../assets/css/topic-algorithms.css?v=20261016"><link rel="stylesheet" href="../assets/css/topic-context.css?v=20261016">
+<link rel="stylesheet" href="../assets/css/topic-runtime.css?v=20261016-review2"><link rel="stylesheet" href="../assets/css/topic-data.css?v=20261016-review2"><link rel="stylesheet" href="../assets/css/topic-network.css?v=20261016-review2"><link rel="stylesheet" href="../assets/css/topic-algorithms.css?v=20261016-review2"><link rel="stylesheet" href="../assets/css/topic-context.css?v=20261016-review2">
 </head>
 <body class="text-slate-700 flex flex-col min-h-screen">
 
@@ -106,46 +106,7 @@
                 </div>
 
                 <!-- Access 物件介紹 (新增) -->
-                <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                    <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <i data-lucide="package" class="w-6 h-6 text-indigo-600"></i> Microsoft Access 核心物件
-                    </h3>
-                    <p class="text-slate-600 mb-6 text-sm">
-                        Access 是一個常見的關聯式數據庫管理系統，它主要由以下四種物件組成。點擊卡片查看詳情：
-                    </p>
-
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                        <div class="access-obj-card bg-white p-4 rounded-lg text-center active" onclick="showAccessObj('table', this)">
-                            <i data-lucide="table" class="w-8 h-8 mx-auto mb-2 text-blue-500"></i>
-                            <h4 class="font-bold text-slate-700 text-sm">數據表<br>(Table)</h4>
-                        </div>
-                        <div class="access-obj-card bg-white p-4 rounded-lg text-center" onclick="showAccessObj('form', this)">
-                            <i data-lucide="form-input" class="w-8 h-8 mx-auto mb-2 text-rose-500"></i>
-                            <h4 class="font-bold text-slate-700 text-sm">表單<br>(Form)</h4>
-                        </div>
-                        <div class="access-obj-card bg-white p-4 rounded-lg text-center" onclick="showAccessObj('report', this)">
-                            <i data-lucide="file-text" class="w-8 h-8 mx-auto mb-2 text-green-500"></i>
-                            <h4 class="font-bold text-slate-700 text-sm">報告<br>(Report)</h4>
-                        </div>
-                        <div class="access-obj-card bg-white p-4 rounded-lg text-center" onclick="showAccessObj('query', this)">
-                            <i data-lucide="search" class="w-8 h-8 mx-auto mb-2 text-purple-500"></i>
-                            <h4 class="font-bold text-slate-700 text-sm">查詢<br>(Query)</h4>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 min-h-[100px] flex items-center">
-                        <div id="accessObjContent" class="w-full">
-                            <!-- Default Content -->
-                            <div class="flex items-start gap-3">
-                                <i data-lucide="info" class="w-5 h-5 text-blue-500 mt-1 shrink-0"></i>
-                                <div>
-                                    <h5 class="font-bold text-slate-800 mb-1">數據表 (Table)</h5>
-                                    <p class="text-sm text-slate-600">這是數據庫的<span class="font-bold">基礎</span>。所有數據都實際儲存在數據表中，以列 (Row) 和欄 (Column) 的形式組織。沒有數據表，其他物件就沒有數據可操作。</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <p>Microsoft Access 以數據表保存資料，並以表單、報告及查詢支援工作；<a href="#sec5-5">在 5.5 節操作同一個產品資料庫的四種物件</a>。</p>
 
             </div>
         </section>
@@ -501,7 +462,7 @@
                 <div class="flex items-center gap-3 mb-6">
                     <i data-lucide="terminal" class="w-8 h-8 text-green-400"></i>
                     <div>
-                        <h3 class="text-2xl font-bold">SQL 積木工廠</h3>
+                        <h3 class="text-2xl font-bold">組合查詢並檢查結果</h3>
                         <p class="text-slate-400 text-sm">點擊下方積木，組合出正確的 SQL 查詢語句！</p>
                     </div>
                 </div>
@@ -597,32 +558,6 @@
             let scrolled = (winScroll / height) * 100;
             document.getElementById("progressBar").style.width = scrolled + "%";
         };
-
-        // 5.1 Access 物件顯示
-        function showAccessObj(objType, card) {
-            document.querySelectorAll('.access-obj-card').forEach(c => c.classList.remove('active'));
-            card.classList.add('active');
-
-            const contentDiv = document.getElementById('accessObjContent');
-            let content = '';
-
-            switch(objType) {
-                case 'table':
-                    content = `<div class="flex items-start gap-3"><i data-lucide="info" class="w-5 h-5 text-blue-500 mt-1 shrink-0"></i><div><h5 class="font-bold text-slate-800 mb-1">數據表 (Table)</h5><p class="text-sm text-slate-600">這是數據庫的<span class="font-bold">基礎</span>。所有數據都實際儲存在數據表中，以列 (Row) 和欄 (Column) 的形式組織。沒有數據表，其他物件就沒有數據可操作。</p></div></div>`;
-                    break;
-                case 'form':
-                    content = `<div class="flex items-start gap-3"><i data-lucide="info" class="w-5 h-5 text-rose-500 mt-1 shrink-0"></i><div><h5 class="font-bold text-slate-800 mb-1">表單 (Form)</h5><p class="text-sm text-slate-600">提供一個<span class="font-bold">友善的介面</span>，讓用戶方便地輸入、修改或檢視數據。它可以一次顯示一筆記錄，避免直接操作數據表時的混亂。</p></div></div>`;
-                    break;
-                case 'report':
-                    content = `<div class="flex items-start gap-3"><i data-lucide="info" class="w-5 h-5 text-green-500 mt-1 shrink-0"></i><div><h5 class="font-bold text-slate-800 mb-1">報告 (Report)</h5><p class="text-sm text-slate-600">用於將數據<span class="font-bold">格式化並列印</span>出來。報告可以對數據進行分組、匯總（如計算總和），適合製作專業的文件。</p></div></div>`;
-                    break;
-                case 'query':
-                    content = `<div class="flex items-start gap-3"><i data-lucide="info" class="w-5 h-5 text-purple-500 mt-1 shrink-0"></i><div><h5 class="font-bold text-slate-800 mb-1">查詢 (Query)</h5><p class="text-sm text-slate-600">用於從數據表中<span class="font-bold">檢索符合特定條件</span>的數據。你可以把它想像成向數據庫提問，例如「找出所有不及格的學生」。</p></div></div>`;
-                    break;
-            }
-            contentDiv.innerHTML = content;
-            if (window.lucide) lucide.createIcons();
-        }
 
         // 5.2 結構高亮
         function highlightStructure(type) {
@@ -757,8 +692,8 @@
         }
     </script>
     <script src="assets/core-a-labs.js"></script>
-    <script src="assets/learning-lab.js?v=20261016"></script>
-<script src="assets/host-navigation.js"></script>
-<script src="../assets/js/topic-data.js?v=20261016"></script><script src="../assets/js/topic-network.js?v=20261016"></script><script src="../assets/js/topic-algorithms.js?v=20261016"></script><script src="../assets/js/topic-context.js?v=20261016"></script><script src="../assets/js/topic-runtime.js?v=20261016"></script>
+    <script src="assets/learning-lab.js?v=20261016-review2"></script>
+<script src="assets/host-navigation.js?v=20261016-review2"></script>
+<script src="../assets/js/topic-data.js?v=20261016-review2"></script><script src="../assets/js/topic-network.js?v=20261016-review2"></script><script src="../assets/js/topic-algorithms.js?v=20261016-review2"></script><script src="../assets/js/topic-context.js?v=20261016-review2"></script><script src="../assets/js/lesson-plan-data.js?v=20261016-review2"></script><script src="../assets/js/lesson-plan-network.js?v=20261016-review2"></script><script src="../assets/js/lesson-plan-algorithms.js?v=20261016-review2"></script><script src="../assets/js/lesson-plan-context.js?v=20261016-review2"></script><script src="../assets/js/topic-runtime.js?v=20261016-review2"></script>
 </body>
 </html>

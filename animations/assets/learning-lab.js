@@ -13,7 +13,9 @@
   }
   function mount(target, data) {
     if (!target || !Array.isArray(data.steps) || !data.steps.length) return;
-    if(window.ICT_USE_BESPOKE){const notes=el('details','topic-notes');notes.append(el('summary','',data.title+'：補充文字解說'));const list=el('ol');data.steps.forEach(step=>{const li=el('li');li.append(el('strong','',step.title),el('p','',step.detail));if(step.code)li.append(el('pre','',step.code));list.append(li);});notes.append(list);if(data.question){const q=data.question,fieldset=el('fieldset');fieldset.append(el('legend','','想一想：'+q.text));const answers=el('div','ict-answers'),feedback=el('p','ict-feedback');feedback.setAttribute('role','status');q.options.forEach((option,i)=>{const b=el('button','',option);b.type='button';b.addEventListener('click',()=>{feedback.textContent=(i===q.answer?'答對了。':'再想一想。')+' '+q.explanation;});answers.append(b);});fieldset.append(answers,feedback);notes.append(fieldset);}target.append(notes);return;}
+    if(window.ICT_USE_BESPOKE){
+      if(data.question){const q=data.question,fieldset=el('fieldset','ict-section-check');fieldset.append(el('legend','','檢查理解：'+q.text));const answers=el('div','ict-answers'),feedback=el('p','ict-feedback');feedback.setAttribute('role','status');q.options.forEach((option,i)=>{const b=el('button','',option);b.type='button';b.addEventListener('click',()=>{feedback.textContent=(i===q.answer?'答對了。':'再想一想。')+' '+q.explanation;});answers.append(b);});fieldset.append(answers,feedback);target.append(fieldset);}return;
+    }
     const box = el('section', 'ict-lab');
     const heading = el('h3', '', data.title || '逐步動畫講解');
     heading.id = 'ict-lab-' + (++serial);
@@ -85,7 +87,7 @@
     document.title=data.title+' · ICT 學習資源網';
     const nav=el('nav'); const home=el('a','','← 課程目錄');home.href='index.html';const review=el('a','','課程對照與閱讀指引');review.href=curriculumLink;nav.append(home,review);root.append(nav);
     root.append(el('p','ict-scope',data.scope||''),el('h1','',data.title));
-    root.append(el('p','ict-note','課程重點與互動示例：配合實作和課堂練習使用。動畫以簡化模型解釋概念；請同時閱讀每課的限制及課程對照。'));
+
     root.append(el('p','',data.intro||''));
     if(data.objectives){const wrap=el('div','ict-objectives');wrap.append(el('h2','','學習目標'));const ul=el('ul');data.objectives.forEach(t=>ul.append(el('li','',t)));wrap.append(ul);root.append(wrap);}
     const toc=el('nav','ict-toc');toc.setAttribute('aria-label','本課內容');

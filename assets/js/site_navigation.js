@@ -7,7 +7,7 @@
     if (!document.querySelector('link[data-viewport-fixes]')) {
         const viewportStyle = document.createElement("link");
         viewportStyle.rel = "stylesheet";
-        viewportStyle.href = "assets/css/viewport-fixes.css?v=1";
+        viewportStyle.href = "assets/css/viewport-fixes.css?v=1&review=20261017";
         viewportStyle.dataset.viewportFixes = "true";
         document.head.append(viewportStyle);
     }
@@ -55,7 +55,7 @@
         <div class="platform-actions">
             ${currentItem?.id === "tool-my-learning" ? "" : '<a class="platform-action" href="progress.html">我的學習</a>'}
             ${practiceAction}
-            <a class="platform-action" href="animations/index.html">課題動畫</a>
+            <a class="platform-action" href="animations/index.html">分課目錄</a>
             <button class="platform-action platform-action-random" type="button" data-platform-random>隨機學習</button>
             <a class="platform-action" href="index.html">課程目錄</a>
         </div>
@@ -71,7 +71,7 @@
     footer.innerHTML = `
         <p>原創 HKDSE ICT 學習資源；並非官方網站。</p>
         <p class="platform-footer-links">
-            課程依據：<a href="${platform.config.curriculumUrl}" target="_blank" rel="noopener">2021 課程及評估指引</a>
+            <a href="updates/index.html">更新紀錄</a> · 課程依據：<a href="${platform.config.curriculumUrl}" target="_blank" rel="noopener">2021 課程及評估指引</a>
         </p>
     `;
     if (shouldAppendFooter) document.body.appendChild(footer);

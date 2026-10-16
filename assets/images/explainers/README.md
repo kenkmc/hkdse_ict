@@ -1,0 +1,7 @@
+# 教學圖像
+
+`desktop-components.webp`：使用內置 image_gen 於2026-10-16生成；以WebP提供1536×1024教材插圖。PNG原稿保留在生成工具的原位置。圖片只用來辨認電腦部件的示例外形，不能作實際拆裝或接線圖；名稱、功能及限制以網頁可存取文字補充。
+
+## 完整生成提示
+
+Use case: scientific-educational. Asset type: a wide raster illustration inside a Hong Kong secondary-school ICT lesson, used for recognizing desktop PC components. Create one clean, physically plausible textbook product cutaway on a neutral off-white background. Show an unbranded desktop tower with the side panel removed, in three-quarter view, revealing the motherboard, CPU with a small heatsink/fan centered on its socket, two vertical DIMM RAM sticks adjacent to it, an M.2 SSD on the motherboard, a power supply at the bottom rear, and a separate mounted hard disk drive with a small inset cutaway showing circular platters and an actuator arm. Keep the exact component identities visually distinct, realistic proportions and tidy believable cables. Slightly separate the removable parts in a careful exploded arrangement while preserving their relationship to the case. Use clear natural materials, soft studio light, high detail and restrained technical illustration style. Wide 3:2 composition, generous clear space between components for HTML captions. Do not render any labels, letters, numbers, arrows, title, logo, watermark, people, or fictional electronics. This is a teaching illustration of example component forms, not a wiring diagram.

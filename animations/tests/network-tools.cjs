@@ -8,7 +8,7 @@ function harness(name) {
  const html=fs.readFileSync(path.join(root,name+'.html'),'utf8');
  // Select the functional lesson script by its public entry points. Page-level
  // configuration scripts may appear before it and are not part of this harness.
- const entryPoints={ 'chc.2':['startTransmission','simulateDNS'], pki_animation:['switchScenario','handleAction'] }[name];
+ const entryPoints={ pki_animation:['switchScenario','handleAction'] }[name];
  assert(entryPoints,'No functional-script selector configured for '+name);
  const scripts=[...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)]
    .filter(match=>! /\bsrc\s*=/i.test(match[1]))
@@ -18,7 +18,9 @@ function harness(name) {
  vm.runInContext(scripts[0],c,{filename:name+'.html:lesson-script'});
  return {c,doc,timers,run:s=>vm.runInContext(s,c),advance(ms){const until=now+ms;for(let i=0;i<10000;i++){const entry=[...timers].filter(([,v])=>v.due<=until).sort((a,b)=>a[1].due-b[1].due)[0];if(!entry)break;now=entry[1].due;timers.delete(entry[0]);entry[1].fn();}now=until;}};
 }
-const tcp=harness('chc.2');tcp.run('startTransmission()');tcp.advance(5700);assert.equal(tcp.run('step'),3);tcp.run('togglePause()');const elapsed=tcp.run('elapsed');tcp.advance(5000);assert.equal(tcp.run('elapsed'),elapsed);tcp.run('togglePause()');tcp.advance(50);assert(tcp.run('elapsed')>elapsed);tcp.run('resetTransmission()');tcp.advance(10000);assert.equal(tcp.run('step'),0);assert.equal(tcp.run('packets.length'),0);assert.equal(tcp.timers.size,0);tcp.run('startTransmission()');assert.equal(tcp.run('packets.length'),3);tcp.advance(10000);assert.equal(tcp.run('step'),4);assert.match(tcp.doc.getElementById('status-text').textContent,/傳輸成功/);
-tcp.doc.getElementById('dns-input').value='www.example.com';tcp.run('simulateDNS()');tcp.advance(700);tcp.run('simulateDNS()');tcp.advance(1600);assert.equal((tcp.doc.getElementById('dns-console').textContent.match(/模擬 A 記錄/g)||[]).length,1);tcp.doc.getElementById('dns-input').value='<img src=x onerror=alert(1)>';tcp.run('simulateDNS()');assert.match(tcp.doc.getElementById('dns-console').textContent,/有效域名/);assert.equal(tcp.timers.size,0);
+// TCP and DNS now use the section-mounted topic models; their replacement
+// handshake / ACK / retransmission / cache / TTL / invalid-input tests live in
+// ../../tests/topic-network.cjs. The original PKI tool is retained here.
 const pki=harness('pki_animation');pki.run("handleAction('bob-pub')");pki.doc.getElementById('send-btn').onclick();assert.equal(pki.timers.size,1);pki.run("switchScenario('authentication')");pki.advance(1000);assert.equal(pki.run('step'),1);assert.equal(pki.timers.size,0);pki.run("handleAction('alice-priv')");pki.doc.getElementById('send-btn').onclick();pki.advance(800);pki.run("handleAction('eve-priv')");assert.match(pki.doc.getElementById('toast').innerText,/可直接讀取明文/);pki.run("switchScenario('confidentiality')");assert.equal(pki.timers.size,0);
-console.log('PASS TCP pause/resume/reset/restart; repeated DNS/invalid input; PKI switch cancellation and signed plaintext semantics');
+pki.run("switchScenario('authentication')");pki.run("handleAction('alice-priv')");pki.doc.getElementById('send-btn').onclick();pki.advance(800);pki.doc.getElementById('tamper-btn').onclick();assert.match(pki.doc.getElementById('sim-data').innerText,/已竄改/);pki.doc.getElementById('continue-btn').onclick();pki.advance(800);pki.run("handleAction('alice-pub')");assert.equal(pki.run('step'),4);assert.match(pki.doc.getElementById('guide-title').innerText,/驗證失敗/);pki.run("switchScenario('confidentiality')");assert.equal(pki.timers.size,0);
+console.log('PASS retained PKI switch cancellation, signed plaintext semantics and tamper rejection; TCP/DNS replacement tests: tests/topic-network.cjs');

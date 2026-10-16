@@ -13,17 +13,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
+
     <style>
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #f0f9ff; }
-        
+
         /* 模擬試算表樣式 */
         .sheet-wrapper { overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .sheet-table { border-collapse: collapse; width: 100%; min-width: 600px; background: white; font-family: 'Courier New', monospace; }
         .sheet-table th, .sheet-table td { border: 1px solid #e2e8f0; padding: 8px 12px; text-align: center; position: relative; height: 40px; }
         .sheet-header-col { background-color: #f8fafc; font-weight: bold; color: #64748b; width: 40px; }
         .sheet-header-row { background-color: #f8fafc; font-weight: bold; color: #64748b; }
-        
+
         /* 儲存格互動 */
         .sheet-cell { cursor: cell; transition: all 0.1s; }
         .sheet-cell:hover { background-color: #f1f5f9; }
@@ -36,13 +36,13 @@
 
         /* 函數標籤 */
         .func-tag { @apply px-2 py-0.5 rounded text-xs font-mono font-bold; }
-        
+
         /* 圖表切換按鈕 */
         .chart-btn.active { @apply bg-indigo-600 text-white border-indigo-600; }
-        
+
         /* 參照模擬器動畫 */
         .ref-anim-box { transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        
+
         /* 排序表格樣式 */
         .sortable-th { cursor: pointer; user-select: none; }
         .sortable-th:hover { background-color: #e2e8f0; }
@@ -59,7 +59,7 @@
         }
     </style>
 <link rel="stylesheet" href="animations/assets/learning-lab.css"><link rel="stylesheet" href="animations/assets/core-a-labs.css"><link rel="stylesheet" href="animations/assets/interactive-models.css"><link rel="stylesheet" href="assets/css/animation-bridge.css">
-<link rel="stylesheet" href="assets/css/topic-runtime.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-data.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-network.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-algorithms.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-context.css?v=20261016">
+<link rel="stylesheet" href="assets/css/topic-runtime.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-data.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-network.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-algorithms.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-context.css?v=20261016-review2">
 </head>
 <body class="text-slate-700 flex flex-col min-h-screen">
 
@@ -73,7 +73,7 @@
                 <span class="font-bold text-lg hidden md:block">必修部分 A > 4. 試算表</span>
             </div>
             <div class="text-sm bg-indigo-800 px-3 py-1 rounded-full flex items-center gap-2">
-                <i data-lucide="table" class="w-4 h-4"></i> 
+                <i data-lucide="table" class="w-4 h-4"></i>
                 <span class="hidden sm:inline">數據處理與分析</span>
             </div>
         </div>
@@ -166,7 +166,7 @@
                 <div class="space-y-4">
                     <div class="bg-white p-4 rounded-xl border border-gray-200 hover-card">
                         <h4 class="font-bold text-orange-600 flex items-center gap-2"><i data-lucide="type" class="w-5 h-5"></i> 文字 (Label)</h4>
-                        <p class="text-xs text-slate-600">非數值數據，預設<span class="font-bold">靠左對齊</span>。無法進行數學運算。</p>
+                        <p class="text-xs text-slate-600">非數值資料通常預設靠左；若要運算須先確定資料可轉成數值。對齊及顯示格式本身不決定儲存類型。</p>
                     </div>
                     <div class="bg-white p-4 rounded-xl border border-gray-200 hover-card">
                         <h4 class="font-bold text-emerald-600 flex items-center gap-2"><i data-lucide="hash" class="w-5 h-5"></i> 數值 (Value)</h4>
@@ -203,7 +203,7 @@
 
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                 <p class="text-slate-600 mb-6">公式必須以 <span class="font-bold text-xl text-indigo-600 font-mono">=</span> 符號開始。電腦會依據運算符號的優先次序計算。</p>
-                
+
                 <div class="grid md:grid-cols-2 gap-8">
                     <div>
                         <h4 class="font-bold text-slate-700 mb-3">算術運算符號 (Operators)</h4>
@@ -215,7 +215,7 @@
                             <li class="flex justify-between bg-slate-50 p-2 rounded"><span>^ (指數)</span> <span>=A1^2</span></li>
                         </ul>
                     </div>
-                    
+
                     <div class="bg-indigo-50 p-5 rounded-xl border border-indigo-100">
                         <h4 class="font-bold text-indigo-800 mb-2">運算優先次序 (Priority)</h4>
                         <ol class="list-decimal list-inside text-sm text-indigo-700 space-y-1 mb-4">
@@ -293,10 +293,10 @@
                 </div>
             </div>
 
-            <!-- 函數實驗室 (Updated with Worksheet View) -->
+            <!-- 在工作表追蹤函數 (Updated with Worksheet View) -->
             <div class="bg-slate-800 rounded-2xl p-6 text-white shadow-xl">
-                <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i data-lucide="flask-conical" class="w-5 h-5 text-yellow-400"></i> 函數實驗室</h3>
-                
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i data-lucide="flask-conical" class="w-5 h-5 text-yellow-400"></i> 在工作表追蹤函數</h3>
+
                 <div class="grid lg:grid-cols-2 gap-8">
                     <!-- 左側：模擬工作表數據 -->
                     <div class="space-y-4">
@@ -324,16 +324,16 @@
                             <!-- 基礎 -->
                             <button onclick="runSheetFunc('SUM')" class="bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded text-xs font-mono transition">SUM(B2:B5)</button>
                             <button onclick="runSheetFunc('AVERAGE')" class="bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded text-xs font-mono transition">AVERAGE(B2:B5)</button>
-                            
+
                             <!-- 文字 -->
                             <button onclick="runSheetFunc('LEN')" class="bg-orange-600 hover:bg-orange-500 px-3 py-1 rounded text-xs font-mono transition">LEN(A2)</button>
                             <button onclick="runSheetFunc('LEFT')" class="bg-orange-600 hover:bg-orange-500 px-3 py-1 rounded text-xs font-mono transition">LEFT(C2, 1)</button>
                             <button onclick="runSheetFunc('MID')" class="bg-orange-600 hover:bg-orange-500 px-3 py-1 rounded text-xs font-mono transition">MID(C3, 3, 3)</button>
-                            
+
                             <!-- 條件 -->
                             <button onclick="runSheetFunc('COUNTIF')" class="bg-purple-600 hover:bg-purple-500 px-3 py-1 rounded text-xs font-mono transition">COUNTIF(A2:A5, "Apple")</button>
                             <button onclick="runSheetFunc('SUMIF')" class="bg-purple-600 hover:bg-purple-500 px-3 py-1 rounded text-xs font-mono transition">SUMIF(A2:A5, "Apple", B2:B5)</button>
-                            
+
                             <!-- 查找 -->
                             <button onclick="runSheetFunc('VLOOKUP')" class="bg-emerald-600 hover:bg-emerald-500 px-3 py-1 rounded text-xs font-mono transition">VLOOKUP("Banana", A2:B5, 2, 0)</button>
                         </div>
@@ -354,35 +354,7 @@
                 <h2 class="text-3xl font-bold text-slate-800">儲存格參照 (Cell Referencing)</h2>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-8">
-                <!-- 相對參照 -->
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm group">
-                    <h3 class="text-xl font-bold text-blue-700 mb-2">相對參照 (Relative)</h3>
-                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-mono mb-4 inline-block">A1</span>
-                    <p class="text-sm text-slate-600 mb-4">當複製公式時，參照地址會隨位置改變。</p>
-                    <div class="bg-slate-100 p-4 rounded h-32 relative flex justify-center border overflow-hidden">
-                        <div class="absolute top-4 w-32 bg-white border border-blue-300 text-blue-600 p-2 rounded text-center z-10">=A1+B1</div>
-                        <div class="absolute top-4 w-32 bg-blue-600/10 border border-blue-300 text-blue-600 p-2 rounded text-center ref-anim-box group-hover:translate-y-16">
-                            <span class="hidden group-hover:inline font-bold">=A2+B2</span>
-                        </div>
-                        <div class="absolute bottom-2 text-[10px] text-slate-400">Hover 查看變化</div>
-                    </div>
-                </div>
-
-                <!-- 絕對參照 -->
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm group">
-                    <h3 class="text-xl font-bold text-rose-700 mb-2">絕對參照 (Absolute)</h3>
-                    <span class="bg-rose-100 text-rose-800 text-xs px-2 py-1 rounded font-mono mb-4 inline-block">$A$1</span>
-                    <p class="text-sm text-slate-600 mb-4">使用 <code>$</code> 鎖定欄及列。<code>$A$1</code> 複製時保持不變；混合參照 <code>$A1</code> 只鎖欄，<code>A$1</code> 只鎖列。</p>
-                    <div class="bg-slate-100 p-4 rounded h-32 relative flex justify-center border overflow-hidden">
-                        <div class="absolute top-4 w-32 bg-white border border-rose-300 text-rose-600 p-2 rounded text-center z-10">=$A$1*B1</div>
-                        <div class="absolute top-4 w-32 bg-rose-600/10 border border-rose-300 text-rose-600 p-2 rounded text-center ref-anim-box group-hover:translate-y-16">
-                            <span class="hidden group-hover:inline font-bold">=$A$1*B2</span>
-                        </div>
-                        <div class="absolute bottom-2 text-[10px] text-slate-400">$A$1 鎖定了</div>
-                    </div>
-                </div>
-            </div>
+<p>複製公式時，相對參照 <code>A1</code> 隨位置改變；<code>$A$1</code> 鎖住欄列。混合參照 <code>$A1</code> 只鎖欄，<code>A$1</code> 只鎖列。以下直接追蹤來源與目的儲存格，並修改依賴數值觀察重新計算。</p>
         </section>
 
         <!-- 4.6 數據操縱和演示 Data Manipulation & Presentation -->
@@ -464,7 +436,7 @@
 
                 <!-- 進階分析工具 (Advanced Analysis) -->
                 <div class="grid md:grid-cols-2 gap-8">
-                    
+
                     <!-- 藍本管理員 -->
                     <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
                         <div class="flex items-center gap-2 mb-4 text-rose-700">
@@ -517,7 +489,7 @@
                                     <span class="text-slate-500">計算的數據內容。<br><span class="text-emerald-600">例：平均分 (Average)、總人數 (Count)</span></span>
                                 </div>
                             </div>
-                            
+
                             <!-- 模擬結果 -->
                             <div class="bg-white border border-emerald-200 rounded shadow-sm overflow-hidden">
                                 <div class="bg-emerald-100 p-1 text-center font-bold text-emerald-900">匯總結果 (班別 x 性別)</div>
@@ -596,7 +568,7 @@
             const input = document.getElementById('dataInput').value;
             const resultDiv = document.getElementById('dataResult');
             const previewDiv = document.getElementById('formatPreview');
-            
+
             if(!input) {
                 resultDiv.innerHTML = "等待輸入...";
                 resultDiv.className = "p-3 bg-white rounded-lg border border-slate-200 text-center text-sm font-bold text-slate-400";
@@ -605,7 +577,7 @@
             }
 
             const isNumber = !isNaN(parseFloat(input)) && isFinite(input);
-            
+
             if(input.startsWith('=')) {
                 resultDiv.innerHTML = `<span class="text-purple-600">這是 公式 (Formula)</span>`;
                 resultDiv.className = "p-3 bg-purple-50 rounded-lg border border-purple-200 text-center text-sm font-bold";
@@ -613,7 +585,7 @@
             } else if (isNumber) {
                 resultDiv.innerHTML = `<span class="text-emerald-600">這是 數值 (Value)</span> <span class="text-xs text-emerald-400 block font-normal">預設靠右對齊</span>`;
                 resultDiv.className = "p-3 bg-emerald-50 rounded-lg border border-emerald-200 text-center text-sm font-bold";
-                
+
                 const num = Number(input);
                 document.getElementById('fmtCurrency').textContent = '$' + num.toFixed(2);
                 document.getElementById('fmtPercent').textContent = (num * 100).toFixed(0) + '%';
@@ -625,11 +597,11 @@
             }
         }
 
-        // 4.4 進階函數實驗室
+        // 4.4 進階在工作表追蹤函數
         function runSheetFunc(funcType) {
             const resultBox = document.getElementById('sheetFuncResult');
             const descBox = document.getElementById('sheetFuncDesc');
-            
+
             let result = "";
             let desc = "";
 
@@ -639,49 +611,49 @@
 
             switch(funcType) {
                 // 基礎
-                case 'SUM': 
-                    result = "33"; 
-                    desc = 'SUM(B2:B5) = 10+5+10+8'; 
+                case 'SUM':
+                    result = "33";
+                    desc = 'SUM(B2:B5) = 10+5+10+8';
                     break;
-                case 'AVERAGE': 
-                    result = "8.25"; 
-                    desc = 'AVERAGE(B2:B5) = 33/4'; 
+                case 'AVERAGE':
+                    result = "8.25";
+                    desc = 'AVERAGE(B2:B5) = 33/4';
                     break;
-                
+
                 // 文字
-                case 'LEN': 
-                    result = "5"; 
-                    desc = 'LEN(A2) -> "Apple" 的長度'; 
+                case 'LEN':
+                    result = "5";
+                    desc = 'LEN(A2) -> "Apple" 的長度';
                     break;
-                case 'LEFT': 
-                    result = "A"; 
-                    desc = 'LEFT(C2, 1) -> "A-001" 左邊 1 個字'; 
+                case 'LEFT':
+                    result = "A";
+                    desc = 'LEFT(C2, 1) -> "A-001" 左邊 1 個字';
                     break;
-                case 'MID': 
-                    result = "002"; 
-                    desc = 'MID(C3, 3, 3) -> "B-002" 從第 3 字取 3 個'; 
+                case 'MID':
+                    result = "002";
+                    desc = 'MID(C3, 3, 3) -> "B-002" 從第 3 字取 3 個';
                     break;
 
                 // 條件
-                case 'COUNTIF': 
-                    result = "2"; 
-                    desc = 'COUNTIF(A2:A5, "Apple") -> Apple 出現次數'; 
+                case 'COUNTIF':
+                    result = "2";
+                    desc = 'COUNTIF(A2:A5, "Apple") -> Apple 出現次數';
                     break;
-                case 'SUMIF': 
-                    result = "20"; 
-                    desc = 'SUMIF(A2:A5, "Apple", B2:B5) -> Apple 對應的 Price 總和 (10+10)'; 
+                case 'SUMIF':
+                    result = "20";
+                    desc = 'SUMIF(A2:A5, "Apple", B2:B5) -> Apple 對應的 Price 總和 (10+10)';
                     break;
 
                 // 查找
-                case 'VLOOKUP': 
-                    result = "5"; 
-                    desc = 'VLOOKUP("Banana", A2:B5, 2, 0) -> 找 Banana 傳回第 2 欄 (Price)'; 
+                case 'VLOOKUP':
+                    result = "5";
+                    desc = 'VLOOKUP("Banana", A2:B5, 2, 0) -> 找 Banana 傳回第 2 欄 (Price)';
                     break;
             }
-            
+
             resultBox.textContent = result;
             descBox.textContent = desc;
-            
+
             // Animation
             resultBox.classList.remove('text-yellow-400');
             void resultBox.offsetWidth;
@@ -693,7 +665,7 @@
             document.querySelectorAll('.chart-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.chart-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('chart-' + type).classList.remove('hidden');
-            
+
             // Activate button
             const btns = document.querySelectorAll('.chart-btn');
             if(type === 'column') btns[0].classList.add('active');
@@ -720,7 +692,7 @@
                 </tr>
             `).join('');
         }
-        
+
         function sortTable(key) {
             tableData.sort((a, b) => a[key] === b[key] ? 0 : a[key] > b[key] ? 1 : -1);
             renderTable();
@@ -735,20 +707,20 @@
             tableData = [...initialData];
             renderTable();
         }
-        
+
         // 4.7 藍本管理員邏輯
         function updateScenario() {
             const scenario = document.getElementById('scenarioSelect').value;
             const salesEl = document.getElementById('scSales');
             const incomeEl = document.getElementById('scIncome');
-            
+
             let sales = 500;
             if(scenario === 'best') sales = 800;
             if(scenario === 'worst') sales = 200;
-            
+
             salesEl.textContent = sales;
             incomeEl.textContent = '$' + (sales * 10);
-            
+
             incomeEl.classList.add('animate-pulse');
             setTimeout(() => incomeEl.classList.remove('animate-pulse'), 500);
         }
@@ -770,11 +742,11 @@
         }
     </script>
     <script src="course_data.js?v=8"></script><script src="assets/js/progress_store.js?v=3"></script>
-    <script src="assets/js/site_navigation.js?v=8&animations=1"></script>
+    <script src="assets/js/site_navigation.js?v=8&review=20261016"></script>
     <script src="question_data.js?v=3"></script>
     <script src="learning_data.js?v=14"></script>
-    <script src="assets/js/lesson_companion.js?v=8"></script>
-<script src="animations/assets/new-lessons.js"></script><script src="animations/assets/programming-lessons.js"></script><script src="animations/assets/programming-supplements.js"></script><script src="animations/assets/core-a-labs.js"></script><script src="animations/assets/network-labs.js"></script><script src="assets/js/animation-bridge.js?v=20261016"></script><script src="animations/assets/learning-lab.js?v=20261016"></script><script src="animations/assets/interactive-models.js?v=20261016"></script>
-<script src="assets/js/topic-data.js?v=20261016"></script><script src="assets/js/topic-network.js?v=20261016"></script><script src="assets/js/topic-algorithms.js?v=20261016"></script><script src="assets/js/topic-context.js?v=20261016"></script><script src="assets/js/topic-runtime.js?v=20261016"></script>
+    <script src="assets/js/lesson_companion.js?v=8&review=20261016"></script>
+<script src="animations/assets/new-lessons.js"></script><script src="animations/assets/programming-lessons.js"></script><script src="animations/assets/programming-supplements.js"></script><script src="animations/assets/core-a-labs.js"></script><script src="animations/assets/network-labs.js"></script><script src="assets/js/animation-bridge.js?v=20261016-review2"></script><script src="animations/assets/learning-lab.js?v=20261016-review2"></script><script src="animations/assets/interactive-models.js?v=20261016-review2"></script>
+<script src="assets/js/topic-data.js?v=20261016-review2"></script><script src="assets/js/topic-network.js?v=20261016-review2"></script><script src="assets/js/topic-algorithms.js?v=20261016-review2"></script><script src="assets/js/topic-context.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-data.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-network.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-algorithms.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-context.js?v=20261016-review2"></script><script src="assets/js/topic-runtime.js?v=20261016-review2"></script>
 </body>
 </html>

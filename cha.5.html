@@ -13,10 +13,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
+
     <style>
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #f0f9ff; }
-        
+
         /* 模擬數據庫表格 */
         .db-table-wrapper { overflow-x: auto; border: 1px solid #cbd5e1; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); background: white; }
         .db-table { width: 100%; border-collapse: collapse; font-family: 'Courier New', monospace; font-size: 0.9rem; }
@@ -27,7 +27,7 @@
         /* 互動高亮效果 */
         .highlight-record { background-color: #fef3c7 !important; transition: background 0.2s; } /* Yellow */
         .highlight-field { background-color: #dbeafe !important; transition: background 0.2s; } /* Blue */
-        
+
         /* SQL 模擬器 */
         .sql-block { @apply px-3 py-1.5 rounded text-xs font-bold font-mono cursor-pointer transition shadow-sm border select-none; }
         .sql-keyword { @apply bg-blue-600 text-white border-blue-700 hover:bg-blue-700; }
@@ -41,13 +41,13 @@
 
         /* 數據類型標籤 */
         .type-badge { @apply text-[10px] px-2 py-0.5 rounded-full border uppercase font-bold tracking-wider; }
-        
+
         /* Access 物件卡片 */
         .access-obj-card { @apply cursor-pointer transition-all duration-300 border hover:shadow-md hover:border-indigo-300; }
         .access-obj-card.active { @apply border-indigo-500 bg-indigo-50 shadow-md transform scale-105; }
     </style>
 <link rel="stylesheet" href="animations/assets/learning-lab.css"><link rel="stylesheet" href="animations/assets/core-a-labs.css"><link rel="stylesheet" href="animations/assets/interactive-models.css"><link rel="stylesheet" href="assets/css/animation-bridge.css">
-<link rel="stylesheet" href="assets/css/topic-runtime.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-data.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-network.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-algorithms.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-context.css?v=20261016">
+<link rel="stylesheet" href="assets/css/topic-runtime.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-data.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-network.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-algorithms.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-context.css?v=20261016-review2">
 </head>
 <body class="text-slate-700 flex flex-col min-h-screen">
 
@@ -61,7 +61,7 @@
                 <span class="font-bold text-lg hidden md:block">必修部分 A > 5. 數據庫</span>
             </div>
             <div class="text-sm bg-indigo-800 px-3 py-1 rounded-full flex items-center gap-2">
-                <i data-lucide="database" class="w-4 h-4"></i> 
+                <i data-lucide="database" class="w-4 h-4"></i>
                 <span class="hidden sm:inline">數據組織與管理</span>
             </div>
         </div>
@@ -108,46 +108,7 @@
                 </div>
 
                 <!-- Access 物件介紹 (新增) -->
-                <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-                    <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <i data-lucide="package" class="w-6 h-6 text-indigo-600"></i> Microsoft Access 核心物件
-                    </h3>
-                    <p class="text-slate-600 mb-6 text-sm">
-                        Access 是一個常見的關聯式數據庫管理系統，它主要由以下四種物件組成。點擊卡片查看詳情：
-                    </p>
-                    
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                        <div class="access-obj-card bg-white p-4 rounded-lg text-center active" onclick="showAccessObj('table', this)">
-                            <i data-lucide="table" class="w-8 h-8 mx-auto mb-2 text-blue-500"></i>
-                            <h4 class="font-bold text-slate-700 text-sm">數據表<br>(Table)</h4>
-                        </div>
-                        <div class="access-obj-card bg-white p-4 rounded-lg text-center" onclick="showAccessObj('form', this)">
-                            <i data-lucide="form-input" class="w-8 h-8 mx-auto mb-2 text-rose-500"></i>
-                            <h4 class="font-bold text-slate-700 text-sm">表單<br>(Form)</h4>
-                        </div>
-                        <div class="access-obj-card bg-white p-4 rounded-lg text-center" onclick="showAccessObj('report', this)">
-                            <i data-lucide="file-text" class="w-8 h-8 mx-auto mb-2 text-green-500"></i>
-                            <h4 class="font-bold text-slate-700 text-sm">報告<br>(Report)</h4>
-                        </div>
-                        <div class="access-obj-card bg-white p-4 rounded-lg text-center" onclick="showAccessObj('query', this)">
-                            <i data-lucide="search" class="w-8 h-8 mx-auto mb-2 text-purple-500"></i>
-                            <h4 class="font-bold text-slate-700 text-sm">查詢<br>(Query)</h4>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 min-h-[100px] flex items-center">
-                        <div id="accessObjContent" class="w-full">
-                            <!-- Default Content -->
-                            <div class="flex items-start gap-3">
-                                <i data-lucide="info" class="w-5 h-5 text-blue-500 mt-1 shrink-0"></i>
-                                <div>
-                                    <h5 class="font-bold text-slate-800 mb-1">數據表 (Table)</h5>
-                                    <p class="text-sm text-slate-600">這是數據庫的<span class="font-bold">基礎</span>。所有數據都實際儲存在數據表中，以列 (Row) 和欄 (Column) 的形式組織。沒有數據表，其他物件就沒有數據可操作。</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <p>Microsoft Access 以數據表保存資料，並以表單、報告及查詢支援工作；<a href="#sec5-5">在 5.5 節操作同一個產品資料庫的四種物件</a>。</p>
 
             </div>
         </section>
@@ -163,7 +124,7 @@
                 <p class="text-slate-600 mb-4">
                     在關聯式數據庫中，數據儲存在<span class="font-bold text-indigo-600">數據表 (Table)</span> 中。
                 </p>
-                
+
                 <!-- 互動結構圖 -->
                 <div class="border border-slate-300 rounded-lg overflow-hidden relative">
                     <!-- 控制按鈕 -->
@@ -190,7 +151,7 @@
                             </tbody>
                         </table>
                     </div>
-                    
+
                     <!-- 浮動提示 -->
                     <div id="structTip" class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-slate-800/90 text-white px-4 py-2 rounded-full text-xs opacity-0 transition-opacity pointer-events-none">
                         提示文字
@@ -301,7 +262,7 @@
                         <p class="text-slate-600 text-sm mb-4">
                             當單一欄位不足以唯一識別記錄時，我們可以結合<span class="font-bold text-purple-600">兩個或以上</span>的欄位來組成主關鍵碼。
                         </p>
-                        
+
                         <!-- 複合鍵例子 -->
                         <div class="bg-purple-50 p-4 rounded-lg border border-purple-100">
                             <h4 class="font-bold text-purple-800 text-sm mb-2">例子：學生選科表</h4>
@@ -443,7 +404,7 @@
                             <p><span class="text-blue-400">SELECT</span> *</p>
                             <p><span class="text-blue-400">FROM</span> Products</p>
                             <p><span class="text-blue-400">WHERE</span> Price > 1000;</p>
-                            
+
                             <div class="mt-4 bg-slate-700 p-3 rounded border border-slate-600">
                                 <p class="text-xs text-slate-400 mb-1">結果：</p>
                                 <table class="w-full text-xs text-left">
@@ -464,7 +425,7 @@
                 <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold text-sm">5.6</span>
                 <h2 class="text-3xl font-bold text-slate-800">數據操作 (Data Manipulation)</h2>
             </div>
-            
+
             <div class="grid md:grid-cols-2 gap-8">
                 <div class="bg-white p-6 rounded-xl border border-gray-200 hover-card">
                     <div class="flex items-center gap-2 mb-3 text-blue-600">
@@ -507,7 +468,7 @@
                 <div class="flex items-center gap-3 mb-6">
                     <i data-lucide="terminal" class="w-8 h-8 text-green-400"></i>
                     <div>
-                        <h3 class="text-2xl font-bold">SQL 積木工廠</h3>
+                        <h3 class="text-2xl font-bold">組合查詢並檢查結果</h3>
                         <p class="text-slate-400 text-sm">點擊下方積木，組合出正確的 SQL 查詢語句！</p>
                     </div>
                 </div>
@@ -604,38 +565,12 @@
             document.getElementById("progressBar").style.width = scrolled + "%";
         };
 
-        // 5.1 Access 物件顯示
-        function showAccessObj(objType, card) {
-            document.querySelectorAll('.access-obj-card').forEach(c => c.classList.remove('active'));
-            card.classList.add('active');
-            
-            const contentDiv = document.getElementById('accessObjContent');
-            let content = '';
-
-            switch(objType) {
-                case 'table':
-                    content = `<div class="flex items-start gap-3"><i data-lucide="info" class="w-5 h-5 text-blue-500 mt-1 shrink-0"></i><div><h5 class="font-bold text-slate-800 mb-1">數據表 (Table)</h5><p class="text-sm text-slate-600">這是數據庫的<span class="font-bold">基礎</span>。所有數據都實際儲存在數據表中，以列 (Row) 和欄 (Column) 的形式組織。沒有數據表，其他物件就沒有數據可操作。</p></div></div>`;
-                    break;
-                case 'form':
-                    content = `<div class="flex items-start gap-3"><i data-lucide="info" class="w-5 h-5 text-rose-500 mt-1 shrink-0"></i><div><h5 class="font-bold text-slate-800 mb-1">表單 (Form)</h5><p class="text-sm text-slate-600">提供一個<span class="font-bold">友善的介面</span>，讓用戶方便地輸入、修改或檢視數據。它可以一次顯示一筆記錄，避免直接操作數據表時的混亂。</p></div></div>`;
-                    break;
-                case 'report':
-                    content = `<div class="flex items-start gap-3"><i data-lucide="info" class="w-5 h-5 text-green-500 mt-1 shrink-0"></i><div><h5 class="font-bold text-slate-800 mb-1">報告 (Report)</h5><p class="text-sm text-slate-600">用於將數據<span class="font-bold">格式化並列印</span>出來。報告可以對數據進行分組、匯總（如計算總和），適合製作專業的文件。</p></div></div>`;
-                    break;
-                case 'query':
-                    content = `<div class="flex items-start gap-3"><i data-lucide="info" class="w-5 h-5 text-purple-500 mt-1 shrink-0"></i><div><h5 class="font-bold text-slate-800 mb-1">查詢 (Query)</h5><p class="text-sm text-slate-600">用於從數據表中<span class="font-bold">檢索符合特定條件</span>的數據。你可以把它想像成向數據庫提問，例如「找出所有不及格的學生」。</p></div></div>`;
-                    break;
-            }
-            contentDiv.innerHTML = content;
-            if (window.lucide) lucide.createIcons();
-        }
-
         // 5.2 結構高亮
         function highlightStructure(type) {
             clearHighlight();
             const tip = document.getElementById('structTip');
             tip.style.opacity = '1';
-            
+
             if(type === 'field') {
                 document.querySelectorAll('.struct-col').forEach(el => el.classList.add('highlight-field'));
                 tip.textContent = "欄位 (Field)：垂直的資料類別";
@@ -668,12 +603,12 @@
                 errorMsg.textContent = `錯誤：ID "${id}" 已存在！主關鍵碼不能重複。`;
                 return;
             }
-            
+
             errorMsg.textContent = "";
             errorMsg.className = "mt-3 text-xs font-bold text-green-600 h-4";
             errorMsg.textContent = "成功新增記錄！";
             setTimeout(() => errorMsg.className = "mt-3 text-xs font-bold text-red-500 h-4", 2000);
-            
+
             records.add(id);
             const row = document.createElement('tr');
             const idCell = document.createElement("td"); idCell.className = "bg-green-50"; idCell.textContent = id;
@@ -681,7 +616,7 @@
             row.append(idCell, nameCell);
             row.className = "bg-green-50";
             tbody.appendChild(row);
-            
+
             document.getElementById('inputPK').value = '';
             document.getElementById('inputName').value = '';
         }
@@ -701,7 +636,7 @@
             if(viewName === 'form') activeBtn = btns[1];
             if(viewName === 'report') activeBtn = btns[2];
             if(viewName === 'query') activeBtn = btns[3];
-            
+
             activeBtn.classList.remove('border-transparent', 'text-gray-500');
             activeBtn.classList.add('border-indigo-600', 'text-indigo-600', 'font-bold', 'bg-indigo-50/50');
         }
@@ -763,11 +698,11 @@
         }
     </script>
     <script src="course_data.js?v=8"></script><script src="assets/js/progress_store.js?v=3"></script>
-    <script src="assets/js/site_navigation.js?v=8&animations=1"></script>
+    <script src="assets/js/site_navigation.js?v=8&review=20261016"></script>
     <script src="question_data.js?v=3"></script>
     <script src="learning_data.js?v=14"></script>
-    <script src="assets/js/lesson_companion.js?v=8"></script>
-<script src="animations/assets/new-lessons.js"></script><script src="animations/assets/programming-lessons.js"></script><script src="animations/assets/programming-supplements.js"></script><script src="animations/assets/core-a-labs.js"></script><script src="animations/assets/network-labs.js"></script><script src="assets/js/animation-bridge.js?v=20261016"></script><script src="animations/assets/learning-lab.js?v=20261016"></script><script src="animations/assets/interactive-models.js?v=20261016"></script>
-<script src="assets/js/topic-data.js?v=20261016"></script><script src="assets/js/topic-network.js?v=20261016"></script><script src="assets/js/topic-algorithms.js?v=20261016"></script><script src="assets/js/topic-context.js?v=20261016"></script><script src="assets/js/topic-runtime.js?v=20261016"></script>
+    <script src="assets/js/lesson_companion.js?v=8&review=20261016"></script>
+<script src="animations/assets/new-lessons.js"></script><script src="animations/assets/programming-lessons.js"></script><script src="animations/assets/programming-supplements.js"></script><script src="animations/assets/core-a-labs.js"></script><script src="animations/assets/network-labs.js"></script><script src="assets/js/animation-bridge.js?v=20261016-review2"></script><script src="animations/assets/learning-lab.js?v=20261016-review2"></script><script src="animations/assets/interactive-models.js?v=20261016-review2"></script>
+<script src="assets/js/topic-data.js?v=20261016-review2"></script><script src="assets/js/topic-network.js?v=20261016-review2"></script><script src="assets/js/topic-algorithms.js?v=20261016-review2"></script><script src="assets/js/topic-context.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-data.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-network.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-algorithms.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-context.js?v=20261016-review2"></script><script src="assets/js/topic-runtime.js?v=20261016-review2"></script>
 </body>
 </html>

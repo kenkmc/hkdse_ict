@@ -41,7 +41,7 @@
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
     </style>
     <link rel="stylesheet" href="assets/learning-lab.css">
-<link rel="stylesheet" href="../assets/css/topic-runtime.css?v=20261016"><link rel="stylesheet" href="../assets/css/topic-data.css?v=20261016"><link rel="stylesheet" href="../assets/css/topic-network.css?v=20261016"><link rel="stylesheet" href="../assets/css/topic-algorithms.css?v=20261016"><link rel="stylesheet" href="../assets/css/topic-context.css?v=20261016">
+<link rel="stylesheet" href="../assets/css/topic-runtime.css?v=20261016-review2"><link rel="stylesheet" href="../assets/css/topic-data.css?v=20261016-review2"><link rel="stylesheet" href="../assets/css/topic-network.css?v=20261016-review2"><link rel="stylesheet" href="../assets/css/topic-algorithms.css?v=20261016-review2"><link rel="stylesheet" href="../assets/css/topic-context.css?v=20261016-review2">
 </head>
 <body class="text-slate-800">
 
@@ -119,28 +119,7 @@
                         <h3 class="text-lg font-bold text-slate-700">客戶端-伺服器網絡</h3>
                     </div>
 
-                    <div class="network-diagram bg-slate-50">
-                        <!-- SVG 連線層 -->
-                        <svg class="connection-layer">
-                            <!-- 連接點均指向中心 (50%, 50%) -->
-                            <line x1="15%" y1="20%" x2="50%" y2="50%" class="network-line" />
-                            <line x1="85%" y1="20%" x2="50%" y2="50%" class="network-line" />
-                            <line x1="15%" y1="80%" x2="50%" y2="50%" class="network-line" />
-                            <line x1="85%" y1="80%" x2="50%" y2="50%" class="network-line" />
-                        </svg>
 
-                        <!-- 中心伺服器 (置中) -->
-                        <div class="node node-server left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                            <i data-lucide="database" class="w-6 h-6 text-amber-600 mb-1"></i>
-                            <span>伺服器</span>
-                        </div>
-
-                        <!-- 四周客戶端 (使用百分比定位與連線座標一致) -->
-                        <div class="node left-[5%] top-[5%]"><i data-lucide="monitor" class="w-4 h-4 mb-1"></i>PC 1</div>
-                        <div class="node right-[5%] top-[5%]"><i data-lucide="monitor" class="w-4 h-4 mb-1"></i>PC 2</div>
-                        <div class="node left-[5%] bottom-[5%]"><i data-lucide="laptop" class="w-4 h-4 mb-1"></i>PC 3</div>
-                        <div class="node right-[5%] bottom-[5%]"><i data-lucide="smartphone" class="w-4 h-4 mb-1"></i>手機</div>
-                    </div>
 
                     <ul class="text-sm space-y-2 text-slate-600 bg-sky-50/50 p-4 rounded-2xl border border-sky-100">
                         <li class="flex items-start gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-sky-500 mt-0.5 shrink-0"></i> <b>伺服器</b>：提供服務與資源給客戶端。</li>
@@ -155,20 +134,7 @@
                         <h3 class="text-lg font-bold text-slate-700">對等網絡 (P2P)</h3>
                     </div>
 
-                    <div class="network-diagram bg-slate-50">
-                        <!-- SVG 連線層 -->
-                        <svg class="connection-layer">
-                            <!-- 繪製三角形連線 -->
-                            <line x1="50%" y1="20%" x2="20%" y2="80%" class="network-line" /> <!-- A to B -->
-                            <line x1="50%" y1="20%" x2="80%" y2="80%" class="network-line" /> <!-- A to C -->
-                            <line x1="20%" y1="80%" x2="80%" y2="80%" class="network-line" /> <!-- B to C -->
-                        </svg>
 
-                        <!-- PC 節點 (與 SVG 座標對齊) -->
-                        <div class="node left-1/2 top-[5%] -translate-x-1/2 shadow-md"><i data-lucide="monitor" class="w-4 h-4 mb-1"></i>PC A</div>
-                        <div class="node left-[5%] bottom-[5%] shadow-md"><i data-lucide="monitor" class="w-4 h-4 mb-1"></i>PC B</div>
-                        <div class="node right-[5%] bottom-[5%] shadow-md"><i data-lucide="monitor" class="w-4 h-4 mb-1"></i>PC C</div>
-                    </div>
 
                     <ul class="text-sm space-y-2 text-slate-600 bg-sky-50/50 p-4 rounded-2xl border border-sky-100">
                         <li class="flex items-start gap-2"><i data-lucide="users" class="w-4 h-4 text-sky-500 mt-0.5 shrink-0"></i> <b>角色對等</b>：每台電腦都可以提供及索取資源；角色取決於當次通訊。</li>
@@ -186,53 +152,35 @@
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                 <!-- 每一張卡片展示一個硬件 -->
                 <div class="hw-card p-4 border rounded-2xl text-center bg-slate-50 border-slate-200">
-                    <svg class="hw-svg mx-auto" viewBox="0 0 100 60">
-                        <rect x="10" y="10" width="80" height="40" rx="3" fill="#334155" />
-                        <rect x="5" y="20" width="10" height="20" fill="#94a3b8" />
-                        <rect x="85" y="25" width="10" height="10" fill="#f59e0b" />
-                        <circle cx="25" cy="30" r="4" fill="#1e293b" />
-                    </svg>
+                    <img src="../assets/images/network/network-interface-card.jpg" alt="具有 RJ45 接口的網絡介面卡" loading="lazy" style="width:100%;height:110px;object-fit:contain"><p class="text-xs text-slate-600">提供裝置傳送及接收網絡數據的介面。</p>
                     <p class="font-bold text-sky-800 mt-2 text-sm">網絡介面卡</p>
                     <p class="text-[9px] text-slate-400 font-bold uppercase">NIC</p>
                 </div>
                 <div class="hw-card p-4 border rounded-2xl text-center bg-slate-50 border-slate-200">
-                    <svg class="hw-svg mx-auto" viewBox="0 0 100 60">
-                        <rect x="15" y="35" width="70" height="15" rx="4" fill="#334155" />
-                        <line x1="25" y1="35" x2="25" y2="10" stroke="#334155" stroke-width="3" />
-                        <line x1="75" y1="35" x2="75" y2="10" stroke="#334155" stroke-width="3" />
-                    </svg>
+                    <img src="../assets/images/network/wifi-router.jpg" alt="具天線及 Ethernet 接口的家用路由器" loading="lazy" style="width:100%;height:110px;object-fit:contain"><p class="text-xs text-slate-600">連接不同網絡，按路由表轉送 IP 封包；家用型號常整合其他功能。</p>
                     <p class="font-bold text-sky-800 mt-2 text-sm">路由器</p>
                     <p class="text-[9px] text-slate-400 font-bold uppercase">Router</p>
                 </div>
                 <div class="hw-card p-4 border rounded-2xl text-center bg-slate-50 border-slate-200">
-                    <svg class="hw-svg mx-auto" viewBox="0 0 100 60">
-                        <rect x="5" y="20" width="90" height="25" rx="3" fill="#0f172a" />
-                        <rect x="15" y="27" width="8" height="8" rx="1" fill="#cbd5e1"/>
-                        <rect x="30" y="27" width="8" height="8" rx="1" fill="#cbd5e1"/>
-                        <rect x="45" y="27" width="8" height="8" rx="1" fill="#cbd5e1"/>
-                    </svg>
+                    <img src="../assets/images/network/network-switch.jpg" alt="多個 Ethernet 連接埠的交換器" loading="lazy" style="width:100%;height:110px;object-fit:contain"><p class="text-xs text-slate-600">連接同一 LAN 的有線裝置，按鏈路層位址轉送訊框。</p>
                     <p class="font-bold text-sky-800 mt-2 text-sm">交換器</p>
                     <p class="text-[9px] text-slate-400 font-bold uppercase">Switch</p>
                 </div>
                 <div class="hw-card p-4 border rounded-2xl text-center bg-slate-50 border-slate-200">
-                    <svg class="hw-svg mx-auto" viewBox="0 0 100 60">
-                        <rect x="10" y="30" width="80" height="20" rx="3" fill="#1e293b" />
-                        <circle cx="20" cy="40" r="2" fill="#22c55e" />
-                    </svg>
+                    <img src="../assets/images/network/adsl-modem.jpg" alt="具有狀態燈的 ADSL 數據機" loading="lazy" style="width:100%;height:110px;object-fit:contain"><p class="text-xs text-slate-600">依線路需要調變及解調訊號，功能不同於路由。</p>
                     <p class="font-bold text-sky-800 mt-2 text-sm">數據機</p>
                     <p class="text-[9px] text-slate-400 font-bold uppercase">Modem</p>
                 </div>
                 <div class="hw-card p-4 border rounded-2xl text-center bg-slate-50 border-slate-200">
-                    <svg class="hw-svg mx-auto" viewBox="0 0 100 60">
-                        <circle cx="50" cy="30" r="15" fill="none" stroke="#334155" stroke-width="2"/>
-                        <circle cx="50" cy="30" r="3" fill="#334155"/>
-                    </svg>
+                    <img src="../assets/images/network/wireless-access-point.jpg" alt="無線接達點實物" loading="lazy" style="width:100%;height:110px;object-fit:contain"><p class="text-xs text-slate-600">以無線電讓 Wi-Fi 裝置接入有線 LAN。</p>
                     <p class="font-bold text-sky-800 mt-2 text-sm">網絡接達點</p>
                     <p class="text-[9px] text-slate-400 font-bold uppercase">AP</p>
                 </div>
             </div>
-        </section>
+        <p class="text-xs text-slate-500">相片：Raysonho（CC0）、Pjpearce（CC0）、Tors（CC0）及 Raimond Spekking（CC BY-SA 4.0）；<a href="../assets/images/network/README.md">完整圖片來源及授權</a>。外觀因型號而異，應按功能辨認。</p>
+</section>
 
+<section id="links" class="section-card"><h2 class="text-2xl font-bold text-sky-800 mb-6">通訊鏈路與無線覆蓋</h2><p>按速度、成本、抗干擾、距離及覆蓋比較；同一媒介的實際表現仍視設備、服務計劃與負載而定。</p><table class="w-full text-sm"><thead><tr><th>媒介</th><th>傳送方式</th><th>情境取捨</th></tr></thead><tbody><tr><td>UTP 雙絞線</td><td>電訊號</td><td>校舍內成本較低；距離及電磁干擾須考慮。</td></tr><tr><td>光纖</td><td>光脈衝</td><td>高容量、長距離及抗電磁干擾；鋪設與設備成本須計算。</td></tr><tr><td>地面微波</td><td>定向無線電</td><td>跨建築物而不鋪全段線纜；通常需要視線路徑。</td></tr><tr><td>衛星</td><td>地面與衛星間無線電</td><td>可覆蓋偏遠地區；延遲、天氣、設備與服務成本視系統而異。</td></tr></tbody></table><p>AP 覆蓋並非剛好圓形。牆壁、頻段、同頻干擾和用戶數量均會影響連線；漫遊須配合實際網絡設定測試。</p></section>
         <!-- 互動組網遊戲 -->
         <section id="game" class="section-card border-2 border-sky-400 bg-sky-50/30">
             <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
@@ -347,8 +295,8 @@
         });
     </script>
 <script src="assets/network-labs.js"></script>
-<script src="assets/learning-lab.js?v=20261016"></script>
-<script src="assets/host-navigation.js"></script>
-<script src="../assets/js/topic-data.js?v=20261016"></script><script src="../assets/js/topic-network.js?v=20261016"></script><script src="../assets/js/topic-algorithms.js?v=20261016"></script><script src="../assets/js/topic-context.js?v=20261016"></script><script src="../assets/js/topic-runtime.js?v=20261016"></script>
+<script src="assets/learning-lab.js?v=20261016-review2"></script>
+<script src="assets/host-navigation.js?v=20261016-review2"></script>
+<script src="../assets/js/topic-data.js?v=20261016-review2"></script><script src="../assets/js/topic-network.js?v=20261016-review2"></script><script src="../assets/js/topic-algorithms.js?v=20261016-review2"></script><script src="../assets/js/topic-context.js?v=20261016-review2"></script><script src="../assets/js/lesson-plan-data.js?v=20261016-review2"></script><script src="../assets/js/lesson-plan-network.js?v=20261016-review2"></script><script src="../assets/js/lesson-plan-algorithms.js?v=20261016-review2"></script><script src="../assets/js/lesson-plan-context.js?v=20261016-review2"></script><script src="../assets/js/topic-runtime.js?v=20261016-review2"></script>
 </body>
 </html>

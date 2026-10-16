@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="assets/css/learning.css?v=6">
     <link rel="stylesheet" href="assets/css/system-lesson.css?v=1">
 <link rel="stylesheet" href="animations/assets/learning-lab.css"><link rel="stylesheet" href="animations/assets/core-a-labs.css"><link rel="stylesheet" href="animations/assets/interactive-models.css"><link rel="stylesheet" href="assets/css/animation-bridge.css">
-<link rel="stylesheet" href="assets/css/topic-runtime.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-data.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-network.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-algorithms.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-context.css?v=20261016">
+<link rel="stylesheet" href="assets/css/topic-runtime.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-data.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-network.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-algorithms.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-context.css?v=20261016-review2">
 </head>
 <body>
     <nav class="sys-lesson-nav" aria-label="本課導覽">
@@ -101,40 +101,8 @@
                 <div><p class="sys-kicker">03 · Interactive machine cycle</p><h2 id="cycle-title">逐步追蹤擷取—解碼—執行</h2></div>
                 <span class="sys-tag">可操作</span>
             </div>
-            <p class="sys-lead">按左方步驟，觀察正在工作的暫存器和匯流排。公開試可只問部件名稱，也可要求說明它們如何互相依賴。</p>
-            <div class="sys-cycle" data-cycle-lab>
-                <div class="sys-cycle-controls" role="tablist" aria-label="機器周期步驟">
-                    <button type="button" role="tab" data-cycle-step="fetchAddress">1A 地址</button>
-                    <button type="button" role="tab" data-cycle-step="fetchInstruction">1B 指令</button>
-                    <button type="button" role="tab" data-cycle-step="decode">2 解碼</button>
-                    <button type="button" role="tab" data-cycle-step="execute">3 執行</button>
-                </div>
-                <div class="sys-cycle-panel" role="tabpanel" tabindex="0">
-                    <div class="sys-machine">
-                        <div class="sys-cpu-box">
-                            <strong>中央處理器 CPU</strong>
-                            <div class="sys-registers">
-                                <div class="sys-register" data-register="pc">PC<br>程序計數器</div>
-                                <div class="sys-register" data-register="mar">MAR<br>地址暫存器</div>
-                                <div class="sys-register" data-register="mdr">MDR<br>數據暫存器</div>
-                                <div class="sys-register" data-register="ir">IR / CIR<br>指令暫存器</div>
-                                <div class="sys-register" data-register="cu">CU<br>控制單元</div>
-                                <div class="sys-register" data-register="alu">ALU<br>算術邏輯</div>
-                                <div class="sys-register" data-register="acc">ACC<br>累加器</div>
-                            </div>
-                        </div>
-                        <div class="sys-memory-box" data-memory-box><strong>主記憶體</strong><p>地址 2048</p><p>LOAD value</p><p>地址 2049</p><p>ADD total</p></div>
-                        <div class="sys-bus-strip" aria-label="匯流排">
-                            <span data-bus="address">地址匯流排</span><span data-bus="data">數據匯流排</span><span data-bus="control">控制匯流排</span>
-                        </div>
-                    </div>
-                    <div class="sys-cycle-explanation">
-                        <h3 data-cycle-title></h3>
-                        <p data-cycle-explanation></p>
-                        <p><strong data-cycle-keyword></strong></p>
-                    </div>
-                </div>
-            </div>
+            <p class="sys-lead">逐步執行同一段程式，觀察暫存器數值和匯流排方向。公開試可只問部件名稱，也可要求說明它們如何互相依賴。</p>
+
         </section>
 
         <section id="memory" class="sys-section" aria-labelledby="memory-title">
@@ -210,12 +178,12 @@
     </main>
 
     <script src="course_data.js?v=8"></script><script src="assets/js/progress_store.js?v=3"></script>
-    <script src="assets/js/site_navigation.js?v=8&animations=1"></script>
+    <script src="assets/js/site_navigation.js?v=8&review=20261016"></script>
     <script src="question_data.js?v=4"></script>
     <script src="learning_data.js?v=14"></script>
     <script src="assets/js/system-lessons.js?v=1"></script>
-    <script src="assets/js/lesson_companion.js?v=8"></script>
-<script src="animations/assets/new-lessons.js"></script><script src="animations/assets/programming-lessons.js"></script><script src="animations/assets/programming-supplements.js"></script><script src="animations/assets/core-a-labs.js"></script><script src="animations/assets/network-labs.js"></script><script src="assets/js/animation-bridge.js?v=20261016"></script><script src="animations/assets/learning-lab.js?v=20261016"></script><script src="animations/assets/interactive-models.js?v=20261016"></script>
-<script src="assets/js/topic-data.js?v=20261016"></script><script src="assets/js/topic-network.js?v=20261016"></script><script src="assets/js/topic-algorithms.js?v=20261016"></script><script src="assets/js/topic-context.js?v=20261016"></script><script src="assets/js/topic-runtime.js?v=20261016"></script>
+    <script src="assets/js/lesson_companion.js?v=8&review=20261016"></script>
+<script src="animations/assets/new-lessons.js"></script><script src="animations/assets/programming-lessons.js"></script><script src="animations/assets/programming-supplements.js"></script><script src="animations/assets/core-a-labs.js"></script><script src="animations/assets/network-labs.js"></script><script src="assets/js/animation-bridge.js?v=20261016-review2"></script><script src="animations/assets/learning-lab.js?v=20261016-review2"></script><script src="animations/assets/interactive-models.js?v=20261016-review2"></script>
+<script src="assets/js/topic-data.js?v=20261016-review2"></script><script src="assets/js/topic-network.js?v=20261016-review2"></script><script src="assets/js/topic-algorithms.js?v=20261016-review2"></script><script src="assets/js/topic-context.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-data.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-network.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-algorithms.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-context.js?v=20261016-review2"></script><script src="assets/js/topic-runtime.js?v=20261016-review2"></script>
 </body>
 </html>

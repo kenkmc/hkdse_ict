@@ -1,0 +1,28 @@
+/* Place each mechanism beside the section that teaches it. */
+Object.assign(window.ICT_LESSON_PLANS ||= {}, {
+  'cha.1': [{sim:'data-information-pipeline',target:'#sec1-3',position:'append'}],
+  'cha.2': [{sim:'data-hierarchy-explorer',target:'#sec2-1',position:'append'},{sim:'validation-verification-gates',target:'#verification-activity',position:'append'},{sim:'parity-transmission',target:'#parity-activity',position:'append'},{sim:'storage-access-head',target:'#sec2-4',position:'append'}],
+  'cha.3': [{sim:'radix-place-machine',target:'#sec3-1',position:'append'},{sim:'twos-complement-workbench',target:'#sec3-1-signed',position:'append'},{sim:'image-rgb-bitdepth',target:'#content-image',position:'append'},{sim:'lossless-run-length',target:'#content-image',position:'append'},{sim:'audio-sampling-quantization',target:'#content-audio',position:'append'}],
+  'cha.4': [{sim:'spreadsheet-reference-copy',target:'#sec4-5',position:'append'}],
+  'cha.5': [{sim:'database-query-execution',target:'#sec5-6',position:'append'}],
+  'chb.1': [{sim:'hardware-component-map',target:'#organisation',position:'append'},{sim:'cpu-register-bus',target:'#cycle',position:'append'},{sim:'memory-address-power',target:'#memory',position:'append'},{sim:'input-adc-controller',target:'#devices',position:'append'}],
+  'chb.2': [{sim:'os-print-service',target:'#software',position:'append'},{sim:'lossless-run-length',target:'#utilities',position:'append'},{sim:'os-job-scheduler',target:'#modes',position:'append'}],
+  'ea.1': [{sim:'entity-relationship-bridge',target:'#schema',position:'append'},{sim:'atomic-transfer',target:'#transaction',position:'append'}],
+  'ea.2': [{sim:'sql-row-mutation',target:'#map',position:'append'},{sim:'join-and-group',target:'#query',position:'append'},{sim:'sql-scalar-subquery',target:'#analysis',position:'append'}],
+  'ea.3': [{sim:'entity-relationship-bridge',target:'#erd',position:'append'},{sim:'key-decomposition',target:'#normalise',position:'append'},{sim:'transitive-dependency',target:'#normalise',position:'append'}],
+  'db_simulator': [],
+  'animations/cha.1': [{sim:'data-information-pipeline',target:'#sec1-3',position:'append'}],
+  'animations/cha.2': [{sim:'data-hierarchy-explorer',target:'#sec2-1',position:'append'},{sim:'validation-verification-gates',target:'#verification-activity',position:'append'},{sim:'parity-transmission',target:'#parity-activity',position:'append'},{sim:'storage-access-head',target:'#sec2-4',position:'append'}],
+  'animations/cha.3': [{sim:'radix-place-machine',target:'#sec3-1',position:'append'},{sim:'twos-complement-workbench',target:'#sec3-1-signed',position:'append'},{sim:'image-rgb-bitdepth',target:'#content-image',position:'append'},{sim:'lossless-run-length',target:'#content-image',position:'append'},{sim:'audio-sampling-quantization',target:'#content-audio',position:'append'}],
+  'animations/cha.4': [{sim:'spreadsheet-reference-copy',target:'#sec4-5',position:'append'}],
+  'animations/cha.5': [{sim:'database-query-execution',target:'#sec5-6',position:'append'}],
+  'animations/chb.1': [{sim:'input-adc-controller',target:'#capture',position:'append'}],
+  'animations/chb.2': [{sim:'hardware-component-map',target:'#cycle',position:'append'},{sim:'cpu-register-bus',target:'#cycle',position:'append'},{sim:'memory-address-power',target:'#memory',position:'append'}],
+  'animations/chb.3': [{sim:'os-print-service',target:'#os',position:'append'},{sim:'lossless-run-length',target:'#os',position:'append'},{sim:'os-job-scheduler',target:'#modes',position:'append'}],
+  'animations/eleca.1': [{sim:'sql-row-mutation',target:'#dml',position:'append'},{sim:'atomic-transfer',target:'#transaction',position:'append'}],
+  'animations/eleca.2': [{sim:'database-query-execution',target:'#where',position:'append'},{sim:'join-and-group',target:'#group',position:'append'}],
+  'animations/eleca.3': [{sim:'join-and-group',target:'#joins',position:'append'},{sim:'sql-scalar-subquery',target:'#subquery',position:'append'}],
+  'animations/eleca.4': [{sim:'entity-relationship-bridge',target:'#keys',position:'append'},{sim:'sql-row-mutation',target:'#integrity',position:'append'}],
+  'animations/eleca.5': [{sim:'entity-relationship-bridge',target:'#erd',position:'append'},{sim:'key-decomposition',target:'#normalise',position:'append'},{sim:'transitive-dependency',target:'#normalise',position:'append'}],
+  'animations/db_simulator': []
+});
