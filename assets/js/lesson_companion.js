@@ -11,7 +11,7 @@
     const page = item ? learning.pages[item.id] : null;
     const nav = document.querySelector(".platform-shell-nav");
     if (!item || !page || !nav || document.querySelector(".lesson-companion")) return;
-    const expandedByDefault = item.type === "lesson" || item.id === "tool-dse-practice";
+    const expandedByDefault = false;
     const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, character => ({
         "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
     })[character]);

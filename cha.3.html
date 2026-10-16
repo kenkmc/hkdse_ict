@@ -15,10 +15,10 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- MathJax for Formulas -->
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    
+
     <style>
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #f0f9ff; }
-        
+
         /* ----------------------------------------------------
            短除法樣式
            ---------------------------------------------------- */
@@ -47,7 +47,7 @@
             flex-direction: column;
             position: relative;
         }
-        
+
         .dividends-column::before {
             content: '';
             position: absolute;
@@ -63,9 +63,9 @@
             border-bottom: 2px solid #374151;
             text-align: left;
         }
-        
+
         .dividend:last-child {
-            border-bottom: none; 
+            border-bottom: none;
         }
 
         .remainders-column {
@@ -82,33 +82,33 @@
             display: flex;
             align-items: center;
         }
-        
+
         /* ----------------------------------------------------
            直式計算樣式
            ---------------------------------------------------- */
-        .binary-calc-box { 
-            font-family: 'Courier New', monospace; 
-            font-size: 1.5rem; 
-            letter-spacing: 0.5rem; 
-            text-align: right; 
-            display: inline-block; 
+        .binary-calc-box {
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            letter-spacing: 0.5rem;
+            text-align: right;
+            display: inline-block;
             line-height: 1.5;
-            margin-top: 1rem; 
+            margin-top: 1rem;
         }
         .calc-row { display: flex; justify-content: flex-end; padding-right: 10px; position: relative; }
         .calc-line { border-top: 2px solid #cbd5e1; margin-top: 5px; padding-top: 5px; }
         .calc-operator { position: absolute; left: -1.5rem; top: 0; font-weight: bold; color: #10b981; }
-        .calc-carry { 
-            color: #f59e0b; 
-            font-size: 0.8rem; 
-            position: absolute; 
+        .calc-carry {
+            color: #f59e0b;
+            font-size: 0.8rem;
+            position: absolute;
             top: -25px;
             right: 0;
             width: 100%;
             text-align: right;
             pointer-events: none;
-            letter-spacing: 0.5rem; 
-            padding-right: 10px; 
+            letter-spacing: 0.5rem;
+            padding-right: 10px;
         }
 
         /* ----------------------------------------------------
@@ -133,7 +133,7 @@
         .bit-switch.off { background-color: #f8fafc; color: #94a3b8; }
         .bit-switch:hover { transform: translateY(-2px); }
         .bit-value { font-size: 0.75rem; position: absolute; bottom: -25px; color: #64748b; font-weight: normal; }
-        
+
         /* 卡片特效 */
         .hover-card { transition: all 0.3s ease; }
         .hover-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
@@ -143,12 +143,12 @@
         .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
+
         /* 表格樣式 */
         .code-table th { background-color: #f1f5f9; color: #475569; font-weight: 600; text-align: left; padding: 12px; font-size: 0.875rem; }
         .code-table td { border-bottom: 1px solid #e2e8f0; padding: 12px; font-family: 'Courier New', monospace; color: #334155; }
         .code-table tr:last-child td { border-bottom: none; }
-        
+
         /* Modal Animation */
         .modal-enter { animation: modalIn 0.3s ease-out forwards; }
         @keyframes modalIn {
@@ -157,7 +157,7 @@
         }
     </style>
 <link rel="stylesheet" href="animations/assets/learning-lab.css"><link rel="stylesheet" href="animations/assets/core-a-labs.css"><link rel="stylesheet" href="animations/assets/interactive-models.css"><link rel="stylesheet" href="assets/css/animation-bridge.css">
-<link rel="stylesheet" href="assets/css/topic-runtime.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-data.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-network.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-algorithms.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-context.css?v=20261016">
+<link rel="stylesheet" href="assets/css/topic-runtime.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-data.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-network.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-algorithms.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-context.css?v=20261016-review2">
 </head>
 <body class="text-slate-700">
 
@@ -193,7 +193,7 @@
     </nav>
 
     <main class="container mx-auto px-4 py-8 max-w-5xl">
-        
+
         <!-- Header -->
         <header class="mb-12 text-center">
             <h1 class="text-4xl font-bold text-slate-800 mb-4">單元 3：數據表示 (Data Representation)</h1>
@@ -269,38 +269,7 @@
             </div>
 
             <!-- Interactive Tool 2: Binary Calculator -->
-            <div class="bg-white rounded-2xl shadow-lg border border-indigo-100 overflow-hidden">
-                <div class="bg-slate-800 p-4 text-white flex justify-between items-center">
-                    <h3 class="font-bold text-lg flex items-center gap-2">
-                        <i data-lucide="plus-square" class="w-5 h-5"></i> 二進制運算 (Binary Arithmetic)
-                    </h3>
-                </div>
-                <div class="p-6 grid md:grid-cols-2 gap-8">
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1">二進制 A</label>
-                            <input type="text" id="binA" class="font-mono w-full p-3 border border-slate-200 rounded-lg" placeholder="1010" value="1010">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1">二進制 B</label>
-                            <input type="text" id="binB" class="font-mono w-full p-3 border border-slate-200 rounded-lg" placeholder="0101" value="0101">
-                        </div>
-                        <div class="flex gap-4">
-                            <button onclick="calcBinary('add')" class="flex-1 bg-blue-600 hover:bg-blue-500 py-3 rounded-lg font-bold text-white transition flex justify-center items-center gap-2">
-                                <i data-lucide="plus" class="w-4 h-4"></i> 加法
-                            </button>
-                            <button onclick="calcBinary('sub')" class="flex-1 bg-rose-600 hover:bg-rose-500 py-3 rounded-lg font-bold text-white transition flex justify-center items-center gap-2">
-                                <i data-lucide="minus" class="w-4 h-4"></i> 減法
-                            </button>
-                        </div>
-                    </div>
-                    <div class="bg-slate-50 rounded-xl p-4 flex flex-col justify-center items-center min-h-[200px] border border-slate-200">
-                        <div id="calcDisplay" class="text-center text-slate-400 text-sm">
-                            點擊按鈕開始計算...
-                        </div>
-                    </div>
-                </div>
-            </div>
+
         </section>
 
         <!-- 3.1.2 Signed Numbers -->
@@ -309,7 +278,7 @@
                 <span class="bg-rose-100 text-rose-700 px-3 py-1 rounded-full font-bold text-sm">3.1.2</span>
                 <h2 class="text-3xl font-bold text-slate-800">有符號數的表示 (Signed Numbers)</h2>
             </div>
-            
+
             <p class="mb-8 text-slate-600 leading-relaxed">
                 在電腦系統中，我們不僅需要處理非負整數（包括 0，Unsigned Integer），還需要處理負數。最常見的表示方法有兩種：<b>符號和值 (Sign and Magnitude)</b> 與 <b>二進制補碼 (Two's Complement)</b>。
             </p>
@@ -356,7 +325,7 @@
                     <i data-lucide="lightbulb" class="w-6 h-6 text-amber-600"></i> 老師重點提提你：定義與概念釐清
                 </h4>
                 <p class="text-sm text-amber-900 mb-4 relative z-10">在考試中，必須清楚區分「數字系統」與「運算動作」：</p>
-                
+
                 <div class="grid md:grid-cols-2 gap-6 relative z-10">
                     <!-- 1. The Representation System -->
                     <div class="bg-white/80 p-5 rounded-lg shadow-sm border-l-4 border-indigo-500">
@@ -371,7 +340,7 @@
                             <li class="bg-rose-50 p-3 rounded text-sm text-rose-900 border-l-4 border-rose-300">
                                 <span class="font-bold block text-rose-700 text-base mb-1">負數 (Negative)</span>
                                 <span class="font-bold text-rose-600 text-lg">= 對應正數的反碼 + 1</span>
-                                <span class="block text-xs text-slate-500 mt-1">(即：先寫出該數的正數，再取反加一)</span>
+                                <span class="block text-xs text-slate-500 mt-1">（先以固定長度寫出絕對值的無號二進制，再反轉加一；最小有號值的正值超出同位數有號範圍）</span>
                             </li>
                         </ul>
                     </div>
@@ -405,96 +374,6 @@
                 </div>
             </div>
 
-            <!-- Interactive Tool: 8-bit Lab -->
-            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden mb-12">
-                <div class="bg-slate-800 p-4 text-white flex justify-between items-center">
-                    <h3 class="font-bold text-lg flex items-center gap-2">
-                        <i data-lucide="flask-conical" class="w-5 h-5"></i> 8 位元有符號數實驗室 (8-bit Signed Lab)
-                    </h3>
-                    <span class="text-xs bg-slate-700 px-2 py-1 rounded text-slate-300">點擊下方方塊切換 0/1</span>
-                </div>
-                
-                <div class="p-6">
-                    <!-- Toggle Bits -->
-                    <div class="grid grid-cols-8 gap-2 mb-8 select-none" id="bit-container">
-                        <!-- Generated by JS -->
-                    </div>
-
-                    <!-- Analysis Dashboard -->
-                    <div class="grid md:grid-cols-3 gap-4">
-                        <!-- Unsigned -->
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
-                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">無符號整數 (Unsigned)</p>
-                            <div class="text-3xl font-mono font-bold text-slate-700" id="val-unsigned">0</div>
-                            <p class="text-xs text-slate-400 mt-2">Range: 0 ~ 255</p>
-                        </div>
-                        
-                        <!-- Sign & Magnitude -->
-                        <div class="bg-amber-50 p-4 rounded-xl border border-amber-200 text-center">
-                            <p class="text-xs font-bold text-amber-600 uppercase tracking-wide mb-1">符號和值 (Sign & Mag)</p>
-                            <div class="text-3xl font-mono font-bold text-amber-700" id="val-signmag">0</div>
-                            <p class="text-xs text-amber-500 mt-2">Range: -127 ~ +127</p>
-                        </div>
-
-                        <!-- Two's Complement -->
-                        <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-200 text-center relative overflow-hidden">
-                            <div class="absolute top-0 right-0 bg-indigo-200 text-indigo-800 text-[10px] px-2 py-0.5 rounded-bl">Standard</div>
-                            <p class="text-xs font-bold text-indigo-600 uppercase tracking-wide mb-1">二進制補碼 (2's Comp)</p>
-                            <div class="text-3xl font-mono font-bold text-indigo-700" id="val-twos">0</div>
-                            <p class="text-xs text-indigo-500 mt-2">Range: -128 ~ +127</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Added Negative Weight Visualization -->
-                    <div class="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
-                        <p class="text-xs font-bold text-slate-500 mb-2 flex items-center gap-2">
-                            <i data-lucide="calculator" class="w-4 h-4"></i> 二進制補碼數字：負權重計算驗證 (Negative Weight Verification)
-                        </p>
-                        <div id="negative-weight-calc" class="font-mono text-sm text-slate-700 break-all bg-white p-3 rounded border border-slate-100 shadow-inner">
-                            0 = 0
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Interactive Tool: Converter -->
-            <div class="bg-gradient-to-r from-indigo-600 to-blue-500 rounded-2xl shadow-lg text-white overflow-hidden">
-                <div class="p-6 md:p-8">
-                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
-                        <i data-lucide="refresh-cw" class="w-6 h-6"></i> 補碼轉換器：求負數
-                    </h3>
-                    <p class="text-indigo-100 text-sm mb-6">輸入一個正整數 (0-127)，看看如何將其轉換為負數的二進制補碼。</p>
-
-                    <div class="flex flex-col md:flex-row gap-4 items-start">
-                        <div class="w-full md:w-1/3">
-                            <input type="number" id="convertInput" min="0" max="127" value="18" 
-                                class="w-full p-3 rounded-lg text-slate-800 font-bold border-none outline-none focus:ring-2 focus:ring-indigo-300"
-                                placeholder="輸入正整數">
-                            <button onclick="startTwosCompDemo()" class="mt-3 w-full bg-white/20 hover:bg-white/30 text-white font-bold py-2 rounded-lg transition">
-                                開始轉換
-                            </button>
-                        </div>
-
-                        <div class="w-full md:w-2/3 bg-slate-900/50 rounded-xl p-4 font-mono space-y-4">
-                            <!-- Step 1 -->
-                            <div class="flex justify-between items-center opacity-50" id="step1-row">
-                                <span class="text-xs text-indigo-300">原數值 (二進制)</span>
-                                <span class="text-lg" id="demo-orig">00000000</span>
-                            </div>
-                            <!-- Step 2 -->
-                            <div class="flex justify-between items-center opacity-50" id="step2-row">
-                                <span class="text-xs text-indigo-300">1. 取反 (Invert Bits)</span>
-                                <span class="text-lg text-amber-400" id="demo-inverted">--------</span>
-                            </div>
-                            <!-- Step 3 -->
-                            <div class="flex justify-between items-center border-t border-white/10 pt-2 opacity-50" id="step3-row">
-                                <span class="text-xs text-indigo-300">2. 加 1 (Add 1)</span>
-                                <span class="text-xl font-bold text-green-400" id="demo-result">--------</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </section>
 
         <!-- 3.2 數據表示 (多媒體) -->
@@ -552,7 +431,7 @@
                                 查看編碼
                             </button>
                         </div>
-                        
+
                         <div id="char-result" class="hidden bg-white rounded-xl shadow-sm overflow-hidden border border-indigo-100">
                             <table class="w-full text-sm code-table">
                                 <thead>
@@ -616,7 +495,7 @@
                     <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
                         <i data-lucide="image" class="w-6 h-6 text-pink-500"></i> 位圖 (Bitmap) vs 矢量圖 (Vector)
                     </h3>
-                    
+
                     <div class="grid md:grid-cols-2 gap-6 mb-8">
                         <div class="bg-slate-50 p-4 rounded-lg">
                             <strong class="block text-slate-700 mb-2">位圖 (Bitmap/Raster)</strong>
@@ -628,7 +507,7 @@
                         <div class="bg-slate-50 p-4 rounded-lg">
                             <strong class="block text-slate-700 mb-2">矢量圖 (Vector)</strong>
                             <p class="text-xs text-slate-500 mb-2">由數學公式定義路徑。</p>
-                            <p class="text-xs text-slate-500">優點：放大不失真，檔案小。</p>
+                            <p class="text-xs text-slate-500">優點：縮放可保持路徑平滑；大小視圖形複雜度而定。</p>
                             <p class="text-xs text-slate-500">缺點：不適合複雜照片。</p>
                             <p class="text-xs font-mono mt-2 bg-white p-1 rounded inline-block">SVG, AI, EPS</p>
                         </div>
@@ -650,7 +529,7 @@
                                     <tr>
                                         <td class="font-bold text-indigo-600">JPEG / JPG</td>
                                         <td>有損 (Lossy)</td>
-                                        <td>最適合<b>相片</b>。檔案小，但重複儲存會導致畫質下降。不支援透明背景。</td>
+                                        <td>最適合<b>相片</b>。通常比未壓縮點陣圖小；重複有損編碼可能累積失真。不支援透明背景。</td>
                                     </tr>
                                     <tr>
                                         <td class="font-bold text-indigo-600">PNG</td>
@@ -700,7 +579,7 @@
                     <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
                         <i data-lucide="mic" class="w-6 h-6 text-amber-500"></i> 聲音數碼化 (Audio Digitization)
                     </h3>
-                    
+
                     <!-- File Formats Table -->
                     <div class="mb-8">
                         <h4 class="font-bold text-slate-700 mb-3">常見聲音檔案格式</h4>
@@ -727,7 +606,7 @@
                                     <tr>
                                         <td class="font-bold text-indigo-600">FLAC</td>
                                         <td>無損壓縮 (Lossless)</td>
-                                        <td>壓縮後不失真，檔案約為 WAV 的一半。</td>
+                                        <td>可重建原本的音訊樣本；壓縮比例視音訊內容及編碼設定而定。</td>
                                     </tr>
                                     <tr>
                                         <td class="font-bold text-indigo-600">AAC</td>
@@ -746,7 +625,7 @@
                         <i data-lucide="hard-drive" class="w-5 h-5 text-slate-500"></i> 未壓縮音訊檔案大小計算機
                     </h3>
                     <p class="text-sm text-slate-500 mb-4">公式：<code class="bg-slate-100 px-1 rounded">檔案大小 (bits) = 採樣率 × 採樣大小 × 聲道 × 時間</code></p>
-                    
+
                     <div class="grid md:grid-cols-5 gap-4 items-end">
                         <div class="col-span-1">
                             <label class="block text-xs font-bold mb-1 text-slate-500">採樣率 (Hz)</label>
@@ -853,7 +732,7 @@
                             <label class="block text-xs font-bold mb-1 text-slate-500">時間 (秒)</label>
                             <input type="number" id="vidTime" class="w-full p-2 border rounded" value="10">
                         </div>
-                        
+
                         <!-- Audio Toggle -->
                         <div class="col-span-1 lg:col-span-1 flex items-center h-[42px]">
                             <label class="flex items-center gap-2 cursor-pointer select-none text-xs font-bold text-slate-600">
@@ -911,7 +790,7 @@
             <button onclick="closeChallenge()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
-            
+
             <div class="text-center mb-6">
                 <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full mb-4">
                     <i data-lucide="zap" class="w-8 h-8"></i>
@@ -928,7 +807,7 @@
                 </div>
                 <div id="challengeFeedback" class="hidden mt-4 font-bold"></div>
             </div>
-            
+
             <div class="text-center">
                 <button onclick="generateChallenge()" class="text-indigo-600 text-sm font-bold hover:underline">換一題</button>
             </div>
@@ -946,14 +825,14 @@
 
         function setBase(base) {
             currentBase = base;
-            document.getElementById('btnBase2').className = base === 2 ? 
-                "px-4 py-2 rounded-md text-sm font-bold bg-white shadow text-indigo-600 transition" : 
+            document.getElementById('btnBase2').className = base === 2 ?
+                "px-4 py-2 rounded-md text-sm font-bold bg-white shadow text-indigo-600 transition" :
                 "px-4 py-2 rounded-md text-sm font-bold text-slate-500 hover:text-indigo-600 transition";
-            
-            document.getElementById('btnBase16').className = base === 16 ? 
-                "px-4 py-2 rounded-md text-sm font-bold bg-white shadow text-indigo-600 transition" : 
+
+            document.getElementById('btnBase16').className = base === 16 ?
+                "px-4 py-2 rounded-md text-sm font-bold bg-white shadow text-indigo-600 transition" :
                 "px-4 py-2 rounded-md text-sm font-bold text-slate-500 hover:text-indigo-600 transition";
-            
+
             if(!document.getElementById('division-result').classList.contains('hidden')) {
                 generateShortDivision();
             }
@@ -962,7 +841,7 @@
         function generateShortDivision() {
             const input = document.getElementById('decimalInput').value;
             const resultDiv = document.getElementById('division-result');
-            
+
             if (!/^[0-9]+$/.test(input) || !Number.isSafeInteger(Number(input)) || Number(input) > 65535) {
                 alert("請輸入 0 至 65535 的整數");
                 return;
@@ -976,7 +855,7 @@
             while (num > 0) {
                 let remainder = num % divisor;
                 let quotient = Math.floor(num / divisor);
-                
+
                 let remDisplay = remainder;
                 if (divisor === 16 && remainder >= 10) {
                     const hexChars = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -989,7 +868,7 @@
             steps.push({ div: divisor, val: 0, rem: '' });
 
             let html = `<div class="factorization-wrapper">`;
-            
+
             html += `<div class="divisors-column">`;
             for(let i=0; i<steps.length - 1; i++) {
                 html += `<div class="divisor">${steps[i].div}</div>`;
@@ -1007,7 +886,7 @@
                 html += `<div class="remainder">... ${steps[i].rem}</div>`;
             }
             html += `</div>`;
-            
+
             html += `</div>`;
 
             let resultStr = "";
@@ -1021,7 +900,7 @@
                     resultStr = rawRems.map(r => r.toString(16).toUpperCase()).join('');
                 }
             }
-            
+
             html += `<div class="ml-8 flex flex-col justify-center items-start">
                         <div class="text-sm text-slate-500 font-bold mb-2">讀取方向: 由下至上</div>
                         <div class="text-3xl font-mono text-indigo-600 font-bold border-2 border-indigo-200 px-4 py-2 rounded-lg bg-white">
@@ -1034,52 +913,12 @@
         }
 
         // ----------------------------------------------------
-        // 2. 二進制直式計算機
-        // ----------------------------------------------------
-        function calcBinary(op) {
-            const strA = document.getElementById('binA').value.trim();
-            const strB = document.getElementById('binB').value.trim();
-            const display = document.getElementById('calcDisplay');
-
-            if(!/^[01]{1,32}$/.test(strA) || !/^[01]{1,32}$/.test(strB)) {
-                display.innerHTML = "<span class='text-red-400 text-sm'>錯誤：請輸入 1 至 32 位二進制數字</span>";
-                return;
-            }
-
-            const maxLen = Math.max(strA.length, strB.length);
-            const numA = parseInt(strA, 2);
-            const numB = parseInt(strB, 2);
-            let res = 0;
-            let operator = '+';
-
-            if(op === 'add') {
-                res = numA + numB;
-                operator = '+';
-            } else {
-                res = numA - numB;
-                operator = '-';
-            }
-
-            let html = `<div class="binary-calc-box">`;
-            html += `<div class="calc-row">${strA.padStart(maxLen + 1, ' ')}</div>`;
-            html += `<div class="calc-row"><span class="calc-operator">${operator}</span>${strB.padStart(maxLen + 1, ' ')}</div>`;
-            html += `<div class="calc-line">${res < 0 ? '-' : ''}${Math.abs(res).toString(2).padStart(maxLen + 1, ' ')}</div>`;
-            html += `</div>`;
-            
-            html += `<div class="mt-4 text-xs text-slate-500 font-sans border-t pt-2 w-full text-center">
-                        (${numA} ${operator} ${numB} = ${res})
-                     </div>`;
-
-            display.innerHTML = html;
-        }
-
-        // ----------------------------------------------------
         // 3. 多媒體 Tabs & Size Calc & Text Inspector
         // ----------------------------------------------------
         function switchTab(tabId, btn) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            
+
             btn.classList.add('active');
             document.getElementById('content-' + tabId).classList.add('active');
             if (window.lucide) lucide.createIcons();
@@ -1114,7 +953,7 @@
             const w = document.getElementById('calcW').value;
             const h = document.getElementById('calcH').value;
             const d = document.getElementById('calcD').value;
-            
+
             if([w, h, d].every(v => Number.isInteger(Number(v)) && Number(v) > 0) && Number.isSafeInteger(w * h * d)) {
                 const bits = w * h * d;
                 const bytes = bits / 8;
@@ -1162,7 +1001,7 @@
             const depth = document.getElementById('vidDepth').value;
             const fps = document.getElementById('vidFps').value;
             const time = document.getElementById('vidTime').value;
-            
+
             const includeAudio = document.getElementById('includeAudio').checked;
             let audioBits = 0;
             let audioDetails = "";
@@ -1172,7 +1011,7 @@
                 const aRes = document.getElementById('vidAudRes').value;
                 const aCh = document.getElementById('vidAudCh').value;
                 audioBits = aRate * aRes * aCh * time;
-                
+
                 const audioBytes = audioBits / 8;
                 audioDetails = `<br><span class="text-xs text-amber-600">+ 音訊大小: ${formatBytes(audioBytes)}</span>`;
             }
@@ -1182,7 +1021,7 @@
                 const totalVideoBits = videoBitsPerFrame * fps * time;
                 const grandTotalBits = totalVideoBits + audioBits;
                 const grandTotalBytes = grandTotalBits / 8;
-                
+
                 document.getElementById('vidSizeResult').classList.remove('hidden');
                 document.getElementById('vidSizeResult').innerHTML = `
                     <strong>計算結果 (未壓縮)：</strong><br>
@@ -1197,125 +1036,6 @@
         }
 
         // ----------------------------------------------------
-        // 4. 8-bit Lab Logic
-        // ----------------------------------------------------
-        const bits = [0,0,0,0,0,0,0,0];
-
-        function initBitLab() {
-            const container = document.getElementById('bit-container');
-            container.innerHTML = '';
-            
-            bits.forEach((bit, index) => {
-                const div = document.createElement('button');
-                div.type = 'button';
-                div.setAttribute('aria-label', `第 ${index + 1} 位，值 ${bit}，按下切換`);
-                div.setAttribute('aria-pressed', String(Boolean(bit)));
-                div.className = `bit-switch ${bit ? 'on' : 'off'}`;
-                if (index === 0) div.style.borderColor = bit ? '#f43f5e' : '#e2e8f0'; 
-                if (index === 0 && bit) div.style.backgroundColor = '#f43f5e';
-                
-                let weightLabel = Math.pow(2, 7-index);
-                if (index === 0) weightLabel = "-128"; 
-
-                div.innerHTML = `
-                    ${bit}
-                    <span class="bit-value">${weightLabel}</span>
-                `;
-                div.onclick = () => toggleBit(index);
-                container.appendChild(div);
-            });
-            updateStats();
-        }
-
-        function toggleBit(index) {
-            bits[index] = bits[index] ? 0 : 1;
-            initBitLab();
-        }
-
-        function updateStats() {
-            const binStr = bits.join('');
-            const val = parseInt(binStr, 2);
-
-            document.getElementById('val-unsigned').innerText = val;
-
-            const signBit = bits[0];
-            const magnitude = parseInt(bits.slice(1).join(''), 2);
-            let smVal = magnitude;
-            if (signBit === 1) smVal = "-" + magnitude;
-            document.getElementById('val-signmag').innerText = smVal;
-
-            let tcVal = val;
-            if (val >= 128) tcVal = val - 256;
-            document.getElementById('val-twos').innerText = tcVal;
-
-            let calcStr = "";
-            let total = 0;
-            
-            if(bits[0] === 1) {
-                calcStr += `<span class="text-rose-600">(-128 × 1)</span>`;
-                total -= 128;
-            } else {
-                calcStr += `<span class="text-slate-400">(-128 × 0)</span>`;
-            }
-
-            for(let i=1; i<8; i++) {
-                const w = Math.pow(2, 7-i);
-                if(bits[i] === 1) {
-                    calcStr += ` + <span class="text-blue-600">(${w} × 1)</span>`;
-                    total += w;
-                } else {
-                    calcStr += ` + <span class="text-slate-400">(${w} × 0)</span>`;
-                }
-            }
-
-            calcStr += ` = <strong>${total}</strong>`;
-            document.getElementById('negative-weight-calc').innerHTML = calcStr;
-        }
-
-        initBitLab();
-
-        // ----------------------------------------------------
-        // 5. Converter Demo Logic
-        // ----------------------------------------------------
-        let twosDemoTimers = [];
-        function startTwosCompDemo() {
-            twosDemoTimers.forEach(clearTimeout); twosDemoTimers = [];
-            let raw = document.getElementById('convertInput').value;
-            let num = Number(raw);
-            if(!raw || !Number.isInteger(num) || num < 0 || num > 127) {
-                alert("請輸入 0 至 127 之間的整數");
-                return;
-            }
-
-            let bin = num.toString(2).padStart(8, '0');
-            document.getElementById('demo-orig').innerText = bin;
-            document.getElementById('step1-row').style.opacity = '1';
-            
-            document.getElementById('step2-row').style.opacity = '0.3';
-            document.getElementById('demo-inverted').innerText = '--------';
-            document.getElementById('step3-row').style.opacity = '0.3';
-            document.getElementById('demo-result').innerText = '--------';
-
-            twosDemoTimers.push(setTimeout(() => {
-                let inverted = "";
-                for(let char of bin) inverted += (char === '0' ? '1' : '0');
-                document.getElementById('demo-inverted').innerText = inverted;
-                document.getElementById('step2-row').style.opacity = '1';
-
-                twosDemoTimers.push(setTimeout(() => {
-                    let valInv = parseInt(inverted, 2);
-                    let resultVal = valInv + 1;
-                    let resultBin = resultVal.toString(2).padStart(8, '0');
-                    if(resultBin.length > 8) resultBin = resultBin.slice(-8);
-
-                    document.getElementById('demo-result').innerText = resultBin + ` (${num === 0 ? 0 : -num})`;
-                    document.getElementById('step3-row').style.opacity = '1';
-                }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1000));
-
-            }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 800));
-        }
-
-        // ----------------------------------------------------
         // 6. Random Challenge Logic
         // ----------------------------------------------------
         let currentChallenge = null;
@@ -1326,7 +1046,7 @@
             document.querySelector('.modal-enter')?.classList.remove('modal-enter');
             void modal.offsetWidth; // trigger reflow
             modal.querySelector('div').classList.add('modal-enter');
-            
+
             generateChallenge();
         }
 
@@ -1340,7 +1060,7 @@
             const qEl = document.getElementById('challengeQ');
             const ansInput = document.getElementById('challengeAns');
             const feedback = document.getElementById('challengeFeedback');
-            
+
             ansInput.value = '';
             feedback.classList.add('hidden');
             feedback.className = 'hidden mt-4 font-bold'; // Reset class
@@ -1382,7 +1102,7 @@
         function checkAnswer() {
             const userAns = document.getElementById('challengeAns').value.trim();
             const feedback = document.getElementById('challengeFeedback');
-            
+
             if(!userAns) return;
 
             if(userAns === currentChallenge.ans) {
@@ -1398,11 +1118,11 @@
 
     </script>
     <script src="course_data.js?v=8"></script><script src="assets/js/progress_store.js?v=3"></script>
-    <script src="assets/js/site_navigation.js?v=8&animations=1"></script>
+    <script src="assets/js/site_navigation.js?v=8&review=20261016"></script>
     <script src="question_data.js?v=3"></script>
     <script src="learning_data.js?v=14"></script>
-    <script src="assets/js/lesson_companion.js?v=8"></script>
-<script src="animations/assets/new-lessons.js"></script><script src="animations/assets/programming-lessons.js"></script><script src="animations/assets/programming-supplements.js"></script><script src="animations/assets/core-a-labs.js"></script><script src="animations/assets/network-labs.js"></script><script src="assets/js/animation-bridge.js?v=20261016"></script><script src="animations/assets/learning-lab.js?v=20261016"></script><script src="animations/assets/interactive-models.js?v=20261016"></script>
-<script src="assets/js/topic-data.js?v=20261016"></script><script src="assets/js/topic-network.js?v=20261016"></script><script src="assets/js/topic-algorithms.js?v=20261016"></script><script src="assets/js/topic-context.js?v=20261016"></script><script src="assets/js/topic-runtime.js?v=20261016"></script>
+    <script src="assets/js/lesson_companion.js?v=8&review=20261016"></script>
+<script src="animations/assets/new-lessons.js"></script><script src="animations/assets/programming-lessons.js"></script><script src="animations/assets/programming-supplements.js"></script><script src="animations/assets/core-a-labs.js"></script><script src="animations/assets/network-labs.js"></script><script src="assets/js/animation-bridge.js?v=20261016-review2"></script><script src="animations/assets/learning-lab.js?v=20261016-review2"></script><script src="animations/assets/interactive-models.js?v=20261016-review2"></script>
+<script src="assets/js/topic-data.js?v=20261016-review2"></script><script src="assets/js/topic-network.js?v=20261016-review2"></script><script src="assets/js/topic-algorithms.js?v=20261016-review2"></script><script src="assets/js/topic-context.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-data.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-network.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-algorithms.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-context.js?v=20261016-review2"></script><script src="assets/js/topic-runtime.js?v=20261016-review2"></script>
 </body>
 </html>

@@ -111,7 +111,7 @@
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
     </style>
     <link rel="stylesheet" href="assets/learning-lab.css">
-<link rel="stylesheet" href="../assets/css/topic-runtime.css?v=20261016"><link rel="stylesheet" href="../assets/css/topic-data.css?v=20261016"><link rel="stylesheet" href="../assets/css/topic-network.css?v=20261016"><link rel="stylesheet" href="../assets/css/topic-algorithms.css?v=20261016"><link rel="stylesheet" href="../assets/css/topic-context.css?v=20261016">
+<link rel="stylesheet" href="../assets/css/topic-runtime.css?v=20261016-review2"><link rel="stylesheet" href="../assets/css/topic-data.css?v=20261016-review2"><link rel="stylesheet" href="../assets/css/topic-network.css?v=20261016-review2"><link rel="stylesheet" href="../assets/css/topic-algorithms.css?v=20261016-review2"><link rel="stylesheet" href="../assets/css/topic-context.css?v=20261016-review2">
 </head>
 <body class="text-slate-800">
 
@@ -147,61 +147,27 @@
                     </h2>
                     <p class="text-sm text-slate-500 mt-1">解釋數據傳輸的原理：數據如何在網絡中被拆分與重組。</p>
                 </div>
-                <div class="flex gap-2">
-                    <button id="btn-start" onclick="startTransmission()" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-md">
-                        <i data-lucide="play" class="w-4 h-4"></i> 開始傳輸
-                    </button>
-                    <button id="btn-pause" onclick="togglePause()" class="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg font-bold transition shadow-md" disabled>
-                        <i data-lucide="pause" class="w-4 h-4"></i> 暫停
-                    </button>
-                    <button onclick="resetTransmission()" class="flex items-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg font-bold transition">
-                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i> 重置
-                    </button>
-                </div>
+
             </div>
 
-            <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 mb-6 rounded-r-xl">
-                <p id="status-text" class="text-indigo-900 font-medium">點擊「開始傳輸」觀察 TCP 與 IP 如何分工合作。</p>
-            </div>
+
 
             <!-- 實驗室畫布 -->
-            <div class="lab-container">
-                <div class="node-icon left-[10%] top-1/2">
-                    <i data-lucide="image" class="w-10 h-10 sm:w-12 sm:h-12 text-indigo-400 mx-auto"></i>
-                    <p class="text-[10px] mt-2 font-bold uppercase tracking-widest text-indigo-300">傳送端 (TCP)</p>
-                </div>
 
-                <div class="node-icon left-[90%] top-1/2 relative">
-                    <div id="receiver-image" class="hidden absolute -top-16 left-1/2 -translate-x-1/2 text-emerald-400 bg-slate-800 p-2 rounded-lg border border-emerald-500 shadow-lg z-30">
-                        <i data-lucide="image" class="w-8 h-8"></i>
-                    </div>
-                    <i data-lucide="monitor" class="w-10 h-10 sm:w-12 sm:h-12 text-emerald-400 mx-auto relative z-20"></i>
-                    <p class="text-[10px] mt-2 font-bold uppercase tracking-widest text-emerald-300">接收端 (TCP)</p>
-                </div>
-
-                <div class="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none z-10">
-                    <div class="w-full h-px bg-slate-500 border-dashed border-b-2 absolute"></div>
-                    <div class="absolute top-[25%] left-[35%] text-slate-400 flex flex-col items-center opacity-50"><i data-lucide="router" class="w-8 h-8 text-sky-400"></i></div>
-                    <div class="absolute top-[50%] left-[50%] text-slate-400 flex flex-col items-center opacity-50 -translate-y-1/2"><i data-lucide="router" class="w-8 h-8 text-indigo-400"></i></div>
-                    <div class="absolute top-[75%] left-[65%] text-slate-400 flex flex-col items-center opacity-50 -translate-y-full"><i data-lucide="router" class="w-8 h-8 text-amber-400"></i></div>
-                </div>
-
-                <div id="packets-area"></div>
-            </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
                 <div class="flex items-start gap-4">
                     <div class="bg-indigo-100 p-3 rounded-xl text-indigo-600"><i data-lucide="split"></i></div>
                     <div>
                         <h4 class="font-bold text-slate-800">1. 傳輸控制協定 (TCP)</h4>
-                        <p class="text-sm text-slate-500">負責將大型數據拆分成多個<b>封包 (Packets)</b>並編號；在接收端重新組合封包，確保數據準確無誤。</p>
+                        <p class="text-sm text-slate-500">把位元組串流分段，以位元組序號、確認與重傳提供可靠、有序的傳送；接收端重新組合資料。連線無法恢復時仍可能回報失敗。</p>
                     </div>
                 </div>
                 <div class="flex items-start gap-4">
                     <div class="bg-amber-100 p-3 rounded-xl text-amber-600"><i data-lucide="map"></i></div>
                     <div>
                         <h4 class="font-bold text-slate-800">2. 互聯網協定 (IP)</h4>
-                        <p class="text-sm text-slate-500">負責為每個封包加上目的地 IP 位址，並透過路由器尋找最佳傳輸路徑送達目的地。</p>
+                        <p class="text-sm text-slate-500">IP 封包的標頭包含來源及目的地位址；路由器按路由表逐站轉送。IP 本身不保證送達，也不保證一定採用最快路徑。</p>
                     </div>
                 </div>
             </div>
@@ -228,7 +194,7 @@
                         <h3 class="text-lg font-bold">IPv6 格式</h3>
                     </div>
                     <code class="text-sm block text-center py-4 text-emerald-700 font-bold break-all">2001:0DB8:AC10:FE01:0000:0000:0000:0001</code>
-                    <p class="text-sm text-slate-500 mt-2">使用十六進制表示，提供近乎無限的位址數量以解決 IPv4 枯竭問題。</p>
+                    <p class="text-sm text-slate-500 mt-2">使用十六進制分組表示，共有 2¹²⁸ 種位元組合，遠多於 IPv4，但並非無限。</p>
                 </div>
             </div>
 
@@ -265,18 +231,10 @@
                 <i data-lucide="search" class="text-indigo-600"></i> 2.3 網域名稱系統 (DNS)
             </h2>
             <p class="text-slate-600 mb-6">
-                因為人類很難記住像 <code>142.250.190.46</code> 這樣的 IP 位址，所以發明了<b>網域名稱系統 (DNS)</b>。它就像互聯網的「電話簿」，負責將人類易讀的域名（Domain Name）轉換為電腦使用的 IP 位址。
+                因為人類很難記住像 <code>192.0.2.80</code> 這樣的 IP 位址，所以發明了<b>網域名稱系統 (DNS)</b>。它就像互聯網的「電話簿」，負責將人類易讀的域名（Domain Name）轉換為電腦使用的 IP 位址。
             </p>
 
-            <div class="bg-slate-900 p-8 rounded-[2rem] text-center text-white shadow-lg">
-                <div class="flex max-w-md mx-auto bg-slate-800 rounded-xl overflow-hidden p-1 border border-slate-700">
-                    <input id="dns-input" type="text" value="www.hkeaa.edu.hk" class="bg-transparent flex-1 px-4 py-2 outline-none font-mono">
-                    <button onclick="simulateDNS()" class="bg-indigo-600 px-6 py-2 rounded-lg font-bold hover:bg-indigo-500 transition">DNS 解析</button>
-                </div>
-                <div id="dns-console" class="mt-6 font-mono text-left max-w-md mx-auto space-y-2 h-20 text-xs text-emerald-400 overflow-y-auto">
-                    > 等待輸入域名查詢...
-                </div>
-            </div>
+
         </section>
 
         <!-- 2.4 URL (包含連接埠) -->
@@ -284,36 +242,9 @@
             <h2 class="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2 border-b pb-4">
                 <i data-lucide="link" class="text-indigo-600"></i> 2.4 劃一資源定位符 (URL)
             </h2>
-            <p class="text-slate-600 mb-6">URL (Uniform Resource Locator) 就是我們常說的「網址」，用來指示網頁或檔案在互聯網上的確切位置。完整的 URL 包含以下四個部分：</p>
+            <p class="text-slate-600 mb-6">URL (Uniform Resource Locator) 就是我們常說的「網址」，用來指示網頁或檔案在互聯網上的確切位置。URL 可包含協定、主機、連接埠、路徑、查詢及片段；預設埠與部分選擇性項目可省略。</p>
 
-            <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                <!-- 網址拆解展示 -->
-                <div class="flex flex-wrap gap-2 text-lg sm:text-xl font-mono justify-center mb-8">
-                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded border border-blue-200 shadow-sm" title="通訊協定">https://</span>
-                    <span class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded border border-emerald-200 shadow-sm" title="網域名稱">www.school.edu.hk</span>
-                    <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded border border-purple-200 shadow-sm" title="連接埠">:443</span>
-                    <span class="px-2 py-1 bg-amber-100 text-amber-800 rounded border border-amber-200 shadow-sm" title="檔案路徑">/index.html</span>
-                </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="text-center p-4 bg-white rounded-xl shadow-sm border">
-                        <div class="font-bold text-blue-800 mb-1">1. 通訊協定</div>
-                        <p class="text-xs text-slate-500">指定使用的資料傳輸規則（如 HTTP/HTTPS 或 FTP）。</p>
-                    </div>
-                    <div class="text-center p-4 bg-white rounded-xl shadow-sm border">
-                        <div class="font-bold text-emerald-800 mb-1">2. 網域名稱</div>
-                        <p class="text-xs text-slate-500">識別互聯網上寄存該網頁的伺服器名稱。</p>
-                    </div>
-                    <div class="text-center p-4 bg-white rounded-xl shadow-sm border">
-                        <div class="font-bold text-purple-800 mb-1">3. 連接埠 (Port)</div>
-                        <p class="text-xs text-slate-500">指定伺服器提供服務的特定通道（HTTPS 預設為 443）。</p>
-                    </div>
-                    <div class="text-center p-4 bg-white rounded-xl shadow-sm border">
-                        <div class="font-bold text-amber-800 mb-1">4. 檔案路徑</div>
-                        <p class="text-xs text-slate-500">資源在伺服器上的特定資料夾與檔案名稱。</p>
-                    </div>
-                </div>
-            </div>
         </section>
 
         <!-- 2.5 常見網絡協定 (包含加密及電郵動畫) -->
@@ -372,7 +303,7 @@
                                 <i data-lucide="lock" class="w-4 h-4 text-emerald-600"></i> HTTPS (加密傳輸)
                             </h4>
                             <p class="text-sm text-slate-600 leading-relaxed mb-4">
-                                傳送前會將數據進行<b>加密 (Encryption)</b> 變成亂碼。黑客即使攔截也無法解讀，到達伺服器後才會解密。
+                                傳送前會將數據進行<b>加密 (Encryption)</b> 變成亂碼。妥善配置的 TLS 令攔截者難以讀取或竄改傳輸內容，伺服器端再解密；仍須保護端點及檢查證書。
                             </p>
                             <!-- HTTPS 動畫 -->
                             <div class="mt-auto relative h-20 bg-emerald-100/50 rounded-lg overflow-hidden flex items-center shadow-inner border border-emerald-200">
@@ -508,132 +439,6 @@
             ]);
         }
 
-        // TCP/IP 傳輸動畫邏輯
-        let step = 0;
-        let isPaused = false;
-        let timer = null;
-        let elapsed = 0;
-        let lastTick = 0;
-        const packets = [];
-        const statusText = document.getElementById('status-text');
-        const packetArea = document.getElementById('packets-area');
-        const btnStart = document.getElementById('btn-start');
-        const btnPause = document.getElementById('btn-pause');
-
-        function createPackets() {
-            packetArea.innerHTML = '';
-            packets.length = 0;
-            for (let i = 1; i <= 3; i++) {
-                const p = document.createElement('div');
-                p.className = 'packet';
-                p.id = `pkt-${i}`;
-                p.innerText = `#${i}`;
-                p.style.left = '20%';
-                p.style.top = `${25 + i * 15}%`;
-                packetArea.appendChild(p);
-                packets.push(p);
-            }
-        }
-
-        function startTransmission() {
-            if (timer !== null || step >= 4) return;
-            btnStart.disabled = true;
-            btnPause.disabled = false;
-            if (!packets.length) createPackets();
-            isPaused = false;
-            lastTick = performance.now();
-            runStepByStep();
-        }
-
-        function runStepByStep() {
-            if (isPaused) return;
-            const now = performance.now();
-            elapsed += now - lastTick;
-            lastTick = now;
-            const nextStep = Math.min(4, 1 + Math.floor(elapsed / 2800));
-            if (nextStep !== step) { step = nextStep; updateUIForStep(step); }
-            if (step === 3) {
-                const progress = Math.min(1, (elapsed - 5600) / 2800);
-                packets.forEach((p, idx) => {
-                    p.style.transition = 'none';
-                    p.style.left = `${20 + 55 * progress}%`;
-                    p.style.top = `${40 + idx * 15 + Math.sin(progress * Math.PI) * (idx - 1) * 15}%`;
-                });
-            }
-            if (elapsed >= 9200) {
-                timer = null;
-                btnPause.disabled = true;
-                const rxImg = document.getElementById('receiver-image');
-                if (rxImg) rxImg.classList.remove('hidden');
-                statusText.textContent = '傳輸成功！接收端 TCP 按序重組位元組串流；遺失資料可透過重傳補回。';
-                return;
-            }
-            timer = setTimeout(runStepByStep, 50);
-        }
-
-        function updateUIForStep(s) {
-            switch(s) {
-                case 1:
-                    statusText.innerText = "第一階段：TCP 把位元組串流分段並使用序號。#1–#3 是教學標籤；實際 TCP 序號按位元組計算。";
-                    packets.forEach(p => p.classList.add('visible'));
-                    break;
-                case 2:
-                    statusText.innerText = "第二階段：IP 為每個封包加上標頭 (Header)，內含目的地 IP 位址。";
-                    packets.forEach(p => p.classList.add('header'));
-                    break;
-                case 3:
-                    statusText.innerHTML = "第三階段：封包在互聯網傳輸。中間包含多個<span class='font-bold text-amber-500'>路由器 (Routers)</span>，引導它們走不同路徑！";
-                    packets.forEach((p, idx) => {
-                        p.style.transition = 'all 1.2s ease-in-out';
-                        p.style.left = idx === 0 ? '35%' : (idx === 1 ? '50%' : '65%');
-                        p.style.top = idx === 0 ? '25%' : (idx === 1 ? '50%' : '75%');
-                    });
-                    break;
-                case 4:
-                    statusText.innerText = "第四階段：接收端 TCP 檢查封包，重新組合成原始檔案。";
-                    packets.forEach((p, idx) => {
-                        p.style.left = '90%';
-                        p.style.top = '50%';
-                        p.style.opacity = '0';
-                        p.style.transform = 'translate(-50%, -50%) scale(0.5)';
-                    });
-                    break;
-            }
-        }
-
-        function togglePause() {
-            isPaused = !isPaused;
-            clearTimeout(timer);
-            timer = null;
-            btnPause.innerHTML = isPaused ?
-                '<i data-lucide="play" class="w-4 h-4"></i> 恢復' :
-                '<i data-lucide="pause" class="w-4 h-4"></i> 暫停';
-            lucide.createIcons();
-            if (!isPaused) { lastTick = performance.now(); runStepByStep(); }
-        }
-
-        function resetTransmission() {
-            step = 0;
-            isPaused = false;
-            clearTimeout(timer);
-            timer = null;
-            elapsed = 0;
-            packets.length = 0;
-            packetArea.innerHTML = '';
-
-            const rxImg = document.getElementById('receiver-image');
-            if(rxImg) {
-                rxImg.classList.add('hidden');
-                rxImg.classList.remove('animate-bounce');
-            }
-
-            statusText.innerText = "點擊「開始傳輸」觀察 TCP 與 IP 如何分工合作。";
-            btnStart.disabled = false;
-            btnPause.disabled = true;
-            btnPause.innerHTML = '<i data-lucide="pause" class="w-4 h-4"></i> 暫停';
-            lucide.createIcons();
-        }
-
         // ipconfig 模擬邏輯
         let ipconfigTimer = null;
         function runIpconfig() {
@@ -661,31 +466,10 @@
             typeWriter();
         }
 
-        // DNS 模擬邏輯
-        let dnsTimers = [];
-        function simulateDNS() {
-            dnsTimers.forEach(clearTimeout);
-            dnsTimers = [];
-            const input = document.getElementById('dns-input').value.trim();
-            const consoleBox = document.getElementById('dns-console');
-            consoleBox.style.whiteSpace = 'pre-wrap';
-            if (!/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}\.?$/i.test(input)) {
-                consoleBox.textContent = '> 請輸入有效域名，例如 www.example.com（不含 https:// 或路徑）。';
-                return;
-            }
-            consoleBox.textContent = `> 教學模擬（不會查詢真正 DNS）：${input}\n> 先檢查本機／解析器快取。`;
-            dnsTimers.push(setTimeout(() => {
-                consoleBox.textContent += '\n> 假設快取未命中，解析器向 DNS 伺服器查詢。';
-            }, 600));
-            dnsTimers.push(setTimeout(() => {
-                consoleBox.textContent += '\n> 模擬 A 記錄：192.0.2.80（文件示例位址，非該域名的真實 IP）。\n> DNS 回覆會按 TTL 快取；瀏覽器之後才建立連線。';
-                consoleBox.scrollTop = consoleBox.scrollHeight;
-            }, 1500));
-        }
     </script>
 <script src="assets/network-labs.js"></script>
-<script src="assets/learning-lab.js?v=20261016"></script>
-<script src="assets/host-navigation.js"></script>
-<script src="../assets/js/topic-data.js?v=20261016"></script><script src="../assets/js/topic-network.js?v=20261016"></script><script src="../assets/js/topic-algorithms.js?v=20261016"></script><script src="../assets/js/topic-context.js?v=20261016"></script><script src="../assets/js/topic-runtime.js?v=20261016"></script>
+<script src="assets/learning-lab.js?v=20261016-review2"></script>
+<script src="assets/host-navigation.js?v=20261016-review2"></script>
+<script src="../assets/js/topic-data.js?v=20261016-review2"></script><script src="../assets/js/topic-network.js?v=20261016-review2"></script><script src="../assets/js/topic-algorithms.js?v=20261016-review2"></script><script src="../assets/js/topic-context.js?v=20261016-review2"></script><script src="../assets/js/lesson-plan-data.js?v=20261016-review2"></script><script src="../assets/js/lesson-plan-network.js?v=20261016-review2"></script><script src="../assets/js/lesson-plan-algorithms.js?v=20261016-review2"></script><script src="../assets/js/lesson-plan-context.js?v=20261016-review2"></script><script src="../assets/js/topic-runtime.js?v=20261016-review2"></script>
 </body>
 </html>

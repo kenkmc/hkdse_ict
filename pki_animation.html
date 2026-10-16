@@ -9,7 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
-        
+
         body {
             font-family: 'Noto Sans TC', sans-serif;
             background-color: #f1f5f9;
@@ -79,13 +79,13 @@
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
     </style>
 <link rel="stylesheet" href="animations/assets/learning-lab.css"><link rel="stylesheet" href="animations/assets/core-a-labs.css"><link rel="stylesheet" href="animations/assets/interactive-models.css"><link rel="stylesheet" href="assets/css/animation-bridge.css">
-<link rel="stylesheet" href="assets/css/topic-runtime.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-data.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-network.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-algorithms.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-context.css?v=20261016">
+<link rel="stylesheet" href="assets/css/topic-runtime.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-data.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-network.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-algorithms.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-context.css?v=20261016-review2">
 </head>
 <body class="p-4">
     <div class="max-w-6xl mx-auto">
         <header class="mb-6 text-center">
             <h1 class="text-2xl font-bold text-slate-800">PKI 互動實戰：加密與數碼簽署</h1>
-            
+
             <!-- 場景切換器 -->
             <p class="text-sm text-slate-600 mt-2">金鑰可拖放，也可點擊或按 Enter 使用。此為概念模擬，不執行真實加密。</p>
             <div class="flex justify-center gap-2 mt-4 flex-wrap">
@@ -103,7 +103,7 @@
             <div class="xl:col-span-1 space-y-4">
                 <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
                     <h3 class="font-bold text-slate-700 mb-3 text-sm flex items-center gap-2">📦 密碼匙工具箱</h3>
-                    
+
                     <div class="space-y-3">
                         <!-- Alice -->
                         <div class="p-2 border border-red-100 rounded-lg bg-red-50/30">
@@ -139,7 +139,7 @@
                     <h3 class="font-bold text-slate-700 mb-2 text-sm">📡 數據流數據</h3>
                     <div id="sim-data" class="data-terminal">準備就緒...</div>
                 </div>
-                
+
                 <button onclick="location.reload()" class="w-full py-2 bg-slate-200 hover:bg-slate-300 text-slate-600 rounded-lg text-xs font-bold transition-all">🔄 重置實驗室</button>
             </div>
 
@@ -180,6 +180,7 @@
                         <p id="guide-text" class="text-blue-700 text-sm">請將 <b>Bob 的公開密碼匙 (藍色🔑)</b> 拖到郵件上來加密內容。</p>
                         <div class="flex gap-2 mt-3">
                             <button id="send-btn" class="hidden bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold hover:bg-blue-700 transition-all">發送 ➔</button>
+                            <button id="tamper-btn" class="hidden bg-amber-700 text-white px-4 py-1 rounded-full text-xs font-bold">竄改明文（保留原簽章）</button>
                             <button id="continue-btn" class="hidden bg-slate-600 text-white px-4 py-1 rounded-full text-xs font-bold hover:bg-slate-700 transition-all">數據繼續傳送 ➔</button>
                         </div>
                     </div>
@@ -195,6 +196,7 @@
         let step = 1; // 1: Alice, 2: Eve (Middle), 3: Bob
         let isProcessed = false;
         let isInTransit = false;
+        let hasTampered = false;
         let scenarioTimers = [];
         function scheduleScenario(fn, ms) { const id = setTimeout(fn, ms); scenarioTimers.push(id); return id; }
         const msg = "秘密：明天下午三點開會。";
@@ -205,10 +207,10 @@
             currentScenario = type;
             step = 1;
             isProcessed = false;
-            
+
             document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(type === 'confidentiality' ? 'btn-conf' : 'btn-auth').classList.add('active');
-            
+
             resetUI();
         }
 
@@ -216,10 +218,12 @@
             scenarioTimers.forEach(clearTimeout);
             scenarioTimers = [];
             isInTransit = false;
+            hasTampered = false;
+            document.getElementById('tamper-btn').classList.add('hidden');
             document.getElementById('toast').classList.remove('opacity-100');
             const packet = document.getElementById('main-packet');
             const path = document.getElementById('packet-path');
-            
+
             path.style.left = "0%";
             packet.classList.remove('shake', 'eve-intercept-active');
             document.getElementById('status-badge').innerText = "";
@@ -230,7 +234,7 @@
             document.getElementById('send-btn').classList.add('hidden');
             document.getElementById('continue-btn').classList.add('hidden');
             document.getElementById('eve-avatar').classList.add('opacity-30', 'grayscale');
-            
+
             if (currentScenario === 'confidentiality') {
                 updateGuide("場景：傳輸加密", "目標：確保只有 Bob 能看見內容。請將 <b>Bob 的公開密碼匙 (藍色🔑)</b> 拖到郵件上進行加密。");
             } else {
@@ -289,7 +293,7 @@
                 // Signed plaintext is readable; a signature provides no confidentiality.
                 const eveAvatar = document.getElementById('eve-avatar');
                 if (currentScenario === 'authentication') {
-                    updateDataDisplay(signedMsg, '#60a5fa');
+                    updateDataDisplay(hasTampered ? msg + '（已竄改）\n[原簽章保留]' : signedMsg, '#60a5fa');
                     showToast(key === 'alice-pub' ? 'Eve 也可用 Alice 的公開密碼匙驗證簽章；公開密碼匙可公開。' : 'Eve 可直接讀取明文；簽章沒有保密作用。她沒有 Alice 的私人密碼匙，不能替修改後的訊息產生有效簽章。', 'orange');
                 } else {
                     showToast('Eve 沒有 Bob 的私人密碼匙，不能用這把密碼匙解開寄給 Bob 的密文。', 'red');
@@ -306,6 +310,7 @@
                     }
                 } else {
                     if (key === 'alice-pub') {
+                        if (hasTampered) { finish('✕', '驗證失敗', msg + '（已竄改）', '#f87171', 'Bob 計算收到訊息的摘要，與原簽章不符。Eve 可閱讀及改寫明文，但沒有 Alice 私人密碼匙，不能替修改後的訊息產生有效簽章。', false); return; }
                         finish("✅", "已驗證", msg, "#10b981", "驗證成功！Bob 用可信的 Alice 公開密碼匙核對簽章及摘要，確認內容未被修改；公開密碼匙與身份的綁定仍須驗證。");
                     } else {
                         showToast("驗證失敗！需使用寄件人 Alice 的公開密碼匙來比對簽章。", "red");
@@ -329,34 +334,43 @@
             const path = document.getElementById('packet-path');
             const packet = document.getElementById('main-packet');
             const eveAvatar = document.getElementById('eve-avatar');
-            
+
             if (!isProcessed || step !== 1 || isInTransit) return;
             isInTransit = true;
             // 移動到中間 (Eve)
             path.style.left = "calc(50% - 48px)";
             document.getElementById('send-btn').classList.add('hidden');
             step = 2;
-            
+
             scheduleScenario(() => {
                 isInTransit = false;
                 eveAvatar.classList.remove('opacity-30', 'grayscale');
                 packet.classList.add('eve-intercept-active');
                 updateGuide("⚠️ 數據被攔截！", "封包目前在攻擊者 Eve 手中。試著將 <b>Eve 的密碼匙 (黑色工具區)</b> 拖到封包上進行破解。本頁展示的 Alice／Bob 私人密碼匙只是教學道具，真實私人密碼匙必須由擁有人保密。簽署模式的明文可直接閱讀。");
                 document.getElementById('continue-btn').classList.remove('hidden');
+                if (currentScenario === 'authentication') document.getElementById('tamper-btn').classList.remove('hidden');
             }, 700);
+        };
+
+        document.getElementById('tamper-btn').onclick = () => {
+            if (currentScenario !== 'authentication' || step !== 2 || isInTransit) return;
+            hasTampered = true;
+            updateDataDisplay(msg + '（已竄改）\n[原簽章保留]', '#f87171');
+            updateGuide('Eve 改寫了明文', '簽章沒有隱藏內容。繼續傳送給 Bob，觀察他以 Alice 公開密碼匙驗證時能否通過。');
         };
 
         document.getElementById('continue-btn').onclick = () => {
             const path = document.getElementById('packet-path');
             const packet = document.getElementById('main-packet');
-            
+
             if (step !== 2 || isInTransit) return;
+            document.getElementById('tamper-btn').classList.add('hidden');
             isInTransit = true;
             packet.classList.remove('eve-intercept-active');
             path.style.left = "calc(100% - 110px)";
             document.getElementById('continue-btn').classList.add('hidden');
             step = 3;
-            
+
             scheduleScenario(() => {
                 isInTransit = false;
                 if (currentScenario === 'confidentiality') {
@@ -367,14 +381,14 @@
             }, 700);
         };
 
-        function finish(icon, label, data, color, guide) {
+        function finish(icon, label, data, color, guide, success = true) {
             step = 4;
             document.getElementById('packet-icon').innerText = icon;
             document.getElementById('packet-label').innerText = label;
             document.getElementById('sim-data').innerText = data;
             document.getElementById('sim-data').style.color = color;
             document.getElementById('status-badge').innerText = "";
-            updateGuide("實驗成功！", guide + "<br><br><b>小結：</b>" + 
+            updateGuide(success ? "實驗成功！" : "驗證失敗：簽章與訊息不符", guide + "<br><br><b>小結：</b>" +
                 (currentScenario === 'confidentiality' ? "即使攻擊者攔截並擁有多把公開密碼匙，沒有正確的『私人密碼匙』依然無法窺探隱私。" : "數碼簽署用私人密碼匙對訊息摘要產生簽章，公開密碼匙用於驗證。它提供完整性及來源驗證的證據；仍須驗證公開密碼匙身份綁定及保障私人密碼匙，且不提供保密性。"));
         }
 
@@ -400,10 +414,10 @@
         resetUI();
     </script>
     <script src="course_data.js?v=8"></script><script src="assets/js/progress_store.js?v=3"></script>
-    <script src="assets/js/site_navigation.js?v=8&animations=1"></script>
+    <script src="assets/js/site_navigation.js?v=8&review=20261016"></script>
     <script src="learning_data.js?v=14"></script>
-    <script src="assets/js/lesson_companion.js?v=8"></script>
-<script src="animations/assets/new-lessons.js"></script><script src="animations/assets/programming-lessons.js"></script><script src="animations/assets/programming-supplements.js"></script><script src="animations/assets/core-a-labs.js"></script><script src="animations/assets/network-labs.js"></script><script src="assets/js/animation-bridge.js?v=20261016"></script><script src="animations/assets/learning-lab.js?v=20261016"></script><script src="animations/assets/interactive-models.js?v=20261016"></script>
-<script src="assets/js/topic-data.js?v=20261016"></script><script src="assets/js/topic-network.js?v=20261016"></script><script src="assets/js/topic-algorithms.js?v=20261016"></script><script src="assets/js/topic-context.js?v=20261016"></script><script src="assets/js/topic-runtime.js?v=20261016"></script>
+    <script src="assets/js/lesson_companion.js?v=8&review=20261016"></script>
+<script src="animations/assets/new-lessons.js"></script><script src="animations/assets/programming-lessons.js"></script><script src="animations/assets/programming-supplements.js"></script><script src="animations/assets/core-a-labs.js"></script><script src="animations/assets/network-labs.js"></script><script src="assets/js/animation-bridge.js?v=20261016-review2"></script><script src="animations/assets/learning-lab.js?v=20261016-review2"></script><script src="animations/assets/interactive-models.js?v=20261016-review2"></script>
+<script src="assets/js/topic-data.js?v=20261016-review2"></script><script src="assets/js/topic-network.js?v=20261016-review2"></script><script src="assets/js/topic-algorithms.js?v=20261016-review2"></script><script src="assets/js/topic-context.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-data.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-network.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-algorithms.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-context.js?v=20261016-review2"></script><script src="assets/js/topic-runtime.js?v=20261016-review2"></script>
 </body>
 </html>

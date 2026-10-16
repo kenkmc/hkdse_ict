@@ -40,8 +40,9 @@ for(let i=1;i<=5;i++){
   get('inputAge').value='24.5';ctx.validateForm();assert(get('validationResult').innerHTML.includes('年齡範圍錯誤'));
   get('hkidInput').value='A123456';ctx.calculateHKID();assert.equal(get('hkidDigit').textContent,'(3)');
   get('hkidInput').value='A123456<script>';ctx.calculateHKID();assert(ctx.lastAlert);
-  get('parityInput').value='1000001';ctx.runParityCheck('even');ctx.runParityCheck('odd');assert.equal(pending.size,1);
-  pending.forEach(fn=>fn());assert.equal(get('parityDisplay').children.at(-1).textContent,'1');
+  const html=fs.readFileSync(path.join(repo,'cha.2.html'),'utf8');
+  assert.equal((html.match(/id="parity-activity"/g)||[]).length,1,'one parity activity slot');
+  assert(!html.includes('id="parityInput"'),'superseded parity player must not remain');
 }
 {
   const {ctx,get}=context(3);
@@ -49,7 +50,7 @@ for(let i=1;i<=5;i++){
   get('decimalInput').value='2.5';ctx.generateShortDivision();assert(ctx.lastAlert.includes('65535'));
   assert.equal(ctx.formatBytes(1024),'1 KiB');
   get('calcW').value='640';get('calcH').value='480';get('calcD').value='24';ctx.calcFileSize();assert(get('sizeResult').innerHTML.includes('7,372,800'));
-  get('binA').value='1011';get('binB').value='0110';ctx.calcBinary('add');assert(get('calcDisplay').innerHTML.includes('10001'));
+  assert(!fs.readFileSync(path.join(repo,'cha.3.html'),'utf8').includes('id="convertInput"'),'one complement mechanism replaces the separate converter');
 }
 {
   const {ctx,get}=context(5);
@@ -61,4 +62,7 @@ for(let i=1;i<=5;i++){
   get('inputPK').value='<img src=x>';get('inputName').value='<script>';ctx.addRecord();const row=get('pkDemoBody').children[0];assert.equal(row.children[0].textContent,'<img src=x>');assert.equal(row.children[1].textContent,'<script>');
   ctx.moveProduct(1);assert.equal(get('productFormID').value,'P002');ctx.moveProduct(-1);assert.equal(get('productFormID').value,'P001');
 }
-console.log(`PASS: five page scripts, ${count} labs / ${steps} steps, section coverage, validation, parity replay, HKID, Unicode safety, binary, sizes, SQL, keys, form navigation.`);
+const dataContext={window:{}};vm.runInNewContext(fs.readFileSync(path.join(repo,'../assets/js/topic-data.js'),'utf8'),dataContext);const data=dataContext.window.ICTDataModels;
+const original=[1,0,0,0,0,0,1],code=original.concat(data.parity(original));assert.equal(data.parityValid(code),true);code[0]^=1;assert.equal(data.parityValid(code),false);code[1]^=1;assert.equal(data.parityValid(code),true);
+assert.equal(data.add(7,1,4).overflow,true);assert.equal(data.add(-1,1,4).carry,1);assert.equal(data.add(-1,1,4).overflow,false);
+console.log(`PASS: five page scripts, ${count} labs / ${steps} steps, section coverage, surviving validation/HKID/Unicode/size/SQL/key/form tools and replacement parity/arithmetic mechanisms.`);

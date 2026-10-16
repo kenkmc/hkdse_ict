@@ -6,17 +6,17 @@
     <link rel="stylesheet" href="assets/css/platform.css?v=4">
     <link rel="stylesheet" href="assets/css/learning.css?v=6">
     <title>HKDSE ICT SQL 學習平台</title>
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    
+
     <!-- Babel for JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
+
     <!-- SQL.js (WebAssembly SQLite) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
 
@@ -26,7 +26,7 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Microsoft JhengHei'; }
         .sql-editor { font-family: 'Courier New', Courier, monospace; }
-        
+
         /* Custom Scrollbar for tables and sidebar */
         .table-container::-webkit-scrollbar, .sidebar-scroll::-webkit-scrollbar { height: 8px; width: 8px; }
         .table-container::-webkit-scrollbar-track, .sidebar-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
@@ -35,12 +35,12 @@
     </style>
 <style>@media(max-width:768px){#root,#root>div{height:auto!important;min-height:100vh}#root header{flex-wrap:wrap;gap:.6rem}.sql-main-layout{flex-direction:column;overflow:visible!important;flex:none!important}.sql-main-layout>aside{width:100%;max-height:250px;flex:none}.sql-work-area{height:680px;min-height:680px;flex:none!important;width:100%}}</style>
 <link rel="stylesheet" href="animations/assets/learning-lab.css"><link rel="stylesheet" href="animations/assets/core-a-labs.css"><link rel="stylesheet" href="animations/assets/interactive-models.css"><link rel="stylesheet" href="assets/css/animation-bridge.css">
-<link rel="stylesheet" href="assets/css/topic-runtime.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-data.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-network.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-algorithms.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-context.css?v=20261016">
+<link rel="stylesheet" href="assets/css/topic-runtime.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-data.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-network.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-algorithms.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-context.css?v=20261016-review2">
 </head>
 <body class="bg-gray-50 text-gray-800">
     <div id="root" class="h-screen flex flex-col"></div>
 
-    <section id="sql-topic-labs" style="max-width:1100px;margin:2rem auto;padding:1rem"><h2 class="text-xl font-bold">逐步理解 SQL 與關聯資料庫</h2><p>以下動畫使用固定教學數據，與上方可編輯資料庫獨立。</p></section>
+
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
@@ -48,20 +48,20 @@
         const initSqlSchema = `
             CREATE TABLE STUDENT (
                 SID VARCHAR(4) NOT NULL PRIMARY KEY,
-                SName VARCHAR(20), 
-                SClass VARCHAR(2), 
+                SName VARCHAR(20),
+                SClass VARCHAR(2),
                 SGender VARCHAR(1)
             );
-            
+
             CREATE TABLE SUBJECT (
                 SubCode VARCHAR(4) NOT NULL PRIMARY KEY,
                 SubName VARCHAR(20)
             );
-            
+
             CREATE TABLE EXAM (
                 SID VARCHAR(4) NOT NULL,
                 SubCode VARCHAR(4) NOT NULL,
-                Mark INTEGER, 
+                Mark INTEGER,
                 PRIMARY KEY (SID, SubCode),
                 FOREIGN KEY (SID) REFERENCES STUDENT(SID),
                 FOREIGN KEY (SubCode) REFERENCES SUBJECT(SubCode)
@@ -174,23 +174,23 @@
                 try {
                     const tablesRes = database.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';");
                     if (tablesRes.length === 0) return {};
-                    
+
                     const tables = tablesRes[0].values.map(row => row[0]);
                     const schema = {};
-                    
+
                     tables.forEach(tableName => {
                         const infoRes = database.exec(`PRAGMA table_info('${tableName}');`);
                         const fkRes = database.exec(`PRAGMA foreign_key_list('${tableName}');`);
-                        
+
                         schema[tableName] = {
                             columns: infoRes.length > 0 ? infoRes[0].values.map(row => ({ name: row[1], type: row[2], notnull: row[3] > 0, pk: row[5] > 0 })) : [],
                             foreignKeys: fkRes.length > 0 ? fkRes[0].values.map(row => ({ table: row[2], from: row[3], to: row[4] })) : []
                         };
                     });
                     return schema;
-                } catch (e) { 
+                } catch (e) {
                     console.error("Schema extraction failed:", e);
-                    return {}; 
+                    return {};
                 }
             };
 
@@ -206,7 +206,7 @@
                         newDb.run(initSqlSchema);
                         setDb(newDb);
                         setIsLoading(false);
-                        
+
                         // Run initial query
                         executeSql(newDb, "SELECT * FROM STUDENT;");
                         setDbSchema(extractSchema(newDb)); // 初始化時載入結構
@@ -217,7 +217,7 @@
                     }
                 };
                 init();
-                
+
                 // Init Mermaid
                 mermaid.initialize({ startOnLoad: false, theme: 'default' });
             }, []);
@@ -235,10 +235,10 @@
                         try {
                             // 重新採用標準的 erDiagram，因為它能精確表示 Crow's foot (圓和三叉) 及 0 的概念
                             let mCode = "erDiagram\n";
-                            
+
                             // 1. 建立關係 (連線與中文文字)
                             Object.entries(dbSchema).forEach(([tableName, tableDef]) => {
-                                tableDef.foreignKeys.forEach(fk => { 
+                                tableDef.foreignKeys.forEach(fk => {
                                     if (dbSchema[fk.table]) {
                                         // fk.table (父表, 必須為1) ||--o{ tableName (子表, 允許為0到多)
                                         const fkCol = tableDef.columns.find(c => c.name === fk.from);
@@ -253,14 +253,14 @@
                                 mCode += `    ${tableName} {\n`;
                                 tableDef.columns.forEach(col => {
                                     const isFk = tableDef.foreignKeys.some(fk => fk.from === col.name);
-                                    let keys = []; 
-                                    if (col.pk) keys.push("PK"); 
+                                    let keys = [];
+                                    if (col.pk) keys.push("PK");
                                     if (isFk) keys.push("FK");
                                     const keyStr = keys.length > 0 ? keys.join(",") : "";
-                                    
+
                                     // 清理資料類型字串，確保沒有特殊字元破壞 Mermaid 語法
                                     const safeType = (col.type || "VARCHAR").replace(/\s+/g, '_');
-                                    
+
                                     mCode += `        ${safeType} ${col.name} ${keyStr}\n`;
                                 });
                                 mCode += `    }\n`;
@@ -268,11 +268,11 @@
 
                             mermaidRef.current.removeAttribute('data-processed');
                             const { svg } = await mermaid.render('er-diagram-svg', mCode);
-                            
+
                             // --- 魔法：將 Mermaid 原生的方形 Label Box 替換成 SVG 菱形 (符合 DSE 標準) ---
                             const parser = new DOMParser();
                             const doc = parser.parseFromString(svg, "image/svg+xml");
-                            
+
                             // 找出所有關係的文字背景框 (rect)
                             const labelBoxes = doc.querySelectorAll('rect.er.relationshipLabelBox');
                             labelBoxes.forEach(box => {
@@ -280,25 +280,25 @@
                                 const y = parseFloat(box.getAttribute('y') || 0);
                                 const width = parseFloat(box.getAttribute('width') || 40);
                                 const height = parseFloat(box.getAttribute('height') || 20);
-                                
+
                                 // 找出中心點
                                 const cx = x + width / 2;
                                 const cy = y + height / 2;
-                                
+
                                 // 設定菱形的寬高 (比原本的文字框稍大，確保文字被完整包覆)
-                                const rw = width + 30; 
-                                const rh = height + 30; 
-                                
+                                const rw = width + 30;
+                                const rh = height + 30;
+
                                 // 計算菱形的四個頂點座標
                                 const points = `${cx},${cy - rh/2} ${cx + rw/2},${cy} ${cx},${cy + rh/2} ${cx - rw/2},${cy}`;
-                                
+
                                 // 創建多邊形 (菱形)
                                 const polygon = doc.createElementNS("http://www.w3.org/2000/svg", "polygon");
                                 polygon.setAttribute("points", points);
                                 polygon.setAttribute("fill", "#e1f5fe"); // 淺藍底
                                 polygon.setAttribute("stroke", "#0288d1"); // 深藍邊框
                                 polygon.setAttribute("stroke-width", "2");
-                                
+
                                 // 將原有的方形替換成菱形 (文字保留在原位且會在最上層)
                                 box.parentNode.replaceChild(polygon, box);
                             });
@@ -365,7 +365,7 @@
 
                     {/* Main Content */}
                     <div className="sql-main-layout flex flex-1 overflow-hidden">
-                        
+
                         {/* Sidebar */}
                         <aside className="w-64 bg-white border-r border-gray-200 flex flex-col hidden md:flex">
                             <div className="p-4 border-b border-gray-200 flex-1 overflow-hidden flex flex-col">
@@ -381,9 +381,9 @@
                                             </summary>
                                             <div className="flex flex-col p-1.5 space-y-1 bg-white border-t border-gray-100">
                                                 {cat.examples.map((ex, j) => (
-                                                    <button 
+                                                    <button
                                                         key={j}
-                                                        onClick={() => handleExampleClick(ex.sql)} 
+                                                        onClick={() => handleExampleClick(ex.sql)}
                                                         className="text-left px-2 py-1.5 text-xs text-gray-600 hover:bg-blue-50 hover:text-blue-700 rounded transition whitespace-nowrap overflow-hidden text-ellipsis"
                                                         title={ex.name}
                                                     >
@@ -407,19 +407,19 @@
                         <main className="sql-work-area min-w-0 flex-1 flex flex-col relative">
                             {/* Tabs */}
                             <div className="flex flex-wrap bg-gray-200 px-2 pt-2 gap-1 border-b border-gray-300">
-                                <button 
+                                <button
                                     onClick={() => setActiveTab('sql')}
                                     className={`px-4 py-2 rounded-t-lg font-medium text-sm flex items-center gap-2 transition-colors ${activeTab === 'sql' ? 'bg-white text-blue-700 shadow-[0_-2px_5px_rgba(0,0,0,0.05)]' : 'bg-gray-300 text-gray-600 hover:bg-gray-100'}`}
                                 >
                                     <Icons.Code /> SQL 編輯器
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => setActiveTab('er')}
                                     className={`px-4 py-2 rounded-t-lg font-medium text-sm flex items-center gap-2 transition-colors ${activeTab === 'er' ? 'bg-white text-blue-700 shadow-[0_-2px_5px_rgba(0,0,0,0.05)]' : 'bg-gray-300 text-gray-600 hover:bg-gray-100'}`}
                                 >
                                     <Icons.Network /> 實體關係圖 (ER Diagram)
                                 </button>
-                                <button 
+                                <button
                                     onClick={() => setActiveTab('schema')}
                                     className={`px-4 py-2 rounded-t-lg font-medium text-sm flex items-center gap-2 transition-colors ${activeTab === 'schema' ? 'bg-white text-blue-700 shadow-[0_-2px_5px_rgba(0,0,0,0.05)]' : 'bg-gray-300 text-gray-600 hover:bg-gray-100'}`}
                                 >
@@ -429,7 +429,7 @@
 
                             {/* Tab Content */}
                             <div className="flex-1 overflow-hidden bg-white flex flex-col">
-                                
+
                                 {/* SQL Editor Tab */}
                                 {activeTab === 'sql' && (
                                     <div className="flex-1 flex flex-col h-full">
@@ -437,14 +437,14 @@
                                         <div className="h-1/2 border-b border-gray-300 flex flex-col relative group">
                                             <div className="bg-gray-800 text-gray-300 px-4 py-1.5 text-xs flex justify-between items-center">
                                                 <span>輸入 SQL 指令</span>
-                                                <button 
+                                                <button
                                                     onClick={handleRun}
                                                     className="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded flex items-center gap-1 font-bold transition-colors"
                                                 >
                                                     <Icons.Play /> 執行 (Run)
                                                 </button>
                                             </div>
-                                            <textarea 
+                                            <textarea
                                                 className="sql-editor flex-1 w-full p-4 bg-gray-900 text-blue-100 focus:outline-none resize-none"
                                                 value={query}
                                                 onChange={(e) => setQuery(e.target.value)}
@@ -465,7 +465,7 @@
                                                         <p className="font-mono mt-1 text-sm">{error}</p>
                                                     </div>
                                                 )}
-                                                
+
                                                 {results && !error && results.columns && (
                                                     <table className="min-w-full bg-white border border-gray-300 shadow-sm rounded-lg overflow-hidden text-sm">
                                                         <thead className="bg-gray-200 text-gray-700">
@@ -538,7 +538,7 @@
                                     <div className="flex-1 overflow-auto p-8 bg-gray-50 flex flex-col items-center">
                                         <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 max-w-4xl w-full">
                                             <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center border-b pb-4">數據庫模式 (Database Schema)</h2>
-                                            
+
                                             <div className="space-y-4 text-lg font-mono text-gray-800 my-8 pl-4">
                                                 {Object.entries(dbSchema).map(([tableName, tableDef]) => {
                                                     return (
@@ -559,7 +559,7 @@
                                                     <div className="text-center text-gray-500 italic">目前沒有任何資料表。請使用 SQL 建立。</div>
                                                 )}
                                             </div>
-                                            
+
                                             <div className="mt-8 p-4 bg-blue-50 rounded-lg text-sm text-gray-700">
                                                 <ul className="list-disc pl-5 space-y-2">
                                                     <li>此格式為 HKDSE 試卷中常見的「數據庫模式」(Database Schema) 表示法。</li>
@@ -581,10 +581,10 @@
         root.render(<App />);
     </script>
     <script src="course_data.js?v=8"></script><script src="assets/js/progress_store.js?v=3"></script>
-    <script src="assets/js/site_navigation.js?v=8&animations=1"></script>
+    <script src="assets/js/site_navigation.js?v=8&review=20261016"></script>
     <script src="learning_data.js?v=14"></script>
-    <script src="assets/js/lesson_companion.js?v=8"></script>
-<script src="animations/assets/new-lessons.js"></script><script src="animations/assets/programming-lessons.js"></script><script src="animations/assets/programming-supplements.js"></script><script src="animations/assets/core-a-labs.js"></script><script src="animations/assets/network-labs.js"></script><script src="assets/js/animation-bridge.js?v=20261016"></script><script src="animations/assets/learning-lab.js?v=20261016"></script><script src="animations/assets/interactive-models.js?v=20261016"></script>
-<script src="assets/js/topic-data.js?v=20261016"></script><script src="assets/js/topic-network.js?v=20261016"></script><script src="assets/js/topic-algorithms.js?v=20261016"></script><script src="assets/js/topic-context.js?v=20261016"></script><script src="assets/js/topic-runtime.js?v=20261016"></script>
+    <script src="assets/js/lesson_companion.js?v=8&review=20261016"></script>
+<script src="animations/assets/new-lessons.js"></script><script src="animations/assets/programming-lessons.js"></script><script src="animations/assets/programming-supplements.js"></script><script src="animations/assets/core-a-labs.js"></script><script src="animations/assets/network-labs.js"></script><script src="assets/js/animation-bridge.js?v=20261016-review2"></script><script src="animations/assets/learning-lab.js?v=20261016-review2"></script><script src="animations/assets/interactive-models.js?v=20261016-review2"></script>
+<script src="assets/js/topic-data.js?v=20261016-review2"></script><script src="assets/js/topic-network.js?v=20261016-review2"></script><script src="assets/js/topic-algorithms.js?v=20261016-review2"></script><script src="assets/js/topic-context.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-data.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-network.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-algorithms.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-context.js?v=20261016-review2"></script><script src="assets/js/topic-runtime.js?v=20261016-review2"></script>
 </body>
 </html>

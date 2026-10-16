@@ -31,18 +31,37 @@ const libraryMap={
 'elecb.1':['http-request','client-server'],'elecb.2':['dhcp-permissions'],'elecb.3':['css-cascade','web-dom'],'elecb.4':['webapp'],'elecb.5':['webapp','client-server'],
 'elecc.1':['python-memory'],'elecc.2':['numericprecision'],'elecc.3':['nestedloops'],'elecc.4':['callstack'],'elecc.5':['datastruct'],'elecc.6':['sorting','linearsearch'],'elecc.7':['filewrite'],'elecc.8':['sensor'],'sba.1':['testcycle'],
 'db_simulator':['databasequery','sql-group','join','transaction'],'pki_animation':['crypto-pki'],'python_converter':['flowchart','trace-machine','python-memory']};
-function init(){const path=location.pathname,id=path.split('/').pop().replace(/\.html$/,''),library=path.includes('/animations/');const topics=(library?libraryMap:hostMap)[id];if(!topics)return;
-const sims=(window.ICT_TOPIC_SIMS||[]).filter(sim=>sim.topics.some(t=>topics.includes(t)));
-const main=document.querySelector('main')||document.getElementById('root')?.parentElement||document.body;
-const target=E('div',undefined,'topic-laboratory');target.id='topic-laboratory';const nav=E('nav',undefined,'topic-jump');nav.setAttribute('aria-label','本課專用動畫');
-const lead=E('p','操作本課的概念模型：改變輸入，觀察位元、數據、設備或程式狀態實際如何改變。','topic-intro');target.append(lead,nav);
-// Place primary mechanisms before the lesson prose; preserve the existing lesson shell.
-if(library){const first=main.querySelector('.ict-objectives');if(first)first.after(target);else main.prepend(target);}else {const first=main.firstElementChild;if(first)first.after(target);else main.append(target);}
-sims.forEach(sim=>{const section=E('section',undefined,'topic-simulation');section.id='sim-'+sim.id;section.dataset.simId=sim.id;section.setAttribute('aria-labelledby',section.id+'-title');const h=E('h2',sim.title,'topic-sim-title');h.id=section.id+'-title';section.append(h,E('p',sim.description,'topic-sim-description'));const stage=E('div',undefined,'topic-sim-stage');section.append(stage);target.append(section);const link=E('a',sim.title);link.href='#'+section.id;nav.append(link);
-try{sim.mount(stage,{E,S,field,button,playback,onCleanup:fn=>cleanups.push(fn)});}catch(error){section.append(E('p','此模型未能初始化，請重新載入頁面。','topic-error'));console.error(sim.id,error);}
-});
-target.dataset.simCount=String(sims.length);
-if(location.hash){requestAnimationFrame(()=>{const anchor=document.getElementById(decodeURIComponent(location.hash.slice(1)));if(anchor&&target.contains(anchor))anchor.scrollIntoView();});}
+function init(){
+ const path=location.pathname,id=path.split('/').pop().replace(/[.]html$/,''),library=path.includes('/animations/'),key=(library?'animations/':'')+id;
+ const plans=window.ICT_LESSON_PLANS||{},hasPlan=Object.prototype.hasOwnProperty.call(plans,key);
+ const topics=(library?libraryMap:hostMap)[id];if(!hasPlan&&!topics)return;
+ const registry=window.ICT_TOPIC_SIMS||[],main=document.querySelector('main')||document.getElementById('root')?.parentElement||document.body;
+ const entries=hasPlan?plans[key]:registry.filter(sim=>sim.topics.some(t=>(topics||[]).includes(t))).map(sim=>({sim:sim.id}));
+ if(typeof window.ICT_LESSON_SETUP?.[key]==='function')window.ICT_LESSON_SETUP[key]();
+ const mounted=new Set();let first=null;
+ for(const entry of entries){
+  const sim=registry.find(s=>s.id===entry.sim);
+  if(!sim){console.error('Unknown lesson mechanism',key,entry.sim);continue;}
+  if(mounted.has(sim.id)){console.error('Repeated lesson mechanism',key,sim.id);continue;}
+  const slot=document.querySelector('[data-topic-sim="'+sim.id+'"]');
+  let target=slot;
+  if(!target&&entry.target){try{target=document.querySelector(entry.target);}catch(error){console.error('Invalid lesson placement',key,entry.target,error);}}
+  if(!target){if(hasPlan){console.error('Missing lesson section',key,sim.id,entry.target);continue;}target=main;}
+  const section=E('section',undefined,'topic-simulation topic-inline');section.id='sim-'+sim.id;section.dataset.simId=sim.id;section.setAttribute('aria-labelledby',section.id+'-title');
+  if(id==='python_converter')section.classList.add('topic-on-dark');
+  const heading=E(entry.headingLevel||'h3',entry.title||sim.title,'topic-sim-title');heading.id=section.id+'-title';section.append(heading);
+  if(entry.description!==false)section.append(E('p',entry.description||sim.description,'topic-sim-description'));
+  const stage=E('div',undefined,'topic-sim-stage');section.append(stage);
+  if(slot)slot.replaceChildren(section);
+  else if(entry.position==='before')target.before(section);
+  else if(entry.position==='after')target.after(section);
+  else if(entry.position==='prepend')target.prepend(section);
+  else{const quiz=Array.from(target.children).find(n=>n.classList?.contains('ict-section-check'));if(quiz)target.insertBefore(section,quiz);else target.append(section);}
+  try{sim.mount(stage,{E,S,field,button,playback,onCleanup:fn=>cleanups.push(fn)});mounted.add(sim.id);first??=section;}catch(error){section.append(E('p','此部分未能載入，請重新載入頁面。','topic-error'));console.error(sim.id,error);}
+ }
+ document.body.dataset.topicSimCount=String(mounted.size);
+ if(first){const anchor=E('span');anchor.id='topic-laboratory';anchor.setAttribute('aria-hidden','true');first.prepend(anchor);}
+ if(location.hash){requestAnimationFrame(()=>{let hash;try{hash=decodeURIComponent(location.hash.slice(1));}catch{return;}if(hash==='topic-laboratory'||hash.startsWith('sim-'))document.getElementById(hash)?.scrollIntoView();});}
 }
 document.addEventListener('visibilitychange',()=>{if(document.hidden)cleanups.forEach(fn=>fn());});window.addEventListener('pagehide',()=>cleanups.forEach(fn=>fn()));
 window.ICTTopicRuntime={hostMap,libraryMap};

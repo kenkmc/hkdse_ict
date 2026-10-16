@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 let intervalId = 0;
 const intervals = new Map();
-const sandbox = {window: {}, setInterval(fn, period) { const id = ++intervalId; intervals.set(id, {fn, period}); return id; }, clearInterval(id) { intervals.delete(id); }};
+const sandbox = {window: {}, TextEncoder, location:{pathname:'/cha.2.html'}, setInterval(fn, period) { const id = ++intervalId; intervals.set(id, {fn, period}); return id; }, clearInterval(id) { intervals.delete(id); }};
 vm.runInNewContext(fs.readFileSync(require('node:path').join(__dirname, '../assets/js/topic-data.js'), 'utf8'), sandbox);
 const M = sandbox.window.ICTDataModels;
 // Exhaustive signed encoding and add/subtract truth tables for both word sizes.
@@ -58,8 +58,16 @@ for (const mode of ['batch', 'timeshare', 'realtime']) {
 }
 assert.equal(M.schedule('batch').find(s => s.job === 'B' && s.completed).time + 1, 6);
 assert.equal(M.schedule('realtime').find(s => s.job === 'B' && s.completed).time + 1, 2);
-assert.equal(sandbox.window.ICT_TOPIC_SIMS.length, 13);
-console.log('PASS: exhaustive 4/8-bit two\'s-complement and arithmetic, parity limitations, references, query, quantization and scheduling. 13 simulations registered.');
+assert.equal(sandbox.window.ICT_TOPIC_SIMS.length, 22);
+assert.equal(M.rle('AAAABB').map(r=>r.char.repeat(r.count)).join(''),'AAAABB');
+assert.equal(M.rle('ABCDEF').length*2,12);
+assert.equal(M.subquery([40,60,80,null]).average,60);
+assert.equal(M.subquery([40,60,80,null]).selected.join(','),'80');
+assert.equal(M.subquery([40,60,80],true).selected.join(','),'60,80');
+assert.equal(M.subquery([null,null]).average,null);
+assert.equal(M.mutate([{id:'B1',copies:3}],'insert','B1',7).error,'主鍵重複，拒絕新增');
+assert.equal(M.mutate([{id:'B1',copies:3},{id:'B2',copies:4}],'update','B1',7,true).rows.map(r=>r.copies).join(','),'7,7');
+console.log('PASS: exhaustive 4/8-bit arithmetic, parity, references, SQL, quantization, scheduling, compression and subqueries. 22 mechanisms registered.');
 
 // Mount the real components, with browser-like string-valued form controls and
 // deterministic timer delivery. No implementation logic is reproduced here.
@@ -264,6 +272,92 @@ function mount(id) {
   assert.equal(s.one('td-audio-stream').textContent.split(' ').length, 8);
   assert.ok(s.one('td-audio-stream').textContent.split(' ').every(bits => bits.length === 2)); s.cleanup();
 }
-assert.equal(mounted.size, 13);
+{
+  const s=mount('data-hierarchy-explorer');assert.match(s.caption,/1 個 UTF-8 位元組/);
+  s.change('學生記錄','S02','input');assert.match(s.caption,/3 個 UTF-8 位元組，即 24 位元/);assert.equal(s.all('td-bitline').length,3);
+  assert.match(s.stage.textContent,/E4 B8 AD/);s.change('欄位','Class','input');assert.match(s.caption,/1 個 UTF-8 位元組/);
+  s.change('字符位置',2,'input');assert.match(s.stage.textContent,/42/);s.cleanup();
+}
+{
+  const s=mount('memory-address-power');assert.match(s.answer,/8 個位置 × 8 bits = 64 bits = 8 bytes/);
+  s.button('寫入 RAM').click();assert.match(s.caption,/37.*RAM\[3\]/);assert.match(s.stage.textContent,/00100101/);
+  s.button('儲存至 SSD').click();s.button('切換電源').click();assert.match(s.caption,/RAM 內容已失去/);
+  const rows=()=>walk(s.stage).find(n=>n.tagName==='tbody').children;
+  assert.equal(rows()[3].children[1].textContent,'未指定');assert.equal(rows()[3].children[2].textContent,'00100101');
+  s.button('寫入 RAM').click();assert.match(s.caption,/先開啟電源/);s.button('切換電源').click();
+  s.change('地址位元數',4,'input');assert.match(s.answer,/16 個位置/);s.change('每格字長（bits）',16,'input');
+  assert.match(s.answer,/256 bits = 32 bytes/);s.change('地址（十進制）',3.5,'input');assert.equal(s.field('地址（十進制）').value,'4');
+  s.change('寫入數值',37.6,'input');assert.equal(s.field('寫入數值').value,'38');s.cleanup();
+}
+{
+  const s=mount('os-print-service');s.finish();assert.equal(s.all('td-printed-pages')[0].children.length,3);assert.match(s.caption,/打印完成/);
+  s.reset();assert.equal(s.one('td-printed-pages').children.length,0);s.change('打印權限','deny','input');
+  s.finish();assert.match(s.caption,/拒絕未獲授權/);assert.equal(s.one('td-printed-pages').children.length,0);
+  s.change('打印權限','allow','input');s.change('裝置驅動程式','wrong','input');s.finish();assert.match(s.caption,/缺少合適驅動程式/);
+  s.change('裝置驅動程式','correct','input');s.change('文件頁數',5,'input');s.finish();assert.equal(s.one('td-printed-pages').children.length,5);
+  s.change('文件頁數',3.6,'input');assert.equal(s.field('文件頁數').value,'4');s.finish();assert.equal(s.one('td-printed-pages').children.length,4);
+  s.change('文件頁數',99,'input');assert.equal(s.field('文件頁數').value,'10');s.finish();assert.equal(s.one('td-printed-pages').children.length,10);s.cleanup();
+}
+{
+  const s=mount('lossless-run-length');s.finish();assert.match(s.answer,/原本 16 bytes；完成後 8 bytes/);
+  assert.equal(s.one('td-equation').textContent,'解碼：AAAAAABBBBCCAAAA');assert.match(s.caption,/與原文完全相同/);
+  s.change('原始字元（A–Z，最多 24 個）','ABCDEF','input');s.finish();assert.match(s.answer,/原本 6 bytes；完成後 12 bytes/);
+  assert.match(s.caption,/沒有節省空間/);s.reset();assert.equal(s.one('td-rle-runs').children.length,0);s.cleanup();
+}
+{
+  const s=mount('entity-relationship-bridge');const count=()=>walk(s.stage).find(n=>n.tagName==='tbody').children.length;
+  assert.equal(count(),3);s.button('新增選科').click();assert.match(s.caption,/複合主鍵.*已存在/);assert.equal(count(),3);
+  s.change('StudentID','S9','input');s.button('新增選科').click();assert.match(s.caption,/參照完整性/);assert.equal(count(),3);
+  s.change('StudentID','S2','input');s.change('CourseID','MATH','input');s.button('新增選科').click();assert.equal(count(),4);assert.match(s.caption,/S2 → MATH/);
+  s.button('重設選科').click();assert.equal(count(),3);s.cleanup();
+}
+{
+  const s=mount('sql-scalar-subquery');s.step();assert.match(s.one('td-inner-query').textContent,/回傳單值 60/);
+  s.finish();assert.equal(s.answer,'結果：80');s.change('外層比較','>=','input');s.finish();assert.equal(s.answer,'結果：60、80');
+  s.change('分數（逗號分隔，可用 NULL）','NULL,NULL','input');s.finish();assert.equal(s.answer,'結果：沒有符合記錄');assert.match(s.caption,/AVG 回傳 NULL/);
+  s.reset();assert.equal(s.all('td-answer').length,0);s.cleanup();
+}
+{
+  const s=mount('sql-row-mutation');s.finish();assert.equal(s.answer,'已更新 1 筆');
+  const rows=()=>walk(s.stage).find(n=>n.tagName==='tbody').children;assert.equal(rows()[1].children[1].textContent,'2');
+  s.change('WHERE 條件','all','input');s.finish();assert.equal(s.answer,'已更新 3 筆');assert.ok(rows().every(r=>r.children[1].textContent==='2'));
+  s.change('SQL 操作','insert','input');s.finish();assert.match(s.answer,/主鍵重複/);assert.equal(rows().length,3);
+  s.change('BookID','B4','input');s.finish();assert.equal(rows().length,4);assert.equal(s.answer,'已新增 1 筆');
+  s.change('SQL 操作','delete','input');s.change('WHERE 條件','all','input');s.finish();assert.equal(rows().length,0);s.reset();assert.equal(rows().length,3);
+  s.change('SQL 操作','update','input');s.change('WHERE 條件','key','input');s.change('BookID','B2','input');
+  for(const [entered,stored] of [[-5,0],[2.6,3],[150,100]]){s.change('Copies',entered,'input');assert.equal(s.field('Copies').value,String(stored));assert.ok(s.one('td-sql').textContent.includes('Copies = '+stored));s.finish();assert.equal(rows()[1].children[1].textContent,String(stored));}s.cleanup();
+}
+{
+  const s=mount('transitive-dependency');s.step();assert.match(s.caption,/更新異常/);s.finish();assert.equal(s.answer,'S1、S2 的班主任均為 陳老師');
+  assert.equal(s.all('td-table').length,2);s.change('5A 新班主任','王校長','input');s.finish();assert.match(s.answer,/王校長/);s.reset();assert.equal(s.all('td-table').length,1);s.cleanup();
+}
+{
+  const s=mount('hardware-component-map');const img=walk(s.host).find(n=>n.tagName==='img');assert.equal(img.width,1536);assert.equal(img.height,1024);
+  assert.equal(img.src,'assets/images/explainers/desktop-components.webp');assert.match(img.alt,/RAM、SSD/);assert.match(s.host.textContent,/並非接線圖/);s.cleanup();
+  sandbox.location.pathname='/animations/chb.2.html';const copy=mount('hardware-component-map');assert.equal(walk(copy.host).find(n=>n.tagName==='img').src,'../assets/images/explainers/desktop-components.webp');copy.cleanup();sandbox.location.pathname='/cha.2.html';
+}
+assert.equal(mounted.size, 22);
 assert.equal(intervals.size, 0, 'all actual transports must stop after completion/cleanup');
-console.log('PASS: all 13 real data/hardware mounts and interactions, including every two\'s-complement mode/preset, playback cleanup, cache buses, pixel editing and waveform samples.');
+console.log('PASS: all 22 data/hardware mechanisms mount and respond correctly; all step mechanisms complete/reset, semantic state changes, constraints, media and image paths verified.');
+
+// Check natural placements against actual native IDs / generated section IDs.
+const path=require('node:path'),repo=path.resolve(__dirname,'..'),placement={window:{}};
+vm.runInNewContext(fs.readFileSync(path.join(repo,'animations/assets/new-lessons.js'),'utf8'),placement);
+vm.runInNewContext(fs.readFileSync(path.join(repo,'assets/js/lesson-plan-data.js'),'utf8'),placement);
+const known=new Set(sandbox.window.ICT_TOPIC_SIMS.map(s=>s.id));
+const algorithmContext={window:{}};vm.runInNewContext(fs.readFileSync(path.join(repo,'assets/js/topic-algorithms.js'),'utf8'),algorithmContext);
+algorithmContext.window.ICT_TOPIC_SIMS.forEach(s=>known.add(s.id));
+assert.equal(Object.keys(placement.window.ICT_LESSON_PLANS).length,25);
+let placements=0;
+for(const [page,entries] of Object.entries(placement.window.ICT_LESSON_PLANS)){
+  const html=fs.readFileSync(path.join(repo,page+'.html'),'utf8');
+  const ids=new Set([...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));
+  const generated=html.match(/data-lesson="([^"]+)"/);
+  if(generated)placement.window.ICT_NEW_LESSONS[generated[1]].sections.forEach((s,i)=>ids.add(s.id||'topic-'+i));
+  const scenes=new Set();
+  for(const entry of entries){assert.ok(known.has(entry.sim),page+': missing mechanism '+entry.sim);assert.ok(ids.has(entry.target.slice(1)),page+': missing section '+entry.target);assert.ok(!scenes.has(entry.sim),page+': duplicate '+entry.sim);scenes.add(entry.sim);placements++;}
+  if(page.endsWith('cha.2')){assert.equal(entries.filter(e=>e.sim==='parity-transmission').length,1);assert.ok(!html.includes('id="parityInput"'));assert.ok(!html.includes('2. 偶校驗 (Even Parity)'));}
+  if(page.endsWith('db_simulator')){assert.equal(entries.length,0);assert.ok(!html.includes('id="sql-topic-labs"'));}
+}
+assert.ok(fs.existsSync(path.join(repo,'assets/images/explainers/desktop-components.webp')));
+console.log(`PASS: ${placements} section placements across 25 data/system/database pages; one parity activity per page and native SQL tools preserved.`);

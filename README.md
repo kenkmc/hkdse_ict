@@ -117,11 +117,17 @@ HTML5、JavaScript、Tailwind CSS、React、SQLite WebAssembly、Pyodide、Merma
 線上版本：https://kenkmc.github.io/hkdse_ict/
 
 
-## 課題專用動畫
+## 課題圖解與互動
 
-43個不同的互動模型按課題呈現位元、封包、資料表、程式記憶體及設備狀態，已接入30個主站頁面及42課獨立教材（另有3個工具）。例如二補碼有逐位反轉、進位與溢出；客戶端／伺服器有請求佇列、封包路徑及故障比較；SQL有逐列篩選與關聯配對；遞迴有真正增減的呼叫堆疊。原有129組逐步文字資料保留作補充說明。
+88 個教學元件按內容呈現位元與進位、網絡設備與封包、資料列與關聯、程式記憶體、陣列與呼叫框架，以及設備與社會情境。元件包括可操作模型及部件外形圖；同頁只保留一套解釋相同機制的操作，必要課文、原創題目與完整工具保留。
 
-[課題目錄](animations/index.html) · [課程對照](animations/curriculum.html) · [設計及模型限制](TOPIC_ANIMATIONS.md) · [整合記錄](ANIMATION_INTEGRATION.md)
+四份 `assets/js/lesson-plan-*.js` 為 75 個教材／工具頁指定相關段落，其中 71 頁共有 194 個安放位置，4 個 SQL／PKI 工具頁使用空計畫保留原完整工具。`topic-runtime.js` 把元件放在解說內、理解題之前；各課沿用原有目錄，沒有課首頁的模型合集。學習助手預設收合，供按需要展開。
+
+例如二補碼逐位反轉並分開呈現進位與有號溢出；客戶端／伺服器沿實際線路移動請求及回應；DNS 可重查快取並令 TTL 到期；CSS 使用原生選擇器改變同一元素；遞迴逐一建立及移除呼叫框架。精確圖解使用 HTML／SVG；硬件外形圖與已授權照片輔助辨認。
+
+[85 頁逐頁檢視及最新驗證](docs/PAGE_REVIEW.md) · [課題目錄](animations/index.html) · [課程對照](animations/curriculum.html) · [元件設計與模型界線](TOPIC_ANIMATIONS.md) · [整合歷史](ANIMATION_INTEGRATION.md) · [更新紀錄](updates/index.html)
+
+`docs/PAGE_REVIEW.md` 分開記錄原始碼檢視、75 頁段落掛載測試、瀏覽器載入／版面與代表性實際操作的範圍。早期 43 個模型、129 組逐步講解及 4 個可調模型的數字只適用於相應歷史版本。
 
 ```text
 node tests/topic-data.cjs

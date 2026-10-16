@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/platform.css?v=4"><link rel="stylesheet" href="assets/css/learning.css?v=6"><link rel="stylesheet" href="assets/css/system-lesson.css?v=1"><link rel="stylesheet" href="assets/css/internet-lesson.css?v=1">
 <link rel="stylesheet" href="animations/assets/learning-lab.css"><link rel="stylesheet" href="animations/assets/core-a-labs.css"><link rel="stylesheet" href="animations/assets/interactive-models.css"><link rel="stylesheet" href="assets/css/animation-bridge.css">
-<link rel="stylesheet" href="assets/css/topic-runtime.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-data.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-network.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-algorithms.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-context.css?v=20261016">
+<link rel="stylesheet" href="assets/css/topic-runtime.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-data.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-network.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-algorithms.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-context.css?v=20261016-review2">
 </head>
 <body class="internet-page">
     <nav class="sys-lesson-nav" aria-label="本課導覽"><a href="#html">HTML 結構</a><a href="#organisation">內容組織</a><a href="#design">受眾設計</a><a href="#publish">發布網站</a><a href="#dse-practice">DSE 練習</a></nav>
@@ -19,26 +19,13 @@
 
         <section id="html" class="sys-section" aria-labelledby="html-title">
             <div class="sys-section-heading"><div><p class="sys-kicker">01 · Interactive HTML anatomy</p><h2 id="html-title">HTML 描述內容結構</h2></div><span class="sys-tag">毋須背誦代碼</span></div>
-            <p class="sys-lead">點選元素查看功能。HTML 標記讓不同平台的瀏覽器理解內容類型；CSS 一般負責外觀，JavaScript 可提供行為。</p>
-            <div class="int-code-lab" data-code-lab>
-                <div class="int-code-window"><div class="int-window-bar">index.html · 結構示例</div><pre><code>&lt;!doctype html&gt;
-&lt;html lang="zh-Hant"&gt;
-  &lt;head&gt;
-    &lt;title&gt;校園開放日&lt;/title&gt;
-  &lt;/head&gt;
-  &lt;body&gt;
-    <span data-code-heading>&lt;h1&gt;校園開放日&lt;/h1&gt;</span>
-    <span data-code-paragraph>&lt;p&gt;歡迎家長和學生參觀。&lt;/p&gt;</span>
-    <span data-code-link>&lt;a href=&quot;map.html&quot;&gt;查看交通地圖&lt;/a&gt;</span>
-    <span data-code-image>&lt;img src=&quot;hall.jpg&quot; alt=&quot;學校禮堂入口&quot;&gt;</span>
-  &lt;/body&gt;
-&lt;/html&gt;</code></pre><div class="int-code-controls" role="group" aria-label="選擇 HTML 元素"><button type="button" data-code-tag="heading">標題</button><button type="button" data-code-tag="paragraph">段落</button><button type="button" data-code-tag="link">連結</button><button type="button" data-code-tag="image">圖像</button></div></div>
-                <div class="int-code-explanation"><p class="sys-label">Element role</p><h3 data-code-title></h3><p data-code-detail></p><div class="int-tag-list" data-code-tags></div><div class="int-note"><strong>跨平台重點：</strong>HTML 是公開標準；只要瀏覽器支援相關標準，同一結構可在不同操作系統和裝置呈現。實際外觀仍會受瀏覽器、CSS、字型和屏幕影響。</div></div>
-            </div>
+            <p class="sys-lead">編輯下方巢狀標記，並點選 DOM 節點對照網頁位置。HTML 標記讓不同平台的瀏覽器理解內容類型；CSS 一般負責外觀，JavaScript 可提供行為。</p>
+
         </section>
 
         <section id="organisation" class="sys-section" aria-labelledby="organisation-title">
             <div class="sys-section-heading"><div><p class="sys-kicker">02 · Information organisation</p><h2 id="organisation-title">先安排資訊，再選擇元素</h2></div></div>
+            <p class="int-note"><strong>文件骨架：</strong><code>head</code> 保存標題、編碼等文件資料；<code>body</code> 保存網頁內容。連結以 <code>a href</code> 指向目的地；圖像以 <code>img src</code> 指定資源、<code>alt</code> 提供替代文字。</p>
             <div class="int-grid-4">
                 <article class="sys-card"><p class="sys-label">Navigation</p><h3>導覽與連結</h3><p>主要選單位置和名稱保持一致；連結文字應描述目的地，並讓使用者知道目前位置。</p></article>
                 <article class="sys-card"><p class="sys-label">Table</p><h3>表格</h3><p>適合展示需要按列和欄比較的資料；不應純粹用表格堆砌整個頁面版面。</p></article>
@@ -77,8 +64,8 @@
         </section>
         <section class="sys-section sys-summary" aria-labelledby="summary-title"><div><p class="sys-kicker">Before you leave</p><h2 id="summary-title">三句答題自檢</h2><a class="sys-next-link" href="chc.5.html">下一課：網上威脅與保安 →</a></div><ol><li><span>1</span>我有沒有分清 HTML 結構、CSS 外觀和互動行為？</li><li><span>2</span>每項設計建議有沒有連結指定受眾？</li><li><span>3</span>發布前後有沒有測試資源路徑和公開網址？</li></ol></section>
     </main>
-    <script src="course_data.js?v=8"></script><script src="assets/js/progress_store.js?v=3"></script><script src="assets/js/site_navigation.js?v=8&animations=1"></script><script src="question_data.js?v=5"></script><script src="learning_data.js?v=14"></script><script src="assets/js/system-lessons.js?v=1"></script><script src="assets/js/internet-lessons.js?v=1"></script><script src="assets/js/lesson_companion.js?v=8"></script>
-<script src="animations/assets/new-lessons.js"></script><script src="animations/assets/programming-lessons.js"></script><script src="animations/assets/programming-supplements.js"></script><script src="animations/assets/core-a-labs.js"></script><script src="animations/assets/network-labs.js"></script><script src="assets/js/animation-bridge.js?v=20261016"></script><script src="animations/assets/learning-lab.js?v=20261016"></script><script src="animations/assets/interactive-models.js?v=20261016"></script>
-<script src="assets/js/topic-data.js?v=20261016"></script><script src="assets/js/topic-network.js?v=20261016"></script><script src="assets/js/topic-algorithms.js?v=20261016"></script><script src="assets/js/topic-context.js?v=20261016"></script><script src="assets/js/topic-runtime.js?v=20261016"></script>
+    <script src="course_data.js?v=8"></script><script src="assets/js/progress_store.js?v=3"></script><script src="assets/js/site_navigation.js?v=8&review=20261016"></script><script src="question_data.js?v=5"></script><script src="learning_data.js?v=14"></script><script src="assets/js/system-lessons.js?v=1"></script><script src="assets/js/internet-lessons.js?v=1"></script><script src="assets/js/lesson_companion.js?v=8&review=20261016"></script>
+<script src="animations/assets/new-lessons.js"></script><script src="animations/assets/programming-lessons.js"></script><script src="animations/assets/programming-supplements.js"></script><script src="animations/assets/core-a-labs.js"></script><script src="animations/assets/network-labs.js"></script><script src="assets/js/animation-bridge.js?v=20261016-review2"></script><script src="animations/assets/learning-lab.js?v=20261016-review2"></script><script src="animations/assets/interactive-models.js?v=20261016-review2"></script>
+<script src="assets/js/topic-data.js?v=20261016-review2"></script><script src="assets/js/topic-network.js?v=20261016-review2"></script><script src="assets/js/topic-algorithms.js?v=20261016-review2"></script><script src="assets/js/topic-context.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-data.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-network.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-algorithms.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-context.js?v=20261016-review2"></script><script src="assets/js/topic-runtime.js?v=20261016-review2"></script>
 </body>
 </html>

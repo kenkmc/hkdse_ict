@@ -14,10 +14,10 @@
         .header { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto 15px auto; transition: all 0.3s; }
         .header h1 { margin: 0; font-size: 1.5rem; color: #61dafb; display: flex; align-items: center; gap: 10px; }
         .lang-switch select { padding: 8px 12px; font-size: 14px; background: #333; color: white; border: 1px solid #555; border-radius: 4px; cursor: pointer; outline: none; }
-        
+
         .container { display: flex; gap: 20px; max-width: 1200px; margin: auto; min-height: 85vh; flex-wrap: wrap; align-items: stretch; transition: all 0.3s; }
         .panel { flex: 1; min-width: 320px; min-height: 500px; display: flex; flex-direction: column; background: #2d2d2d; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: all 0.3s; }
-        
+
         h2 { margin-top: 0; font-size: 1.2rem; color: #61dafb; display: flex; align-items: center; gap: 10px;}
         textarea { flex: 1; width: 100%; min-height: 300px; padding: 15px; font-family: 'Consolas', 'Courier New', monospace; font-size: 15px; border: 1px solid #444; border-radius: 6px; resize: none; box-sizing: border-box; background: #1e1e1e; color: #d4d4d4; line-height: 1.5; tab-size: 4;}
         textarea:focus { outline: none; border-color: #61dafb; }
@@ -34,28 +34,28 @@
         .success { background: #e8f5e9; color: #2e7d32; display: block !important; border-left: 5px solid #2e7d32; }
         .info { background: #e3f2fd; color: #1565c0; display: block !important; border-left: 5px solid #1565c0; }
         #output-area { flex: 1; min-height: 300px; border: 1px solid #444; border-radius: 6px; padding: 15px; background: #1e1e1e; overflow-y: auto; white-space: pre-wrap; font-family: 'Consolas', 'Courier New', monospace; font-size: 15px; color: #d4d4d4;}
-        
+
         #flow-editor-container { flex: 1; display: none; flex-direction: column; min-height: 450px; }
         .flow-toolbar { display: flex; gap: 8px; margin-bottom: 10px; background: #333; padding: 8px; border-radius: 6px; flex-wrap: wrap; align-items: center; }
         .flow-btn { padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; color: white; display: flex; align-items: center; gap: 5px; }
-        
+
         /* 支援捲動的大畫布容器 */
         #flow-workspace { flex: 1; width: 100%; min-height: 450px; background: #eceff1; border-radius: 6px; border: 1px solid #555; overflow: auto; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); transition: all 0.3s; }
         /* 實際的畫布大小 */
         #flow-canvas { position: relative; width: 1200px; height: 1200px; touch-action: none; transform-origin: top left; }
-        
+
         .flow-node { position: absolute; min-width: 120px; padding: 10px; background: white; border: 2px solid #333; display: flex; align-items: center; justify-content: center; cursor: move; user-select: none; box-shadow: 2px 2px 6px rgba(0,0,0,0.3); z-index: 10; font-size: 14px; color: #333; transition: box-shadow 0.2s; }
         .flow-node.selected { border-color: #ff5722; box-shadow: 0 0 12px #ff5722; z-index: 12; }
         .flow-node input { width: 90%; border: none; background: transparent; text-align: center; font-size: 14px; outline: none; font-weight: bold; font-family: 'Segoe UI', sans-serif; }
         .flow-node input::placeholder { color: #888; font-weight: normal; }
-        
+
         .connect-port { position: absolute; width: 14px; height: 14px; background-color: #2196f3; border: 2px solid #fff; border-radius: 50%; cursor: crosshair; z-index: 15; box-shadow: 0 0 4px rgba(0,0,0,0.5); display: none; transition: transform 0.1s, background-color 0.1s; }
         .connect-port:hover { transform: scale(1.4); background-color: #ff5722; }
         .port-top { top: -7px; left: 50%; margin-left: -7px; }
         .port-bottom { bottom: -7px; left: 50%; margin-left: -7px; }
         .port-left { left: -7px; top: 50%; margin-top: -7px; }
         .port-right { right: -7px; top: 50%; margin-top: -7px; }
-        
+
         .flow-node.selected .connect-port, .flow-node:hover .connect-port { display: block; }
 
         .node-start { border-radius: 30px; background: #c8e6c9; border-color: #388e3c; }
@@ -63,7 +63,7 @@
         .node-process { border-radius: 6px; background: #bbdefb; border-color: #1976d2; }
         .node-io { border-radius: 6px; background: #ffe082; border-color: #f57c00; transform: skewX(-10deg); }
         .node-io input { transform: skewX(10deg); }
-        
+
         .node-decision {
             background: url('data:image/svg+xml;utf8,<svg preserveAspectRatio="none" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><polygon points="50,2 98,50 50,98 2,50" fill="%23e1bee7" stroke="%238e24aa" stroke-width="3" stroke-linejoin="round"/></svg>') no-repeat center center;
             background-size: 100% 100%;
@@ -83,10 +83,10 @@
             z-index: 12;
         }
         .node-decision input { width: 100%; }
-        
+
         .edge-label-input {
-            width: 70px; height: 28px; 
-            border-radius: 4px; text-align: center; font-size: 13px; font-weight: bold; 
+            width: 70px; height: 28px;
+            border-radius: 4px; text-align: center; font-size: 13px; font-weight: bold;
             outline: none; font-family: sans-serif; box-shadow: 0 1px 4px rgba(0,0,0,0.3);
             transition: all 0.2s; box-sizing: border-box;
         }
@@ -97,13 +97,13 @@
         body.maximized .header { display: none; }
         body.maximized .container { max-width: 100%; width: 100vw; height: 100vh; margin: 0; gap: 0; }
         body.maximized .panel { border-radius: 0; min-height: 100vh; padding: 15px; }
-        body.maximized #right-panel { display: none; } 
-        body.maximized #flow-workspace { height: calc(100vh - 140px); } 
+        body.maximized #right-panel { display: none; }
+        body.maximized #flow-workspace { height: calc(100vh - 140px); }
 
     </style>
 <style>@media(max-width:700px){body{padding:12px}.header{flex-wrap:wrap;gap:10px}.container{min-width:0}.panel{box-sizing:border-box;min-width:0;width:100%;flex:1 1 100%;padding:14px}#example-select,#mode-select{min-width:0!important;max-width:100%;width:100%}.header h1{overflow-wrap:anywhere}}</style>
 <link rel="stylesheet" href="animations/assets/learning-lab.css"><link rel="stylesheet" href="animations/assets/core-a-labs.css"><link rel="stylesheet" href="animations/assets/interactive-models.css"><link rel="stylesheet" href="assets/css/animation-bridge.css">
-<link rel="stylesheet" href="assets/css/topic-runtime.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-data.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-network.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-algorithms.css?v=20261016"><link rel="stylesheet" href="assets/css/topic-context.css?v=20261016">
+<link rel="stylesheet" href="assets/css/topic-runtime.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-data.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-network.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-algorithms.css?v=20261016-review2"><link rel="stylesheet" href="assets/css/topic-context.css?v=20261016-review2">
 </head>
 <body>
 
@@ -138,9 +138,9 @@
         </div>
 
         <h2 id="input-title">✍️ 互動流程圖編輯器</h2>
-        
+
         <textarea id="python-code" style="display:none;" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'    '+v.substring(e);this.selectionStart=this.selectionEnd=s+4;return false;}"></textarea>
-        
+
         <div id="flow-editor-container" style="display: flex;">
             <div class="flow-toolbar">
                 <button class="flow-btn" onclick="window.flowApp.addNode('start')" style="background:#4caf50;">🟢 <span id="lbl-add-start">開始</span></button>
@@ -153,7 +153,7 @@
                 <button class="flow-btn" onclick="window.flowApp.clearAll()" style="background:#d32f2f;">🗑️ <span id="lbl-clear-all">清空</span></button>
                 <button class="flow-btn" onclick="toggleMaximize()" style="background:#607d8b; margin-left:auto;">🔲 <span id="lbl-maximize">最大化</span></button>
             </div>
-            
+
             <div id="flow-workspace">
                 <div id="flow-canvas">
                     <svg id="flow-lines" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1;">
@@ -195,7 +195,7 @@
 </div>
 
 <script>
-    try { if(typeof mermaid !== 'undefined') mermaid.initialize({ startOnLoad: true, theme: 'dark' }); } 
+    try { if(typeof mermaid !== 'undefined') mermaid.initialize({ startOnLoad: true, theme: 'dark' }); }
     catch(e) { console.warn("Mermaid載入失敗", e); }
 
     const i18n = {
@@ -226,113 +226,113 @@
     // === 漸進式且統一的教學範例庫 ===
     const universalExamples = [
         // --- 基礎篇 ---
-        { id: "b1", group: "[基礎]", name: "1. 簡單輸出 (Hello World)", 
-          py: 'print("Hello, World!")', 
+        { id: "b1", group: "[基礎]", name: "1. 簡單輸出 (Hello World)",
+          py: 'print("Hello, World!")',
           ps: '輸出 "Hello, World!"',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸出 Hello, World!",250,100), N("n3","end","結束",250,180)], edges: [E("n1","n2"), E("n2","n3")] } },
-        { id: "b2", group: "[基礎]", name: "2. 變數與輸出 (個人資料)", 
-          py: 'name = "小明"\nage = 15\nprint(name)\nprint(age)', 
+        { id: "b2", group: "[基礎]", name: "2. 變數與輸出 (個人資料)",
+          py: 'name = "小明"\nage = 15\nprint(name)\nprint(age)',
           ps: 'name = "小明"\nage = 15\n輸出 name\n輸出 age',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","process",'name = "小明"',250,100), N("n3","process","age = 15",250,180), N("n4","io","輸出 name",250,260), N("n5","io","輸出 age",250,340), N("n6","end","結束",250,420)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5"), E("n5","n6")] } },
-        { id: "b3", group: "[基礎]", name: "3. 讀取輸入 (打招呼)", 
-          py: 'name = input("輸入名字:")\nprint("你好:")\nprint(name)', 
+        { id: "b3", group: "[基礎]", name: "3. 讀取輸入 (打招呼)",
+          py: 'name = input("輸入名字:")\nprint("你好:")\nprint(name)',
           ps: '輸出 "輸入名字:"\n輸入 name\n輸出 "你好:"\n輸出 name',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 name",250,100), N("n3","io","輸出 你好:",250,180), N("n4","io","輸出 name",250,260), N("n5","end","結束",250,340)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5")] } },
-        { id: "b4", group: "[基礎]", name: "4. 數值輸入 (年齡計算)", 
-          py: 'age = int(input("輸入年齡:"))\nyear = 2024 - age\nprint("出生年份:")\nprint(year)', 
+        { id: "b4", group: "[基礎]", name: "4. 數值輸入 (年齡計算)",
+          py: 'age = int(input("輸入年齡:"))\nyear = 2024 - age\nprint("出生年份:")\nprint(year)',
           ps: '輸出 "輸入年齡:"\n輸入 age\nyear = 2024 - age\n輸出 "出生年份:"\n輸出 year',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 age",250,100), N("n3","process","year = 2024 - age",250,180), N("n4","io","輸出 出生年份:",250,260), N("n5","io","輸出 year",250,340), N("n6","end","結束",250,420)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5"), E("n5","n6")] } },
-        { id: "b5", group: "[基礎]", name: "5. 多重輸入 (長寬資訊)", 
-          py: 'w = input("輸入寬度:")\nh = input("輸入高度:")\nprint("寬與高:")\nprint(w)\nprint(h)', 
+        { id: "b5", group: "[基礎]", name: "5. 多重輸入 (長寬資訊)",
+          py: 'w = input("輸入寬度:")\nh = input("輸入高度:")\nprint("寬與高:")\nprint(w)\nprint(h)',
           ps: '輸出 "輸入寬度:"\n輸入 w\n輸出 "輸入高度:"\n輸入 h\n輸出 "寬與高:"\n輸出 w\n輸出 h',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 w",250,100), N("n3","io","輸入 h",250,180), N("n4","io","輸出 寬與高:",250,260), N("n5","io","輸出 w",250,340), N("n6","io","輸出 h",250,420), N("n7","end","結束",250,500)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5"), E("n5","n6"), E("n6","n7")] } },
 
         // --- 運算篇 ---
-        { id: "m1", group: "[運算]", name: "1. 加法計算機", 
-          py: 'a = int(input("數字1:"))\nb = int(input("數字2:"))\nc = a + b\nprint(c)', 
+        { id: "m1", group: "[運算]", name: "1. 加法計算機",
+          py: 'a = int(input("數字1:"))\nb = int(input("數字2:"))\nc = a + b\nprint(c)',
           ps: '輸出 "數字1:"\n輸入 a\n輸出 "數字2:"\n輸入 b\nc = a + b\n輸出 c',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 a",250,100), N("n3","io","輸入 b",250,180), N("n4","process","c = a + b",250,260), N("n5","io","輸出 c",250,340), N("n6","end","結束",250,420)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5"), E("n5","n6")] } },
-        { id: "m2", group: "[運算]", name: "2. 乘法 (總價計算)", 
-          py: 'price = 50\nqty = int(input("購買數量:"))\ntotal = price * qty\nprint("總價為:")\nprint(total)', 
+        { id: "m2", group: "[運算]", name: "2. 乘法 (總價計算)",
+          py: 'price = 50\nqty = int(input("購買數量:"))\ntotal = price * qty\nprint("總價為:")\nprint(total)',
           ps: 'price = 50\n輸出 "購買數量:"\n輸入 qty\ntotal = price * qty\n輸出 "總價為:"\n輸出 total',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","price = 50",250,100), N("n3","io","輸入 qty",250,180), N("n4","process","total = price * qty",250,260), N("n5","io","輸出 總價為:",250,340), N("n6","io","輸出 total",250,420), N("n7","end","結束",250,500)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5"), E("n5","n6"), E("n6","n7")] } },
-        { id: "m3", group: "[運算]", name: "3. 計算圓面積", 
-          py: 'r = float(input("輸入半徑:"))\narea = r * r * 3.14\nprint(area)', 
+        { id: "m3", group: "[運算]", name: "3. 計算圓面積",
+          py: 'r = float(input("輸入半徑:"))\narea = r * r * 3.14\nprint(area)',
           ps: '輸出 "輸入半徑:"\n輸入 r\narea = r * r * 3.14\n輸出 area',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 r",250,100), N("n3","process","area = r * r * 3.14",250,180), N("n4","io","輸出 area",250,260), N("n5","end","結束",250,340)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5")] } },
-        { id: "m4", group: "[運算]", name: "4. BMI 計算器", 
-          py: 'h = float(input("身高(m):"))\nw = float(input("體重(kg):"))\nbmi = w / (h * h)\nprint(bmi)', 
+        { id: "m4", group: "[運算]", name: "4. BMI 計算器",
+          py: 'h = float(input("身高(m):"))\nw = float(input("體重(kg):"))\nbmi = w / (h * h)\nprint(bmi)',
           ps: '輸出 "身高(m):"\n輸入 h\n輸出 "體重(kg):"\n輸入 w\nbmi = w / (h * h)\n輸出 bmi',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 h",250,100), N("n3","io","輸入 w",250,180), N("n4","process","bmi = w / (h * h)",250,260), N("n5","io","輸出 bmi",250,340), N("n6","end","結束",250,420)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5"), E("n5","n6")] } },
-        { id: "m5", group: "[運算]", name: "5. 餘數計算 (換算硬幣)", 
-          py: 'money = int(input("輸入金額:"))\ntens = money // 10\nones = money % 10\nprint("十元數量:")\nprint(tens)\nprint("一元數量:")\nprint(ones)', 
+        { id: "m5", group: "[運算]", name: "5. 餘數計算 (換算硬幣)",
+          py: 'money = int(input("輸入金額:"))\ntens = money // 10\nones = money % 10\nprint("十元數量:")\nprint(tens)\nprint("一元數量:")\nprint(ones)',
           ps: '輸出 "輸入金額:"\n輸入 money\ntens = money // 10\nones = money % 10\n輸出 "十元數量:"\n輸出 tens\n輸出 "一元數量:"\n輸出 ones',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 money",250,100), N("n3","process","tens = money // 10",250,180), N("n4","process","ones = money % 10",250,260), N("n5","io","輸出 tens",250,340), N("n6","io","輸出 ones",250,420), N("n7","end","結束",250,500)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5"), E("n5","n6"), E("n6","n7")] } },
 
         // --- 判斷篇 ---
-        { id: "c1", group: "[判斷]", name: "1. 單一判斷 (密碼檢查)", 
-          py: 'pwd = input("輸入密碼:")\nif pwd == "1234":\n    print("歡迎")\nprint("檢查完畢")', 
+        { id: "c1", group: "[判斷]", name: "1. 單一判斷 (密碼檢查)",
+          py: 'pwd = input("輸入密碼:")\nif pwd == "1234":\n    print("歡迎")\nprint("檢查完畢")',
           ps: '輸出 "輸入密碼:"\n輸入 pwd\n如果 pwd == "1234" 則\n    輸出 "歡迎"\n輸出 "檢查完畢"',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 pwd",250,100), N("n3","decision",'pwd == "1234"',250,180), N("n4","io","輸出 歡迎",100,280), N("n5","io","輸出 檢查完畢",250,380), N("n6","end","結束",250,460)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n5","否","right","top"), E("n4","n5","","bottom","left"), E("n5","n6")] } },
-        { id: "c2", group: "[判斷]", name: "2. 雙向判斷 (及格與否)", 
-          py: 'score = int(input("分數:"))\nif score >= 60:\n    print("及格")\nelse:\n    print("不及格")', 
+        { id: "c2", group: "[判斷]", name: "2. 雙向判斷 (及格與否)",
+          py: 'score = int(input("分數:"))\nif score >= 60:\n    print("及格")\nelse:\n    print("不及格")',
           ps: '輸出 "分數:"\n輸入 score\n如果 score >= 60 則\n    輸出 "及格"\n否則\n    輸出 "不及格"',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 score",250,100), N("n3","decision","score >= 60",250,180), N("n4","io","輸出 及格",100,280), N("n5","io","輸出 不及格",400,280), N("n6","end","結束",250,400)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n5","否","right","top"), E("n4","n6","","bottom","left"), E("n5","n6","","bottom","right")] } },
-        { id: "c3", group: "[判斷]", name: "3. 雙向判斷 (奇數與偶數)", 
-          py: 'num = int(input("整數:"))\nif num % 2 == 0:\n    print("偶數")\nelse:\n    print("奇數")', 
+        { id: "c3", group: "[判斷]", name: "3. 雙向判斷 (奇數與偶數)",
+          py: 'num = int(input("整數:"))\nif num % 2 == 0:\n    print("偶數")\nelse:\n    print("奇數")',
           ps: '輸出 "整數:"\n輸入 num\n如果 num % 2 == 0 則\n    輸出 "偶數"\n否則\n    輸出 "奇數"',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 num",250,100), N("n3","decision","num % 2 == 0",250,180), N("n4","io","輸出 偶數",100,280), N("n5","io","輸出 奇數",400,280), N("n6","end","結束",250,400)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n5","否","right","top"), E("n4","n6","","bottom","left"), E("n5","n6","","bottom","right")] } },
-        { id: "c4", group: "[判斷]", name: "4. 多重判斷 (購物折扣)", 
-          py: 'cost = int(input("金額:"))\nif cost >= 1000:\n    print("8折")\nelif cost >= 500:\n    print("9折")\nelse:\n    print("不打折")', 
+        { id: "c4", group: "[判斷]", name: "4. 多重判斷 (購物折扣)",
+          py: 'cost = int(input("金額:"))\nif cost >= 1000:\n    print("8折")\nelif cost >= 500:\n    print("9折")\nelse:\n    print("不打折")',
           ps: '輸出 "金額:"\n輸入 cost\n如果 cost >= 1000 則\n    輸出 "8折"\n否則如果 cost >= 500 則\n    輸出 "9折"\n否則\n    輸出 "不打折"',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 cost",250,100), N("n3","decision","cost >= 1000",250,180), N("n4","io","輸出 8折",100,280), N("n5","decision","cost >= 500",400,280), N("n6","io","輸出 9折",250,380), N("n7","io","輸出 不打折",550,380), N("n8","end","結束",250,500)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n5","否","right","top"), E("n5","n6","是","left","top"), E("n5","n7","否","right","top"), E("n4","n8","","bottom","left"), E("n6","n8","","bottom","top"), E("n7","n8","","bottom","right")] } },
-        { id: "c5", group: "[判斷]", name: "5. 多重判斷 (成績等第)", 
-          py: 's = int(input("分數:"))\nif s >= 90:\n    print("A")\nelif s >= 80:\n    print("B")\nelif s >= 70:\n    print("C")\nelse:\n    print("F")', 
+        { id: "c5", group: "[判斷]", name: "5. 多重判斷 (成績等第)",
+          py: 's = int(input("分數:"))\nif s >= 90:\n    print("A")\nelif s >= 80:\n    print("B")\nelif s >= 70:\n    print("C")\nelse:\n    print("F")',
           ps: '輸出 "分數:"\n輸入 s\n如果 s >= 90 則\n    輸出 "A"\n否則如果 s >= 80 則\n    輸出 "B"\n否則如果 s >= 70 則\n    輸出 "C"\n否則\n    輸出 "F"',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 s",250,100), N("n3","decision","s >= 90",250,180), N("n4","io","輸出 A",100,280), N("n5","decision","s >= 80",400,280), N("n6","io","輸出 B",250,380), N("n7","decision","s >= 70",550,380), N("n8","io","輸出 C",400,480), N("n9","io","輸出 F",700,480), N("n10","end","結束",250,600)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n5","否","right","top"), E("n5","n6","是","left","top"), E("n5","n7","否","right","top"), E("n7","n8","是","left","top"), E("n7","n9","否","right","top"), E("n4","n10","","bottom","left"), E("n6","n10","","bottom","left"), E("n8","n10","","bottom","right"), E("n9","n10","","bottom","right")] } },
 
         // --- 迴圈篇 ---
-        { id: "l1", group: "[迴圈]", name: "1. 倒數計時", 
-          py: 'n = 5\nwhile n > 0:\n    print(n)\n    n = n - 1\nprint("發射")', 
+        { id: "l1", group: "[迴圈]", name: "1. 倒數計時",
+          py: 'n = 5\nwhile n > 0:\n    print(n)\n    n = n - 1\nprint("發射")',
           ps: 'n = 5\n當 n > 0 執行\n    輸出 n\n    n = n - 1\n輸出 "發射"',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","n = 5",250,100), N("n3","decision","n > 0",250,180), N("n4","io","輸出 n",100,280), N("n5","process","n = n - 1",100,360), N("n6","io","輸出 發射",400,280), N("n7","end","結束",400,360)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n6","否","right","top"), E("n4","n5"), E("n5","n3","","left","left"), E("n6","n7")] } },
-        { id: "l2", group: "[迴圈]", name: "2. 順數計時", 
-          py: 'i = 1\nwhile i <= 5:\n    print(i)\n    i = i + 1\nprint("結束")', 
+        { id: "l2", group: "[迴圈]", name: "2. 順數計時",
+          py: 'i = 1\nwhile i <= 5:\n    print(i)\n    i = i + 1\nprint("結束")',
           ps: 'i = 1\n當 i <= 5 執行\n    輸出 i\n    i = i + 1\n輸出 "結束"',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","i = 1",250,100), N("n3","decision","i <= 5",250,180), N("n4","io","輸出 i",100,280), N("n5","process","i = i + 1",100,360), N("n6","io","輸出 結束",400,280), N("n7","end","結束",400,360)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n6","否","right","top"), E("n4","n5"), E("n5","n3","","left","left"), E("n6","n7")] } },
-                { id: "l2f", group: "[迴圈]", name: "3. for 迴圈 (印出 1 到 5)", 
-                    py: 'for i in range(1, 6):\n    print(i)\nprint("結束")', 
+                { id: "l2f", group: "[迴圈]", name: "3. for 迴圈 (印出 1 到 5)",
+                    py: 'for i in range(1, 6):\n    print(i)\nprint("結束")',
                     ps: '對於每個 i 在 range(1, 6) 執行\n    輸出 i\n輸出 "結束"',
                     fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","i = 1",250,100), N("n3","decision","i <= 5",250,180), N("n4","io","輸出 i",100,280), N("n5","process","i = i + 1",100,360), N("n6","io","輸出 結束",400,280), N("n7","end","結束",400,360)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n6","否","right","top"), E("n4","n5"), E("n5","n3","","left","left"), E("n6","n7")] } },
-                { id: "l2g", group: "[迴圈]", name: "4. for 迴圈 (印出偶數)", 
-                    py: 'for i in range(2, 11, 2):\n    print(i)\nprint("完成")', 
+                { id: "l2g", group: "[迴圈]", name: "4. for 迴圈 (印出偶數)",
+                    py: 'for i in range(2, 11, 2):\n    print(i)\nprint("完成")',
                     ps: '對於每個 i 在 range(2, 11, 2) 執行\n    輸出 i\n輸出 "完成"',
                     fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","i = 2",250,100), N("n3","decision","i <= 10",250,180), N("n4","io","輸出 i",100,280), N("n5","process","i = i + 2",100,360), N("n6","io","輸出 完成",400,280), N("n7","end","結束",400,360)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n6","否","right","top"), E("n4","n5"), E("n5","n3","","left","left"), E("n6","n7")] } },
-                { id: "l2h", group: "[迴圈]", name: "5. for 迴圈 (累加 1 到 5)", 
-                    py: 'total = 0\nfor i in range(1, 6):\n    total = total + i\nprint("總和:")\nprint(total)', 
+                { id: "l2h", group: "[迴圈]", name: "5. for 迴圈 (累加 1 到 5)",
+                    py: 'total = 0\nfor i in range(1, 6):\n    total = total + i\nprint("總和:")\nprint(total)',
                     ps: 'total = 0\n對於每個 i 在 range(1, 6) 執行\n    total = total + i\n輸出 "總和:"\n輸出 total',
                     fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","total = 0",250,100), N("n3","process","i = 1",250,180), N("n4","decision","i <= 5",250,260), N("n5","process","total = total + i",100,360), N("n6","process","i = i + 1",100,440), N("n7","io","輸出 總和:",400,360), N("n8","io","輸出 total",400,440), N("n9","end","結束",400,520)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5","是","left","top"), E("n4","n7","否","right","top"), E("n5","n6"), E("n6","n4","","left","left"), E("n7","n8"), E("n8","n9")] } },
-                { id: "l2i", group: "[迴圈]", name: "6. for 迴圈 (3 的乘法練習)", 
-                    py: 'for i in range(1, 10):\n    print(3 * i)\nprint("完成")', 
+                { id: "l2i", group: "[迴圈]", name: "6. for 迴圈 (3 的乘法練習)",
+                    py: 'for i in range(1, 10):\n    print(3 * i)\nprint("完成")',
                     ps: '對於每個 i 在 range(1, 10) 執行\n    輸出 3 * i\n輸出 "完成"',
                     fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","i = 1",250,100), N("n3","decision","i <= 9",250,180), N("n4","io","輸出 3 * i",100,280), N("n5","process","i = i + 1",100,360), N("n6","io","輸出 完成",400,280), N("n7","end","結束",400,360)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n6","否","right","top"), E("n4","n5"), E("n5","n3","","left","left"), E("n6","n7")] } },
-                { id: "l3", group: "[迴圈]", name: "7. 累加計算 (1加到N)", 
-          py: 'target = int(input("加到多少?"))\ntotal = 0\ni = 1\nwhile i <= target:\n    total = total + i\n    i = i + 1\nprint("總和:")\nprint(total)', 
+                { id: "l3", group: "[迴圈]", name: "7. 累加計算 (1加到N)",
+          py: 'target = int(input("加到多少?"))\ntotal = 0\ni = 1\nwhile i <= target:\n    total = total + i\n    i = i + 1\nprint("總和:")\nprint(total)',
           ps: '輸出 "加到多少?"\n輸入 target\ntotal = 0\ni = 1\n當 i <= target 執行\n    total = total + i\n    i = i + 1\n輸出 "總和:"\n輸出 total',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","io","輸入 target",250,100), N("n3","process","total = 0",250,180), N("n4","process","i = 1",250,260), N("n5","decision","i <= target",250,340), N("n6","process","total = total + i",100,440), N("n7","process","i = i + 1",100,520), N("n8","io","輸出 total",400,440), N("n9","end","結束",400,520)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4"), E("n4","n5"), E("n5","n6","是","left","top"), E("n5","n8","否","right","top"), E("n6","n7"), E("n7","n5","","left","left"), E("n8","n9")] } },
-                { id: "l4", group: "[迴圈]", name: "8. 密碼重試機制", 
-          py: 'pwd = ""\nwhile pwd != "1234":\n    pwd = input("請輸入密碼:")\nprint("登入成功")', 
+                { id: "l4", group: "[迴圈]", name: "8. 密碼重試機制",
+          py: 'pwd = ""\nwhile pwd != "1234":\n    pwd = input("請輸入密碼:")\nprint("登入成功")',
           ps: 'pwd = ""\n當 pwd != "1234" 執行\n    輸出 "請輸入密碼:"\n    輸入 pwd\n輸出 "登入成功"',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","process",'pwd = ""',250,100), N("n3","decision",'pwd != "1234"',250,180), N("n4","io","輸入 pwd",100,280), N("n5","io","輸出 登入成功",400,280), N("n6","end","結束",400,360)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n5","否","right","top"), E("n4","n3","","left","left"), E("n5","n6")] } },
-                { id: "l5", group: "[迴圈]", name: "9. 存錢筒 (累計到目標金額)", 
-          py: 'saved = 0\nwhile saved < 100:\n    add = int(input("存入金額:"))\n    saved = saved + add\n    print(saved)\nprint("目標達成!")', 
+                { id: "l5", group: "[迴圈]", name: "9. 存錢筒 (累計到目標金額)",
+          py: 'saved = 0\nwhile saved < 100:\n    add = int(input("存入金額:"))\n    saved = saved + add\n    print(saved)\nprint("目標達成!")',
           ps: 'saved = 0\n當 saved < 100 執行\n    輸出 "存入金額:"\n    輸入 add\n    saved = saved + add\n    輸出 saved\n輸出 "目標達成!"',
           fl: { nodes: [N("n1","start","開始",250,20), N("n2","process","saved = 0",250,100), N("n3","decision","saved < 100",250,180), N("n4","io","輸入 add",100,280), N("n5","process","saved = saved + add",100,360), N("n6","io","輸出 saved",100,440), N("n7","io","輸出 目標達成!",400,280), N("n8","end","結束",400,360)], edges: [E("n1","n2"), E("n2","n3"), E("n3","n4","是","left","top"), E("n3","n7","否","right","top"), E("n4","n5"), E("n5","n6"), E("n6","n3","","left","left"), E("n7","n8")] } }
     ];
 
     let currentLang = 'zh';
     let currentMode = 'flow';
-    let isMaximized = false; 
+    let isMaximized = false;
 
     function toggleMaximize() {
         isMaximized = !isMaximized;
@@ -343,13 +343,13 @@
         if (isMaximized) {
             body.classList.add('maximized');
             btnText.textContent = t.flowTools.restore;
-            document.getElementById('lbl-maximize').parentElement.style.background = '#e91e63'; 
+            document.getElementById('lbl-maximize').parentElement.style.background = '#e91e63';
         } else {
             body.classList.remove('maximized');
             btnText.textContent = t.flowTools.maximize;
             document.getElementById('lbl-maximize').parentElement.style.background = '#607d8b';
         }
-        
+
         setTimeout(() => { if(window.flowApp) window.flowApp.renderEdges(); }, 350);
     }
 
@@ -364,7 +364,7 @@
             document.addEventListener('mouseup', this.onMouseUp.bind(this));
             document.addEventListener('touchmove', this.onTouchMove.bind(this), {passive: false});
             document.addEventListener('touchend', this.onMouseUp.bind(this));
-            
+
             document.addEventListener('keydown', (e) => {
                 if ((e.key === 'Delete' || e.key === 'Backspace') && currentMode === 'flow') {
                     if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'SELECT') {
@@ -403,7 +403,7 @@
             const id = 'node_' + (++this.nodeCounter);
             let text = "";
             const t = i18n[currentLang];
-            
+
             if (type === 'start') text = t.flowTools.start;
             else if (type === 'end') text = t.flowTools.end;
 
@@ -411,7 +411,7 @@
             const scrollLeft = container.scrollLeft;
             const scrollTop = container.scrollTop;
             const viewW = container.clientWidth;
-            
+
             const node = { id, type, text, x: scrollLeft + viewW/2 - 60, y: scrollTop + 50 + (this.nodeCounter * 20) % 150 };
             this.nodes.push(node);
             this.selectNode(id);
@@ -420,7 +420,7 @@
 
         selectNode(id) {
             this.selectedNodeId = id;
-            if (id !== null) this.selectedEdgeIndex = null; 
+            if (id !== null) this.selectedEdgeIndex = null;
             this.renderNodes();
             this.renderEdges();
         },
@@ -452,7 +452,7 @@
             if (!el) return { x: 0, y: 0 };
             const w = el.offsetWidth, h = el.offsetHeight;
             const left = el.offsetLeft, top = el.offsetTop;
-            
+
             switch(pos) {
                 case 'top': return { x: left + w/2, y: top };
                 case 'bottom': return { x: left + w/2, y: top + h };
@@ -467,15 +467,15 @@
             this.connectingFromNode = nodeId;
             this.connectingFromPort = pos;
             this.selectNode(nodeId);
-            
+
             const coords = this.getPortCoords(nodeId, pos);
             this.tempLineStartX = coords.x;
             this.tempLineStartY = coords.y;
-            
+
             const tempLine = document.getElementById('temp-line');
             tempLine.setAttribute('x1', this.tempLineStartX);
             tempLine.setAttribute('y1', this.tempLineStartY);
-            
+
             let clientX = e.touches ? e.touches[0].clientX : e.clientX;
             let clientY = e.touches ? e.touches[0].clientY : e.clientY;
             const containerRect = document.getElementById('flow-canvas').getBoundingClientRect();
@@ -493,7 +493,7 @@
             this.offsetX = e.clientX - rect.left;
             this.offsetY = e.clientY - rect.top;
         },
-        
+
         onNodeTouchStart(e, id) {
             if (e.target.tagName === 'INPUT' || e.target.classList.contains('connect-port')) return;
             e.stopPropagation();
@@ -512,7 +512,7 @@
             // 允許在 1200x1200 畫布內拖曳
             this.draggedNode.x = Math.max(0, Math.min(x, 1200 - 120));
             this.draggedNode.y = Math.max(0, Math.min(y, 1200 - 40));
-            
+
             const el = document.getElementById(this.draggedNode.id);
             if(el) { el.style.left = this.draggedNode.x + 'px'; el.style.top = this.draggedNode.y + 'px'; }
             this.renderEdges();
@@ -528,8 +528,8 @@
                 this.handleDrag(e.clientX, e.clientY);
             }
         },
-        
-        onTouchMove(e) { 
+
+        onTouchMove(e) {
             if (this.connectingFromNode) {
                 e.preventDefault();
                 const containerRect = document.getElementById('flow-canvas').getBoundingClientRect();
@@ -546,30 +546,30 @@
             if (this.connectingFromNode) {
                 const tempLine = document.getElementById('temp-line');
                 tempLine.style.display = 'none';
-                
+
                 let clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
                 let clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
-                
+
                 const svgEl = document.getElementById('flow-lines');
                 const labelsEl = document.getElementById('labels-container');
                 const origSvgDisplay = svgEl.style.display;
                 const origLabelsDisplay = labelsEl.style.display;
-                
+
                 svgEl.style.display = 'none';
                 labelsEl.style.display = 'none';
-                
+
                 const targetEl = document.elementFromPoint(clientX, clientY);
-                
+
                 svgEl.style.display = origSvgDisplay;
                 labelsEl.style.display = origLabelsDisplay;
 
                 const nodeEl = targetEl ? targetEl.closest('.flow-node') : null;
-                
+
                 if (nodeEl && nodeEl.id !== this.connectingFromNode) {
                     const containerRect = document.getElementById('flow-canvas').getBoundingClientRect();
                     const dropX = clientX - containerRect.left;
                     const dropY = clientY - containerRect.top;
-                    
+
                     const w = nodeEl.offsetWidth, h = nodeEl.offsetHeight;
                     const left = nodeEl.offsetLeft, top = nodeEl.offsetTop;
                     const ports = [
@@ -583,17 +583,17 @@
 
                     const sourceNode = this.nodes.find(n => n.id === this.connectingFromNode);
                     let label = undefined;
-                    
+
                     if (sourceNode.type === 'decision') {
                         let existingEdgesCount = this.edges.filter(ed => ed.from === sourceNode.id).length;
                         label = existingEdgesCount === 0 ? "是" : (existingEdgesCount === 1 ? "否" : "");
                     }
-                    
+
                     if (!this.edges.some(e => e.from === this.connectingFromNode && e.to === nodeEl.id)) {
-                        this.edges.push({ 
-                            from: this.connectingFromNode, fromPort: this.connectingFromPort, 
-                            to: nodeEl.id, toPort: targetPort, 
-                            label: label 
+                        this.edges.push({
+                            from: this.connectingFromNode, fromPort: this.connectingFromPort,
+                            to: nodeEl.id, toPort: targetPort,
+                            label: label
                         });
                         this.renderEdges();
                     }
@@ -601,7 +601,7 @@
                 this.connectingFromNode = null;
                 this.connectingFromPort = null;
             }
-            this.draggedNode = null; 
+            this.draggedNode = null;
         },
 
         onInputChanged(e, id) {
@@ -612,7 +612,7 @@
         updateEdgeLabel(index, val) {
             if(this.edges[index]) {
                 this.edges[index].label = val.trim();
-                this.renderEdges(); 
+                this.renderEdges();
             }
         },
 
@@ -631,7 +631,7 @@
                 el.id = node.id;
                 el.style.left = node.x + 'px';
                 el.style.top = node.y + 'px';
-                
+
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.value = node.text;
@@ -642,7 +642,7 @@
                     input.style.cursor = 'pointer';
                 }
                 el.appendChild(input);
-                
+
                 ['top', 'bottom', 'left', 'right'].forEach(pos => {
                     const port = document.createElement('div');
                     port.className = `connect-port port-${pos}`;
@@ -662,10 +662,10 @@
             const svg = document.getElementById('lines-group');
             const labelsContainer = document.getElementById('labels-container');
             if(!svg || !labelsContainer) return;
-            
+
             svg.innerHTML = '';
-            labelsContainer.innerHTML = ''; 
-            
+            labelsContainer.innerHTML = '';
+
             const trueLabels = ['true', 't', 'yes', 'y', '是', '對', '成立'];
             const falseLabels = ['false', 'f', 'no', 'n', '否', '錯', '不成立'];
 
@@ -686,21 +686,21 @@
 
                 let baseColor = isTrue ? '#2e7d32' : (isFalse ? '#c62828' : '#333');
                 let marker = isTrue ? 'url(#arrowhead-true)' : (isFalse ? 'url(#arrowhead-false)' : 'url(#arrowhead)');
-                
+
                 let finalColor = isSelected ? '#ff5722' : baseColor;
                 let finalWidth = isSelected ? '4' : '2.5';
                 let finalMarker = isSelected ? 'url(#arrowhead-selected)' : marker;
 
                 let lineHTML = `<g class="edge-group" data-edge-index="${index}" style="pointer-events: auto; cursor: pointer;">`;
                 lineHTML += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="transparent" stroke-width="20"></line>`;
-                
+
                 if (y2 < y1 - 40 && Math.abs(x1 - x2) > 20) {
-                     let midX = Math.min(x1, x2) - 60; 
+                     let midX = Math.min(x1, x2) - 60;
                      lineHTML += `<polyline points="${x1},${y1} ${midX},${y1} ${midX},${y2} ${x2},${y2}" stroke="${finalColor}" fill="none" stroke-width="${finalWidth}" marker-end="${finalMarker}" stroke-dasharray="8,4"></polyline>`;
                 } else {
                      lineHTML += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${finalColor}" stroke-width="${finalWidth}" marker-end="${finalMarker}"></line>`;
                 }
-                
+
                 lineHTML += `</g>`;
                 svg.innerHTML += lineHTML;
 
@@ -716,10 +716,10 @@
                            onmousedown="event.stopPropagation()"
                            ontouchstart="event.stopPropagation()"
                            title="直接修改條件"
-                           style="position:absolute; left:${mx - 35}px; top:${my - 14}px; 
-                                  border: 2px solid ${borderColor}; background: ${bgCol}; color: ${txtCol}; 
+                           style="position:absolute; left:${mx - 35}px; top:${my - 14}px;
+                                  border: 2px solid ${borderColor}; background: ${bgCol}; color: ${txtCol};
                                   pointer-events:auto; z-index:4;">`;
-                                  
+
                     labelsContainer.innerHTML += labelHTML;
                 }
             });
@@ -765,10 +765,10 @@
                     if (node.text.trim()) codeStr += prefix + processTextToPython(node.text) + "\n";
                     outgoingEdges.forEach(e => traverse(e.to, indent, currentPathVisited));
                 } else if (node.type === 'decision') {
-                    let cond = node.text.trim() || "True"; 
+                    let cond = node.text.trim() || "True";
                     let trueEdges = outgoingEdges.filter(e => e.label && trueLabels.includes(e.label.trim().toLowerCase()));
                     let falseEdges = outgoingEdges.filter(e => e.label && falseLabels.includes(e.label.trim().toLowerCase()));
-                    
+
                     if (trueEdges.length === 0 && falseEdges.length === 0 && outgoingEdges.length > 0) {
                         trueEdges = [outgoingEdges[0]];
                         if (outgoingEdges.length > 1) falseEdges = [outgoingEdges[1]];
@@ -788,10 +788,10 @@
 
                     if (isWhileLoop) codeStr += prefix + "while " + cond + ":\n";
                     else codeStr += prefix + "if " + cond + ":\n";
-                    
+
                     let lenBeforeTrue = codeStr.length;
                     trueEdges.forEach(e => traverse(e.to, indent + 1, currentPathVisited));
-                    if (codeStr.length === lenBeforeTrue) codeStr += prefix + "    pass\n"; 
+                    if (codeStr.length === lenBeforeTrue) codeStr += prefix + "    pass\n";
 
                     if (falseEdges.length > 0 && !isWhileLoop) {
                         codeStr += prefix + "else:\n";
@@ -808,12 +808,12 @@
 
             let firstEdge = this.edges.find(e => e.from === startNode.id);
             if (firstEdge) traverse(firstEdge.to, 0, new Set([startNode.id]));
-            
+
             if (!codeStr.trim()) codeStr = "# 未產生程式碼，請確認連線箭頭是否從「開始」節點出發！";
 
             document.getElementById('python-code').value = codeStr;
             if(isMaximized) toggleMaximize();
-            
+
             document.getElementById('mode-select').value = 'python';
             changeMode();
             document.getElementById('output-area').textContent = "【 本機編譯結果 】\n\n" + codeStr;
@@ -829,14 +829,14 @@
         const exSelect = document.getElementById('example-select');
         const currentVal = exSelect.value; // 保留目前選擇
         exSelect.innerHTML = `<option value="">${t.defaultSelectExample}</option>`;
-        
+
         universalExamples.forEach(ex => {
             let opt = document.createElement('option');
             opt.value = ex.id;
             opt.textContent = `${ex.group} ${ex.name}`;
             exSelect.appendChild(opt);
         });
-        
+
         if (currentVal) {
             exSelect.value = currentVal;
             // 若有選擇，則強制切換內容
@@ -860,7 +860,7 @@
         } else if (currentMode === 'flow') {
             window.flowApp.nodes = JSON.parse(JSON.stringify(ex.fl.nodes));
             window.flowApp.edges = JSON.parse(JSON.stringify(ex.fl.edges));
-            
+
             let maxId = 0;
             window.flowApp.nodes.forEach(n => {
                 let match = n.id.match(/\d+/);
@@ -869,7 +869,7 @@
             window.flowApp.nodeCounter = maxId;
 
             window.flowApp.selectNode(null);
-            
+
             // 將畫布捲動回頂部
             document.getElementById('flow-workspace').scrollTo({top: 0, left: 0, behavior: 'smooth'});
         }
@@ -882,10 +882,10 @@
         document.getElementById('output-title').textContent = t.outputTitle;
         document.getElementById('mode-label').textContent = t.modeLabel;
         document.getElementById('example-label').textContent = t.exampleLabel;
-        
+
         const modeSelect = document.getElementById('mode-select');
         modeSelect.options[0].text = t.modeFlow; modeSelect.options[1].text = t.modePy; modeSelect.options[2].text = t.modePs;
-        
+
         document.getElementById('btn-compile-flow').textContent = t.btnCompileFlow;
         document.getElementById('lbl-add-start').textContent = t.flowTools.start;
         document.getElementById('lbl-add-end').textContent = t.flowTools.end;
@@ -896,14 +896,14 @@
         document.getElementById('lbl-clear-all').textContent = t.flowTools.clear;
         document.getElementById('lbl-maximize').textContent = isMaximized ? t.flowTools.restore : t.flowTools.maximize;
         document.getElementById('flow-hint').textContent = t.flowTools.hint;
-        
-        changeMode(); 
+
+        changeMode();
     }
 
     function changeMode() {
         currentMode = document.getElementById('mode-select').value;
         const t = i18n[currentLang];
-        
+
         if(isMaximized && currentMode !== 'flow') toggleMaximize();
 
         document.getElementById('status-msg').style.display = 'none';
@@ -914,14 +914,14 @@
 
         if (currentMode === 'python' || currentMode === 'pseudo') {
             document.getElementById('input-title').textContent = currentMode === 'python' ? t.inputTitlePy : t.inputTitlePs;
-            document.getElementById('python-code').style.display = 'block'; 
+            document.getElementById('python-code').style.display = 'block';
             document.getElementById('python-code').placeholder = currentMode === 'python' ? t.placeholderPy : t.placeholderPs;
             document.getElementById('btn-group-standard').style.display = 'flex';
-            
+
             document.getElementById('btn-check').style.display = currentMode === 'python' ? 'inline-block' : 'none';
             document.getElementById('btn-pseudo').style.display = currentMode === 'python' ? 'inline-block' : 'none';
             document.getElementById('btn-to-python').style.display = currentMode === 'pseudo' ? 'inline-block' : 'none';
-            
+
             document.getElementById('btn-check').textContent = t.btnCheck;
             document.getElementById('btn-pseudo').textContent = t.btnPseudo;
             document.getElementById('btn-to-python').textContent = t.btnToPython;
@@ -935,10 +935,10 @@
             setTimeout(() => window.flowApp.renderEdges(), 50);
         }
 
-        updateExampleOptions(); 
+        updateExampleOptions();
     }
 
-    function setStatus(msg, type) { 
+    function setStatus(msg, type) {
         const statusEl = document.getElementById('status-msg');
         statusEl.textContent = msg; statusEl.className = type; statusEl.style.display = 'block';
     }
@@ -971,7 +971,7 @@
             if(commentIdx !== -1) line = line.substring(0, commentIdx);
 
             if (line.trim() === '') {
-                if(lines[i].trim() !== '') continue; 
+                if(lines[i].trim() !== '') continue;
                 pseudoLines.push('');
                 continue;
             }
@@ -982,7 +982,7 @@
             let inputMatch = text.match(/^([a-zA-Z0-9_]+)\s*=\s*(?:int|float|str)?\s*\(\s*input\s*\(\s*(.*?)\s*\)\s*\)*$/);
             if (inputMatch) {
                 let varName = inputMatch[1];
-                let prompt = inputMatch[2]; 
+                let prompt = inputMatch[2];
                 if (prompt) pseudoLines.push(indent + `${t.pseudo.output} ${prompt}`);
                 pseudoLines.push(indent + `${t.pseudo.input} ${varName}`);
                 continue;
@@ -1007,7 +1007,7 @@
             if (line.trim() === '') return '';
             let indent = line.match(/^[ \t]*/)[0];
             let text = line.trim()
-                .replace(/\^/g, '**') 
+                .replace(/\^/g, '**')
                 .replace(/^(FUNCTION|函數)\s+(.*?)\((.*?)\)\s+(BEGIN|開始)/i, "def $2($3):")
                 .replace(/^(IF|如果)\s+(.*?)\s+(THEN|則)/i, "if $2:")
                 .replace(/^(ELSE IF|否則如果)\s+(.*?)\s+(THEN|則)/i, "elif $2:")
@@ -1015,7 +1015,7 @@
                 .replace(/^(FOR EACH|對於每個)\s+(.*?)\s+(IN|在)\s+(.*?)\s+(DO|執行)/i, "for $2 in $4:")
                 .replace(/^(WHILE|當)\s+(.*?)\s+(DO|執行)/i, "while $2:")
                 .replace(/^(OUTPUT|輸出)\s+(.*)/i, "print($2)")
-                .replace(/^(INPUT|輸入)\s+(.*)/i, "$2 = input()"); 
+                .replace(/^(INPUT|輸入)\s+(.*)/i, "$2 = input()");
             return indent + text;
         }).join('\n');
     }
@@ -1067,10 +1067,10 @@
         }
 
         for (let i = 0; i < lines.length; i++) {
-            let line = lines[i]; 
+            let line = lines[i];
             let commentIdx = line.indexOf('#');
             if (commentIdx !== -1) line = line.substring(0, commentIdx);
-            
+
             let stripped = line.trim();
             if (!stripped) continue;
             let indent = line.match(/^[ \t]*/)[0].length;
@@ -1181,9 +1181,9 @@ builtins.input = __pyodide_browser_input
         document.getElementById('output-area').textContent = "⏳ 執行中...\n";
         try {
             let pyodide = await initPyodide();
-            document.getElementById('output-area').textContent = ""; 
+            document.getElementById('output-area').textContent = "";
             if (codeUsesInput(code)) setStatus(t.msgInputPopup, 'info');
-            
+
             await pyodide.runPythonAsync(code);
             setStatus("✅ 執行完畢！", 'success');
         } catch (err) {
@@ -1191,16 +1191,17 @@ builtins.input = __pyodide_browser_input
             setStatus("❌ 執行錯誤", 'error');
         }
     }
-    
+
     changeLang();
 </script>
 
+<section id="python-topic-labs" class="ta-tool-explanations"><h2>對照流程路徑與變數狀態</h2><p>轉換器保留完整編輯、語法檢查、轉換及 Pyodide 執行功能。轉換規則只涵蓋常見順序、選擇及迭代；請檢查生成結果，語法正確亦不保證邏輯正確。</p><div id="python-decision-guide"><h3>讀圖：只有一條判斷分支會執行</h3><p>在編輯器畫好 yes／no 出口後，先預測某個輸入會沿哪一條路；以下可修改合格線驗證分界。</p></div><div id="python-trace-guide"><h3>讀碼：追蹤每次賦值如何寫回記憶體</h3><p>流程圖給出路徑；追蹤變數可確認走過該路徑時實際算出甚麼。先預測 total，再執行對照。</p></div></section>
     <script src="course_data.js?v=8"></script><script src="assets/js/progress_store.js?v=3"></script>
-    <script src="assets/js/site_navigation.js?v=8&animations=1"></script>
+    <script src="assets/js/site_navigation.js?v=8&review=20261016"></script>
     <script src="learning_data.js?v=14"></script>
-    <script src="assets/js/lesson_companion.js?v=8"></script>
-<section id="python-topic-labs" style="max-width:1100px;margin:2rem auto"><p>轉換器以文字規則處理常見順序、選擇及迭代範例，並非完整 Python 編譯器。請檢查轉換結果；語法正確也不代表邏輯正確。</p></section>
-<script src="animations/assets/new-lessons.js"></script><script src="animations/assets/programming-lessons.js"></script><script src="animations/assets/programming-supplements.js"></script><script src="animations/assets/core-a-labs.js"></script><script src="animations/assets/network-labs.js"></script><script src="assets/js/animation-bridge.js?v=20261016"></script><script src="animations/assets/learning-lab.js?v=20261016"></script><script src="animations/assets/interactive-models.js?v=20261016"></script>
-<script src="assets/js/topic-data.js?v=20261016"></script><script src="assets/js/topic-network.js?v=20261016"></script><script src="assets/js/topic-algorithms.js?v=20261016"></script><script src="assets/js/topic-context.js?v=20261016"></script><script src="assets/js/topic-runtime.js?v=20261016"></script>
+    <script src="assets/js/lesson_companion.js?v=8&review=20261016"></script>
+
+<script src="animations/assets/new-lessons.js"></script><script src="animations/assets/programming-lessons.js"></script><script src="animations/assets/programming-supplements.js"></script><script src="animations/assets/core-a-labs.js"></script><script src="animations/assets/network-labs.js"></script><script src="assets/js/animation-bridge.js?v=20261016-review2"></script><script src="animations/assets/learning-lab.js?v=20261016-review2"></script><script src="animations/assets/interactive-models.js?v=20261016-review2"></script>
+<script src="assets/js/topic-data.js?v=20261016-review2"></script><script src="assets/js/topic-network.js?v=20261016-review2"></script><script src="assets/js/topic-algorithms.js?v=20261016-review2"></script><script src="assets/js/topic-context.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-data.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-network.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-algorithms.js?v=20261016-review2"></script><script src="assets/js/lesson-plan-context.js?v=20261016-review2"></script><script src="assets/js/topic-runtime.js?v=20261016-review2"></script>
 </body>
 </html>

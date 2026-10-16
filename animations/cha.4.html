@@ -57,7 +57,7 @@
     </style>
     <link rel="stylesheet" href="assets/learning-lab.css">
     <link rel="stylesheet" href="assets/core-a-labs.css">
-<link rel="stylesheet" href="../assets/css/topic-runtime.css?v=20261016"><link rel="stylesheet" href="../assets/css/topic-data.css?v=20261016"><link rel="stylesheet" href="../assets/css/topic-network.css?v=20261016"><link rel="stylesheet" href="../assets/css/topic-algorithms.css?v=20261016"><link rel="stylesheet" href="../assets/css/topic-context.css?v=20261016">
+<link rel="stylesheet" href="../assets/css/topic-runtime.css?v=20261016-review2"><link rel="stylesheet" href="../assets/css/topic-data.css?v=20261016-review2"><link rel="stylesheet" href="../assets/css/topic-network.css?v=20261016-review2"><link rel="stylesheet" href="../assets/css/topic-algorithms.css?v=20261016-review2"><link rel="stylesheet" href="../assets/css/topic-context.css?v=20261016-review2">
 </head>
 <body class="text-slate-700 flex flex-col min-h-screen">
 
@@ -164,7 +164,7 @@
                 <div class="space-y-4">
                     <div class="bg-white p-4 rounded-xl border border-gray-200 hover-card">
                         <h4 class="font-bold text-orange-600 flex items-center gap-2"><i data-lucide="type" class="w-5 h-5"></i> 文字 (Label)</h4>
-                        <p class="text-xs text-slate-600">非數值數據，預設<span class="font-bold">靠左對齊</span>。無法進行數學運算。</p>
+                        <p class="text-xs text-slate-600">非數值資料通常預設靠左；若要運算須先確定資料可轉成數值。對齊及顯示格式本身不決定儲存類型。</p>
                     </div>
                     <div class="bg-white p-4 rounded-xl border border-gray-200 hover-card">
                         <h4 class="font-bold text-emerald-600 flex items-center gap-2"><i data-lucide="hash" class="w-5 h-5"></i> 數值 (Value)</h4>
@@ -291,9 +291,9 @@
                 </div>
             </div>
 
-            <!-- 函數實驗室 (Updated with Worksheet View) -->
+            <!-- 在工作表追蹤函數 (Updated with Worksheet View) -->
             <div class="bg-slate-800 rounded-2xl p-6 text-white shadow-xl">
-                <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i data-lucide="flask-conical" class="w-5 h-5 text-yellow-400"></i> 函數實驗室</h3>
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2"><i data-lucide="flask-conical" class="w-5 h-5 text-yellow-400"></i> 在工作表追蹤函數</h3>
 
                 <div class="grid lg:grid-cols-2 gap-8">
                     <!-- 左側：模擬工作表數據 -->
@@ -352,35 +352,7 @@
                 <h2 class="text-3xl font-bold text-slate-800">儲存格參照 (Cell Referencing)</h2>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-8">
-                <!-- 相對參照 -->
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm group">
-                    <h3 class="text-xl font-bold text-blue-700 mb-2">相對參照 (Relative)</h3>
-                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-mono mb-4 inline-block">A1</span>
-                    <p class="text-sm text-slate-600 mb-4">當複製公式時，參照地址會隨位置改變。</p>
-                    <div class="bg-slate-100 p-4 rounded h-32 relative flex justify-center border overflow-hidden">
-                        <div class="absolute top-4 w-32 bg-white border border-blue-300 text-blue-600 p-2 rounded text-center z-10">=A1+B1</div>
-                        <div class="absolute top-4 w-32 bg-blue-600/10 border border-blue-300 text-blue-600 p-2 rounded text-center ref-anim-box group-hover:translate-y-16">
-                            <span class="hidden group-hover:inline font-bold">=A2+B2</span>
-                        </div>
-                        <div class="absolute bottom-2 text-[10px] text-slate-400">Hover 查看變化</div>
-                    </div>
-                </div>
-
-                <!-- 絕對參照 -->
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm group">
-                    <h3 class="text-xl font-bold text-rose-700 mb-2">絕對參照 (Absolute)</h3>
-                    <span class="bg-rose-100 text-rose-800 text-xs px-2 py-1 rounded font-mono mb-4 inline-block">$A$1</span>
-                    <p class="text-sm text-slate-600 mb-4">使用 <code>$</code> 鎖定欄及列。<code>$A$1</code> 複製時保持不變；混合參照 <code>$A1</code> 只鎖欄，<code>A$1</code> 只鎖列。</p>
-                    <div class="bg-slate-100 p-4 rounded h-32 relative flex justify-center border overflow-hidden">
-                        <div class="absolute top-4 w-32 bg-white border border-rose-300 text-rose-600 p-2 rounded text-center z-10">=$A$1*B1</div>
-                        <div class="absolute top-4 w-32 bg-rose-600/10 border border-rose-300 text-rose-600 p-2 rounded text-center ref-anim-box group-hover:translate-y-16">
-                            <span class="hidden group-hover:inline font-bold">=$A$1*B2</span>
-                        </div>
-                        <div class="absolute bottom-2 text-[10px] text-slate-400">$A$1 鎖定了</div>
-                    </div>
-                </div>
-            </div>
+<p>複製公式時，相對參照 <code>A1</code> 隨位置改變；<code>$A$1</code> 鎖住欄列。混合參照 <code>$A1</code> 只鎖欄，<code>A$1</code> 只鎖列。以下直接追蹤來源與目的儲存格，並修改依賴數值觀察重新計算。</p>
         </section>
 
         <!-- 4.6 數據操縱和演示 Data Manipulation & Presentation -->
@@ -623,7 +595,7 @@
             }
         }
 
-        // 4.4 進階函數實驗室
+        // 4.4 進階在工作表追蹤函數
         function runSheetFunc(funcType) {
             const resultBox = document.getElementById('sheetFuncResult');
             const descBox = document.getElementById('sheetFuncDesc');
@@ -768,8 +740,8 @@
         }
     </script>
     <script src="assets/core-a-labs.js"></script>
-    <script src="assets/learning-lab.js?v=20261016"></script>
-<script src="assets/host-navigation.js"></script>
-<script src="../assets/js/topic-data.js?v=20261016"></script><script src="../assets/js/topic-network.js?v=20261016"></script><script src="../assets/js/topic-algorithms.js?v=20261016"></script><script src="../assets/js/topic-context.js?v=20261016"></script><script src="../assets/js/topic-runtime.js?v=20261016"></script>
+    <script src="assets/learning-lab.js?v=20261016-review2"></script>
+<script src="assets/host-navigation.js?v=20261016-review2"></script>
+<script src="../assets/js/topic-data.js?v=20261016-review2"></script><script src="../assets/js/topic-network.js?v=20261016-review2"></script><script src="../assets/js/topic-algorithms.js?v=20261016-review2"></script><script src="../assets/js/topic-context.js?v=20261016-review2"></script><script src="../assets/js/lesson-plan-data.js?v=20261016-review2"></script><script src="../assets/js/lesson-plan-network.js?v=20261016-review2"></script><script src="../assets/js/lesson-plan-algorithms.js?v=20261016-review2"></script><script src="../assets/js/lesson-plan-context.js?v=20261016-review2"></script><script src="../assets/js/topic-runtime.js?v=20261016-review2"></script>
 </body>
 </html>
