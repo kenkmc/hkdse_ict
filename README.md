@@ -117,6 +117,16 @@ HTML5、JavaScript、Tailwind CSS、React、SQLite WebAssembly、Pyodide、Merma
 線上版本：https://kenkmc.github.io/hkdse_ict/
 
 
-## 逐步動畫教材
+## 課題專用動畫
 
-主站各課現已接入129組逐步講解及四個可調模型；[獨立動畫目錄](animations/index.html)按42個課題整理，並附[課程對照](animations/curriculum.html)。原有題庫、進度、登入及教師功能繼續使用原介面。整合與驗證詳見[發布說明](ANIMATION_INTEGRATION.md)。
+43個不同的互動模型按課題呈現位元、封包、資料表、程式記憶體及設備狀態，已接入30個主站頁面及42課獨立教材（另有3個工具）。例如二補碼有逐位反轉、進位與溢出；客戶端／伺服器有請求佇列、封包路徑及故障比較；SQL有逐列篩選與關聯配對；遞迴有真正增減的呼叫堆疊。原有129組逐步文字資料保留作補充說明。
+
+[課題目錄](animations/index.html) · [課程對照](animations/curriculum.html) · [設計及模型限制](TOPIC_ANIMATIONS.md) · [整合記錄](ANIMATION_INTEGRATION.md)
+
+```text
+node tests/topic-data.cjs
+node tests/topic-network.cjs
+node tests/topic-algorithms.cjs
+node tests/topic-context.cjs
+node tests/topic-coverage.cjs
+```

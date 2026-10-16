@@ -13,6 +13,7 @@
   }
   function mount(target, data) {
     if (!target || !Array.isArray(data.steps) || !data.steps.length) return;
+    if(window.ICT_USE_BESPOKE){const notes=el('details','topic-notes');notes.append(el('summary','',data.title+'：補充文字解說'));const list=el('ol');data.steps.forEach(step=>{const li=el('li');li.append(el('strong','',step.title),el('p','',step.detail));if(step.code)li.append(el('pre','',step.code));list.append(li);});notes.append(list);if(data.question){const q=data.question,fieldset=el('fieldset');fieldset.append(el('legend','','想一想：'+q.text));const answers=el('div','ict-answers'),feedback=el('p','ict-feedback');feedback.setAttribute('role','status');q.options.forEach((option,i)=>{const b=el('button','',option);b.type='button';b.addEventListener('click',()=>{feedback.textContent=(i===q.answer?'答對了。':'再想一想。')+' '+q.explanation;});answers.append(b);});fieldset.append(answers,feedback);notes.append(fieldset);}target.append(notes);return;}
     const box = el('section', 'ict-lab');
     const heading = el('h3', '', data.title || '逐步動畫講解');
     heading.id = 'ict-lab-' + (++serial);
@@ -98,7 +99,7 @@
     if(data.exercise){const wrap=el('section','ict-lesson-section');wrap.append(el('h2','','動手做與解釋'),el('p','',data.exercise));root.append(wrap);}
     const foot=el('footer');const source=el('a','','教育局《資訊及通訊科技課程及評估指引》（2021）');source.href=guide;foot.append(source,document.createTextNode('；相關印刷頁：'+(data.sourcePages||'10–41')+'。此網站為輔助教材，並非考評局官方教材。'));root.append(foot);
   }
-  function init(){renderLesson();const id=location.pathname.split('/').pop().replace(/\.html$/,'');(window.ICT_TOPIC_LABS?.[id]||[]).forEach(data=>{let target;try{target=document.querySelector(data.target||'main')||document.body;}catch(_){target=document.body;}mount(target,data);});
+  function init(){renderLesson();if(window.ICT_USE_BESPOKE)return;const id=location.pathname.split('/').pop().replace(/\.html$/,'');(window.ICT_TOPIC_LABS?.[id]||[]).forEach(data=>{let target;try{target=document.querySelector(data.target||'main')||document.body;}catch(_){target=document.body;}mount(target,data);});
     if(window.ICT_TOPIC_LABS?.[id]){const note=el('aside','ict-lab');note.append(el('strong','','課程依據與閱讀提示'),el('p','','本課已按教育局2021年課程指引檢視並補充逐步講解。動畫為簡化模型；請配合實作、文字解釋及課程對照使用。'));const link=el('a','','課程對照、逐課檢視及範圍說明 →');link.href=curriculumLink;link.style.textDecoration='underline';note.append(link);const parent=document.querySelector('main')||document.body;parent.append(note);}
   }
   document.addEventListener('visibilitychange',()=>{if(document.hidden)players.forEach(p=>p.stop());});

@@ -5,7 +5,17 @@ function harness(name) {
  class Elem {constructor(id){this.id=id;this.style={};this.dataset={};this.textContent='';this.innerText='';this.innerHTML='';this.value='www.example.com';this.children=[];this.disabled=false;const set=new Set();this.classList={add:(...x)=>x.forEach(s=>set.add(s)),remove:(...x)=>x.forEach(s=>set.delete(s)),contains:x=>set.has(x)};}appendChild(e){this.children.push(e)}addEventListener(){}setAttribute(){} }
  const doc={getElementById(id){if(!elements.has(id))elements.set(id,new Elem(id));return elements.get(id);},querySelectorAll(){return []},createElement(tag){return new Elem(tag)}};
  const c=vm.createContext({document:doc,lucide:{createIcons(){}},performance:{now:()=>now},setTimeout:(fn,ms)=>{const id=++nextId;timers.set(id,{fn,due:now+ms});return id},clearTimeout:id=>timers.delete(id),console,Math});
- const html=fs.readFileSync(path.join(root,name+'.html'),'utf8'); const s=[...html.matchAll(/<script(?![^>]*src=)[^>]*>([\s\S]*?)<\/script>/g)][0][1]; vm.runInContext(s,c);
+ const html=fs.readFileSync(path.join(root,name+'.html'),'utf8');
+ // Select the functional lesson script by its public entry points. Page-level
+ // configuration scripts may appear before it and are not part of this harness.
+ const entryPoints={ 'chc.2':['startTransmission','simulateDNS'], pki_animation:['switchScenario','handleAction'] }[name];
+ assert(entryPoints,'No functional-script selector configured for '+name);
+ const scripts=[...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)]
+   .filter(match=>! /\bsrc\s*=/i.test(match[1]))
+   .map(match=>match[2])
+   .filter(source=>entryPoints.every(fn=>new RegExp('\\bfunction\\s+'+fn+'\\s*\\(').test(source)));
+ assert.equal(scripts.length,1,'Expected exactly one inline functional script for '+name+' containing '+entryPoints.join(', '));
+ vm.runInContext(scripts[0],c,{filename:name+'.html:lesson-script'});
  return {c,doc,timers,run:s=>vm.runInContext(s,c),advance(ms){const until=now+ms;for(let i=0;i<10000;i++){const entry=[...timers].filter(([,v])=>v.due<=until).sort((a,b)=>a[1].due-b[1].due)[0];if(!entry)break;now=entry[1].due;timers.delete(entry[0]);entry[1].fn();}now=until;}};
 }
 const tcp=harness('chc.2');tcp.run('startTransmission()');tcp.advance(5700);assert.equal(tcp.run('step'),3);tcp.run('togglePause()');const elapsed=tcp.run('elapsed');tcp.advance(5000);assert.equal(tcp.run('elapsed'),elapsed);tcp.run('togglePause()');tcp.advance(50);assert(tcp.run('elapsed')>elapsed);tcp.run('resetTransmission()');tcp.advance(10000);assert.equal(tcp.run('step'),0);assert.equal(tcp.run('packets.length'),0);assert.equal(tcp.timers.size,0);tcp.run('startTransmission()');assert.equal(tcp.run('packets.length'),3);tcp.advance(10000);assert.equal(tcp.run('step'),4);assert.match(tcp.doc.getElementById('status-text').textContent,/傳輸成功/);
