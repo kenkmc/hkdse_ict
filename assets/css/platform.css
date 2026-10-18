@@ -208,6 +208,7 @@ body.maximized > .platform-footer { display: none; }
     .platform-context { order: 3; flex-basis: 100%; text-align: left; }
     .platform-context small { display: none; }
     .platform-context strong { font-size: 12px; }
+    .platform-actions { order: 4; flex: 1 1 100%; flex-wrap: wrap; max-width: 100%; gap: 6px; }
     .platform-action { min-height: 34px; padding: 7px 10px; }
     .platform-action-random { display: none; }
 }

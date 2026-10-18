@@ -13,7 +13,8 @@
         "hkdse-ict-layered-learning-v1",
         "hkdse-ict-zero-start-v1",
         "hkdse-ict-lesson-games-v1",
-        "hkdse-ict-sba-progress-v1"
+        "hkdse-ict-sba-progress-v1",
+        "hkdse-ict-manual-v1"
     ];
 
     const isoNow = () => new Date().toISOString();
@@ -402,13 +403,23 @@
         if (!plainObject(value) || value.format !== "hkdse-ict-progress-backup" || !plainObject(value.progress)) {
             throw new Error("這不是有效的 HKDSE ICT 學習記錄備份。");
         }
-        const state = write(value.progress, false);
-        if (plainObject(value.legacy)) {
-            legacyKeys.forEach(key => {
-                if (value.legacy[key] !== undefined) {
-                    window.localStorage.setItem(key, JSON.stringify(value.legacy[key]));
-                }
-            });
+        const state = normaliseState(value.progress);
+        state.updatedAt = isoNow();
+        // Stage every value before touching storage. A quota error must not be
+        // reported as a successful, partially restored backup.
+        const replacements = new Map([[storageKey, JSON.stringify(state)]]);
+        if (plainObject(value.legacy)) legacyKeys.forEach(key => {
+            if (value.legacy[key] !== undefined) replacements.set(key, JSON.stringify(value.legacy[key]));
+        });
+        const previous = new Map([...replacements.keys()].map(key => [key, window.localStorage.getItem(key)]));
+        try {
+            replacements.forEach((_, key) => window.localStorage.removeItem(key));
+            replacements.forEach((text, key) => window.localStorage.setItem(key, text));
+        } catch (error) {
+            let restored = true;
+            replacements.forEach((_, key) => { try { window.localStorage.removeItem(key); } catch (_) { restored = false; } });
+            previous.forEach((text, key) => { if (text !== null) try { window.localStorage.setItem(key, text); } catch (_) { restored = false; } });
+            throw new Error(restored ? "未能儲存匯入資料，原有紀錄已保留。請保留備份檔並檢查瀏覽器儲存空間。" : "匯入及回復部分資料時失敗。請保留備份檔，暫勿清除瀏覽器資料。");
         }
         dispatchChange();
         return state;

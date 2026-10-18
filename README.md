@@ -2,6 +2,16 @@
 
 專為 HKDSE 資訊及通訊科技科學生及教師設計的互動學習平台。項目以課程內容、動畫、模擬器、程式碼執行及題型練習，把抽象概念轉化成可操作的學習體驗。
 
+## 課文與教學手冊
+
+[由零起步](course-manual/index.html?view=start) · [自學路徑](course-manual/index.html?view=path) · [教學規劃](course-manual/index.html?view=teacher) · [綜合應用](course-manual/index.html?view=exam)
+
+手冊涵蓋26個課程單元及SBA流程：循序課文、中英詞彙、逐步示例、每節診斷與選項專屬回饋、三級原創練習與完整範答、可重現實作，以及課前診斷、課堂活動、分層支援、離堂題和逐分準則。既有課頁及分課教材導覽連到相應課文，動畫仍在原來的內容段落。
+
+學生選兩個選修，活動紀錄分開顯示診斷、作答、自評及實作，不把閱讀或自評當成掌握率。高階任務訓練陌生情境推論、方法取捨與證據評估；網站不設5**分數門檻。工作紙不印出獨立題範答；教師列印另含教案及答案。筆記只在本機，納入「我的學習」備份；匯入失敗會回復原有資料。
+
+[內容範圍、課程對照及驗證](docs/COMPLETE_COURSE.md)。實作仍須真正執行，伺服器、實物裝置及正式SBA依各課環境與校方規定安排。
+
 ## 目前功能
 
 - 必修 A「資訊處理」：資訊處理簡介、數據組織及數據控制、數據表示、試算表和數據庫。
@@ -97,6 +107,8 @@
 
 ```text
 node scripts/validate_catalog.js
+node scripts/validate_manual.js
+node tests/manual-backup.cjs
 node scripts/validate_questions.js
 node scripts/validate_mock_exam.js
 node scripts/validate_study_records.js
@@ -125,7 +137,7 @@ HTML5、JavaScript、Tailwind CSS、React、SQLite WebAssembly、Pyodide、Merma
 
 例如二補碼逐位反轉並分開呈現進位與有號溢出；客戶端／伺服器沿實際線路移動請求及回應；DNS 可重查快取並令 TTL 到期；CSS 使用原生選擇器改變同一元素；遞迴逐一建立及移除呼叫框架。精確圖解使用 HTML／SVG；硬件外形圖與已授權照片輔助辨認。
 
-[85 頁逐頁檢視及最新驗證](docs/PAGE_REVIEW.md) · [課題目錄](animations/index.html) · [課程對照](animations/curriculum.html) · [元件設計與模型界線](TOPIC_ANIMATIONS.md) · [整合歷史](ANIMATION_INTEGRATION.md) · [更新紀錄](updates/index.html)
+[2026-10-17 的85頁檢視記錄](docs/PAGE_REVIEW.md) · [課題目錄](animations/index.html) · [課程對照](animations/curriculum.html) · [元件設計與模型界線](TOPIC_ANIMATIONS.md) · [整合歷史](ANIMATION_INTEGRATION.md) · [更新紀錄](updates/index.html)
 
 `docs/PAGE_REVIEW.md` 分開記錄原始碼檢視、75 頁段落掛載測試、瀏覽器載入／版面與代表性實際操作的範圍。早期 43 個模型、129 組逐步講解及 4 個可調模型的數字只適用於相應歷史版本。
 

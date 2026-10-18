@@ -1,0 +1,244 @@
+{
+  "date": "2026-10-19",
+  "units": 27,
+  "courseUnits": 26,
+  "sbaGuides": 1,
+  "sections": 192,
+  "unitPractice": 180,
+  "integratedCases": 5,
+  "integratedTasks": 15,
+  "teacherPeriods": 89,
+  "vocabularyTerms": 233,
+  "domViews": 112,
+  "passedTestScripts": 28,
+  "unitInventory": [
+    {
+      "id": "cha-1",
+      "title": "資訊處理簡介：由原始事實到可解釋的決策",
+      "syllabusRef": "必修 A(a)；教育局2021課程印刷頁12",
+      "sections": 4,
+      "practice": 6,
+      "periods": 2
+    },
+    {
+      "id": "cha-2",
+      "title": "數據組織與控制：從記錄結構到錯誤偵測",
+      "syllabusRef": "必修 A(b)；教育局2021課程印刷頁13",
+      "sections": 5,
+      "practice": 6,
+      "periods": 3
+    },
+    {
+      "id": "cha-3",
+      "title": "數據表示：位元、二補碼與多媒體的可驗證計算",
+      "syllabusRef": "必修 A(c)；教育局2021課程印刷頁13–14；整數範圍及運算練習涵蓋最多2 bytes",
+      "sections": 10,
+      "practice": 8,
+      "periods": 4
+    },
+    {
+      "id": "cha-4",
+      "title": "試算表：建立可靠公式、分析模型與可重現報告",
+      "syllabusRef": "必修 A(d)試算表部分；教育局2021課程印刷頁14–15",
+      "sections": 10,
+      "practice": 8,
+      "periods": 4
+    },
+    {
+      "id": "cha-5",
+      "title": "數據庫基礎：表、表單、查詢與受眾報告",
+      "syllabusRef": "必修 A(d)數據庫；教育局2021課程印刷頁15；較完整SQL編寫及跨表工作另見選修A",
+      "sections": 5,
+      "practice": 6,
+      "periods": 3
+    },
+    {
+      "id": "chb-1",
+      "title": "基本機器組織：資料如何穿過處理器、記憶體與裝置",
+      "syllabusRef": "必修 B(a)；教育局2021課程印刷頁18–19",
+      "sections": 7,
+      "practice": 6,
+      "periods": 3
+    },
+    {
+      "id": "chb-2",
+      "title": "系統軟件與運作模式：管理資源、控制設備與滿足時限",
+      "syllabusRef": "必修 B(b)；教育局2021課程印刷頁19–20",
+      "sections": 5,
+      "practice": 6,
+      "periods": 2
+    },
+    {
+      "id": "chc-1",
+      "title": "建網及互聯網基本知識：由連線需要到可解釋的設計",
+      "syllabusRef": "2021 教育局課程必修 C(a)，印刷頁22–23：建網、硬件、鏈路及互聯網接入；協定另見 chc-2。",
+      "sections": 7,
+      "practice": 6,
+      "periods": 4
+    },
+    {
+      "id": "chc-2",
+      "title": "互聯網協定：一次開啟網頁背後的分工",
+      "syllabusRef": "2021 教育局必修 C(a)，印刷頁22–23；TCP/IP、IPv4/IPv6、DNS、URL、HTTP與HTTPS。",
+      "sections": 8,
+      "practice": 6,
+      "periods": 3
+    },
+    {
+      "id": "chc-3",
+      "title": "互聯網服務及應用：找得到、判得準、用得合適",
+      "syllabusRef": "2021 教育局必修 C(b)，印刷頁23–24：搜尋、來源評估、網上服務、多媒體、串流與社會應用。",
+      "sections": 6,
+      "practice": 6,
+      "periods": 3
+    },
+    {
+      "id": "chc-4",
+      "title": "基礎網頁編寫：讓指定讀者找得到並用得順",
+      "syllabusRef": "2021 教育局必修 C(c)，印刷頁24：HTML基本結構、跨平台、資訊組織、受眾設計及網上發布；不要求死記HTML代碼。",
+      "sections": 6,
+      "practice": 6,
+      "periods": 3
+    },
+    {
+      "id": "chc-5",
+      "title": "網上威脅與保安：由攻擊路徑選擇有效控制",
+      "syllabusRef": "2021 教育局必修 C(d)，印刷頁24–26：威脅、私隱、防護、加密、認證、授權、數碼證書與電子交易。",
+      "sections": 9,
+      "practice": 8,
+      "periods": 5
+    },
+    {
+      "id": "chd-1",
+      "title": "問題建構與分析：把需要寫成可驗證規格",
+      "syllabusRef": "必修 D(a)；教育局2021課程指引印刷頁28",
+      "sections": 6,
+      "practice": 6,
+      "periods": 3
+    },
+    {
+      "id": "chd-2",
+      "title": "算法設計：由表示法到可追蹤的狀態",
+      "syllabusRef": "必修 D(b)；教育局2021課程指引印刷頁29–30",
+      "sections": 7,
+      "practice": 6,
+      "periods": 3
+    },
+    {
+      "id": "chd-3",
+      "title": "程式開發：從數據到可驗證的列表與字串程式",
+      "syllabusRef": "必修 D(c)；教育局2021課程指引印刷頁30–31",
+      "sections": 9,
+      "practice": 6,
+      "periods": 4
+    },
+    {
+      "id": "chd-4",
+      "title": "測試及除錯：用證據找出原因",
+      "syllabusRef": "必修 D(d)；教育局2021課程指引印刷頁32",
+      "sections": 5,
+      "practice": 6,
+      "periods": 3
+    },
+    {
+      "id": "che-1",
+      "title": "科技創新：由資料到可評估的應用",
+      "syllabusRef": "E(a)",
+      "sections": 5,
+      "practice": 6,
+      "periods": 2
+    },
+    {
+      "id": "che-2",
+      "title": "健康、可及性與數碼道德",
+      "syllabusRef": "E(b)",
+      "sections": 6,
+      "practice": 7,
+      "periods": 2
+    },
+    {
+      "id": "che-3",
+      "title": "知識產權、授權與數碼保護",
+      "syllabusRef": "E(c)",
+      "sections": 5,
+      "practice": 7,
+      "periods": 2
+    },
+    {
+      "id": "ea-1",
+      "title": "關聯式數據庫：鍵、完整性、索引與交易",
+      "syllabusRef": "選修 A(a)；教育局2021課程印刷頁38",
+      "sections": 5,
+      "practice": 6,
+      "periods": 2
+    },
+    {
+      "id": "ea-2",
+      "title": "SQL：由問題寫出可驗證的查詢與維護操作",
+      "syllabusRef": "教育局《資訊及通訊科技課程及評估指引》2021，選修 A(b) 關聯式數據庫：資料定義與操縱、視圖、函數、最多三表連接及一層子查詢。",
+      "sections": 12,
+      "practice": 9,
+      "periods": 3
+    },
+    {
+      "id": "ea-3",
+      "title": "數據庫設計：由需求、ER 圖到可靠的關聯綱要",
+      "syllabusRef": "教育局《資訊及通訊科技課程及評估指引》2021，選修 A(c) 數據庫設計：二元關係與參與、ER 模型、正規化至3NF、反正規化、存取權及私隱。",
+      "sections": 10,
+      "practice": 8,
+      "periods": 3
+    },
+    {
+      "id": "eb-1",
+      "title": "網絡服務與實施：由請求、設定到權限測試",
+      "syllabusRef": "2021 教育局選修 B(a)，印刷頁44：client/server、TCP埠、GET/POST、常見伺服器、Ethernet／無線裝設、共享權限及簡單服務。",
+      "sections": 6,
+      "practice": 7,
+      "periods": 4
+    },
+    {
+      "id": "eb-2",
+      "title": "互聯網應用開發：把介面、可信伺服器與資料連成可測試系統",
+      "syllabusRef": "選修 B(b)：互聯網應用開發；B(a) 客戶／伺服器通訊的應用",
+      "sections": 9,
+      "practice": 8,
+      "periods": 6
+    },
+    {
+      "id": "ec-1",
+      "title": "選修程式編寫：算法、資料結構與可維護實作",
+      "syllabusRef": "選修 C(a)；教育局2021課程指引印刷頁48–50",
+      "sections": 13,
+      "practice": 8,
+      "periods": 7
+    },
+    {
+      "id": "ec-2",
+      "title": "實際應用：感測、事件、控制與實物驗證",
+      "syllabusRef": "選修 C(b)；教育局2021課程指引印刷頁50–51",
+      "sections": 7,
+      "practice": 6,
+      "periods": 4
+    },
+    {
+      "id": "tool-sba-prep",
+      "title": "SBA：從真實需要到有證據的評估",
+      "syllabusRef": "SBA",
+      "sections": 5,
+      "practice": 6,
+      "periods": 2
+    }
+  ],
+  "validated": [
+    "all 13 scripts/validate_*.js",
+    "all 5 tests/topic-*.cjs",
+    "all 4 animations/tests/*.cjs",
+    "tests/manual-backup.cjs",
+    "tests/manual-data.py (7917 assertions; SQLite 3.45.1)",
+    "tests/manual-programming.py (19 Python examples, expected outputs and boundary cases)",
+    "tests/manual-network.py (3 tests: Python compilation, HTTP handlers, authentication, validation, sessions and SQLite persistence)",
+    "tests/manual-network.cjs (7 units, 35 materials, 12 mappings and front-end fixtures)",
+    "tests/manual-ui.cjs (112 pure DOM views plus interaction and backup-import regressions)"
+  ],
+  "realBrowserStatus": "unavailable: CUA kernel assets missing; retried 2026-10-19, not a browser visual or geometry audit"
+}
