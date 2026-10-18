@@ -39,6 +39,11 @@
     const practiceAction = currentItem?.id === "tool-dse-practice"
         ? ""
         : '<a class="platform-action platform-action-primary" href="practice.html">DSE 練習</a>';
+    const manualId = currentItem?.type === "lesson" ? currentItem.id : ({
+        "tool-sba-prep":"tool-sba-prep", "tool-sql-simulator":"ea-2",
+        "tool-python-converter":"chd-3", "tool-pki-lab":"chc-5"
+    })[currentItem?.id];
+    const manualAction = `<a class="platform-action" href="course-manual/index.html${manualId ? '?unit=' + manualId : ''}">${manualId ? '本課課文與教學' : '課文與教學'}</a>`;
 
     nav.innerHTML = `
         <a class="platform-brand" href="index.html" aria-label="返回 ICT 學習資源網首頁">
@@ -55,6 +60,7 @@
         <div class="platform-actions">
             ${currentItem?.id === "tool-my-learning" ? "" : '<a class="platform-action" href="progress.html">我的學習</a>'}
             ${practiceAction}
+            ${manualAction}
             <a class="platform-action" href="animations/index.html">分課目錄</a>
             <button class="platform-action platform-action-random" type="button" data-platform-random>隨機學習</button>
             <a class="platform-action" href="index.html">課程目錄</a>

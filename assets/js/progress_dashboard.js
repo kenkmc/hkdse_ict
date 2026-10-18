@@ -93,8 +93,13 @@
         output.textContent = message;
         output.style.color = isError ? "#be123c" : "#047857";
     };
+    const backupFileLimit = 32 * 1024 * 1024;
     byId("progress-export").addEventListener("click", () => {
         const blob = new Blob([JSON.stringify(progress.exportData(), null, 2)], { type: "application/json" });
+        if (blob.size > backupFileLimit) {
+            status("備份超過 32 MiB 上限，尚未匯出。請保留本機資料並先另存較長筆記。", true);
+            return;
+        }
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
@@ -106,17 +111,18 @@
         status("備份已下載。請把檔案存放在安全位置。");
     });
     byId("progress-import").addEventListener("change", async event => {
-        const file = event.currentTarget.files?.[0];
+        const input = event.currentTarget;
+        const file = input.files?.[0];
         if (!file) return;
         try {
-            if (file.size > 5 * 1024 * 1024) throw new Error("備份檔案過大。");
+            if (file.size > backupFileLimit) throw new Error("備份超過 32 MiB 上限，未有匯入。");
             progress.importData(JSON.parse(await file.text()));
             status("備份已匯入，頁面統計已更新。");
             renderSummary();
         } catch (error) {
             status(error.message || "未能匯入備份。", true);
         } finally {
-            event.currentTarget.value = "";
+            input.value = "";
         }
     });
     byId("progress-clear").addEventListener("click", () => {
